@@ -10,9 +10,9 @@ import java.util.List;
  * channels. A channel is a virtual instrument number. Tracks that are mapped
  * to the same channel will use the same instrument for playback.
  * 
- * @author Thomas Schürger
- *
  * @see Track
+ *
+ * @author Thomas Schürger (thomas@schuerger.com)
  */
 
 public class Arrangement {

@@ -16,6 +16,8 @@ import com.soundhelix.harmonyengine.HarmonyEngine;
  * Each point in time within the song is addressed by its tick number (counted from 0). Beats, bars,
  * ticks within a beat and beats within a bar can be derived by using the ticks per beat and
  * the beats per bar.
+ * 
+ * @author Thomas Schürger (thomas@schuerger.com)
  */
 
 public class Structure {

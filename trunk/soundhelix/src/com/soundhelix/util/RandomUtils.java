@@ -12,6 +12,8 @@ import java.util.Random;
 public class RandomUtils {
 	private static final Random random = new Random();
 
+	private RandomUtils() {}
+	
 	/**
 	 * Returns a random integer uniformly distributed within min
 	 * and max (both inclusive), using a quantization of step.

@@ -16,6 +16,8 @@ public class NoteUtils {
 		}
 	}
 	
+	private NoteUtils() {}
+
 	public static String getNoteName(int pitch) {
 		int offset = (pitch >= 0 ? pitch%12 : ((pitch%12)+12)%12);
 		return noteNames[offset];

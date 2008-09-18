@@ -158,14 +158,13 @@ public class ActivityVector {
     }
     
 	/**
-	 * Modifies the given ActivityVector so that all interval changes
+	 * Modifies the ActivityVector so that all interval changes
 	 * from inactive to active are preponed by preStartTicks and all
 	 * changes from active to inactive preponed by preStopTicks.
 	 * preStartTicks and preStopTicks may also be negative to postpone
 	 * instead of prepone. The first interval (starting at tick 0) is
 	 * never modified.
 	 * 
-	 * @param activityVector the ActivityVector to modify
 	 * @param preStartTicks the number of ticks to prepone before or postpone after starting
 	 * @param preStopTicks the number of ticks to prepone before or postpone after stopping
 	 */

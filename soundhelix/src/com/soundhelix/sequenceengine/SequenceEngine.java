@@ -48,7 +48,7 @@ public abstract class SequenceEngine implements XMLConfigurable {
       * sequences, more than 1 might be required. Subclasses should override
       * this.
       * 
-      * @return
+      * @return the number of ActivityVectors
       */
      
      public int getActivityVectorCount() {

@@ -13,7 +13,7 @@ import com.soundhelix.util.NoteUtils;
  * octave, it is up to the caller to make use of or ignore the pitch's
  * octave.
  * 
- * @author Thomas Schürger
+ * @author Thomas Schürger (thomas@schuerger.com)
  *
  */
 

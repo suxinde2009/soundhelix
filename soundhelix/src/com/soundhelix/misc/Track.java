@@ -16,7 +16,7 @@ import java.util.List;
  * same channel for playback. If different channels are needed, the sequences must each
  * be put into a track individually.
  *
- * @author Thomas Schürger
+ * @author Thomas Schürger (thomas@schuerger.com)
  */
 
 public class Track {

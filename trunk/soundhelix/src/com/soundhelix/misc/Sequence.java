@@ -87,11 +87,11 @@ public class Sequence {
 	}
 
 	/**
-	 * Returns the total number of ticks this sequence spans.#
+	 * Returns the total number of ticks this sequence spans.
 	 * 
+	 * @see #size()
+     *
 	 * @return the number of ticks
-	 * 
-	 * @see size
 	 */
 
 	public int getTicks() {
@@ -116,7 +116,7 @@ public class Sequence {
 	 * 
 	 * @return the size of the sequence
 	 * 
-	 * @see getTicks
+	 * @see #getTicks()
 	 */
 
 	public int size() {

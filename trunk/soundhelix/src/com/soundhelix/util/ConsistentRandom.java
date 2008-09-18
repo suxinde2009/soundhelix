@@ -32,7 +32,7 @@ public class ConsistentRandom {
      * @param max the maximum value (inclusive)
      * @param seed the seed to use
      *
-     * @return
+     * @return a random integer
      */
     
     public int getInteger(int min,int max,long seed) {

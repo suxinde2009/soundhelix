@@ -9,7 +9,7 @@
     </target>
 
     <target name="compile" depends="init" description="compile the source" >
-        <javac srcdir="${src}" destdir="${build}"/>
+        <javac classpath="${classpath}" srcdir="${src}" destdir="${build}"/>
     </target>
 
     <target name="jar" depends="compile" description="generate the JAR">

@@ -29,18 +29,17 @@ public abstract class SequenceEngine implements XMLConfigurable {
     }
     
 	/**
-	 * Renders one or more sequences (i.e., voices) for the given song. The
-	 * method should check the given ActivityVector to decide when to insert
+	 * Renders one or more sequences (i.e., voices). The
+	 * method should check the given ActivityVectors to decide when to insert
 	 * notes and when to insert pauses. The method should also take care that
 	 * played notes are not sustained beyond inactive intervals of the
 	 * ActivityVector (however, it is not strictly forbidden to do so). The
 	 * returned list must contain at least one sequence. The length of each
 	 * sequence must match the length of the song. The method must take the
-	 * song's HarmonyEngine into consideration but must not use the song's
-	 * transposition.
+	 * song's HarmonyEngine into consideration.
 	 */
 
-     public abstract Track render(ActivityVector... activityVectors);
+     public abstract Track render(ActivityVector[] activityVectors);
 
      /**
       * Returns the required number of ActivityVectors. For most implementations,

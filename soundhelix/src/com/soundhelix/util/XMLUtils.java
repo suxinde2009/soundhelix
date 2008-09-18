@@ -92,26 +92,34 @@ public class XMLUtils {
 	
 		if(n.getNodeName().equals("random")) {
 			try {
-				int min = Integer.parseInt((String)xpath.evaluate("attribute::min",n,XPathConstants.STRING));
-				int max = Integer.parseInt((String)xpath.evaluate("attribute::max",n,XPathConstants.STRING));
+				String s = (String)xpath.evaluate("attribute::list",n,XPathConstants.STRING);
 
-				String type = (String)xpath.evaluate("attribute::type",n,XPathConstants.STRING);
-				
-				if(type == null || type.equals("") || type.equals("uniform")) {
-					int step = 1;
-					
-					try {
-						step = Integer.parseInt((String)xpath.evaluate("attribute::step",n,XPathConstants.STRING));						
-					} catch(Exception e) {}
-					
-					return RandomUtils.getUniformInteger(min,max,step);
-				} else if(type.equals("normal")) {
-					double mean = Double.parseDouble((String)xpath.evaluate("attribute::mean",n,XPathConstants.STRING));
-					double variance = Double.parseDouble((String)xpath.evaluate("attribute::variance",n,XPathConstants.STRING));
-	
-					return RandomUtils.getNormalInteger(min,max,mean,variance);
+				if(s != null && !s.equals("")) {
+					String[] str = s.split("\\|");
+
+					return Integer.parseInt(str[random.nextInt(str.length)]);
 				} else {
-					throw(new RuntimeException("Unknown random distribution \""+type+"\""));
+					int min = Integer.parseInt((String)xpath.evaluate("attribute::min",n,XPathConstants.STRING));
+					int max = Integer.parseInt((String)xpath.evaluate("attribute::max",n,XPathConstants.STRING));
+
+					String type = (String)xpath.evaluate("attribute::type",n,XPathConstants.STRING);
+
+					if(type == null || type.equals("") || type.equals("uniform")) {
+						int step = 1;
+
+						try {
+							step = Integer.parseInt((String)xpath.evaluate("attribute::step",n,XPathConstants.STRING));						
+						} catch(Exception e) {}
+
+						return RandomUtils.getUniformInteger(min,max,step);
+					} else if(type.equals("normal")) {
+						double mean = Double.parseDouble((String)xpath.evaluate("attribute::mean",n,XPathConstants.STRING));
+						double variance = Double.parseDouble((String)xpath.evaluate("attribute::variance",n,XPathConstants.STRING));
+
+						return RandomUtils.getNormalInteger(min,max,mean,variance);
+					} else {
+						throw(new RuntimeException("Unknown random distribution \""+type+"\""));
+					}
 				}
 			} catch(Exception e) {throw(new RuntimeException("Error parsing random attributes",e));}
 		}

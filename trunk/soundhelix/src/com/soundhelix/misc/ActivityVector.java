@@ -98,7 +98,7 @@ public class ActivityVector {
      * @return the total number of ticks
      */
     
-    public int getTotalTicks() {
+    public int getTicks() {
         return totalTicks;
     }
 
@@ -113,7 +113,7 @@ public class ActivityVector {
     }
     
     /**
-     * Returns the tick where the ActivityVector becomes active the
+     * Returns the tick where the ActivityVector becomes active for the
      * first time. If the ActvityVector never becomes active, -1 is
      * returned.
      * 
@@ -144,7 +144,8 @@ public class ActivityVector {
     
     /**
      * Modifies the ActivityVector so that it has the given state in
-     * the interval from from (inclusive) to till (exclusive).
+     * the interval from from (inclusive) to till (exclusive). The
+     * vector will be extended, if necessary.
      * 
      * @param from the starting tick (inclusive)
      * @param till the ending tick (exclusive)

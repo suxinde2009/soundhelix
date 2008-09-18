@@ -20,7 +20,7 @@ import com.soundhelix.util.XMLUtils;
 
 /**
  * Implements a sequence engine that repeats user-specified patterns in a single
- * voice. A pattern is a string containing comma-separated integers, minus and
+ * voice. A pattern is a string containing any number of comma-separated integers, minus and
  * plus signs. Integers play the corresponding note of the chord (0 is the base
  * note, 1 the middle note and so on; the numbers may also be negative). A minus
  * sign is a pause. A plus sign plays a transition note between the current
@@ -106,6 +106,9 @@ public class PatternSequenceEngine extends SequenceEngine {
         				if(t < ticks && activityVector.isActive(t)) {
         					nextChord = ce.getChord(t);
         				} else {
+        					// the next chord would either fall into
+        					// an inactivity interval or be at the end
+        					// of the song
         					nextChord = null;
         				}
 
@@ -128,7 +131,7 @@ public class PatternSequenceEngine extends SequenceEngine {
         			// negative values
         			
         			int octave = (value >= 0 ? value/3 : (value-2)/3);
-        			int offset = (value >= 0 ? value%3 : ((value%3)+3)%3);
+        			int offset = ((value%3)+3)%3;
         			
         	 	    if(chord.isMajor()) {
         			    seq.addNote(octave*12+majorTable[offset]+chord.getPitch(),1,vel);
@@ -148,6 +151,14 @@ public class PatternSequenceEngine extends SequenceEngine {
         track.add(seq);
         return track;
 	}
+	
+	/**
+	 * Parses the given pattern and creates pitch and velocity arrays.
+	 * 
+	 * @param s the pattern string
+	 * 
+	 * @return an array containing the pitch and the velocity array (in that order)
+	 */
 	
 	private static Object[] parsePatternString(String s) {
 		String[] p = s.split(",");
@@ -190,7 +201,6 @@ public class PatternSequenceEngine extends SequenceEngine {
 	 * @return a transition pitch
 	 */
 	
-	
     private static int getTransitionPitch(Chord chord,Chord nextChord) {
     	if(nextChord == null) {
     		// next chord is undefined, just return the current pitch
@@ -215,12 +225,14 @@ public class PatternSequenceEngine extends SequenceEngine {
     		// use the current pitch
     		return(pitch1);
     	} else if(diff > 0) {
+    		// we have a pitch difference of at least 3 halftones up
     		pitch1 += Math.min(0,absdiff/2-1);
     		do {
     			pitch1++;
     		} while(!isOnScale(pitch1));
     	   	return pitch1;
     	} else {
+    		// we have a pitch difference of at least 3 halftones down
     		pitch1 -= Math.min(0,absdiff/2-1);
     		do {
     			pitch1--;
@@ -229,7 +241,14 @@ public class PatternSequenceEngine extends SequenceEngine {
     	}
     }
     
-    // checks if the given pitch is on the C/Am scale
+    /**
+     * Returns true iff the given pitch is on the C/Am scale
+     * (i.e., a "white key" on the piano keyboard).
+     * 
+     * @param pitch the pitch to check
+     * 
+     * @return true or false
+     */
     
     private static boolean isOnScale(int pitch) {
     	pitch = ((pitch%12)+12)%12;

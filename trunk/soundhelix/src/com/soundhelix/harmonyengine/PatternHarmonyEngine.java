@@ -15,12 +15,11 @@ import com.soundhelix.misc.Chord;
 import com.soundhelix.misc.Chord.ChordType;
 import com.soundhelix.util.NoteUtils;
 import com.soundhelix.util.XMLUtils;
-import com.sun.org.apache.xpath.internal.NodeSet;
 
 /**
  * Implements a flexible HarmonyEngine based on user-specified patterns.
  * 
- * @author Thomas Schürger
+ * @author Thomas Schürger (thomas@schuerger.com)
  */
 
 public class PatternHarmonyEngine extends HarmonyEngine {

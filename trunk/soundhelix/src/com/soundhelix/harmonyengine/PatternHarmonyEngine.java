@@ -18,7 +18,15 @@ import com.soundhelix.util.XMLUtils;
 
 /**
  * Implements a flexible HarmonyEngine based on user-specified patterns.
- * 
+ *
+ * <br><br>
+ * <b>XML-Configuration</b>
+ * <table border=1>
+ * <tr><th>Tag</th> <th>#</th> <th>Example</th> <th>Description</th> <th>Required</th>
+ * <tr><td><code>chordPattern</code></td> <td>+</td> <td><code>0/4,1/4,1/4,2/4</code></td> <td>Sets the patterns to use. The pattern is a comma-separated list consisting of random table numbers and lengths in beats. One of the patterns is selected at random.</td> <td>yes</td>
+ * <tr><td><code>chordRandomTable</code></td> <td>*</td> <td><code>C,Am,G,F,Em,Dm</code></td> <td>Adds a random table. Random tables can be accessed from patterns. The tables are numbered from 0 in the order of appearance.</td> <td>yes</td>
+ * </table>
+ *
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 

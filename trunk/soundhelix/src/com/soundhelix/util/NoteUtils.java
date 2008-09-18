@@ -2,6 +2,12 @@ package com.soundhelix.util;
 
 import java.util.Hashtable;
 
+/**
+ * Implements some static methods for converting notes to pitches and vice versa.
+ * 
+ * @author Thomas Schürger (thomas@schuerger.com)
+ */
+
 public class NoteUtils {
 	
 	private static String noteNames[] = {

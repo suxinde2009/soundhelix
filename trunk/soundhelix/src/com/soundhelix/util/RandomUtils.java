@@ -3,10 +3,9 @@ package com.soundhelix.util;
 import java.util.Random;
 
 /**
- * Implements some static random methods.
+ * Implements some static methods for random numbers.
  * 
- * @author Thomas Schürger
- *
+ * @author Thomas Schürger (thomas@schuerger.com)
  */
 
 public class RandomUtils {

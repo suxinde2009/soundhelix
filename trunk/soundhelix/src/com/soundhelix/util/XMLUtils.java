@@ -4,7 +4,6 @@ import java.util.Random;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathFactory;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.Node;
@@ -14,7 +13,7 @@ import com.soundhelix.misc.XMLConfigurable;
 /**
  * Implements some static methods for parsing XML data.
  * 
- * @author Thomas Schürger
+ * @author Thomas Schürger (thomas@schuerger.com)
  */
 
 public class XMLUtils {

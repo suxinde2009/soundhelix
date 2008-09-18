@@ -13,7 +13,7 @@ In 1995, I started working on a similar software on the Amiga platform,
 called AlgoMusic, which was published on Aminet and was improved over
 time. In 1998, I stopped development. Due to the limitations of the
 standard Amiga audio hardware, AlgoMusic itself was very limited and
-unflexible.
+inflexible.
 
 SoundHelix is a Java rewrite from scratch which offers a whole lot of
 flexibility and customization capabilities. It is also a framework
@@ -23,7 +23,8 @@ components and use them within SoundHelix.
 Currently SoundHelix features some basic music creation abilities and a MIDI
 player, which can access any MIDI resource accessible to Java. Note that
 some external MIDI software is required for playback. This can be any
-MIDI software or hardware which can be accessed using a MIDI driver.
+MIDI software or hardware which can be accessed using a MIDI driver on
+your platform.
 
 SoundHelix does not provide any internal sound playback capabilities.
 
@@ -34,8 +35,8 @@ Requirements
 ------------
 
 - Java 5 or later
-- a MIDI device or MIDI-capable software
-- MIDI hub software (optional)
+- a MIDI playback device or MIDI-capable software
+- some MIDI hub software (optional)
 
 
 Installing a MIDI hub
@@ -55,10 +56,10 @@ SoundHelix and the MIDI software. SoundHelix must be configured
 to use MIDI Yoke as the MIDI output device and the MIDI software
 must use MIDI Yoke as the MIDI input device. MIDI Yoke provides
 up to 8 MIDI ports. It is sufficient to use one of the ports
-for SoundHelix. The name of the MIDI Yoke MIDI ports is
+for SoundHelix. The name of the MIDI Yoke MIDI output port is
 "Out To MIDI Yoke:  n" (with n from 1 to 8). Note the extra
-space after the colon. The MIDI software can then use
-"In From MIDI Yoke:  n".
+space after the colon. This must be used in SoundHelix. The
+MIDI software can then use "In From MIDI Yoke:  n".
 
 MIDI Yoke can be found here: http://www.midiox.com/myoke.htm
 
@@ -71,3 +72,22 @@ provided at startup, the file "SoundHelix.xml" is read.
 
 Details t.b.w.
 
+
+Sourcecode
+----------
+
+SoundHelix is OpenSource and is hosted on SourceForge:
+
+http://sourceforge.net/projects/soundhelix/
+
+The sourcecode can be checked out using SVN like this:
+
+svn co https://soundhelix.svn.sourceforge.net/svnroot/soundhelix soundhelix 
+
+
+Developers welcome
+------------------
+
+I'm looking for more developers to join this project. If you
+have Java and some music skills or documentation skills,
+don't hesitate to contact me.

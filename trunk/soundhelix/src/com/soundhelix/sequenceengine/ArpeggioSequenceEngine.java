@@ -19,6 +19,8 @@ import com.soundhelix.misc.Track.TrackType;
  * Implements a sequence engine that repeats user-specified patterns. For each
  * power of 2, a different pattern can be specified. The length of the current chord
  * determines which of these patterns will be used.
+ * 
+ * @author Thomas Schürger (thomas@schuerger.com)
  */
 
 public class ArpeggioSequenceEngine extends SequenceEngine {

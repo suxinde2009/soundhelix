@@ -16,6 +16,8 @@ import com.soundhelix.misc.Track.TrackType;
 /**
  * Implements a pad sequence engine using 3 or more voices. This engine
  * simply plays chords.
+ * 
+ * @author Thomas Schürger (thomas@schuerger.com)
  */
 
 public class PadSequenceEngine extends SequenceEngine {

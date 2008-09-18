@@ -12,6 +12,8 @@ import com.soundhelix.misc.Track.TrackType;
 
 /**
  * Implements a sequence engine that repeats user-specified patterns.
+ * 
+ * @author Thomas Schürger (thomas@schuerger.com)
  */
 
 public class RhythmSequenceEngine extends SequenceEngine {

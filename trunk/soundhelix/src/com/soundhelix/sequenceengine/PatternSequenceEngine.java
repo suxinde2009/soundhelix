@@ -24,6 +24,8 @@ import com.soundhelix.util.XMLUtils;
  * chord and the chord of the next non-transition tone that will be played. The
  * pitch of the transition note is based on the base notes of the two chords.
  * This can be used for funky base lines.
+ * 
+ * @author Thomas Schürger (thomas@schuerger.com)
  */
 
 public class PatternSequenceEngine extends SequenceEngine {

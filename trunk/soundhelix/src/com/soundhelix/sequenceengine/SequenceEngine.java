@@ -5,7 +5,7 @@ package com.soundhelix.sequenceengine;
  * 
  * @see Sequence
  * 
- * @author Thomas Schürger
+ * @author Thomas Schürger (thomas@schuerger.com)
  */
 
 import org.apache.log4j.Logger;

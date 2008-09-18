@@ -1,0 +1,73 @@
+SoundHelix
+----------
+
+Author: Thomas Schürger (thomas@schuerger.com)
+
+
+Introduction
+------------
+
+SoundHelix is a framework for algorithmic music creation and playback.
+
+In 1995, I started working on a similar software on the Amiga platform,
+called AlgoMusic, which was published on Aminet and was improved over
+time. In 1998, I stopped development. Due to the limitations of the
+standard Amiga audio hardware, AlgoMusic itself was very limited and
+unflexible.
+
+SoundHelix is a Java rewrite from scratch which offers a whole lot of
+flexibility and customization capabilities. It is also a framework
+which allows other developers to easily write their own music creation
+components and use them within SoundHelix.
+
+Currently SoundHelix features some basic music creation abilities and a MIDI
+player, which can access any MIDI resource accessible to Java. Note that
+some external MIDI software is required for playback. This can be any
+MIDI software or hardware which can be accessed using a MIDI driver.
+
+SoundHelix does not provide any internal sound playback capabilities.
+
+The best of all: SoundHelix is fun!
+
+
+Requirements
+------------
+
+- Java 5 or later
+- a MIDI device or MIDI-capable software
+- MIDI hub software (optional)
+
+
+Installing a MIDI hub
+---------------------
+
+Some MIDI software (like Propellerhead Reason) does not offer a
+MIDI device itself, but can connect to a present MIDI device to receive
+MIDI messages. SoundHelix also does not make itself visible as a MIDI device,
+so neither can SoundHelix connect to the MIDI software
+nor can the MIDI software connect to SoundHelix. In this case, you
+must install some MIDI hub software, for example MIDI Yoke (available
+for Windows, other platforms offer similar MIDI hub software).
+
+This software simply sets up a MIDI device that is visible from Java
+and from any other MIDI software and relays MIDI messages between
+SoundHelix and the MIDI software. SoundHelix must be configured
+to use MIDI Yoke as the MIDI output device and the MIDI software
+must use MIDI Yoke as the MIDI input device. MIDI Yoke provides
+up to 8 MIDI ports. It is sufficient to use one of the ports
+for SoundHelix. The name of the MIDI Yoke MIDI ports is
+"Out To MIDI Yoke:  n" (with n from 1 to 8). Note the extra
+space after the colon. The MIDI software can then use
+"In From MIDI Yoke:  n".
+
+MIDI Yoke can be found here: http://www.midiox.com/myoke.htm
+
+
+Configuration
+-------------
+
+Configuration is done using an XML file. If no filename is
+provided at startup, the file "SoundHelix.xml" is read.
+
+Details t.b.w.
+

@@ -10,6 +10,8 @@ import java.util.Random;
  * and other parameters to instantiate and use a Random instance. For different
  * parameters the Random class will be seeded differently with a very high
  * probability.
+ * 
+ * @author Thomas Schürger (thomas@schuerger.com)
  */
 
 public class ConsistentRandom {

@@ -273,7 +273,7 @@ public class SimpleArrangementEngine extends ArrangementEngine {
         for(int section=0;section<sections;section++) {
         	int len = he.getChordSectionTicks(tick);
         	
-        	int tracks = getTrackCount(section,sections,num);
+        	int tracks = getTrackCount(section,sections,num*5/8);
         	
         	int card = bitset.cardinality();
         	
@@ -320,16 +320,18 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 	 */
 	
 	private int getTrackCount(int section,int sections,int maxTracks) {
-		
-		int increaseTill = Math.min(sections/2,3)-1;
-		int decreaseFrom = sections-Math.min(sections/2,3);
+		int increaseTill = Math.min(maxTracks,Math.min(sections/2,4))-1;
+		int decreaseFrom = sections-Math.min(maxTracks,Math.min(sections/2,3));
 		
 		if(section <= increaseTill) {
 			return section+1;
 		} else if(section >= decreaseFrom) {
 			return sections-section;
 		} else {
-			return 3+random.nextInt(maxTracks*5/8-2);
+			int min = Math.min(maxTracks,2);
+			int max = maxTracks;
+			
+			return min+random.nextInt(max-min+1);
 		}
 	}
 	

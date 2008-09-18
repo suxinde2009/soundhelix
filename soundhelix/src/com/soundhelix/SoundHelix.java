@@ -108,6 +108,12 @@ public class SoundHelix implements Runnable {
 		}
     }
 	
+	/**
+	 * Implements the functionality of the thread that generates songs. The method
+	 * runs forever and generates a new song as soon as it detects the queue to be
+	 * empty.
+	 */
+	
 	public void run() {
 		try {
 			while(true) {
@@ -130,6 +136,17 @@ public class SoundHelix implements Runnable {
 			}
 		} catch(Exception e) {e.printStackTrace();}
 	}
+	
+	/**
+	 * Parses the structure tag and creates a Structure instance.
+	 * 
+	 * @param node the node of the tag
+	 * @param xpath an XPath instance
+	 * 
+	 * @return a Structure
+	 * 
+	 * @throws XPathException
+	 */
 	
 	public static Structure parseStructure(Node node,XPath xpath) throws XPathException {
 		int bars = XMLUtils.parseInteger("bars",node,xpath);

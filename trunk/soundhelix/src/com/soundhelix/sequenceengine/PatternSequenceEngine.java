@@ -1,10 +1,13 @@
 package com.soundhelix.sequenceengine;
 
+import java.util.Random;
+
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathException;
 
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import com.soundhelix.harmonyengine.HarmonyEngine;
 import com.soundhelix.misc.ActivityVector;
@@ -40,8 +43,6 @@ public class PatternSequenceEngine extends SequenceEngine {
 	private static final boolean[] scaleTable = new boolean[] {true,false,true,false,true,true,false,true,false,true,false,true};
 
 	private static boolean obeyChordSubtype = false;
-	private static String defaultPatternString = "0,-,-,0,-,-,0,-,1,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,-1,-,0,-,-,-,0,-,-,0,-,-,0,-,1,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,-1,-,0,-,4,1";
-	private String patternString;
 	private int[] pattern;
 	private short[] velocity;
 	private int patternLength;
@@ -51,7 +52,6 @@ public class PatternSequenceEngine extends SequenceEngine {
 	}
 
 	public void setPattern(String patternString) {
-		this.patternString = patternString;
 		Object[] p = parsePatternString(patternString);
 		this.pattern = (int[])p[0];
 		this.velocity = (short[])p[1];
@@ -231,6 +231,12 @@ public class PatternSequenceEngine extends SequenceEngine {
     }
     	
     public void configure(Node node,XPath xpath) throws XPathException {
-    	setPattern(XMLUtils.parseString((Node)xpath.evaluate("pattern",node,XPathConstants.NODE),xpath));	
+		NodeList nodeList = (NodeList)xpath.evaluate("pattern",node,XPathConstants.NODESET);
+
+		if(nodeList.getLength() == 0) {
+			throw(new RuntimeException("Need at least 1 pattern"));
+		}
+		
+		setPattern(XMLUtils.parseString(nodeList.item(new Random().nextInt(nodeList.getLength())),xpath));
     }
 }

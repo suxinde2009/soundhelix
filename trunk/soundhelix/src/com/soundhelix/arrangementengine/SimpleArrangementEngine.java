@@ -18,6 +18,8 @@ import com.soundhelix.util.XMLUtils;
 
 /**
  * Implements a simple ArrangementEngine.
+ * 
+ * @author Thomas Schürger (thomas@schuerger.com)
  */
 
 public class SimpleArrangementEngine extends ArrangementEngine {

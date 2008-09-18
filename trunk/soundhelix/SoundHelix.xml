@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<soundhelix>
+  <structure>
+     <bars><random min="96" max="160" step="16"/></bars>
+     <beatsPerBar>4</beatsPerBar>
+     <ticksPerBeat>4</ticksPerBeat>
+  </structure>
+  <harmonyEngine class="PatternHarmonyEngine">
+    <chordPattern>0/4,1/4,1/4,2/4</chordPattern>
+    <chordPattern>0/4,1/4,1/4,1/2,2/2</chordPattern>
+    <chordPattern>0/4,1/4,1/2,1/2,1/2,2/2</chordPattern>
+    <chordPattern>0/4,1/4,1/4,1/4,0/4,1/4,1/4,2/4</chordPattern>
+    <chordPattern>0/4,1/4,1/4,1/4,0/4,1/4,1/4,1/2,2/2</chordPattern>
+    <chordPattern>0/4,1/4,1/4,1/2,1/2,0/4,1/4,1/4,1/2,2/2</chordPattern>
+    <chordPattern>0/4,1/4,1/2,1/2,2/4</chordPattern>
+    <chordPattern>0/4,1/4,$0/4,1/2,$1/2</chordPattern>
+    <chordRandomTable>C,Am</chordRandomTable>
+    <chordRandomTable>C,Am,G,F,Em,Dm</chordRandomTable>
+    <chordRandomTable>C,Am,G,F,Em,Dm,E</chordRandomTable>
+  </harmonyEngine> 
+  <arrangementEngine class="SimpleArrangementEngine">
+    <track>
+      <channel>1</channel>
+      <sequenceEngine class="PadSequenceEngine"/>
+    </track>
+    <track>
+      <channel>0</channel>
+      <sequenceEngine class="ArpeggioSequenceEngine"/>
+    </track>
+    <track>
+      <channel>2</channel>
+      <sequenceEngine class="PatternSequenceEngine">
+        <pattern>0,-,-,0,-,-,1,-,0,-,-,0,-,-,+,-,0,-,-,0,-,-,2,-,0,-,-,0,-,-,+,-</pattern>
+        <!--<pattern>0,-,-,0,-,-,0,-,-,0,-,1,0,-,-,0,-,-,0,-,-,0,-,+</pattern> -->
+      </sequenceEngine>
+    </track>
+    <track>
+      <minRatios>50,30,30,20</minRatios>
+      <maxRatios>80,80,100,100</maxRatios>
+      <channel>3</channel>
+      <sequenceEngine class="DrumSequenceEngine"/>
+    </track>
+    <track>
+      <channel>4</channel>
+      <sequenceEngine class="PatternSequenceEngine">
+        <pattern>-,-,0,-,-,2,-,-,-,-,0,-,-,-,-,3,-,-,0,-,-,2,-,-,-,-,0,-,-,3,2,4,-,-,0,-,-,2,-,-,-,-,0,-,-,-,-,3,-,-,0,-,-,2,-,-,-,-,0,5,7,3,5,4</pattern>
+      </sequenceEngine>
+    </track>
+    <track>
+      <channel>5</channel>
+      <sequenceEngine class="ChordSequenceEngine">
+        <pattern>0,-,-,-,0,-,-,0,-,-,0,-,-,0,-,-,0,-,-,-,0,-,-,0,-,-,0,-,3,-,1,-,0,-,-,-,0,-,-,0,-,-,0,-,-,0,-,-,0,-,-,-,0,-,-,0,-,-,0,-,3,1,4,2</pattern>
+      </sequenceEngine>
+    </track>
+    <track>
+      <channel>7</channel>
+      <sequenceEngine class="RhythmSequenceEngine"/>
+    </track>
+    <track>
+      <channel>8</channel>
+      <sequenceEngine class="PatternSequenceEngine">
+        <pattern>0,0,-,0,-,-,0,-,0,-,-,-,-,-,-,-,0,0,-,0,-,-,0,-,0,-,-,-,-,4,2,3,0,0,-,0,-,-,0,-,0,-,-,-,-,-,-,-,0,0,-,0,-,-,0,-,2,-,-,-,-,4,2,3</pattern>
+      </sequenceEngine>
+    </track>
+    <track>
+      <channel>9</channel>
+      <sequenceEngine class="PatternSequenceEngine">
+        <pattern>0,0,0,-,0,-,-,0,-,-,0,-,3,-,-,-</pattern>
+      </sequenceEngine>
+    </track>
+    <track>
+      <channel>10</channel>
+      <sequenceEngine class="PatternSequenceEngine">
+        <pattern>0:1,-,0:1,-,0:1,-,-,0:1,-,0:1,-,0:1,1:12000,-,0:1,-,0:1,-,0:1,-,0:1,-,-,0:1,0:1,3:20000,0:1,-,2:1,-,0:1,-,0:1,-,0:1,-,0:1,-,-,0:1,-,0:1,-,0:1,1:18000,-,0:1,-,0:1,-,0:1,-,0:1,-,-,0:1,0:1,3:30000,0:1,-,2:1,-,0:1,-</pattern>
+      </sequenceEngine>
+    </track>
+    <forceActive track="drums:0" minRatio="0.6" maxRatio="0.8"/>
+  </arrangementEngine>
+  <player class="MidiPlayer">
+    <device>Out To MIDI Yoke:  1</device>
+    <bpm><random min="128" max="150" type="normal" mean="140" variance="6.5"/></bpm>
+	<transposition><random min="64" max="70"/></transposition>
+    <groove><random list="115,85|100,100|120,80"/></groove>
+  </player>
+</soundhelix>

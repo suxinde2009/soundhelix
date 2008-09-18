@@ -20,9 +20,9 @@ import com.soundhelix.misc.XMLConfigurable;
 public class XMLUtils {
 	private static Logger logger = Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
 	
-	
-	
 	private static Random random = new Random();
+
+	private XMLUtils() {}
 	
 	public static Node getFirstElementChild(Node node) {
 		node = node.getFirstChild();

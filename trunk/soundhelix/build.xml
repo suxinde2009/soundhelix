@@ -26,13 +26,13 @@
 		           use="true"
 		           windowtitle="SoundHelix API">
 		    <doctitle><![CDATA[<h1>SoundHelix</h1>]]></doctitle>
-		    <link offline="true" href="http://java.sun.com/j2se/1.5.0/docs/api/" packagelistLoc="C:\tmp"/>
-		    <link href="http://developer.java.sun.com/developer/products/xml/docs/api/"/>
+		    <link offline="true" href="http://java.sun.com/javase/6/docs/api/" packagelistLoc="C:\tmp"/>
+		    <link href="http://java.sun.com/javase/6/docs/api/"/>
 		  </javadoc>
-	
 	</target>
 
 	<target name="clean" description="clean up">
         <delete dir="${build}"/>
+		<delete dir="${javadoc}"/>
     </target>
 </project>

@@ -5,7 +5,7 @@ package com.soundhelix.player;
  * 
  * @see Arrangement
  * 
- * @author Thomas Schürger
+ * @author Thomas Schürger (thomas@schuerger.com)
  */
 
 import org.apache.log4j.Logger;

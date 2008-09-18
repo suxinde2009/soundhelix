@@ -23,6 +23,15 @@ import com.soundhelix.misc.Sequence.SequenceEntry;
 import com.soundhelix.misc.Track.TrackType;
 import com.soundhelix.util.XMLUtils;
 
+/**
+ * Implements a MIDI player. Track's channels are mapped to MIDI channels
+ * in a 1:1 fashion.
+ * 
+ * @todo Add MIDI channel mapping
+ * 
+ * @author Thomas Schürger (thomas@schuerger.com)
+ */
+
 public class MidiPlayer extends Player {
 	private String deviceName;
 	private MidiDevice device;

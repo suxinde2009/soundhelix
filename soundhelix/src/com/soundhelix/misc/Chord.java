@@ -5,16 +5,20 @@ import com.soundhelix.util.NoteUtils;
 
 /**
  * Defines a chord. A chord is immutable, consists of a pitch (with 0 being C'),
- * a type (major, minor) and a subtype (base 0, base 4 and base 6). The pitch
- * always identifies the base/main note of the chord, which need not be the
- * lowest note of the chord.
+ * a type (major, minor) and a subtype (base 0, base 4 [first inversion] and base 6 [second inversion]).
+ * The pitch always identifies the base/root/main note of the chord, which need not be the
+ * lowest note of the chord. Currently, only standard major and minor chords (triads), including
+ * two inversions of each, are supported. More complex types (seventh chords, etc.) may be
+ * added in the future. 
  * 
  * Note that even though the pitch of the base note also defines the
  * octave, it is up to the caller to make use of or ignore the pitch's
- * octave.
+ * implicit octave.
+ * 
+ * Callers are encouraged to interpret the second inversion as a downwards shift
+ * (ceg becomes Gce) and the first inversion as an upwards shift (ceg becomes egc').
  * 
  * @author Thomas Schürger (thomas@schuerger.com)
- *
  */
 
 public class Chord {
@@ -79,27 +83,11 @@ public class Chord {
 	}
 	
 	public boolean equals(Chord otherChord) {
-		return otherChord != null && this.pitch == otherChord.pitch && this.type == otherChord.type && this.subtype == otherChord.subtype;
+		return this == otherChord || otherChord != null && this.pitch == otherChord.pitch && this.type == otherChord.type && this.subtype == otherChord.subtype;
 	}
 	
 	public String toString() {
 		return NoteUtils.getNoteName(pitch).toUpperCase()+(isMinor() ? "m" : "")+(subtype == ChordSubtype.BASE_4 ? "4" : subtype == ChordSubtype.BASE_6 ? "6" : "")+"+"+getLowPitch()+"/"+getMiddlePitch()+"/"+getHighPitch();
-	}
-
-	/**
-	 * Returns the sum of the absolute pitch differences between this chord and
-	 * the given chord of the low, middle and high note. This is a measure of
-	 * how far the two chords are away from each other on the keyboard.
-	 * 
-	 * @param otherChord
-	 * 
-	 * @return the pitch difference
-	 */
-	
-	public int getPitchDistance(Chord otherChord) {
-        return Math.abs(getLowPitch()-otherChord.getLowPitch()) +
-               Math.abs(getMiddlePitch()-otherChord.getMiddlePitch()) +
-               Math.abs(getHighPitch()-otherChord.getHighPitch());
 	}
 
 	/**
@@ -116,8 +104,6 @@ public class Chord {
 	 */
 	
 	public Chord findClosestChord(Chord otherChord) {
-		//System.out.println("Find closest chord of "+otherChord+" for "+this);
-		
 		if(pitch == otherChord.getPitch() && type == otherChord.getType()) {
 			// our chord clearly is the best choice in this case, regardless
 			// of the subtype of the other chord
@@ -127,38 +113,40 @@ public class Chord {
 		int pitch1 = getMiddlePitch();
 		int pitch2 = otherChord.getMiddlePitch();
 
+		if(pitch1 == pitch2) {
+			// middle pitches are equal; any modification of otherChord
+			// could only make things worse
+			return otherChord;
+		}
+
 		if(pitch2 < pitch1) {
 			Chord lastChord = otherChord;
 			
 			while(true) {				
-				Chord chord = lastChord.getHigherChord();
-				//System.out.println("Chord: "+chord+" low pitch: "+chord.getLowPitch()+"  lastChord: "+lastChord+" low pitch: "+lastChord.getLowPitch());
+				Chord chord = lastChord.getHigherChord();				
+				pitch2 = chord.getMiddlePitch();
 				
-				if(chord.getMiddlePitch() >= pitch1) {
+				if(pitch2 >= pitch1) {
 					// the new chord's low pitch has now reached at least pitch1
 					// the last chord's low pitch was lower than pitch1
 					
 					// check if chord or lastChord is better
 					
-					int diff1 = chord.getMiddlePitch()-pitch1;
+					int diff1 = pitch2-pitch1;
 					int diff2 = pitch1-lastChord.getMiddlePitch();
 					
 					if(diff1 < diff2) {
 						return chord;
 					} else if(diff1 > diff2 ){
 						return lastChord;
-					} else {
-						System.out.println("Tie between "+lastChord+" and "+chord+"  Reference: "+this);
-						
+					} else {						
 						if(random == null) {
 							random = new ConsistentRandom();
 						}
 						
 						if(random.getBoolean(lastChord.toString()+"#"+chord.toString())) {
-							System.out.println("Using "+chord);
 							return chord;
 						} else {
-							System.out.println("Using "+lastChord);
 							return lastChord;
 						}
 					}
@@ -171,15 +159,15 @@ public class Chord {
 			
 			while(true) {
 				Chord chord = lastChord.getLowerChord();
-				//System.out.println("Chord: "+chord+" low pitch: "+chord.getLowPitch()+"  lastChord: "+lastChord+" low pitch: "+lastChord.getLowPitch());
+				pitch2 = chord.getMiddlePitch();
 				
-				if(chord.getMiddlePitch() <= pitch1) {
+				if(pitch2 <= pitch1) {
 					// the new chord's low pitch has now reached at most pitch1
 					// the last chord's low pitch was higher than pitch1
 					
 					// check if chord or lastChord is better
 					
-					int diff1 = pitch1-chord.getMiddlePitch();
+					int diff1 = pitch1-pitch2;
 					int diff2 = lastChord.getMiddlePitch()-pitch1;
 
 					if(diff1 < diff2) {
@@ -187,17 +175,13 @@ public class Chord {
 					} else if(diff1 > diff2) {
 						return lastChord;
 					} else {
-						System.out.println("Tie between "+lastChord+" and "+chord+"  Reference: "+this);
-						
 						if(random == null) {
 							random = new ConsistentRandom();
 						}
 						
 						if(random.getBoolean(lastChord.toString()+"#"+chord.toString())) {
-							System.out.println("Using "+chord);
 							return chord;
 						} else {
-							System.out.println("Using "+lastChord);
 							return lastChord;
 						}
 					}

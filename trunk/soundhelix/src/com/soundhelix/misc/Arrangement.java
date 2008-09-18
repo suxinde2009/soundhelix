@@ -16,11 +16,11 @@ import java.util.List;
  */
 
 public class Arrangement {
-	private final Structure song;
+	private final Structure structure;
     private final List<ArrangementEntry> entryList = new ArrayList<ArrangementEntry>();
     
-    public Arrangement(Structure song) {
-    	this.song = song;
+    public Arrangement(Structure structure) {
+    	this.structure = structure;
     }
     
     public void add(Track track,int channel) {
@@ -40,7 +40,7 @@ public class Arrangement {
     }
 
     public Structure getStructure() {
-    	return song;
+    	return structure;
     }
     
     public class ArrangementEntry {

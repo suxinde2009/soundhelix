@@ -23,9 +23,12 @@ import com.soundhelix.util.XMLUtils;
  */
 
 public class SimpleArrangementEngine extends ArrangementEngine {
-	private Random random = new Random();
+	private final Random random = new Random();
 
 	private ArrangementEntry[] arrangementEntries;
+	
+	// maximum number of tries before failing
+	private static final int MAX_TRIES = 2500;
 	
 	public SimpleArrangementEngine() {
 		super();
@@ -100,50 +103,62 @@ public class SimpleArrangementEngine extends ArrangementEngine {
     */
 	
 	public Arrangement render() {
-	       
+	       int ticks = structure.getTicks();
 	       int tracks = arrangementEntries.length;
 	       
-	       System.out.println("Rendering");
-	       
 	       System.out.println("Creating vectors for "+tracks+" tracks");
+	       
+	       // count the total number of ActivityVectors we need
+	       // most SequenceEngines use 1 ActivityVector, but some use
+	       // more
 	       
 	       int vectors = 0;
 	       
 	       for(int i=0;i<tracks;i++) {
 	    	   SequenceEngine sequenceEngine = arrangementEntries[i].sequenceEngine;
+	    	   // SequenceEngines have been instantiated and configured, but the
+	    	   // Structure has not been set yet
 	    	   sequenceEngine.setStructure(structure);
 	    	   vectors += sequenceEngine.getActivityVectorCount();
 	       }
 
-	       int ticks = structure.getTicks();
-
 	       System.out.println("Creating "+vectors+" ActivityVectors");
-	       ActivityVector[] av;
+
+	       ActivityVector[] activityVectors;
 
 	       int tries = 0;
 	       
 	       again: while(true) {
-	    	   av = createActivityVectors(vectors);
+	    	   // create ActivityVectors at random
+	    	   // then check if the constraints (minimum and maximum
+	    	   // activity ratio) are met for each ActivityVector
+	    	   
+	    	   activityVectors = createActivityVectors(vectors);
 
 	    	   int v = 0;
 
 	    	   for(int i=0;i<tracks;i++) {
 	    		   SequenceEngine sequenceEngine = arrangementEntries[i].sequenceEngine;
 
+	    		   // get min/max ratio arrays
+	    		   
 	    		   double[] minRatios = arrangementEntries[i].minRatios;
 	    		   double[] maxRatios = arrangementEntries[i].maxRatios;
 
 	    		   int num = sequenceEngine.getActivityVectorCount();
 
 	    		   for(int k=0;k<num;k++) {
-	    			   double ratio = 100.0d*(double)av[v].getActiveTicks()/(double)ticks;
+	    			   // compute current activity ratio
+	    			   double ratio = 100.0d*(double)activityVectors[v].getActiveTicks()/(double)ticks;
 
+	    			   // check if ratio is outside the required bounds
+	    			   
 	    			   if(ratio < minRatios[k] || ratio > maxRatios[k]) {
 	    				   System.out.println("Track "+i+", vector "+k+"  Ratio: "+ratio+"  min: "+minRatios[k]+" max: "+maxRatios[k]);
 
 	    				   tries++;
 	    				   
-	    				   if(tries >= 1000) {
+	    				   if(tries >= MAX_TRIES) {
 	    					   throw(new RuntimeException("Could satisfy constraints within "+tries+" tries"));
 	    				   }
 	    				   
@@ -157,12 +172,12 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 	    	   break;
 
 	       }
-          
-	   	       //} while(av[3].isActive(0) || av[3].isActive(ticks-1) || 100*av[3].getActiveTicks()/ticks < 50);
+
+	       // use each SequenceEngine to render a track
 	       
 	       Arrangement arrangement = new Arrangement(structure);
 
-	       int vector = 0;
+	       int vectorNum = 0;
 	       
 	       for(int i=0;i<tracks;i++) {
 	    	   SequenceEngine sequenceEngine = arrangementEntries[i].sequenceEngine;
@@ -171,7 +186,7 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 	    	   ActivityVector[] list = new ActivityVector[num];
 	    	   
 	    	   for(int k=0;k<num;k++) {
-	    		   list[k] = av[vector++];
+	    		   list[k] = activityVectors[vectorNum++];
 	    	   }
 	   
 	    	   arrangement.add(sequenceEngine.render(list),arrangementEntries[i].channel);
@@ -179,14 +194,17 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 
 	       return arrangement;
 		}
+	
 	/**
-	 * Sets one random bit in the BitSet, if this is possible.
-	 * From the set of false bits, one is chosen at random and that
-	 * bit is set.
+	 * Sets one random bit in the BitSet, if this is possible (i.e.,
+	 * if not all bits are set already). From the set of false bits,
+	 * one is chosen at random and that bit is set to true. The method
+	 * avoids setting the bit given by avoidBit, unless there is only
+	 * 1 bit left that can be set to true.
 	 * 
 	 * @param bitSet the BitSet to modify
 	 * @param size the size of the BitSet
-	 * @param avoidBit the bit number to avoid (or -1)
+	 * @param avoidBit the bit number to avoid (or -1 to skip this step)
 	 * 
 	 * @return the number of the set bit (or -1 if no clear bit existed)
 	 */
@@ -199,34 +217,36 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 		}
 
 		int zeroes = size-ones;
-		
+
 		int bit;
-		
+
 		do {		
-		// choose random bit number
-		    bit = random.nextInt(zeroes);
+			// choose random bit number
+			bit = random.nextInt(zeroes);
 		} while(zeroes > 1 && bit == avoidBit);
-		
+
 		// set the bit'th zero bit
-		
+
 		int pos = bitset.nextClearBit(0);
-		
+
 		while(bit-- > 0) {
 			pos = bitset.nextClearBit(pos+1);
 		}
-		
+
 		bitset.set(pos);
-		
+
 		return pos;	
 	}
 	
 	/**
-	 * Clears one random bit in the BitSet, if this is possible.
-	 * From the set of true bits, one is chosen at random and that
-	 * bit is cleared.
+	 * Clears one random bit in the BitSet, if this is possible
+	 * (i.e., if at least one bit is set to true). From the set
+	 * of true bits, one is chosen at random and that bit is cleared.
+	 * The method avoids setting the bit given by avoidBit, unless
+	 * there is only 1 bit left that can be set to false.
 	 * 
 	 * @param bitSet the BitSet to modify
-	 * @param avoidBit the bit number to avoid (or -1)
+	 * @param avoidBit the bit number to avoid (or -1 to skip this set)
 	 * 
 	 * @return the number of the cleared bit (or -1 if no set bit existed)
 	 */
@@ -241,8 +261,8 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 		int bit;
 		
 		do {
-		// choose random bit number
-		 bit = random.nextInt(ones);
+			// choose random bit number
+			bit = random.nextInt(ones);
 		} while(ones > 1 && bit == avoidBit);
 		
 		// skip to the bit'th one bit
@@ -258,27 +278,53 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 		return pos;	
 	}
 	
+	/**
+	 * Creates num ActivityVectors. A BitSet is used to
+	 * to represent which of the ActivityVectors should be
+	 * active. The BitSet is changed on each new chord
+	 * section by removing or adding bits randomly.
+	 * 
+	 * @param num the number of ActivityVectors to create
+	 *
+	 * @return the array of ActivityVectors
+	 */
+	
 	private ActivityVector[] createActivityVectors(int num) {
 		HarmonyEngine he = structure.getHarmonyEngine();
 		int sections = he.getChordSectionCount();
-		ActivityVector[] av = new ActivityVector[num];
+		
+		// create num empty ActivityVectors
+		
+		ActivityVector[] activityVectors = new ActivityVector[num];
 		
 		for(int i=0;i<num;i++) {
-			av[i] = new ActivityVector();
+			activityVectors[i] = new ActivityVector();
 		}
 		
+		// start with an empty BitSet
+		// the BitSet contains the number of vectors that are
+		// currently active
 		BitSet bitset = new BitSet();
-		int tick = 0;
 		
+		int tick = 0;
+
+    	int lastAddedBit = -1;
+    	int lastRemovedBit = -1;
+    	
         for(int section=0;section<sections;section++) {
         	int len = he.getChordSectionTicks(tick);
         	
+        	// get the number of tracks we want active
         	int tracks = getTrackCount(section,sections,num*5/8);
         	
+        	// get the number of tracks that are currently active
         	int card = bitset.cardinality();
+
+        	// add and/or remove bits from the BitSet
         	
-        	int lastAddedBit = -1;
-        	int lastRemovedBit = -1;
+        	// we try not to remove a bit that was added in the previous
+        	// section and not to add a bit that was removed in the previous
+        	// section
         	
         	if(card < tracks) {
         		do {lastAddedBit = setRandomBit(bitset,num,lastRemovedBit);} while(bitset.cardinality() < tracks);
@@ -291,18 +337,21 @@ public class SimpleArrangementEngine extends ArrangementEngine {
         	
         	System.out.println("Section: "+section+"  Tracks: "+tracks+"  BitSet: "+bitset);
 
+        	// check the BitSet and add activity or inactivity intervals
+        	// for the current section
+        	
         	for(int i=0;i<num;i++) {
         		if(bitset.get(i)) {
-        			av[i].addActivity(len);
+        			activityVectors[i].addActivity(len);
         		} else {
-        			av[i].addInactivity(len);
+        			activityVectors[i].addInactivity(len);
         		}
         	}
        	
             tick += len;
         }
 				
-		return av;	
+		return activityVectors;	
 	}
 	
 	/**
@@ -320,18 +369,22 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 	 */
 	
 	private int getTrackCount(int section,int sections,int maxTracks) {
+		// important: all of this must work properly when only few sections
+        // and few tracks (or even 1) are available
+		
 		int increaseTill = Math.min(maxTracks,Math.min(sections/2,4))-1;
 		int decreaseFrom = sections-Math.min(maxTracks,Math.min(sections/2,3));
 		
 		if(section <= increaseTill) {
+			// in fade-in phase
 			return section+1;
 		} else if(section >= decreaseFrom) {
+			// in fade-out phase
 			return sections-section;
 		} else {
+			// in between
 			int min = Math.min(maxTracks,2);
-			int max = maxTracks;
-			
-			return min+random.nextInt(max-min+1);
+			return min+random.nextInt(maxTracks-min+1);
 		}
 	}
 	

@@ -6,9 +6,9 @@ import com.soundhelix.harmonyengine.HarmonyEngine;
  * Defines the logical structure of a song. The logical structure consists of the song's
  * signature (internal note quantization) and the HarmonyEngine.
  * 
- * The main quantization is a beat. Beats are divided into ticks (usually 4 ticks form a beat),
+ * The main unit is a beat. Beats are divided into ticks (usually 4 ticks form a beat),
  * and beats are grouped into bars (usually 4 beats form a bar), and an integer number of bars
- * forms the song. Ticks are the smallest quantization of a song.
+ * forms the song. Ticks are the smallest units of a song.
  * 
  * The song signature is defined by specifying the total number of bars, the number of beats
  * per bar and the number of ticks per beat.

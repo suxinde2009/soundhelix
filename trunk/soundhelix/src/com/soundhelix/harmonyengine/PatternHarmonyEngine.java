@@ -17,7 +17,11 @@ import com.soundhelix.util.NoteUtils;
 import com.soundhelix.util.XMLUtils;
 
 /**
- * Implements a flexible HarmonyEngine based on user-specified patterns.
+ * Implements a flexible HarmonyEngine based on user-specified patterns. One of the given
+ * patterns is chosen at random. The patterns contain references to chord random tables, which
+ * are used to randomly select a chord for the pattern position. Chord patterns can also
+ * contain back references (denoted as "$position", e.g., "$0") which reproduces a chord that
+ * was generated at an earlier position.
  *
  * <br><br>
  * <b>XML-Configuration</b>
@@ -208,10 +212,17 @@ public class PatternHarmonyEngine extends HarmonyEngine {
 		this.chordRandomTables = chordRandomTables;
 	}
 	
+	/**
+	 * Creates a pattern that can be parsed using parsePattern().
+	 * 
+	 * @return a pattern
+	 */
+	
 	private String createPattern() {
 		Random random = new Random();
 		StringBuilder sb = new StringBuilder(80);
 		
+		// choose a chord pattern at random
 		String[] chords = chordPatterns[random.nextInt(chordPatterns.length)].split(",");
 		
 		int count = chords.length;
@@ -246,7 +257,6 @@ public class PatternHarmonyEngine extends HarmonyEngine {
 				}
 				
 				chord = chordList.get(refnum);
-				System.out.println("Chord reference $"+refnum+": "+chord);
 			} else {
 				int table = Integer.parseInt(spec[0]);
 

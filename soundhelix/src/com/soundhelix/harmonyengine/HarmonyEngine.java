@@ -12,7 +12,8 @@ import com.soundhelix.misc.XMLConfigurable;
  * The song's complete chord sequence can be divided into repeating sections.
  * For example, a chord sequence might consist of a chord section for
  * a verse and a (possibly longer or shorter) chord section for a refrain,
- * which could each be repeated a couple of times.
+ * which could each be repeated a couple of times. These chord sections
+ * splits the chord sequence into a number of logical parts.
  * 
  * For each tick, this generator must return the current chord, the remaining
  * number of ticks this chord will be played before a chord change occurs (or the
@@ -49,7 +50,7 @@ import com.soundhelix.misc.XMLConfigurable;
  * an invalid tick is used (128 is the end of the song).
  * 
  * It is very important to get the method behavior correct. The HarmonyEngine
- * is sanity-checked upon instantiation so that correct behavior is enforced.
+ * can be sanity-checked using checkSanitiy().
  * 
  * @author Thomas Schürger (thomas@schuerger.com)
  */
@@ -134,7 +135,9 @@ public abstract class HarmonyEngine implements XMLConfigurable {
 	}
 	
 	/**
-	 * Returns the total number of chord sections.
+	 * Returns the total number of chord sections. The return
+	 * value, once calculated, is cached for further method
+	 * calls.
 	 * 
 	 * @return the total number of chord sections
 	 */
@@ -143,6 +146,9 @@ public abstract class HarmonyEngine implements XMLConfigurable {
 		if(chordSections >= 0) {
 			return chordSections;
 		} else {
+			// skip through the chord sections
+			// and count how many are available
+			
 			int sections = 0;
 			int tick = 0;
 

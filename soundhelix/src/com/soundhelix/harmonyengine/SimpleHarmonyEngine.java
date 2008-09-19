@@ -11,6 +11,7 @@ import com.soundhelix.misc.Chord.ChordType;
 
 /**
  * Implements a simple HarmonyEngine that plays a fixed sequence of chords.
+ * This is more for educational purposes than for real use. ;-)
  * 
  * @author Thomas Schürger (thomas@schuerger.com)
  */
@@ -22,6 +23,8 @@ public class SimpleHarmonyEngine extends HarmonyEngine {
 	}
 	
 	public Chord getChord(int tick) {
+		// make a chord change at (almost) each new bar
+		
 		switch((tick/structure.getTicksPerBar()) & 7) {
 		case 0: return new Chord(-3,ChordType.MINOR,ChordSubtype.BASE_0);
 		case 1: return new Chord(-7,ChordType.MAJOR,ChordSubtype.BASE_0);

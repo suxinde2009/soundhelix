@@ -16,6 +16,8 @@ import com.soundhelix.misc.Track.TrackType;
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
+// TODO: make all patterns configurable (including mapping from patterns to ActivityVectors)
+
 public class DrumSequenceEngine extends SequenceEngine {
 
 	// pitch for each of the note pattern strings

@@ -6,7 +6,7 @@ import java.util.List;
 
 /**
  * Represents a sequence, i.e., the notes and pauses of a single voice. A note
- * consists of a pitch (with 0 being c'), a velocity (between 0 and
+ * consists of a pitch (with 0 being c', 1 being c'# and so on), a velocity (between 0 and
  * Short.MAX_VALUE) and a positive length in ticks. A pause is represented by an
  * arbitrary pitch, a velocity of -1 and a positive length in ticks. The
  * velocity can be used to represent a note's volume, but after all, it is up to
@@ -32,7 +32,7 @@ public class Sequence {
 	 */
 
 	public void addNote(int pitch, int ticks) {
-		addNote(pitch, ticks, Short.MAX_VALUE);
+		addNote(pitch,ticks,Short.MAX_VALUE);
 	}
 
 	/**

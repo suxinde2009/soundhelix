@@ -311,11 +311,17 @@ public class SimpleArrangementEngine extends ArrangementEngine {
     	int lastAddedBit = -1;
     	int lastRemovedBit = -1;
     	
+    	// the maximum number of ActivityVectors that may be active
+    	// at each point in time
+    	int maxTracks = getTrackMaximum(num,0.65,0.2);
+
+    	System.out.println("Num: "+num+"  maxTracks: "+maxTracks);
+    	
         for(int section=0;section<sections;section++) {
         	int len = he.getChordSectionTicks(tick);
         	
         	// get the number of tracks we want active
-        	int tracks = getTrackCount(section,sections,num*5/8);
+        	int tracks = getTrackCount(section,sections,maxTracks);
         	
         	// get the number of tracks that are currently active
         	int card = bitset.cardinality();
@@ -396,6 +402,10 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 		NodeList nodeList = (NodeList)xpath.evaluate("track",node,XPathConstants.NODESET);
 
 		int tracks = nodeList.getLength();
+
+		if(tracks == 0) {
+			throw(new RuntimeException("Need at least 1 track"));
+		}
 		
 		ArrangementEntry[] arrangementEntries = new ArrangementEntry[tracks];
 		
@@ -453,6 +463,26 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 		}
 		
 		return array;
+	}
+	
+	/**
+	 * Returns the maximum number of tracks to use at the same time,
+	 * given the total number of tracks available. The method uses an
+	 * exponential drop-off so that the returned value is 1 for tracks
+	 * = 1 and the value converges down to tracks*factor as tracks goes to infinity.
+	 * The lambda value specifies the speed of the exponential drop-off. The goal
+	 * is to use almost all tracks when the number of tracks is small and
+	 * use (in relation) fewer tracks when the number of tracks becomes larger.
+	 * 
+	 * @param tracks the number of tracks (must be positive)
+	 * @param factor the factor (between 0 and 1)
+	 * @param lambda the drop-off factor (must be positive)
+	 * 
+	 * @return the maximum number of tracks to use
+	 */
+		
+	private int getTrackMaximum(int tracks,double factor,double lambda) {
+		return (int)(0.5d+(double)tracks*(factor+(1d-factor)*Math.exp(-lambda*(double)(tracks-1))));
 	}
 	
 	private class ArrangementEntry {

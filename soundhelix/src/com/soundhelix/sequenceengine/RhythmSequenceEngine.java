@@ -11,7 +11,7 @@ import com.soundhelix.misc.Track;
 import com.soundhelix.misc.Track.TrackType;
 
 /**
- * Implements a sequence engine that repeats user-specified patterns.
+ * Implements a sequence engine for loop players.
  * 
  * @author Thomas Schürger (thomas@schuerger.com)
  */

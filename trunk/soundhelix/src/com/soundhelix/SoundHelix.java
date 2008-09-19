@@ -52,7 +52,7 @@ public class SoundHelix implements Runnable {
 	public static void main(String[] args) throws Exception {		
 		String filename;
 		
-		if(args.length ==1  && args[0].equals("-h") || args.length > 1) {
+		if(args.length == 1 && args[0].equals("-h") || args.length > 1) {
 			System.out.println("java SoundHelix [XML-File]");
 			System.exit(0);
 		}
@@ -63,6 +63,7 @@ public class SoundHelix implements Runnable {
 			filename = "SoundHelix.xml";
 		}
 		
+		// initialize log4j
 		PropertyConfigurator.configureAndWatch( "log4j.properties", 60*1000 );
 
 		logger = Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
@@ -78,6 +79,7 @@ public class SoundHelix implements Runnable {
 
 			XPath xpath = XPathFactory.newInstance().newXPath();
 
+			// get the root element of the file (we don't care what it's called)
 			Node mainNode = (Node)xpath.evaluate("/*",doc,XPathConstants.NODE);
 
 			Node structureNode = (Node)xpath.evaluate("structure",mainNode,XPathConstants.NODE);
@@ -91,6 +93,8 @@ public class SoundHelix implements Runnable {
 
 			arrangementQueue = new LinkedBlockingQueue<Arrangement>();
 
+			// instantiate this class so than we can launch a thread
+			
 			SoundHelix electro = new SoundHelix(structure,arrangementEngineNode,xpath);
 			Thread t = new Thread(electro);
 			t.start();
@@ -115,9 +119,11 @@ public class SoundHelix implements Runnable {
 	 */
 	
 	public void run() {
-		try {
-			while(true) {
+		while(true) {
+			try {
 				if(arrangementQueue.size() < 1) {
+					// the queue is empty; render a new song
+
 					System.out.println("Rendering new song");
 
 					long startTime = System.nanoTime();
@@ -130,15 +136,14 @@ public class SoundHelix implements Runnable {
 					arrangementQueue.add(arrangement);
 				}
 
-				try {
-					Thread.sleep(10000);
-				} catch(Exception e) {}
-			}
-		} catch(Exception e) {e.printStackTrace();}
+				Thread.sleep(10000);
+			} catch(Exception e) {e.printStackTrace();}
+		}
 	}
 	
 	/**
-	 * Parses the structure tag and creates a Structure instance.
+	 * Parses the structure tag and creates a Structure instance. Note that
+	 * no HarmonyEngine is set yet.
 	 * 
 	 * @param node the node of the tag
 	 * @param xpath an XPath instance
@@ -153,8 +158,19 @@ public class SoundHelix implements Runnable {
 		int beatsPerBar = XMLUtils.parseInteger("beatsPerBar",node,xpath);
 		int ticksPerBeat = XMLUtils.parseInteger("ticksPerBeat",node,xpath);
 
+		if(bars <= 0) {
+			throw(new RuntimeException("Number of bars must be > 0"));
+		}
+		
+		if(beatsPerBar <= 0) {
+			throw(new RuntimeException("Number of beats per bar must be > 0"));
+		}
+		
+		if(ticksPerBeat <= 0) {
+			throw(new RuntimeException("Number of ticks per beat must be > 0"));
+		}
+		
 		Structure structure = new Structure(bars,beatsPerBar,ticksPerBeat);
-		structure.setHarmonyEngine(new PatternHarmonyEngine());
 
 		return structure;
 	}

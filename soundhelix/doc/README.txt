@@ -15,6 +15,10 @@ time. In 1998, I stopped development. Due to the limitations of the
 standard Amiga audio hardware, AlgoMusic itself was very limited and
 inflexible.
 
+SoundHelix has a similar goal, but strives to remove most (if not all)
+of the limitations of AlgoMusic. Due to its nature as a framework, it
+is possible to plug-in own implementations of most components.
+
 SoundHelix is a Java rewrite from scratch which offers a whole lot of
 flexibility and customization capabilities. It is also a framework
 which allows other developers to easily write their own music creation
@@ -22,21 +26,30 @@ components and use them within SoundHelix.
 
 Currently SoundHelix features some basic music creation abilities and a MIDI
 player, which can access any MIDI resource accessible to Java. Note that
-some external MIDI software is required for playback. This can be any
-MIDI software or hardware which can be accessed using a MIDI driver on
+currently some external MIDI software is required for playback. This can be
+any MIDI software or hardware which can be accessed using a MIDI driver on
 your platform.
 
-SoundHelix does not provide any internal sound playback capabilities.
+SoundHelix currently does not provide any internal sound playback capabilities.
 
-The best of all: SoundHelix is fun!
+But the best of all: SoundHelix is free and fun!
 
 
 Requirements
 ------------
 
-- Java 5 or later
+End users:
+
+- Java Runtime Environment 5 or later
 - a MIDI playback device or MIDI-capable software
 - some MIDI hub software (optional)
+
+
+Developers:
+
+- Java Software Development Kit 5 or later
+- ant (http://ant.apache.org)
+- Eclipse (optional)
 
 
 Installing a MIDI hub
@@ -58,8 +71,9 @@ must use MIDI Yoke as the MIDI input device. MIDI Yoke provides
 up to 8 MIDI ports. It is sufficient to use one of the ports
 for SoundHelix. The name of the MIDI Yoke MIDI output port is
 "Out To MIDI Yoke:  n" (with n from 1 to 8). Note the extra
-space after the colon. This must be used in SoundHelix. The
-MIDI software can then use "In From MIDI Yoke:  n".
+space after the colon. This must be used in SoundHelix for
+output. The
+MIDI software can then use "In From MIDI Yoke:  n" for input.
 
 MIDI Yoke can be found here: http://www.midiox.com/myoke.htm
 
@@ -70,7 +84,7 @@ Configuration
 Configuration is done using an XML file. If no filename is
 provided at startup, the file "SoundHelix.xml" is read.
 
-Details t.b.w.
+Details about configuration are still to be written.
 
 
 Sourcecode
@@ -80,14 +94,15 @@ SoundHelix is OpenSource and is hosted on SourceForge:
 
 http://sourceforge.net/projects/soundhelix/
 
-The sourcecode can be checked out using SVN like this:
+The most recent sourcecode can be checked out using SVN like this:
 
 svn co https://soundhelix.svn.sourceforge.net/svnroot/soundhelix soundhelix 
 
 
-Developers welcome
-------------------
+More developers welcome
+-----------------------
 
 I'm looking for more developers to join this project. If you
-have Java and some music skills or documentation skills,
-don't hesitate to contact me.
+have Java and some music skills or documentation skills and think
+you can contribute to the project, then please don't hesitate to contact
+me.

@@ -16,6 +16,8 @@ import com.soundhelix.misc.Track.TrackType;
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
+// TODO: make this all configurable or drop the class
+
 public class RhythmSequenceEngine extends SequenceEngine {
 
 	// pitch for each of the note pattern strings

@@ -135,9 +135,11 @@ public class SoundHelix implements Runnable {
 					System.out.println("Rendering took "+(time/1000000)+" ms");
 					arrangementQueue.add(arrangement);
 				}
-
-				Thread.sleep(10000);
 			} catch(Exception e) {e.printStackTrace();}
+			
+			try {
+				Thread.sleep(10000);
+			} catch(Exception e) {}
 		}
 	}
 	

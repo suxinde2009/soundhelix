@@ -15,10 +15,13 @@ import com.soundhelix.misc.Track;
 import com.soundhelix.misc.Track.TrackType;
 
 /**
- * Implements a sequence engine that repeats user-specified patterns.
+ * Implements a sequence engine plays a randomly generated melody, played
+ * with a given rhythmic pattern.
  * 
  * @author Thomas Schürger (thomas@schuerger.com)
  */
+
+// TODO: work on this (not really usable yet)
 
 public class MelodySequenceEngine extends SequenceEngine {
 	
@@ -142,7 +145,6 @@ public class MelodySequenceEngine extends SequenceEngine {
 	 * 
 	 * @return a transition pitch
 	 */
-	
 	
     private static int getTransitionPitch(Chord chord,Chord nextChord) {
     	if(nextChord == null) {

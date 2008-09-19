@@ -159,7 +159,7 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 	    				   tries++;
 	    				   
 	    				   if(tries >= MAX_TRIES) {
-	    					   throw(new RuntimeException("Could satisfy constraints within "+tries+" tries"));
+	    					   throw(new RuntimeException("Couldn't satisfy activity constraints within "+tries+" tries"));
 	    				   }
 	    				   
 	    				   continue again;
@@ -417,6 +417,17 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 		
 		setArrangementEntries(arrangementEntries);
 	}
+	
+	/**
+	 * Parses the given ratio string and returns an array with its contents.
+	 * If the ratio string is empty, an array of default ratios is returned.
+	 * 
+	 * @param ratioString the ratio string (may also be empty or null)
+	 * @param count the expected number of ratios
+	 * @param defaultRatio the ratio value to use when the string is undefined
+	 *
+	 * @return an array of doubles containing the ratios
+	 */
 	
 	private double[] parseRatios(String ratioString,int count,double defaultRatio) {
 		double[] array = new double[count];

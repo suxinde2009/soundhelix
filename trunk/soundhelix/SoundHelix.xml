@@ -3,7 +3,7 @@
   <structure>
      <bars><random min="96" max="160" step="16"/></bars>
      <beatsPerBar>4</beatsPerBar>
-     <ticksPerBeat><random list="4|3"/></ticksPerBeat>
+     <ticksPerBeat>4</ticksPerBeat>
   </structure>
   <harmonyEngine class="PatternHarmonyEngine">
     <chordPattern>0/4,1/4,1/4,2/4</chordPattern>
@@ -26,23 +26,23 @@
       </sequenceEngine>
     </track>
     <track>
-      <minRatios>50,30,30,20</minRatios>
-      <maxRatios>80,80,100,100</maxRatios>
       <channel>3</channel>
       <sequenceEngine class="DrumSequenceEngine"/>
+      <minRatios>50,25,25,0</minRatios>
+      <maxRatios>90,100,100,100</maxRatios>
     </track>
     <track>
       <channel>0</channel>
       <sequenceEngine class="ArpeggioSequenceEngine"/>
     </track>
    <track>
-      <minRatios>60</minRatios>
       <channel>2</channel>
       <sequenceEngine class="PatternSequenceEngine">
         <pattern>0,-,-,0,-,-,1,-,0,-,-,0,-,-,+,-,0,-,-,0,-,-,2,-,0,-,-,0,-,-,+,-</pattern>
         <pattern>0,-,-,-,0,-,-,0,-,-,0,-,-,-1,-,-,0,-,-,-,0,-,-,0,-,-,0,-,-,-,+,-</pattern>
         <pattern>0,-,-,-,0,-,-,-,0,-,-,2,-,-,-1,-,0,-,-,-,0,-,-,-,0,-,-,2,-,-,+,-</pattern>
       </sequenceEngine>
+      <minRatios>60</minRatios>
     </track>
     <track>
       <channel>4</channel>

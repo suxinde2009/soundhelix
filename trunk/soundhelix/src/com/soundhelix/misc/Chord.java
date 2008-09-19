@@ -4,7 +4,7 @@ import com.soundhelix.util.ConsistentRandom;
 import com.soundhelix.util.NoteUtils;
 
 /**
- * Defines a chord. A chord is immutable, consists of a pitch (with 0 being C'),
+ * Defines a chord. A chord is immutable, consists of a pitch (with 0 being c', 1 being c#' and so on),
  * a type (major, minor) and a subtype (base 0, base 4 [first inversion] and base 6 [second inversion]).
  * The pitch always identifies the base/root/main note of the chord, which need not be the
  * lowest note of the chord. Currently, only standard major and minor chords (triads), including
@@ -74,10 +74,23 @@ public class Chord {
 		return subtype;
 	}
 
+	/**
+	 * Returns true iff this chord is a major chord.
+	 * 
+	 * @return true iff the chord is a major chord
+	 */
+	
 	public boolean isMajor() {
 		return type == ChordType.MAJOR;
 	}
+
+	/**
+	 * Returns true iff this chord is a minor chord.
+	 * 
+	 * @return true iff the chord is a minor chord
+	 */
 	
+
 	public boolean isMinor() {
 		return type == ChordType.MINOR;
 	}
@@ -91,12 +104,11 @@ public class Chord {
 	}
 
 	/**
-	 * Returns a version of the given chord that is closest to this chord. This
-	 * method chooses the version of the chord that minimizes the pitch distance
-	 * of the middle note of the two chords. This may include modifying the
-	 * subtype and/or octave of the chord. If there is a tie between two
-	 * possible chord candidates, one of the chords is chosen randomly, but
-	 * consistently.
+	 * Returns a version of the given chord that is closest (i.e., most compatible)
+	 * to this chord. This method chooses the version of the chord that minimizes
+	 * the pitch distance of the middle note of the two chords. This may include
+	 * modifying the subtype and/or octave of the chord. If there is a tie between two
+	 * possible chord candidates, one of the chords is chosen randomly, but consistently.
 	 * 
 	 * @param otherChord the chord to return a close version of
 	 * 
@@ -117,9 +129,7 @@ public class Chord {
 			// middle pitches are equal; any modification of otherChord
 			// could only make things worse
 			return otherChord;
-		}
-
-		if(pitch2 < pitch1) {
+		} else if(pitch2 < pitch1) {
 			Chord lastChord = otherChord;
 			
 			while(true) {				
@@ -140,6 +150,9 @@ public class Chord {
 					} else if(diff1 > diff2 ){
 						return lastChord;
 					} else {						
+						// we have a tie, choose on of the chords
+						// randomly, but consistently
+
 						if(random == null) {
 							random = new ConsistentRandom();
 						}
@@ -154,7 +167,7 @@ public class Chord {
 				
 				lastChord = chord;
 			}
-		} else {
+		} else {   // pitch2 > pitch1
 			Chord lastChord = otherChord;
 			
 			while(true) {
@@ -175,6 +188,9 @@ public class Chord {
 					} else if(diff1 > diff2) {
 						return lastChord;
 					} else {
+						// we have a tie, choose on of the chords
+						// randomly, but consistently
+						
 						if(random == null) {
 							random = new ConsistentRandom();
 						}

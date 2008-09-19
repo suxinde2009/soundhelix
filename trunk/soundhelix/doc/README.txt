@@ -86,6 +86,31 @@ provided at startup, the file "SoundHelix.xml" is read.
 
 Details about configuration are still to be written.
 
+Within each XML tag that requires an integer you can use
+the following instead of a plain integer:
+
+- <random min="minimum" max="maximum"/>
+
+  to generate a random integer between minimum and maximum
+  (both inclusive) with uniform distribution
+  
+- <random min="minimum max="maximum" type="normal" mean="mean" variance="variance"/>
+
+  to generate a random integer between minimum and maximum
+  (both inclusive) with a Gaussian (normal) distribution having a mean of mean and
+  a variance of variance
+  
+- <random list="value1,value2,..."/>
+
+  to randomly select one of the specified values with uniform distribution
+
+Within each XML tag that requires a string, you can use
+the following instead of a plain string:
+
+- <random list="string1|string2|..."/>
+
+  to randomly select one of the specified strings with uniform distribution
+
 
 Sourcecode
 ----------

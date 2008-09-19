@@ -19,7 +19,7 @@ public class ConsistentRandom {
 	private long constantSeed = System.nanoTime();
     
 	// pertubation seed for booleans
-	// these nanoTime() and currentTimeMillis() are correlated,
+	// nanoTime() and currentTimeMillis() are correlated,
 	// but this should be fine for our purposes
 	private long millis = System.currentTimeMillis();
     
@@ -38,7 +38,7 @@ public class ConsistentRandom {
      */
     
     public int getInteger(int min,int max,long seed) {
-    	Random r = new Random((long)min*93+(long)max*107+constantSeed+seed);
+    	Random r = new Random((long)min*167852533l+(long)max*7531057l+constantSeed+seed);
     	return min+r.nextInt(max-min);
     }
 

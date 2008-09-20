@@ -17,7 +17,11 @@ import com.soundhelix.sequenceengine.SequenceEngine;
 import com.soundhelix.util.XMLUtils;
 
 /**
- * Implements a simple ArrangementEngine.
+ * Implements a simple ArrangementEngine. From the given set of SequenceEngines
+ * the number of needed ActivityVectors is determined and a subset of these
+ * vectors is selected to be active for each chord section. The song starts with
+ * a "fade-in" of the number of active ActivityVectors and ends with a "fade-out"
+ * of the number of active ActivityVectors.
  * 
  * @author Thomas Schürger (thomas@schuerger.com)
  */
@@ -103,97 +107,95 @@ public class SimpleArrangementEngine extends ArrangementEngine {
     */
 	
 	public Arrangement render() {
-	       int ticks = structure.getTicks();
-	       int tracks = arrangementEntries.length;
-	       
-	       System.out.println("Creating vectors for "+tracks+" tracks");
-	       
-	       // count the total number of ActivityVectors we need
-	       // most SequenceEngines use 1 ActivityVector, but some use
-	       // more
-	       
-	       int vectors = 0;
-	       
-	       for(int i=0;i<tracks;i++) {
-	    	   SequenceEngine sequenceEngine = arrangementEntries[i].sequenceEngine;
-	    	   // SequenceEngines have been instantiated and configured, but the
-	    	   // Structure has not been set yet
-	    	   sequenceEngine.setStructure(structure);
-	    	   vectors += sequenceEngine.getActivityVectorCount();
-	       }
+		int ticks = structure.getTicks();
+		int tracks = arrangementEntries.length;
 
-	       System.out.println("Creating "+vectors+" ActivityVectors");
+		// count the total number of ActivityVectors we need
+		// most SequenceEngines use 1 ActivityVector, but some use
+		// more
 
-	       ActivityVector[] activityVectors;
+		int vectors = 0;
 
-	       int tries = 0;
-	       
-	       again: while(true) {
-	    	   // create ActivityVectors at random
-	    	   // then check if the constraints (minimum and maximum
-	    	   // activity ratio) are met for each ActivityVector
-	    	   
-	    	   activityVectors = createActivityVectors(vectors);
-
-	    	   int v = 0;
-
-	    	   for(int i=0;i<tracks;i++) {
-	    		   SequenceEngine sequenceEngine = arrangementEntries[i].sequenceEngine;
-
-	    		   // get min/max ratio arrays
-	    		   
-	    		   double[] minRatios = arrangementEntries[i].minRatios;
-	    		   double[] maxRatios = arrangementEntries[i].maxRatios;
-
-	    		   int num = sequenceEngine.getActivityVectorCount();
-
-	    		   for(int k=0;k<num;k++) {
-	    			   // compute current activity ratio
-	    			   double ratio = 100.0d*(double)activityVectors[v].getActiveTicks()/(double)ticks;
-
-	    			   // check if ratio is outside the required bounds
-	    			   
-	    			   if(ratio < minRatios[k] || ratio > maxRatios[k]) {
-	    				   System.out.println("Track "+i+", vector "+k+"  Ratio: "+ratio+"  min: "+minRatios[k]+" max: "+maxRatios[k]);
-
-	    				   tries++;
-	    				   
-	    				   if(tries >= MAX_TRIES) {
-	    					   throw(new RuntimeException("Couldn't satisfy activity constraints within "+tries+" tries"));
-	    				   }
-	    				   
-	    				   continue again;
-	    			   }
-
-	    			   v++;
-	    		   }
-	    	   }
-
-	    	   break;
-
-	       }
-
-	       // use each SequenceEngine to render a track
-	       
-	       Arrangement arrangement = new Arrangement(structure);
-
-	       int vectorNum = 0;
-	       
-	       for(int i=0;i<tracks;i++) {
-	    	   SequenceEngine sequenceEngine = arrangementEntries[i].sequenceEngine;
-	    	   int num = sequenceEngine.getActivityVectorCount();
-	    	   
-	    	   ActivityVector[] list = new ActivityVector[num];
-	    	   
-	    	   for(int k=0;k<num;k++) {
-	    		   list[k] = activityVectors[vectorNum++];
-	    	   }
-	   
-	    	   arrangement.add(sequenceEngine.render(list),arrangementEntries[i].channel);
-	       }
-
-	       return arrangement;
+		for(int i=0;i<tracks;i++) {
+			SequenceEngine sequenceEngine = arrangementEntries[i].sequenceEngine;
+			// SequenceEngines have been instantiated and configured, but the
+			// Structure has not been set yet
+			sequenceEngine.setStructure(structure);
+			vectors += sequenceEngine.getActivityVectorCount();
 		}
+
+		System.out.println("Creating "+vectors+" ActivityVectors for "+tracks+" tracks");
+
+		ActivityVector[] activityVectors;
+
+		int tries = 0;
+
+		again: while(true) {
+			// create ActivityVectors at random
+			// then check if the constraints (minimum and maximum
+			// activity ratio) are met for each ActivityVector
+
+			activityVectors = createActivityVectors(vectors);
+
+			int v = 0;
+
+			for(int i=0;i<tracks;i++) {
+				SequenceEngine sequenceEngine = arrangementEntries[i].sequenceEngine;
+
+				// get min/max ratio arrays
+
+				double[] minRatios = arrangementEntries[i].minRatios;
+				double[] maxRatios = arrangementEntries[i].maxRatios;
+
+				int num = sequenceEngine.getActivityVectorCount();
+
+				for(int k=0;k<num;k++) {
+					// compute current activity ratio
+					double ratio = 100.0d*(double)activityVectors[v].getActiveTicks()/(double)ticks;
+
+					// check if ratio is outside the required bounds
+
+					if(ratio < minRatios[k] || ratio > maxRatios[k]) {
+						tries++;
+
+						if(tries >= MAX_TRIES) {
+							throw(new RuntimeException("Couldn't satisfy activity constraints within "+tries+" tries"));
+						} else {
+							// one constraint wasn't satisfied, retry
+							continue again;
+						}
+					}
+
+					v++;
+				}
+			}
+
+			break;
+		}
+
+		// use each SequenceEngine to render a track
+		// each SequenceEngine is given the number of ActivityVectors it
+		// requires
+
+		Arrangement arrangement = new Arrangement(structure);
+
+		int vectorNum = 0;
+
+		for(int i=0;i<tracks;i++) {
+			SequenceEngine sequenceEngine = arrangementEntries[i].sequenceEngine;
+			int num = sequenceEngine.getActivityVectorCount();
+
+			ActivityVector[] list = new ActivityVector[num];
+
+			for(int k=0;k<num;k++) {
+				list[k] = activityVectors[vectorNum++];
+			}
+
+			arrangement.add(sequenceEngine.render(list),arrangementEntries[i].channel);
+		}
+
+		return arrangement;
+	}
 	
 	/**
 	 * Sets one random bit in the BitSet, if this is possible (i.e.,
@@ -242,7 +244,7 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 	 * Clears one random bit in the BitSet, if this is possible
 	 * (i.e., if at least one bit is set to true). From the set
 	 * of true bits, one is chosen at random and that bit is cleared.
-	 * The method avoids setting the bit given by avoidBit, unless
+	 * The method avoids clearing the bit given by avoidBit, unless
 	 * there is only 1 bit left that can be set to false.
 	 * 
 	 * @param bitSet the BitSet to modify
@@ -313,35 +315,34 @@ public class SimpleArrangementEngine extends ArrangementEngine {
     	
     	// the maximum number of ActivityVectors that may be active
     	// at each point in time
-    	int maxTracks = getTrackMaximum(num,0.65,0.2);
-
-    	System.out.println("Num: "+num+"  maxTracks: "+maxTracks);
-    	
+    	int maxActivityVectors = getActivityVectorMaximum(num,0.65,0.2);
+   	
         for(int section=0;section<sections;section++) {
         	int len = he.getChordSectionTicks(tick);
         	
-        	// get the number of tracks we want active
-        	int tracks = getTrackCount(section,sections,maxTracks);
+        	// get the number of ActivityVectors we want active for this chord section
+        	int wantedActivityVectors = getActivityVectorCount(section,sections,maxActivityVectors);
         	
         	// get the number of tracks that are currently active
         	int card = bitset.cardinality();
 
-        	// add and/or remove bits from the BitSet
+        	// add and/or remove bits from the BitSet until tracks
+        	// bits are present
         	
         	// we try not to remove a bit that was added in the previous
         	// section and not to add a bit that was removed in the previous
         	// section
         	
-        	if(card < tracks) {
-        		do {lastAddedBit = setRandomBit(bitset,num,lastRemovedBit);} while(bitset.cardinality() < tracks);
-        	} else if(card > tracks) {
-        		do {lastRemovedBit = clearRandomBit(bitset,lastAddedBit);} while(bitset.cardinality() > tracks);
+        	if(card < wantedActivityVectors) {
+        		do {lastAddedBit = setRandomBit(bitset,num,lastRemovedBit);} while(bitset.cardinality() < wantedActivityVectors);
+        	} else if(card > wantedActivityVectors) {
+        		do {lastRemovedBit = clearRandomBit(bitset,lastAddedBit);} while(bitset.cardinality() > wantedActivityVectors);
         	} else if(card > 0 && Math.random() > 0.2) {
         		lastRemovedBit = clearRandomBit(bitset,lastAddedBit);
         		lastAddedBit = setRandomBit(bitset,num,lastRemovedBit);
         	}
         	
-        	System.out.println("Section: "+section+"  Tracks: "+tracks+"  BitSet: "+bitset);
+        	//System.out.println("Section: "+section+"  Tracks: "+tracks+"  BitSet: "+bitset);
 
         	// check the BitSet and add activity or inactivity intervals
         	// for the current section
@@ -361,25 +362,25 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 	}
 	
 	/**
-	 * Returns the number of tracks that should be played during the
-	 * given section. There is always a "fade-in" of tracks (1, 2, ...)
-	 * for the first number of sections and a "fade-out" of tracks (..., 2, 1)
-	 * for the last number of sections. In between, the number of tracks is
+	 * Returns the number of ActivityVectors that should be active during the
+	 * given section. There is always a "fade-in" of ActivityVectors (1, 2, ...)
+	 * for the first number of sections and a "fade-out" of ActivityVectors (..., 2, 1)
+	 * for the last number of sections. In between, the number of ActivityVectors is
 	 * chosen randomly.
 	 * 
 	 * @param section the section number (between 0 and sections-1)
 	 * @param sections the total number of sections
-	 * @param maxTracks the maximum number of tracks to use
+	 * @param maxActivityVectors the maximum number of tracks to use
 
 	 * @return the number of tracks
 	 */
 	
-	private int getTrackCount(int section,int sections,int maxTracks) {
+	private int getActivityVectorCount(int section,int sections,int maxActivityVectors) {
 		// important: all of this must work properly when only few sections
-        // and few tracks (or even 1) are available
+        // and few ActivityVectors (or even 1) are available
 		
-		int increaseTill = Math.min(maxTracks,Math.min(sections/2,4))-1;
-		int decreaseFrom = sections-Math.min(maxTracks,Math.min(sections/2,3));
+		int increaseTill = Math.min(maxActivityVectors,Math.min(sections/2,4))-1;
+		int decreaseFrom = sections-Math.min(maxActivityVectors,Math.min(sections/2,3));
 		
 		if(section <= increaseTill) {
 			// in fade-in phase
@@ -389,8 +390,8 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 			return sections-section;
 		} else {
 			// in between
-			int min = Math.min(maxTracks,2);
-			return min+random.nextInt(maxTracks-min+1);
+			int min = Math.min(maxActivityVectors,2);
+			return min+random.nextInt(maxActivityVectors-min+1);
 		}
 	}
 	
@@ -443,7 +444,8 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 		double[] array = new double[count];
 
 		if(ratioString == null || ratioString.equals("")) {
-
+			// use the default ratio for all ActivityVectors
+			
 			for(int i=0;i<count;i++) {
 				array[i] = defaultRatio;
 			}
@@ -466,23 +468,23 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 	}
 	
 	/**
-	 * Returns the maximum number of tracks to use at the same time,
-	 * given the total number of tracks available. The method uses an
-	 * exponential drop-off so that the returned value is 1 for tracks
-	 * = 1 and the value converges down to tracks*factor as tracks goes to infinity.
+	 * Returns the maximum number of ActivityVectors to use at the same time,
+	 * given the total number of ActivityVectors available. The method uses an
+	 * exponential drop-off so that the returned value is 1 for activityVectors
+	 * = 1 and the value converges down to activityVectors*factor as activityVectors goes to infinity.
 	 * The lambda value specifies the speed of the exponential drop-off. The goal
-	 * is to use almost all tracks when the number of tracks is small and
-	 * use (in relation) fewer tracks when the number of tracks becomes larger.
+	 * is to use almost all ActivityVectors when the number of ActivityVectors is small and
+	 * use (in relation) fewer ActivityVectors when the number of ActivityVectors becomes larger.
 	 * 
-	 * @param tracks the number of tracks (must be positive)
+	 * @param activityVectors the number of ActivtiyVectors (must be positive)
 	 * @param factor the factor (between 0 and 1)
 	 * @param lambda the drop-off factor (must be positive)
 	 * 
-	 * @return the maximum number of tracks to use
+	 * @return the maximum number of ActivityVectors to use
 	 */
 		
-	private int getTrackMaximum(int tracks,double factor,double lambda) {
-		return (int)(0.5d+(double)tracks*(factor+(1d-factor)*Math.exp(-lambda*(double)(tracks-1))));
+	private int getActivityVectorMaximum(int activityVectors,double factor,double lambda) {
+		return (int)(0.5d+(double)activityVectors*(factor+(1d-factor)*Math.exp(-lambda*(double)(activityVectors-1))));
 	}
 	
 	private class ArrangementEntry {

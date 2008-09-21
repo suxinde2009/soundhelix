@@ -1,17 +1,53 @@
 package com.soundhelix.sequenceengine;
 
 import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathException;
 
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import com.soundhelix.misc.ActivityVector;
 import com.soundhelix.misc.Sequence;
 import com.soundhelix.misc.Track;
 import com.soundhelix.misc.Track.TrackType;
+import com.soundhelix.util.XMLUtils;
 
 /**
- * Implements a sequence engine that repeats user-specified patterns.
+ * Implements a sequence engine for drum machines. Drum machines normally play a certain
+ * sample (e.g., a base drum or a snare) when a certain pitch is played. This class supports an
+ * arbitrary number of combinations of patterns, pitches and activity groups.
+ * Each pattern acts as a voice for a certain pitch. The activity group can be used to
+ * group the voices together so that they are all active or all silent at the same time.
+ * For example, you might group three hi-hat patterns together so that all 3 are active
+ * or silent. The activity groups must be numbered starting from 0, and the used groups must be
+ * "dense" (i.e., without gaps).
+ *
+ * <h3>XML configuration</h3>
+ * <table border=1>
+ * <tr><th>Tag</th> <th>#</th> <th>Attributes</th> <th>Description</th> <th>Required</th>
+ * <tr><td><code>pattern</code></td> <td>+</td> <td><code>pitch</code>, <code>activityGroup</code></td> <td>Defines the pattern to use with the given pitch. The pattern is put into the given activity group.</td> <td>yes</td>
+ * </table>
+ *
+ * <h3>Configuration example</h3>
+ * 
+ * The following example uses 6 patterns with 4 activity groups:
+ * <br>
+ * <pre>&lt;sequenceEngine class="DrumSequenceEngine"&gt;
+ *   &lt;!-- base drum --&gt;
+ *   &lt;pattern pitch="36" activityGroup="0"&gt;10001000100010001000100010001001100010001000100010001000100010101000100010001000100010001000100110001000100010001000100011101011&lt;/pattern&gt;
+ *   &lt;!-- clap --&gt;
+ *   &lt;pattern pitch="37" activityGroup="1"&gt;00001000000010000000100000001000000010000000100000001000000110100000100000001000000010000000100000001000000010000000100001001000&lt;/pattern&gt;
+ *   &lt;!-- closed hi-hat --&gt;
+ *   &lt;pattern pitch="40" activityGroup="2"&gt;10001000100010001100100010001000&lt;/pattern&gt;
+ *   &lt;!-- open hi-hat --&gt;
+ *   &lt;pattern pitch="44" activityGroup="2"&gt;0010001000100010001000100010001000100010001000100010001000100101&lt;/pattern&gt;
+ *   &lt;!-- other hi-hat --&gt;
+ *   &lt;pattern pitch="39" activityGroup="2"&gt;001&lt;/pattern&gt;
+ *   &lt;!-- snare --&gt;
+ *   &lt;pattern pitch="42" activityGroup="3"&gt;00001000010010000000100001001010000010000100100000001000010010110000100001001000000010010100101000001000010010000000100101001011&lt;/pattern&gt;
+ * &lt;/sequenceEngine&gt;
+ * </pre>
  * 
  * @author Thomas Schürger (thomas@schuerger.com)
  */
@@ -20,75 +56,49 @@ import com.soundhelix.misc.Track.TrackType;
 
 public class DrumSequenceEngine extends SequenceEngine {
 
-	// pitch for each of the note pattern strings
-	int[] pitch = {36,37,40,44,39,42};
-
-	// notes for ticks per beat that are a power of 2
-	String[] notes4 = new String[] {
-			// base
-			"10001000100010001000100010001001100010001000100010001000100010101000100010001000100010001000100110001000100010001000100011101011",
-			// clap
-			"00001000000010000000100000001000000010000000100000001000000110100000100000001000000010000000100000001000000010000000100001001000",
-            // closed hihat
-			"10001000100010001100100010001000",
-			// open hihat
-			"0010001000100010001000100010001000100010001000100010001000100101",
-            // tick
-			"001",
-            // snare
-            "00001000010010000000100001001010000010000100100000001000010010110000100001001000000010010100101000001000010010000000100101001011"
-	};
-
-	// notes for ticks per beat that are 3 times a power of 2
-	String[] notes3 = new String[] {
-			// base
-			"100100100100100100100100",
-			// clap
-			"000100000100000100000101",
-			// closed hihat
-			"100100100100100100100100",
-			// open hihat
-			"001",
-			// tick
-			"010",
-			// snare
-			"000100000101000100000100000100000101000100000111"
-	};
-
-	// maps note lanes to ActivityVectors
-	// we give the 3 hihat lanes (2, 3 and 4) the same ActivityVector
-	int[] vectorMapping = new int[] {0,1,2,2,2,3};
+	private DrumEntry[] drumEntries;
+	private int activityVectors;
 	
 	public DrumSequenceEngine() {
 		super();
 	}
 	
-	public Track render(ActivityVector... activityVector) {
+	public void setDrumEntries(DrumEntry[] drumEntries) {
+		int activityVectors = -1;
+		
+		for(int i=0;i<drumEntries.length;i++) {
+			activityVectors = Math.max(activityVectors,drumEntries[i].activityGroup);
+		}
+
+		activityVectors++;
+
+		this.activityVectors = activityVectors;
+		
+		this.drumEntries = drumEntries;
+	}
+	
+	public Track render(ActivityVector[] activityVector) {
 		Track track = new Track(TrackType.RHYTHM);
 
 		int stretchFactor;
 		
-		String[] notes;		
 		int ticksPerBeat = structure.getTicksPerBeat();
 		
 		switch(ticksPerBeat) {
-		case 12:
-		case 6:
-		case 3: notes = notes3;
-		        stretchFactor = 1;
-		        break;
-		      
 		case 16:
+		case 12:
 		case 8:
-		case 4: notes = notes4;
+		case 6:
+		case 4:
+		case 3:
 		        stretchFactor = 1;
 		        break;
 
-		case 2: notes = notes4;
+		case 2: 
         		stretchFactor = 2;
         		break;
 
-		case 1: notes = notes4;
+		case 1: 
         		stretchFactor = 4;
         		break;
         		
@@ -96,12 +106,14 @@ public class DrumSequenceEngine extends SequenceEngine {
         		throw(new RuntimeException("Invalid ticks per beat"));
 		}
 	
-		for(int i=0;i<notes.length;i++) {
+		for(int i=0;i<drumEntries.length;i++) {
+			DrumEntry drumEntry = drumEntries[i];
+			
         	Sequence seq = new Sequence();
       	
         	for(int tick=0,patternTick=0;tick<structure.getTicks();tick++,patternTick++) {
-        		if(activityVector[vectorMapping[i]].isActive(tick) && notes[i].charAt((patternTick*stretchFactor)%notes[i].length()) == '1') {
-        			seq.addNote(pitch[i],1);
+        		if(activityVector[drumEntry.activityGroup].isActive(tick) && drumEntry.pattern.charAt((patternTick*stretchFactor)%drumEntry.pattern.length()) == '1') {
+        			seq.addNote(drumEntry.pitch,1);
         		} else {
         			seq.addPause(1);
         		}
@@ -126,11 +138,44 @@ public class DrumSequenceEngine extends SequenceEngine {
 	}
 	
 	public int getActivityVectorCount() {
-		// we generate 6 sequences, but these are
-		// based on 4 ActivityVectors
-		return 4;
+		return activityVectors;
 	}
 	
     public void configure(Node node,XPath xpath) throws XPathException {
+		NodeList nodeList = (NodeList)xpath.evaluate("pattern",node,XPathConstants.NODESET);
+
+		int patterns = nodeList.getLength();
+		
+		DrumEntry[] drumEntries = new DrumEntry[patterns];
+		
+		if(nodeList.getLength() == 0) {
+			throw(new RuntimeException("Need at least 1 pattern"));
+		}
+		
+		for(int i=0;i<patterns;i++) {
+			String pattern = XMLUtils.parseString(nodeList.item(i),xpath);
+			int pitch = Integer.parseInt((String)xpath.evaluate("attribute::pitch",nodeList.item(i),XPathConstants.STRING));
+			int activityGroup = Integer.parseInt((String)xpath.evaluate("attribute::activityGroup",nodeList.item(i),XPathConstants.STRING));
+
+			if(activityGroup < 0) {
+				throw(new RuntimeException("activityGroup must not be negative"));
+			}
+			
+			drumEntries[i] = new DrumEntry(pattern,pitch,activityGroup);
+		}
+		
+		setDrumEntries(drumEntries);
+    }
+    
+    private class DrumEntry {
+    	private final String pattern;
+    	private final int pitch;
+    	private final int activityGroup;
+    	
+    	private DrumEntry(String pattern,int pitch,int activityGroup) {
+    		this.pattern = pattern;
+    		this.pitch = pitch;
+    		this.activityGroup = activityGroup;
+    	}
     }
 }

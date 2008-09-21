@@ -23,6 +23,8 @@ import com.soundhelix.misc.Track.TrackType;
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
+// TODO: make all patterns configurable
+
 public class ArpeggioSequenceEngine extends SequenceEngine {
 	
 	private static final int[] majorTable = new int[] {0,4,7};

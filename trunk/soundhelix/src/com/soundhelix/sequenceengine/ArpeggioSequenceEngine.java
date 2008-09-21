@@ -1,11 +1,11 @@
 package com.soundhelix.sequenceengine;
 
-import java.util.Hashtable;
-
 import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathException;
 
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import com.soundhelix.harmonyengine.HarmonyEngine;
 import com.soundhelix.misc.ActivityVector;
@@ -14,11 +14,31 @@ import com.soundhelix.misc.Sequence;
 import com.soundhelix.misc.Track;
 import com.soundhelix.misc.Chord.ChordSubtype;
 import com.soundhelix.misc.Track.TrackType;
+import com.soundhelix.util.XMLUtils;
 
 /**
- * Implements a sequence engine that repeats user-specified patterns. For each
- * power of 2, a different pattern can be specified. The length of the current chord
- * determines which of these patterns will be used.
+ * Implements a sequence engine that repeats user-specified patterns. Patterns are comma-separated integers (notes from chords) or minus signs (pauses).
+ * For each chord section the pattern with the best-matching length is used. The best-matching pattern
+ * is the one with the smallest length that is equal to or larger than the required length or
+ * the pattern with the largest length if the former doesn't exist.
+ *
+ * <h3>XML configuration</h3>
+ * <table border=1>
+ * <tr><th>Tag</th> <th>#</th> <th>Attributes</th> <th>Description</th> <th>Required</th>
+ * <tr><td><code>pattern</code></td> <td>+</td> <td></td> <td>Defines the pattern to use.</td> <td>yes</td>
+ * </table>
+ *
+ * <h3>Configuration example</h3>
+ * <pre>
+ * &lt;sequenceEngine class="ArpeggioSequenceEngine"&gt;
+ *   &lt;pattern&gt;0&lt;/pattern&gt;
+ *   &lt;pattern&gt;0,1&lt;/pattern&gt;
+ *   &lt;pattern&gt;0,1,2,1&lt;/pattern&gt;
+ *   &lt;pattern&gt;0,1,2,1,2,3,2,1&lt;/pattern&gt;
+ *   &lt;pattern&gt;0,1,2,1,2,3,2,3,4,3,4,5,4,3,2,1&lt;/pattern&gt;
+ *   &lt;pattern&gt;0,1,2,1,2,3,2,3,4,3,4,5,4,5,6,5,6,7,6,7,8,7,8,9,8,7,6,5,4,3,2,1&lt;/pattern&gt;
+ * &lt;/sequenceEngine&gt;
+ * </pre>
  * 
  * @author Thomas Schürger (thomas@schuerger.com)
  */
@@ -26,39 +46,18 @@ import com.soundhelix.misc.Track.TrackType;
 // TODO: make all patterns configurable
 
 public class ArpeggioSequenceEngine extends SequenceEngine {
-	
 	private static final int[] majorTable = new int[] {0,4,7};
 	private static final int[] minorTable = new int[] {0,3,7};
 
 	private static final boolean obeyChordSubtype = true;
-	
-	private static final Hashtable<Integer,int[]> arpeggioTable = new Hashtable<Integer,int[]>();
-	
-	static {
-		arpeggioTable.put(1,new int[] {0});
-		arpeggioTable.put(2,new int[] {0,1});
-		arpeggioTable.put(4,new int[] {0,1,2,1});
-		arpeggioTable.put(8,new int[] {0,1,2,1,2,3,2,1});
-		arpeggioTable.put(16,new int[] {0,1,2,1,2,3,2,3,4,3,4,5,4,3,2,1});
-		arpeggioTable.put(32,new int[] {0,1,2,1,2,3,2,3,4,3,4,5,4,5,6,5,6,7,6,7,8,7,8,9,8,7,6,5,4,3,2,1});
-		arpeggioTable.put(64,new int[] {0,1,2,1,2,3,2,3,4,3,4,5,4,5,6,5,6,7,6,7,8,7,8,9,8,9,10,9,10,11,10,11,12,11,12,13,12,13,14,13,14,15,14,15,16,15,16,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1});
 
-		/*
-		arpeggioTable.put(1,new int[] {0});
-		arpeggioTable.put(2,new int[] {0,2});
-		arpeggioTable.put(4,new int[] {0,2,1,3});
-		arpeggioTable.put(8,new int[] {0,2,1,3,0,2,1,3});
-		arpeggioTable.put(16,new int[] {0,2,1,3,0,2,1,3,0,2,1,3,0,2,1,3});
-		arpeggioTable.put(32,new int[] {0,2,1,3,0,2,1,3,0,2,1,3,0,2,1,3,0,2,1,3,0,2,1,3,0,2,1,3,0,2,1,3});
-		arpeggioTable.put(64,new int[] {0,2,1,3,0,2,1,3,0,2,1,3,0,2,1,3,0,2,1,3,0,2,1,3,0,2,1,3,0,2,1,3,0,2,1,3,0,2,1,3,0,2,1,3,0,2,1,3,0,2,1,3,0,2,1,3,0,2,1,3,0,2,1,3});
-        */
-}
+	private int[][] patterns;
 
 	public ArpeggioSequenceEngine() {
 		super();
 	}
 	
-	public Track render(ActivityVector... activityVectors) {
+	public Track render(ActivityVector[] activityVectors) {
 		ActivityVector activityVector = activityVectors[0];
 		
         Sequence seq = new Sequence();
@@ -69,16 +68,18 @@ public class ArpeggioSequenceEngine extends SequenceEngine {
         while(tick < structure.getTicks()) {
         	Chord chord = ce.getChord(tick);
         	int len = ce.getChordTicks(tick);
-        	int seqlen = Integer.highestOneBit(Math.min(32,len));
         	
+        	// get arpeggio table for current chord section length
+			int[] pattern = getArpeggioPattern(len);
+        	int patternLen = pattern.length;
+			
         	for(int i=0;i<len;i++) {
         		if(activityVector.isActive(tick)) {
         			// add next note for major/minor chord
         			
-        			int[] table = arpeggioTable.get(seqlen);
-        			int value = table[i%seqlen];
+        			int value = pattern[i%patternLen];
         			
-        			if(value == -1) {
+        			if(value == Integer.MIN_VALUE) {
             			// add pause
             			seq.addPause(1);
         				continue;
@@ -93,7 +94,7 @@ public class ArpeggioSequenceEngine extends SequenceEngine {
         			}
         			
         			int octave = (value >= 0 ? value/3 : (value-2)/3);
-        			int offset = (value >= 0 ? value%3 : (value%3)+3);
+        			int offset = ((value%3)+3)%3;
         			
         	 	    if(chord.isMajor()) {
         			    seq.addNote(octave*12+majorTable[offset]+chord.getPitch(),1);
@@ -113,7 +114,87 @@ public class ArpeggioSequenceEngine extends SequenceEngine {
         track.add(seq);
         return track;
 	}
+
+	/**
+	 * Returns an optimal arpeggio pattern for the given length,
+	 * based on a best-fit selection. The method returns the shortest
+	 * pattern that has a length of len or more. If such a pattern
+	 * doesn't exist, returns the longest pattern shorter than len,
+	 * which is the longest pattern available.
+	 * 
+	 * @param len the length
+	 * 
+	 * @return the arpeggio pattern
+	 */
+	
+	private int[] getArpeggioPattern(int len) {
+		// slow implementation, but this method is only called
+		// once per chord section and we normally don't have
+		// a whole lot of patterns
+		
+		// might use binary search or a hashtable later
+		
+		int bestIndex = -1;
+		int bestIndexLen = Integer.MAX_VALUE;
+		int maxIndex = -1;
+		int maxIndexLen = -1;
+		
+		for(int i=0;i<patterns.length;i++) {
+			int l = patterns[i].length;
+			
+			if(l >= len && l < bestIndexLen) {
+				bestIndex = i;
+				bestIndexLen = l;
+			}
+			
+			if(l >= maxIndexLen) {
+				maxIndex = i;
+				maxIndexLen = l;
+			}		
+		}
+		
+		if(bestIndex != -1) {
+			return patterns[bestIndex];
+		} else {
+			// we haven't found an optimal pattern
+			// use the longest one we've found
+			return patterns[maxIndex];
+		}
+	}
+	
+	public void setPatterns(int[][] patterns) {
+		this.patterns = patterns;
+	}
 	
     public void configure(Node node,XPath xpath) throws XPathException {
+		NodeList nodeList = (NodeList)xpath.evaluate("pattern",node,XPathConstants.NODESET);
+
+		int patterns = nodeList.getLength();
+		
+		if(nodeList.getLength() == 0) {
+			throw(new RuntimeException("Need at least 1 pattern"));
+		}
+		
+		int[][] array = new int[patterns][];
+		
+		for(int i=0;i<patterns;i++) {
+			String pattern = XMLUtils.parseString(nodeList.item(i),xpath);
+
+			String[] p = pattern.split(",");
+			
+			int[] l = new int[p.length];
+			
+			for(int k=0;k<p.length;k++) {
+				if(p[k].equals("-")) {
+					l[k] = Integer.MIN_VALUE;
+				} else {
+				    l[k] = Integer.parseInt(p[k]);
+				}
+			}
+			
+			array[i] = l;
+		}
+		
+		setPatterns(array);   
     }
 }

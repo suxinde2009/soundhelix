@@ -58,8 +58,10 @@ import com.soundhelix.util.XMLUtils;
 
 // TODO: add possibility to map a virtual channel to several MIDI channels (do we need this)?
 // TODO: add possibility to use more than one MIDI device and map virtual channels to combinations of MIDI channels and MIDI devices
+// TODO: add possibility to choose a program number (i.e., instrument) for each MIDI channel
 // TODO: mute all MIDI channels when starting playing (how?)
-// TODO: add MIDI synchronization (sending clock ticks to target device, how?)
+// TODO: mute all MIDI channels when player is aborted by ctrl+c (how?)
+// TODO: add MIDI synchronization support (sending clock ticks to target device, how?)
 
 public class MidiPlayer extends Player {
 	private String deviceName;

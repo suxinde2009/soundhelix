@@ -1,8 +1,10 @@
 package com.soundhelix.player;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.sound.midi.MidiDevice;
 import javax.sound.midi.MidiSystem;
@@ -13,6 +15,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathException;
 
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import com.soundhelix.misc.Arrangement;
 import com.soundhelix.misc.Sequence;
@@ -25,12 +28,37 @@ import com.soundhelix.util.XMLUtils;
 
 /**
  * Implements a MIDI player. Track's channels are mapped to MIDI channels
- * in a 1:1 fashion.
+ * in a 1:1 fashion, unless mapped otherwise explicitly.
  * 
- * @todo Add MIDI channel mapping
+ * <h3>XML configuration</h3>
+ * <table border=1>
+ * <tr><th>Tag</th> <th>#</th> <th>Attributes</th> <th>Description</th> <th>Required</th>
+ * <tr><td><code>device</code></td> <td>1</td> <td></td> <td>Specifies the MIDI device to use.</td> <td>yes</td>
+ * <tr><td><code>bpm</code></td> <td>1</td> <td></td> <td>Specifies the beats per minute to use.</td> <td>yes</td>
+ * <tr><td><code>transposition</code></td> <td>1</td> <td></td> <td>Specifies the transposition in halftones to use. Pitches are generated at around 0, so for MIDI the transposition must be something around 60.</td> <td>yes</td>
+ * <tr><td><code>groove</code></td> <td>1</td> <td></td> <td>Specifies the groove to use. See method setGroove().</td> <td>yes</td>
+ * <tr><td><code>map</code></td> <td>*</td> <td><code>from</code>, <code>to</code></td> <td>Maps the virtual channel specified by <i>from</i> to MIDI channel <i>to</i>.</td> <td>no</td>
+ * </table>
+ *
+ * <h3>Configuration example</h3>
+ *
+ * <pre>
+ * &lt;player class="MidiPlayer"&gt;
+ *   &lt;device&gt;Out To MIDI Yoke:  1&lt;/device&gt;
+ *   &lt;bpm&gt;&lt;random min="130" max="150" type="normal" mean="140" variance="6"/&gt;&lt;/bpm&gt;
+ *   &lt;transposition&gt;&lt;random min="64" max="70"/&gt;&lt;/transposition&gt;
+ *   &lt;groove&gt;&lt;random list="100,100|110,90|115,85|120,80|115,85,120,80"/&gt;&lt;/groove&gt;
+ *   &lt;map from="0" to="8"/&gt;
+ *   &lt;map from="1" to="7"/&gt;
+ * &lt;/player&gt;
+ * </pre>
  * 
  * @author Thomas Schürger (thomas@schuerger.com)
  */
+
+// TODO: add possibility to map a virtual channel to several MIDI channels (do we need this)?
+// TODO: mute all MIDI channels when starting playing
+// TODO: add MIDI synchronization (sending clock ticks to target device)
 
 public class MidiPlayer extends Player {
 	private String deviceName;
@@ -39,6 +67,8 @@ public class MidiPlayer extends Player {
 	private int bpm;
 	private int transposition;
 	private int groove[];
+	
+	private Map<Integer,Integer> channelMap;
 	
     public MidiPlayer() {
     	super();
@@ -81,6 +111,8 @@ public class MidiPlayer extends Player {
     		throw(new IllegalArgumentException("BPM must be > 0"));
     	}
     	
+    	System.out.println("Setting BPM to "+bpm);
+    	
     	this.bpm = bpm;
     }
 
@@ -116,6 +148,8 @@ public class MidiPlayer extends Player {
     		grooveString = "1";
     	}
     	
+    	System.out.println("Setting groove to "+grooveString);
+    	
     	String[] grooveList = grooveString.split(",");
     	int len = grooveList.length;
 
@@ -141,6 +175,18 @@ public class MidiPlayer extends Player {
     	// correct total groove
     	
     	groove[len-1] -= totalGroove-len*1000;
+    }
+    
+    /**
+     * Sets the channel map, which maps virtual channels to MIDI
+     * channels. All virtual channels which are not mapped explicitly
+     * are mapped to the MIDI channel with the same number.
+     * 
+     * @param channelMap the channel map
+     */
+    
+    public void setChannelMap(Map<Integer,Integer> channelMap) {
+    	this.channelMap = channelMap;
     }
     
 	private static MidiDevice findMidiDevice(String name) {
@@ -200,6 +246,12 @@ public class MidiPlayer extends Player {
     				Track track = e.getTrack();
     				int channel = e.getChannel();
 
+    				// map channel if mapped
+    				
+    				if(channelMap.containsKey(channel)) {
+    					channel = channelMap.get(channel);
+    				}
+    				
     				int[] t = tickList.get(k);
     				int[] p = posList.get(k);
 
@@ -314,5 +366,24 @@ public class MidiPlayer extends Player {
     	setBPM(XMLUtils.parseInteger((Node)xpath.evaluate("bpm",node,XPathConstants.NODE),xpath));
     	setTransposition(XMLUtils.parseInteger((Node)xpath.evaluate("transposition",node,XPathConstants.NODE),xpath));
     	setGroove(XMLUtils.parseString((Node)xpath.evaluate("groove",node,XPathConstants.NODE),xpath));
+    	
+		NodeList nodeList = (NodeList)xpath.evaluate("map",node,XPathConstants.NODESET);
+
+		int mapEntries = nodeList.getLength();
+		
+		Map<Integer,Integer> channelMap = new HashMap<Integer,Integer>();
+		
+		for(int i=0;i<mapEntries;i++) {
+			int from = Integer.parseInt((String)xpath.evaluate("attribute::from",nodeList.item(i),XPathConstants.STRING));
+			int to = Integer.parseInt((String)xpath.evaluate("attribute::to",nodeList.item(i),XPathConstants.STRING));
+
+			if(channelMap.containsKey(from)) {
+				throw(new RuntimeException("Channel "+from+" must not be re-mapped"));
+			}
+			
+			channelMap.put(from,to);
+		}
+		
+		setChannelMap(channelMap);
     }
 }

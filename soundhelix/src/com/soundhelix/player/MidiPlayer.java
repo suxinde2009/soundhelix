@@ -48,8 +48,8 @@ import com.soundhelix.util.XMLUtils;
  *   &lt;bpm&gt;&lt;random min="130" max="150" type="normal" mean="140" variance="6"/&gt;&lt;/bpm&gt;
  *   &lt;transposition&gt;&lt;random min="64" max="70"/&gt;&lt;/transposition&gt;
  *   &lt;groove&gt;&lt;random list="100,100|110,90|115,85|120,80|115,85,120,80"/&gt;&lt;/groove&gt;
- *   &lt;map from="0" to="8"/&gt;
- *   &lt;map from="1" to="7"/&gt;
+ *   &lt;mapChannel from="0" to="8"/&gt;
+ *   &lt;mapChannel from="1" to="7"/&gt;
  * &lt;/player&gt;
  * </pre>
  * 
@@ -404,7 +404,7 @@ public class MidiPlayer extends Player {
     	setTransposition(XMLUtils.parseInteger((Node)xpath.evaluate("transposition",node,XPathConstants.NODE),xpath));
     	setGroove(XMLUtils.parseString((Node)xpath.evaluate("groove",node,XPathConstants.NODE),xpath));
     	
-		NodeList nodeList = (NodeList)xpath.evaluate("map",node,XPathConstants.NODESET);
+		NodeList nodeList = (NodeList)xpath.evaluate("mapChannel",node,XPathConstants.NODESET);
 
 		int mapEntries = nodeList.getLength();
 		

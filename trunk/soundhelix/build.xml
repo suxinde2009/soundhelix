@@ -24,6 +24,7 @@
 		           author="true"
 		           version="true"
 		           use="true"
+		  	       target="1.5"
 		           windowtitle="SoundHelix API">
 		    <doctitle><![CDATA[<h1>SoundHelix</h1>]]></doctitle>
 		    <link offline="true" href="http://java.sun.com/javase/6/docs/api/" packagelistLoc="C:\tmp"/>

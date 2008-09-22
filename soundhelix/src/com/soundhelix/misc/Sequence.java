@@ -150,6 +150,30 @@ public class Sequence {
 		return sb.append('}').toString();
 	}
 
+	/**
+	 * Transposes all notes of this sequence up by the given
+	 * number of halftones.
+	 * 
+	 * @param halftones the number of halftones (positive or negative)
+	 */
+	
+	public void transpose(int halftones) {
+		if(halftones == 0) {
+			// nothing to do
+			return;
+		}
+		
+		Iterator<SequenceEntry> iter = sequence.iterator();
+		
+		while(iter.hasNext()) {
+			SequenceEntry entry = iter.next();
+			
+			if(entry.isNote()) {
+				entry.pitch += halftones;
+			}
+		}
+	}
+	
 	public class SequenceEntry {
 		private int pitch;
 		private short velocity;
@@ -175,6 +199,10 @@ public class Sequence {
 
 		public boolean isNote() {
 			return velocity > 0;
+		}
+		
+		public boolean isPause() {
+			return velocity <= 0;
 		}
 
 		public String toString() {

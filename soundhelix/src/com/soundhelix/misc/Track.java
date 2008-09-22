@@ -1,6 +1,7 @@
 package com.soundhelix.misc;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -75,5 +76,25 @@ public class Track {
 	
 	public Sequence get(int index) {
 		return seqList.get(index);
+	}
+	
+	/**
+	 * Transposes all sequences of this track up by the given
+	 * number of halftones.
+	 * 
+	 * @param halftones the number of halftones (positive or negative)
+	 */
+	
+	public void transpose(int halftones) {
+		if(halftones == 0) {
+			// nothing to do
+			return;
+		}
+		
+		Iterator<Sequence> iter = seqList.iterator();
+		
+		while(iter.hasNext()) {
+			iter.next().transpose(halftones);
+		}
 	}
 }

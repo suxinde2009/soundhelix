@@ -79,7 +79,7 @@ public class MidiPlayer extends Player {
        		device = MidiPlayer.findMidiDevice(deviceName);
 
     		if(device == null) {
-    			throw(new RuntimeException("Could not find MIDI device"));
+       			throw(new RuntimeException("Could not find MIDI device \""+deviceName+"\". Available devices with MIDI IN:\n"+getMidiDevices()));
     		}
 
     		device.open();
@@ -87,13 +87,43 @@ public class MidiPlayer extends Player {
     		receiver = device.getReceiver();
 
     		if(receiver == null) {
-    			throw(new RuntimeException("MIDI device does not have a Receiver"));
+    			throw(new RuntimeException("MIDI device \""+deviceName+"\" does not have a Receiver. Available devices with MIDI IN:\n"+getMidiDevices()));
     		}
     	} catch(Exception e) {
     		throw(new RuntimeException("Error opening MIDI device \""+deviceName+"\"",e));
     	}
     }
+    
+    /**
+     * Returns a string containing all MIDI devices that can receive MIDI
+     * messages.
+     * 
+     * @return the string of MIDI devices
+     */
 
+    private String getMidiDevices() {
+    	StringBuilder sb = new StringBuilder();
+
+    	MidiDevice.Info[] info = MidiSystem.getMidiDeviceInfo();
+
+    	int num = 1;
+
+    	for(int i=0;i<info.length;i++) {
+    		try {
+    			MidiDevice device = MidiSystem.getMidiDevice(info[i]);
+
+    			if(device != null && device.getReceiver() != null) {   		
+    				if(sb.length() > 0) {
+    					sb.append('\n');
+    				}
+    				sb.append("MIDI device "+(num++)+": \""+info[i].getName()+"\"");
+    			}
+    		} catch(Exception e) {}
+    	}
+
+    	return sb.toString();
+    }
+    
     public void close() {
     	if(device != null) {
     		device.close();
@@ -329,6 +359,12 @@ public class MidiPlayer extends Player {
     			ArrangementEntry e = i.next();
     			Track track = e.getTrack();
     			int channel = e.getChannel();
+
+				// map channel if mapped
+				
+				if(channelMap.containsKey(channel)) {
+					channel = channelMap.get(channel);
+				}
 
     			int[] p = posList.get(k);
 

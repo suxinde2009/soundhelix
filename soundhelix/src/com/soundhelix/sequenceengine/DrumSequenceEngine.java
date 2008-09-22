@@ -52,8 +52,6 @@ import com.soundhelix.util.XMLUtils;
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
-// TODO: make all patterns configurable (including mapping from patterns to ActivityVectors)
-
 public class DrumSequenceEngine extends SequenceEngine {
 
 	private DrumEntry[] drumEntries;

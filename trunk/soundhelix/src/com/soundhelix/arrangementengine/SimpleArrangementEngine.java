@@ -13,6 +13,7 @@ import org.w3c.dom.NodeList;
 import com.soundhelix.harmonyengine.HarmonyEngine;
 import com.soundhelix.misc.ActivityVector;
 import com.soundhelix.misc.Arrangement;
+import com.soundhelix.misc.Track;
 import com.soundhelix.sequenceengine.SequenceEngine;
 import com.soundhelix.util.XMLUtils;
 
@@ -191,7 +192,9 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 				list[k] = activityVectors[vectorNum++];
 			}
 
-			arrangement.add(sequenceEngine.render(list),arrangementEntries[i].channel);
+			Track track = sequenceEngine.render(list);
+			track.transpose(arrangementEntries[i].transposition);
+			arrangement.add(track,arrangementEntries[i].channel);
 		}
 
 		return arrangement;
@@ -412,6 +415,12 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 		
 		for(int i=0;i<tracks;i++) {
 			int channel = XMLUtils.parseInteger("channel",nodeList.item(i),xpath);
+
+			int transposition = 0;
+			
+			try {
+			    transposition = XMLUtils.parseInteger("transposition",nodeList.item(i),xpath);
+			} catch(Exception e) {}
 			
 			String minRatios = XMLUtils.parseString("minRatios",nodeList.item(i),xpath);
 			String maxRatios = XMLUtils.parseString("maxRatios",nodeList.item(i),xpath);
@@ -420,7 +429,7 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 
 			try {
 			    SequenceEngine sequenceEngine = XMLUtils.getInstance(SequenceEngine.class,sequenceEngineNode,xpath);
-			    arrangementEntries[i] = new ArrangementEntry(channel,sequenceEngine,parseRatios(minRatios,sequenceEngine.getActivityVectorCount(),0d),parseRatios(maxRatios,sequenceEngine.getActivityVectorCount(),100d));
+			    arrangementEntries[i] = new ArrangementEntry(channel,sequenceEngine,parseRatios(minRatios,sequenceEngine.getActivityVectorCount(),0d),parseRatios(maxRatios,sequenceEngine.getActivityVectorCount(),100d),transposition);
 			} catch(Exception e) {
 				throw(new RuntimeException("Error instantiating SequenceEngine",e));
 			}	
@@ -492,12 +501,14 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 		private SequenceEngine sequenceEngine;
 		private double[] minRatios;
 		private double[] maxRatios;
+		private int transposition;
 		
-		private ArrangementEntry(int channel,SequenceEngine sequenceEngine,double[] minRatios,double[] maxRatios) {
+		private ArrangementEntry(int channel,SequenceEngine sequenceEngine,double[] minRatios,double[] maxRatios,int transposition) {
 			this.channel = channel;
 			this.sequenceEngine = sequenceEngine;
 			this.minRatios = minRatios;
 			this.maxRatios = maxRatios;
+			this.transposition = transposition;
 		}
 	}
 }

@@ -131,3 +131,13 @@ I'm looking for more developers to join this project. If you
 have Java and some music skills or documentation skills and think
 you can contribute to the project, then please don't hesitate to contact
 me.
+
+
+Developer Resources
+-------------------
+
+Java Sound API:
+http://java.sun.com/products/java-media/sound/reference/api/index.html
+
+Java MIDI Programming FAQ:
+http://www.jsresources.org/faq_midi.html

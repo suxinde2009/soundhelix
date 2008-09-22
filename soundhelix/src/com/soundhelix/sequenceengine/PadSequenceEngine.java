@@ -40,7 +40,7 @@ public class PadSequenceEngine extends SequenceEngine {
 	
 	private static int postPauseTicks = 1;
 	
-	private static int voiceCount = 3;
+	private int voiceCount = -1;
 	private int[] offsets;
 	
 	public PadSequenceEngine() {
@@ -124,7 +124,13 @@ public class PadSequenceEngine extends SequenceEngine {
 	}
 	
     public void configure(Node node,XPath xpath) throws XPathException {
-    	String[] offsetList = XMLUtils.parseString("offsets",node,xpath).split(",");
+    	String offsetString = XMLUtils.parseString("offsets",node,xpath);
+    	
+    	if(offsetString == null || offsetString.equals("")) {
+    		offsetString = "0,1,2";
+    	}
+
+    	String[] offsetList = offsetString.split(",");
     	
     	int[] offsets = new int[offsetList.length];
     	

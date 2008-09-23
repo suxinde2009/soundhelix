@@ -15,13 +15,13 @@ public class RandomUtils {
 	
 	/**
 	 * Returns a random integer uniformly distributed within min
-	 * and max (both inclusive), using a quantization of step.
-	 * The quantization is based on min, i.e., only values
+	 * and max (both inclusive), using a granularity of step.
+	 * The granularity is based on min, i.e., only values
 	 * of the form min+k*step (k = 0, 1, ..., upto a suitable
 	 * maximum) can be returned.
 	 * 
-	 * @param min the minimum value
-	 * @param max the maximum value
+	 * @param min the minimum value (inclusive)
+	 * @param max the maximum value (inclusive)
 	 * @param step the step (normally 1)
      *
 	 * @return a uniformly distributed integer
@@ -32,16 +32,51 @@ public class RandomUtils {
 	}
 
 	/**
+	 * Returns a random double uniformly distributed within min
+	 * (inclusive) and max (exclusive). max cannot be returned by
+	 * this method, but even if it could, the probability for the
+	 * random value being exactly max would be negligible (in the
+	 * order of 2^-53).
+	 * 
+	 * @param min the minimum value (inclusive)
+	 * @param max the maximum value (exclusive)
+     *
+	 * @return a uniformly distributed integer
+	 */
+	
+	public static double getUniformDouble(double min,double max) {
+		return min+(max-min)*random.nextDouble();
+	}
+
+	/**
+	 * Returns a random double uniformly distributed within min
+	 * (inclusive) and max (exclusive), using a granularity of step.
+	 * The granularity is based on min, i.e., only values
+	 * of the form min+k*step (k = 0, 1, ..., upto a suitable
+	 * maximum) can be returned.
+	 * 
+	 * @param min the minimum value (inclusive)
+	 * @param max the maximum value (exclusive)
+	 * @param step the step (must not be 0)
+     *
+	 * @return a uniformly distributed double
+	 */
+	
+	public static double getUniformDouble(double min,double max,double step) {
+		return min+step*Math.floor((max-min)*random.nextDouble()/step);
+	}
+
+	/**
 	 * Returns a normally distributed integer within min and max
 	 * (both inclusive), having the specified mean and the
 	 * specified variance. If the calculated random Gaussian does not
 	 * fall into the specified interval between min and max,
 	 * the process is repeated until it does.
 	 * 
-	 * @param min the minimum value
-	 * @param max the maximum value
+	 * @param min the minimum value (inclusive)
+	 * @param max the maximum value (inclusive)
 	 * @param mean the mean value
-	 * @param variance the variance (square of the standard diviation)
+	 * @param variance the variance (square of the standard deviation)
 	 * 
 	 * @return a normally distributed integer 
 	 */
@@ -51,6 +86,31 @@ public class RandomUtils {
 		
 		do {
 			value = (int)(mean+variance*random.nextGaussian());
+		} while(value < min || value > max);
+
+		return value;
+	}
+	
+	/**
+	 * Returns a normally distributed double within min and max
+	 * (both inclusive), having the specified mean and the
+	 * specified variance. If the calculated random Gaussian does not
+	 * fall into the specified interval between min and max,
+	 * the process is repeated until it does.
+	 * 
+	 * @param min the minimum value (inclusive)
+	 * @param max the maximum value (inclusive)
+	 * @param mean the mean value
+	 * @param variance the variance (square of the standard deviation)
+	 * 
+	 * @return a normally distributed double
+	 */
+	
+	public static double getNormalDouble(double min,double max,double mean,double variance) {
+		double value;
+		
+		do {
+			value = mean+variance*random.nextGaussian();
 		} while(value < min || value > max);
 
 		return value;

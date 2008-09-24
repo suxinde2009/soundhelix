@@ -164,6 +164,48 @@ public abstract class HarmonyEngine implements XMLConfigurable {
 	}
 	
 	/**
+	 * Returns a string specifying the chord section that starts
+	 * at the specified tick, which is a comma-separated list of
+	 * chords and tick lengths. This is done by listing all the
+	 * chords and their lengths until the next chord section starts
+	 * or the song ends.
+	 * 
+	 * @param tick
+	 * 
+	 * @return a chord section string (or null if the tick parameter is invalid)
+	 */
+	
+	public String getChordSectionString(int tick) {
+		StringBuilder sb = new StringBuilder();
+		
+		if(tick < 0 || tick >= structure.getTicks()) {
+			return null;
+		}
+		
+		int tickEnd = tick+getChordSectionTicks(tick);
+
+		while(tick < tickEnd) {
+			Chord chord = getChord(tick);
+			int len = getChordTicks(tick);
+			
+			if(sb.length() > 0) {
+				sb.append(',');
+			}
+			
+			sb.append(chord.getShortName());
+			sb.append('/');
+			
+			// the chord section might end before a chord change occurs
+			// therefore we need to use Math.min()
+			sb.append(Math.min(tickEnd-tick,len));
+
+			tick += len;
+		}
+		
+		return sb.toString();
+	}
+	
+	/**
 	 * Checks if the 3 abstract methods return consistent and correct
 	 * results. In case of a detected problem, a RuntimeException will
 	 * be thrown.

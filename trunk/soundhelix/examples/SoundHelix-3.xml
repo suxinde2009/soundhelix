@@ -1,0 +1,107 @@
+<?xml version="1.0"?>
+<!-- Simple configuration file that uses 3 ticks per beat -->
+<soundHelix>
+  <structure>
+     <bars><random min="96" max="160" step="16"/></bars>
+     <beatsPerBar>4</beatsPerBar>
+     <ticksPerBeat>3</ticksPerBeat>
+  </structure>
+  <harmonyEngine class="PatternHarmonyEngine">
+    <chordPattern>0/4,1/4,1/4,2/4</chordPattern>
+    <chordPattern>0/4,1/4,1/4,1/2,2/2</chordPattern>
+    <chordPattern>0/4,1/4,1/2,1/2,1/2,2/2</chordPattern>
+    <chordPattern>0/4,1/4,1/4,1/4,0/4,1/4,1/4,2/4</chordPattern>
+    <chordPattern>0/4,1/4,1/4,1/4,0/4,1/4,1/4,1/2,2/2</chordPattern>
+    <chordPattern>0/4,1/4,1/4,1/2,1/2,0/4,1/4,1/4,1/2,2/2</chordPattern>
+    <chordPattern>0/4,1/4,1/2,1/2,2/4</chordPattern>
+    <chordPattern>0/4,1/4,$0/4,1/2,$1/2</chordPattern>
+    <chordRandomTable>C,Am</chordRandomTable>
+    <chordRandomTable>C,Am,G,F,Em,Dm</chordRandomTable>
+    <chordRandomTable>C,Am,G,F,Em,Dm,E</chordRandomTable>
+  </harmonyEngine> 
+  <arrangementEngine class="SimpleArrangementEngine">
+    <track>
+      <channel>1</channel>
+      <sequenceEngine class="PadSequenceEngine">
+        <offsets><random list="0,1,2|0,1,2,3|-1,0,1|-2,-1,0,1,2|1,2,3"/></offsets>
+      </sequenceEngine>
+    </track>
+    <track>
+      <channel>3</channel>
+      <sequenceEngine class="DrumSequenceEngine">
+        <!-- base drum -->
+        <pattern pitch="36" activityGroup="0">100</pattern>
+        <!-- clap -->
+        <pattern pitch="37" activityGroup="1">000100000100000100000101</pattern>
+        <!-- closed hi-hat -->
+        <pattern pitch="40" activityGroup="2">100</pattern>
+        <!-- open hi-hat -->
+        <pattern pitch="44" activityGroup="2">010</pattern>
+        <!-- other hi-hat -->
+        <pattern pitch="39" activityGroup="2">111</pattern>
+	    <!-- snare -->
+        <pattern pitch="42" activityGroup="3">000100000100000100000100000100000100000100000111</pattern>
+      </sequenceEngine>
+      <minRatios>50,25,25,0</minRatios>
+      <maxRatios>90,100,100,100</maxRatios>
+    </track>
+    <track>
+      <channel>0</channel>
+      <sequenceEngine class="ArpeggioSequenceEngine">
+        <pattern>0</pattern>
+        <pattern>0,1</pattern>
+        <pattern>0,1,2,1</pattern>
+        <pattern>0,1,2,1,2,3,2,1</pattern>
+        <pattern>0,1,2,1,2,3,2,3,4,3,4,5,4,3,2,1</pattern>
+        <pattern>0,1,2,1,2,3,2,3,4,3,4,5,4,5,6,5,6,7,6,7,8,7,8,9,8,7,6,5,4,3,2,1</pattern>
+      </sequenceEngine>
+    </track>
+   <track>
+      <channel>2</channel>
+      <sequenceEngine class="PatternSequenceEngine">
+        <pattern>0,-,-,0,-,-,1,-,-,0,-,+</pattern>
+      </sequenceEngine>
+      <minRatios>60</minRatios>
+    </track>
+    <track>
+      <channel>4</channel>
+      <sequenceEngine class="PatternSequenceEngine">
+        <pattern>0,-,-,0,-,-,0,-,1,0,-,2,0,-,1,2,-,0,-,2,3,1,4,2</pattern>
+      </sequenceEngine>
+    </track>
+    <track>
+      <channel>5</channel>
+      <sequenceEngine class="ChordSequenceEngine">
+        <pattern>0,-,-,0,-,-,0,-,-,0,-,-,0,-,-,0,-,-,0,-,-,0,2,1,0,-,-,0,-,-,0,-,-,0,-,-,0,-,-,0,-,-,0,-,2,1,3,4</pattern>
+      </sequenceEngine>
+    </track>-->
+    <!--<track>
+      <channel>7</channel>
+      <sequenceEngine class="RhythmSequenceEngine"/>
+    </track>-->
+    <track>
+      <channel>8</channel>
+      <sequenceEngine class="PatternSequenceEngine">
+        <pattern>0,-,-</pattern>
+      </sequenceEngine>
+    </track>
+    <track>
+      <channel>9</channel>
+      <sequenceEngine class="PatternSequenceEngine">
+        <pattern>0,0,0,-,0,-,-,0,-,-,0,-</pattern>
+      </sequenceEngine>
+    </track>
+    <track>
+      <channel>10</channel>
+      <sequenceEngine class="PatternSequenceEngine">
+        <pattern>0:1,-,0:1,-,0:1,-,-,0:1,-,0:1,-,0:1</pattern>
+      </sequenceEngine>
+    </track>
+  </arrangementEngine>
+  <player class="MidiPlayer">
+    <device>Out To MIDI Yoke:  1</device>
+    <bpm><random min="130" max="150" type="normal" mean="140" variance="6"/></bpm>
+	<transposition><random min="64" max="70"/></transposition>
+    <groove><random list="1,1,1"/></groove>
+  </player>
+</soundHelix>

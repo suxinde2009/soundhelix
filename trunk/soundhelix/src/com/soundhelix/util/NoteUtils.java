@@ -9,7 +9,10 @@ import java.util.Hashtable;
  */
 
 public class NoteUtils {
-	
+	// list of notes which are on the C/Am scale, i.e., which
+	// form the white keys on the piano keyboard, starting with C
+	private static final boolean[] scaleTable = new boolean[] {true,false,true,false,true,true,false,true,false,true,false,true};
+
 	private static String noteNames[] = {
 		"c","c#","d","d#","e","f","f#","g","g#","a","a#","b"
 	};
@@ -32,4 +35,17 @@ public class NoteUtils {
 	public static int getNotePitch(String name) {
 		return h.get(name.toLowerCase());
 	}
+	
+    /**
+     * Returns true iff the given pitch is on the C/Am scale
+     * (i.e., a "white key" on the piano keyboard).
+     * 
+     * @param pitch the pitch to check
+     * 
+     * @return true or false
+     */
+    
+    public static boolean isOnScale(int pitch) {
+    	return scaleTable[((pitch%12)+12)%12];
+    }
 }

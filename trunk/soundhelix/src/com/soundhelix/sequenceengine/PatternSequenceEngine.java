@@ -16,6 +16,7 @@ import com.soundhelix.misc.Sequence;
 import com.soundhelix.misc.Track;
 import com.soundhelix.misc.Chord.ChordSubtype;
 import com.soundhelix.misc.Track.TrackType;
+import com.soundhelix.util.NoteUtils;
 import com.soundhelix.util.XMLUtils;
 
 /**
@@ -46,7 +47,6 @@ public class PatternSequenceEngine extends SequenceEngine {
 	
 	private static final int[] majorTable = new int[] {0,4,7};
 	private static final int[] minorTable = new int[] {0,3,7};
-	private static final boolean[] scaleTable = new boolean[] {true,false,true,false,true,true,false,true,false,true,false,true};
 
 	private static boolean obeyChordSubtype = false;
 	private int[] pattern;
@@ -229,30 +229,16 @@ public class PatternSequenceEngine extends SequenceEngine {
     		pitch1 += Math.min(0,absdiff/2-1);
     		do {
     			pitch1++;
-    		} while(!isOnScale(pitch1));
+    		} while(!NoteUtils.isOnScale(pitch1));
     	   	return pitch1;
     	} else {
     		// we have a pitch difference of at least 3 halftones down
     		pitch1 -= Math.min(0,absdiff/2-1);
     		do {
     			pitch1--;
-    		} while(!isOnScale(pitch1));
+    		} while(!NoteUtils.isOnScale(pitch1));
     		return pitch1;
     	}
-    }
-    
-    /**
-     * Returns true iff the given pitch is on the C/Am scale
-     * (i.e., a "white key" on the piano keyboard).
-     * 
-     * @param pitch the pitch to check
-     * 
-     * @return true or false
-     */
-    
-    private static boolean isOnScale(int pitch) {
-    	pitch = ((pitch%12)+12)%12;
-    	return scaleTable[pitch];
     }
     	
     public void configure(Node node,XPath xpath) throws XPathException {

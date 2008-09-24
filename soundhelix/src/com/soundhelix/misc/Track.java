@@ -85,20 +85,21 @@ public class Track {
 	
 	/**
 	 * Transposes all sequences of this track up by the given
-	 * number of halftones.
+	 * number of halftones. If the number of halftones is not zero,
+     * the track type must not be RHYTHM.
 	 * 
 	 * @param halftones the number of halftones (positive or negative)
 	 */
 	
 	public void transpose(int halftones) {
-		if(type == TrackType.RHYTHM) {
-			// transposing is forbidden
-			throw(new RuntimeException("Tracks of type RHYTHM must not be transposed"));
-		}
-		
 		if(halftones == 0) {
 			// nothing to do
 			return;
+		}
+		
+		if(type == TrackType.RHYTHM) {
+			// transposing is forbidden
+			throw(new RuntimeException("Tracks of type RHYTHM must not be transposed"));
 		}
 		
 		Iterator<Sequence> iter = seqList.iterator();

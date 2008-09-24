@@ -20,12 +20,17 @@ import java.util.List;
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
+// TODO: consider moving the TrackType to the Sequence class (as SequenceType)
+// this way, different types of sequences could be put into a track, which is currently not possible
+
 public class Track {
 	// the sequence list
 	List<Sequence> seqList = new ArrayList<Sequence>();
 	
 	public enum TrackType {
+		// the track contains melodic sequences, subject to transposition
 		MELODY,
+		// the track contains fixed-pitch sequences, which must not be transposed
 		RHYTHM
 	}
 	
@@ -86,6 +91,11 @@ public class Track {
 	 */
 	
 	public void transpose(int halftones) {
+		if(type == TrackType.RHYTHM) {
+			// transposing is forbidden
+			throw(new RuntimeException("Tracks of type RHYTHM must not be transposed"));
+		}
+		
 		if(halftones == 0) {
 			// nothing to do
 			return;

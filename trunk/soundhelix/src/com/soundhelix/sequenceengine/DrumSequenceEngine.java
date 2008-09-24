@@ -52,6 +52,8 @@ import com.soundhelix.util.XMLUtils;
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
+// TODO: consider adding velocity support to the patterns (do we need this?)
+
 public class DrumSequenceEngine extends SequenceEngine {
 
 	private DrumEntry[] drumEntries;

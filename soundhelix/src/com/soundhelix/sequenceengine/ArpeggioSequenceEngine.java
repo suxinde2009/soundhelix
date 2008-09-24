@@ -43,6 +43,8 @@ import com.soundhelix.util.XMLUtils;
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
+// TODO: allow specifying velocities in arpeggio patterns (like in the PatternSequenceEngine)
+
 public class ArpeggioSequenceEngine extends SequenceEngine {
 	private static final int[] majorTable = new int[] {0,4,7};
 	private static final int[] minorTable = new int[] {0,3,7};

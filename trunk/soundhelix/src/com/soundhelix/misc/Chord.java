@@ -104,6 +104,17 @@ public class Chord {
 	}
 
 	/**
+	 * Returns the name of the chord in a short form (like 'C' or 'Am').
+	 * The chord's subtype is not taken into consideration.
+	 * 
+	 * @return the short name of the chord
+	 */
+	
+	public String getShortName() {
+		return NoteUtils.getNoteName(pitch).toUpperCase()+(isMinor() ? "m" : "");
+	}
+	
+	/**
 	 * Returns a version of the given chord that is closest (i.e., most compatible)
 	 * to this chord. This method chooses the version of the chord that minimizes
 	 * the pitch distance of the middle note of the two chords. This may include

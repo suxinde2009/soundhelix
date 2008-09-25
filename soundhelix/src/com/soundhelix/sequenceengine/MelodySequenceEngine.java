@@ -18,7 +18,7 @@ import com.soundhelix.misc.Track.TrackType;
  * Implements a sequence engine plays a randomly generated melody, played
  * with a given rhythmic pattern.
  * 
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas Schï¿½rger (thomas@schuerger.com)
  */
 
 // TODO: work on this (not really usable yet)
@@ -51,9 +51,7 @@ public class MelodySequenceEngine extends SequenceEngine {
 
 	public MelodySequenceEngine(String patternString) {
 		super();
-		this.patternString = patternString;
-		this.pattern = parsePatternString(patternString);
-		this.patternLength = pattern.length;
+		setPattern(patternString);
 	}
 
 	public Track render(ActivityVector... activityVectors) {
@@ -208,4 +206,10 @@ public class MelodySequenceEngine extends SequenceEngine {
     
     public void configure(Node node,XPath xpath) throws XPathException {
     }
+    
+	public void setPattern(String patternString) {
+		this.patternString = patternString;
+		this.pattern = parsePatternString(patternString);
+		this.patternLength = pattern.length;
+	}
 }

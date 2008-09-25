@@ -17,21 +17,29 @@ import com.soundhelix.util.NoteUtils;
 import com.soundhelix.util.XMLUtils;
 
 /**
- * Implements a flexible HarmonyEngine based on user-specified patterns. One of the given
- * patterns is chosen at random. The patterns contain references to chord random tables, which
- * are used to randomly select a chord for the pattern position. Chord patterns can also
- * contain back references (denoted as "$position", e.g., "$0") which reproduces a chord that
- * was generated at an earlier position.
+ * Implements a flexible HarmonyEngine based on user-specified patterns. The patterns consist
+ * of chord patterns and random table patterns. One of the given
+ * chord patterns is chosen at random. A chord pattern consists of comma-separated combinations of chords
+ * and lengths in beats (separated by a slash). A chord is either a simple chord name ("C" for C major, "Am" for A minor, etc.),
+ * a random table number (starting from 0) or a backreference to an already generated chord at an
+ * earlier position ("$0" for first chord, "$1" for second chord, etc.). If a random table number is
+ * given, a chord is randomly chosen from that table. Chord random tables a comma-separated lists of
+ * chord names (e.g., "Am,G,F,Em,Dm"), they are numbered starting from 0. For example, the chord pattern
+ * "Am/4,0/4,1/4,$1/4" means "A minor for 4 beats, a random chord from random table 0 for 4 beats, a random
+ * chord from random table 1 for 4 beats and the second chord again for 4 beats" and could result in the
+ * chord sequence "Am/4,F/4,G/4,F/4" (given suitable random tables). Normally, each chord pattern is an individual
+ * chord section. A pattern can be split into two or more chord sections by using "+" signs directly
+ * before a chord/length combination (e.g., "Am/4,F/4,G/4,C/4,+Am/4,F/4,G/4,Em/4").
  *
  * <br><br>
  * <b>XML-Configuration</b>
  * <table border=1>
  * <tr><th>Tag</th> <th>#</th> <th>Example</th> <th>Description</th> <th>Required</th>
- * <tr><td><code>chordPattern</code></td> <td>+</td> <td><code>0/4,1/4,1/4,2/4</code></td> <td>Sets the patterns to use. The pattern is a comma-separated list consisting of random table numbers and lengths in beats. One of the patterns is selected at random.</td> <td>yes</td>
- * <tr><td><code>chordRandomTable</code></td> <td>*</td> <td><code>C,Am,G,F,Em,Dm</code></td> <td>Adds a random table. Random tables can be accessed from patterns. The tables are numbered from 0 in the order of appearance.</td> <td>yes</td>
+ * <tr><td><code>chordPattern</code></td> <td>+</td> <td><code>Am/4,1/4,1/4,2/4</code></td> <td>Sets the chord patterns to use. One of the patterns is chosen at random.</td> <td>yes</td>
+ * <tr><td><code>chordRandomTable</code></td> <td>*</td> <td><code>C,Am,G,F,Em,Dm</code></td> <td>Adds a random table. Random tables can be accessed from patterns. The tables are numbered from 0 in the order of appearance.</td> <td>no</td>
  * </table>
  *
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas SchÃ¼rger (thomas@schuerger.com)
  */
 
 public class PatternHarmonyEngine extends HarmonyEngine {
@@ -51,7 +59,7 @@ public class PatternHarmonyEngine extends HarmonyEngine {
 			parsePattern();
 		}
 		
-		if(tick < structure.getTicks()) {
+		if(tick >= 0 && tick < structure.getTicks()) {
 			return chord[tick];
 		} else {
 			return null;
@@ -63,7 +71,7 @@ public class PatternHarmonyEngine extends HarmonyEngine {
 			parsePattern();
 		}
 
-		if(tick < structure.getTicks()) {
+		if(tick >= 0 && tick < structure.getTicks()) {
 			return ticks[tick];
 		} else {
 			return 0;
@@ -75,7 +83,7 @@ public class PatternHarmonyEngine extends HarmonyEngine {
 			parsePattern();
 		}
 
-		if(tick < structure.getTicks()) {
+		if(tick >= 0 && tick < structure.getTicks()) {
 			return sectionTicks[tick];
 		} else {
 			return 0;
@@ -89,20 +97,10 @@ public class PatternHarmonyEngine extends HarmonyEngine {
 		
 		String pat = createPattern();
 		
+		// prepend a '+' sign, if not already present
+		
 		if(!pat.startsWith("+")) {
 			pat = "+"+pat;
-		}
-		
-		float factor;
-		float r = (float)Math.random();
-		
-		if(r > 1) {
-			factor = 2.0f;
-		} else if(r > 0.01) {
-			factor = 1.0f;
-		} else {
-			factor = 0.5f;
-			pat = pat+","+pat.substring(1);
 		}
 		
 		logger.debug("Using harmony pattern "+pat);
@@ -123,8 +121,10 @@ public class PatternHarmonyEngine extends HarmonyEngine {
 
 			boolean newSection = false;
 			
-			int len = (int)(Integer.parseInt(p[1])*structure.getTicksPerBeat()*factor);
+			int len = (int)(Integer.parseInt(p[1])*structure.getTicksPerBeat());
+			
 			String cho = p[0];
+			
 			if(cho.startsWith("+")) {
 				newSection = true;
 				if(sTicks > 0) {
@@ -181,7 +181,6 @@ public class PatternHarmonyEngine extends HarmonyEngine {
 		sectionVector.add(sTicks);
 		
 		System.out.println("Sections: "+sectionVector.size());
-		
 		
 		tick = 0;
 		for(int section=0;section<sectionVector.size();section++) {
@@ -258,16 +257,27 @@ public class PatternHarmonyEngine extends HarmonyEngine {
 				
 				chord = chordList.get(refnum);
 			} else {
-				int table = Integer.parseInt(spec[0]);
+				// check if we have a note or a random table number
+				
+				int pitch = NoteUtils.getNotePitch(spec[0].endsWith("m") ? spec[0].substring(0,spec[0].length()-1) : spec[0]);
+				
+				if(pitch == Integer.MIN_VALUE) {
+					// we have a random chord table number
+					
+					int table = Integer.parseInt(spec[0]);
 
-				int num;
+					int num;
 
-				do {
-					num = random.nextInt(chordRandomTables[table].length);
-					chord = chordRandomTables[table][num];
-				} while(chord.equals(prevChord) || i == count-1 && chord.equals(firstChord));
+					do {
+						num = random.nextInt(chordRandomTables[table].length);
+						chord = chordRandomTables[table][num];
+					} while(chord.equals(prevChord) || i == count-1 && chord.equals(firstChord));
+				} else {
+					// we have a note, take the note (include 'm' suffix, if present)
+					chord = spec[0];				
+				}
 			}
-			
+				
 			sb.append((nextSection ? "+" : "")+chord+"/"+length);
 			prevChord = chord;
 

@@ -1,19 +1,29 @@
 package com.soundhelix.util;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.Random;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 
 import org.apache.log4j.Logger;
+import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 import com.soundhelix.misc.XMLConfigurable;
 
 /**
  * Implements some static methods for parsing XML data.
  * 
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas Schï¿½rger (thomas@schuerger.com)
  */
 
 public class XMLUtils {
@@ -205,6 +215,7 @@ public class XMLUtils {
 		String className = (String)xpath.evaluate("attribute::class",node,XPathConstants.STRING);
 
 		if(className.indexOf('.') < 0) {
+			// prefix the class name with the package name of the superclass
 			className = superclass.getName().substring(0,superclass.getName().lastIndexOf('.')+1)+className;
 		}
 		
@@ -213,6 +224,7 @@ public class XMLUtils {
 		Class<?> cl = Class.forName(className);
 		
 		if(superclass.isAssignableFrom(cl)) {
+			// TODO: any chance of getting rid of the warning here?
 			T inst = (T)cl.newInstance();
 
 			// configure instance if it is XML-configurable
@@ -226,5 +238,130 @@ public class XMLUtils {
 		else {
 			throw(new RuntimeException("Class "+className+" is not a subclass of "+superclass));
 		}
+	}
+
+	public static int expandIncludeTags(Document doc,Node node,XPath xpath) {
+		return expandIncludeTags(doc,node,xpath,0);
+	}
+
+	/**
+	 * Recursively traverses the node and expands any "include" tags it finds
+	 * by replacing it with the corresponding contents of the included files.
+	 * An included file must contain an XML fragment (plain XML without an XML header and
+	 * without a document type) and may contain more than one tag at the
+	 * top level. The original include node is replaced by all top-level nodes in the order
+	 * within the included file. This method throws a RuntimeException if the total
+	 * number of included files exceeds a certain threshold. This is done to
+	 * prevent inclusion cycles (file including itself directly or indirectly via
+	 * other included files).
+	 *
+	 * @param doc the document
+	 * @param node the node to start searching from (must belong to doc)
+	 * @param xpath an XPath instance
+	 * @param includedFiles the number of files already included so far
+	 *
+	 * @return includedFiles increased by the number of included files of this method call (including recursively included files)
+	 */
+	
+	private static int expandIncludeTags(Document doc,Node node,XPath xpath,int includedFiles) {
+		NodeList nodeList = null;
+		
+		try {
+		    // recursively search all "include" tags, starting from node
+			nodeList = (NodeList)xpath.evaluate("//include",node,XPathConstants.NODESET);
+		} catch(Exception e) {}
+		
+		int nodes = nodeList.getLength();
+	
+		for(int i=0;i<nodes;i++) {
+	        includedFiles++;
+
+	        if(includedFiles > 100) {
+	        	throw(new RuntimeException("More than 100 files included (inclusion cycle?)"));
+	        }
+	            
+			Node includeNode = nodeList.item(i);
+			
+			String filename = XMLUtils.parseString(includeNode,xpath);
+			String fileData;
+
+			logger.debug("Including XML fragment \""+filename+"\"");			
+
+			try {
+				fileData = readTextFile(filename);
+			} catch(Exception e) {
+				throw(new RuntimeException("Could not read included file \""+filename+"\"",e));
+			}
+
+			DocumentBuilder builder;
+			Document includeDoc;
+			
+			try {
+				builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+				
+				// we wrap the file data into an artificial XML tag "fragment", so that
+				// we have a valid XML document having one root element
+				
+				includeDoc = builder.parse(new InputSource(new StringReader("<fragment>"+fileData+"</fragment>")));
+			} catch(Exception e) {
+				throw(new RuntimeException("Error parsing XML document \""+filename+"\"",e));
+			}
+			
+			// recursively expand the include tags of the included file (if any)
+			includedFiles = expandIncludeTags(includeDoc,includeDoc.getDocumentElement(),xpath,includedFiles);
+			
+			// import the document to include into the original document tree
+			// (without having any location in the tree yet, see importNode())
+			// newNode will be a recursively cloned version of the "fragment" tag
+			
+			Node newNode = doc.importNode(includeDoc.getDocumentElement(),true);
+			
+			// create a DocumentFragment to hold the child nodes of the
+			// "fragment" tag
+			
+            DocumentFragment docFragment = doc.createDocumentFragment();
+    
+            // move the children of the "fragment" tag into the fragment
+            
+            while(newNode.hasChildNodes()) {
+                docFragment.appendChild(newNode.removeChild(newNode.getFirstChild()));
+            }
+
+            // replace the original "include" node by the document fragment holding the
+            // included nodes
+            
+            includeNode.getParentNode().replaceChild(docFragment,includeNode);
+		}
+		
+		return includedFiles;
+	}
+	
+	/**
+	 * Reads the given file and returns its contents as a string. The
+	 * file is assumed have standard system encoding.
+	 * 
+	 * @param filename the filename of the file to read
+	 * @return the file's contents
+	 * 
+	 * @throws IOException in case of an I/O error
+	 */
+	
+	private static String readTextFile(String filename) throws IOException {
+		StringBuilder sb = new StringBuilder(1024);
+		
+		BufferedReader reader = new BufferedReader(new FileReader(filename));
+		
+		// the buffer used for reading
+		char[] buf = new char[8192];
+		
+		int numRead;
+		
+		while((numRead = reader.read(buf)) != -1){
+			sb.append(buf, 0, numRead);
+		}
+		
+		reader.close();
+		
+		return sb.toString();
 	}
 }

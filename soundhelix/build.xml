@@ -9,7 +9,7 @@
     </target>
 
     <target name="compile" depends="init" description="compile the source" >
-        <javac classpath="${classpath}" srcdir="${src}" destdir="${build}"/>
+        <javac classpath="${classpath}" srcdir="${src}" destdir="${build}" target="1.5"/>
     </target>
 
     <target name="jar" depends="compile" description="generate the JAR">
@@ -24,7 +24,6 @@
 		           author="true"
 		           version="true"
 		           use="true"
-		  	       target="1.5"
 		           windowtitle="SoundHelix API">
 		    <doctitle><![CDATA[<h1>SoundHelix</h1>]]></doctitle>
 		    <link offline="true" href="http://java.sun.com/javase/6/docs/api/" packagelistLoc="C:\tmp"/>

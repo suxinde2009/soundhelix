@@ -45,11 +45,8 @@ public class MelodySequenceEngine extends SequenceEngine {
 	
 	private static Random random = new Random();
 	
-	private MelodySequenceEngine() {
-		super();
-		this.patternString = defaultPatternString;
-		this.pattern = parsePatternString(patternString);
-		this.patternLength = pattern.length;
+	public MelodySequenceEngine() {
+		this(defaultPatternString);
 	}
 
 	public MelodySequenceEngine(String patternString) {

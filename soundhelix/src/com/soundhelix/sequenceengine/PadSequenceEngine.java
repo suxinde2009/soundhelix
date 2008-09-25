@@ -15,9 +15,10 @@ import com.soundhelix.misc.Track.TrackType;
 import com.soundhelix.util.XMLUtils;
 
 /**
- * Implements a pad sequence engine using 1 or more voices. This engine
- * simply plays chords. The chord tones are selected by specifying a list
- * of chord offsets. For example, offsets 0, 1 and 2 form a normal
+ * Implements a pad sequence engine using 1 or more voices, playing at
+ * full velocity. This engine simply plays each chord for its whole
+ * length. The chord tones are selected by specifying a list of
+ * chord offsets. For example, offsets 0, 1 and 2 form a normal
  * 3-tone chord. The chord can be "stretched" by using a wider offset range, e.g.,
  * 0,1,2,3,4 which would add base and middle tone with increased octave to the
  * normal chord tones.

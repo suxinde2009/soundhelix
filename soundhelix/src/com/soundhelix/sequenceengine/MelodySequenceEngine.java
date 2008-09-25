@@ -3,9 +3,11 @@ package com.soundhelix.sequenceengine;
 import java.util.Random;
 
 import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathException;
 
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import com.soundhelix.harmonyengine.HarmonyEngine;
 import com.soundhelix.misc.ActivityVector;
@@ -13,11 +15,17 @@ import com.soundhelix.misc.Chord;
 import com.soundhelix.misc.Sequence;
 import com.soundhelix.misc.Track;
 import com.soundhelix.misc.Track.TrackType;
+import com.soundhelix.util.XMLUtils;
 
 /**
  * Implements a sequence engine plays a randomly generated melody, played
  * with a given rhythmic pattern.
- * 
+ * <br><br>
+ * <b>XML-Configuration</b>
+ * <table border=1>
+ * <tr><th>Tag</th> <th>#</th> <th>Example</th> <th>Description</th> <th>Required</th>
+ * <tr><td><code>pattern</code></td> <td>+</td> <td><code>0,-,-,-,1,-,2,-</code></td> <td>Sets the patterns to use. One of the patterns is selected at random.</td> <td>no</td>
+ * </table>
  * @author Thomas Sch�rger (thomas@schuerger.com)
  */
 
@@ -36,7 +44,7 @@ public class MelodySequenceEngine extends SequenceEngine {
 	private static final boolean[] scaleTable = new boolean[] {true,false,true,false,true,true,false,true,false,true,false,true};
 
 	private static boolean obeyChordSubtype = false;
-	private static String defaultPatternString = "0,-,-,0,-,-,0,-,1,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,-1,-,0,-,-,-,0,-,-,0,-,-,0,-,1,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,-1,-,0,-,4,1";
+	private static String defaultPatternString = "+,-,-,+,-,-,+,-,+,-,-,+,-,-,+,-,+,-,-,+,-,-,+,-,+,-,+,-,+,-,-,-,+,-,-,+,-,-,+,-,+,-,-,+,-,-,+,-,+,-,-,+,-,-,+,-,+,-,+,-,+,-,+,+";
 	private String patternString;
 	private int[] pattern;
 	private int patternLength;
@@ -81,12 +89,12 @@ public class MelodySequenceEngine extends SequenceEngine {
             			seq.addPause(1);
         				continue;
         			} else if(value == FREE) {
-        				if(tick >= pitchPattern.length) {
-            				pitch = pitchPattern[tick % pitchPattern.length];
+        				if((tick+i) >= pitchPattern.length) {
+            				pitch = pitchPattern[(tick+i) % pitchPattern.length];
         				} else {
         					pitch = getRandomPitch(pitch == Integer.MIN_VALUE ? chord.getPitch() : pitch);
         					System.out.println("Using pitch "+pitch);
-        					pitchPattern[tick % pitchPattern.length] = pitch;
+        					pitchPattern[(tick+i) % pitchPattern.length] = pitch;
         				}
         				seq.addNote(pitch,1);
         			} else {
@@ -205,6 +213,13 @@ public class MelodySequenceEngine extends SequenceEngine {
     }
     
     public void configure(Node node,XPath xpath) throws XPathException {
+		NodeList nodeList = (NodeList)xpath.evaluate("pattern",node,XPathConstants.NODESET);
+
+		if(nodeList.getLength() == 0) {
+			return; // Use default pattern
+		}
+		
+		setPattern(XMLUtils.parseString(nodeList.item(new Random().nextInt(nodeList.getLength())),xpath));
     }
     
 	public void setPattern(String patternString) {

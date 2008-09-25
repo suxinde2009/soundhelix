@@ -30,7 +30,7 @@ import com.soundhelix.util.XMLUtils;
  * generation of songs is done in a separate thread to guarantee
  * seamless playing.
  * 
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas Schï¿½rger (thomas@schuerger.com)
  */
 
 public class SoundHelix implements Runnable {
@@ -76,9 +76,18 @@ public class SoundHelix implements Runnable {
 			
 			DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			Document doc = builder.parse(file);
-
+			
 			XPath xpath = XPathFactory.newInstance().newXPath();
 
+			// preprocess document tree by expanding include tags, if present
+			
+			// note that if the include tags use random selection, this random
+			// selection is done only once per start of the application, not once
+			// per generated song; this is in contrast to the random selection
+			// applied in configure() method calls
+			
+			XMLUtils.expandIncludeTags(doc,doc.getFirstChild(),xpath);
+			
 			// get the root element of the file (we don't care what it's called)
 			Node mainNode = (Node)xpath.evaluate("/*",doc,XPathConstants.NODE);
 

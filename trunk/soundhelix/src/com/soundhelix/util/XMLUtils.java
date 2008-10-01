@@ -23,7 +23,7 @@ import com.soundhelix.misc.XMLConfigurable;
 /**
  * Implements some static methods for parsing XML data.
  * 
- * @author Thomas Sch�rger (thomas@schuerger.com)
+ * @author Thomas Schürger (thomas@schuerger.com)
  */
 
 public class XMLUtils {

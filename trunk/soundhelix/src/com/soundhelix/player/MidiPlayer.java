@@ -53,7 +53,7 @@ import com.soundhelix.util.XMLUtils;
  * &lt;/player&gt;
  * </pre>
  * 
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas SchÃ¼rger (thomas@schuerger.com)
  */
 
 // TODO: add possibility to map a virtual channel to several MIDI channels (do we need this)?

@@ -9,7 +9,7 @@ import org.w3c.dom.Node;
  * Simple interface that adds XML-configurability to a class. XML
  * configuration is based on DOM and XPath.
  *
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas SchÃ¼rger (thomas@schuerger.com)
  */
 
 public interface XMLConfigurable {

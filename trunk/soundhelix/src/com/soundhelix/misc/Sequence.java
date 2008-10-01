@@ -14,7 +14,7 @@ import java.util.List;
  * might always play a note at its full volume and use the velocity to control
  * filter cut-off instead.
  * 
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas SchÃ¼rger (thomas@schuerger.com)
  */
 
 public class Sequence {

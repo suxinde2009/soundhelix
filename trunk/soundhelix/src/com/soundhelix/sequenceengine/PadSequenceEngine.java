@@ -29,7 +29,7 @@ import com.soundhelix.util.XMLUtils;
  * <tr><td><code>offsets</code></td> <td></td> <td><code>0,1,2</code></td> <td>The list of offsets to use for playing chords.</td> <td>yes</td>
  * </table>
 
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas SchÃ¼rger (thomas@schuerger.com)
  */
 
 public class PadSequenceEngine extends SequenceEngine {

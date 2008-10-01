@@ -9,7 +9,7 @@ import com.soundhelix.misc.XMLConfigurable;
 /**
  * Represents an abstract generator for song arrangements.
  * 
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas SchÃ¼rger (thomas@schuerger.com)
  */
 
 public abstract class ArrangementEngine implements XMLConfigurable {

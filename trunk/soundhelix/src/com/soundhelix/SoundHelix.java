@@ -30,7 +30,7 @@ import com.soundhelix.util.XMLUtils;
  * generation of songs is done in a separate thread to guarantee
  * seamless playing.
  * 
- * @author Thomas Sch�rger (thomas@schuerger.com)
+ * @author Thomas Schürger (thomas@schuerger.com)
  */
 
 public class SoundHelix implements Runnable {

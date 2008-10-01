@@ -22,7 +22,7 @@ import com.soundhelix.harmonyengine.HarmonyEngine;
  * notes, one might consider using 12 ticks per beat, so that quarter notes (3 ticks) and third notes
  * (4 ticks) can be used at the same time. 
  * 
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas SchÃ¼rger (thomas@schuerger.com)
  */
 
 public class Structure {

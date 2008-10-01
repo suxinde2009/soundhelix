@@ -49,7 +49,7 @@ import com.soundhelix.util.XMLUtils;
  * &lt;/sequenceEngine&gt;
  * </pre>
  * 
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas SchÃ¼rger (thomas@schuerger.com)
  */
 
 // TODO: consider adding velocity support to the patterns (do we need this?)

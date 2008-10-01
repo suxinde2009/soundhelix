@@ -5,7 +5,7 @@ import java.util.Hashtable;
 /**
  * Implements some static methods for converting notes to pitches and vice versa.
  * 
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas SchÃ¼rger (thomas@schuerger.com)
  */
 
 public class NoteUtils {

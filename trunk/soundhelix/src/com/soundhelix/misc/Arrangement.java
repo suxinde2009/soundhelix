@@ -12,7 +12,7 @@ import java.util.List;
  * 
  * @see Track
  *
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas SchÃ¼rger (thomas@schuerger.com)
  */
 
 public class Arrangement {

@@ -242,12 +242,12 @@ public class MidiPlayer extends Player {
     	}
     	
     	try {
-    		Structure song = arrangement.getStructure();
+    		Structure structure = arrangement.getStructure();
 
     		List<int[]> tickList = new ArrayList<int[]>();
     		List<int[]> posList = new ArrayList<int[]>();
 
-    		System.out.println("Song length: "+(song.getTicks()*60/(song.getTicksPerBeat()*bpm))+" seconds");
+    		System.out.println("Song length: "+(structure.getTicks()*60/(structure.getTicksPerBeat()*bpm))+" seconds");
 
     		Iterator<ArrangementEntry> i = arrangement.iterator();
 
@@ -265,14 +265,16 @@ public class MidiPlayer extends Player {
 
     		int tick = 0;
 
+    		int ticksPerBar = structure.getTicksPerBar();
+    		
     		long nanos = System.nanoTime();
     		long lastWantedNanos = nanos;
 
-    		while(tick < song.getTicks()) {
+    		while(tick < structure.getTicks()) {
     			i = arrangement.iterator();
 
-    			if((tick % 16) == 0) {
-    				System.out.printf("Tick: %4d   Seconds: %3d\n",tick,tick*60/(song.getTicksPerBeat()*bpm));
+    			if((tick % ticksPerBar) == 0) {
+    				System.out.printf("Tick: %4d   Seconds: %3d\n",tick,tick*60/(structure.getTicksPerBeat()*bpm));
     			}
     			for(int k=0;i.hasNext();k++) {
     				ArrangementEntry e = i.next();
@@ -326,7 +328,7 @@ public class MidiPlayer extends Player {
     			// tries hard to keep the player exactly in sync with the system clock
 
     			// desired length of the current tick in nanoseconds
-    			long length = 1000000000l*60l*(long)groove[tick%groove.length]/1000l/(long)(song.getTicksPerBeat()*bpm);
+    			long length = 1000000000l*60l*(long)groove[tick%groove.length]/1000l/(long)(structure.getTicksPerBeat()*bpm);
 
     			long wantedNanos = lastWantedNanos+length;
 

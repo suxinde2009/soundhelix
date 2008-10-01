@@ -52,7 +52,7 @@ import com.soundhelix.misc.XMLConfigurable;
  * It is very important to get the method behavior correct. The HarmonyEngine
  * can be sanity-checked using checkSanitiy().
  * 
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas SchÃ¼rger (thomas@schuerger.com)
  */
 
 public abstract class HarmonyEngine implements XMLConfigurable {

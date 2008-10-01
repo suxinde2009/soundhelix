@@ -18,7 +18,7 @@ import com.soundhelix.util.NoteUtils;
  * Callers are encouraged to interpret the second inversion as a downwards shift
  * (ceg becomes Gce) and the first inversion as an upwards shift (ceg becomes egc').
  * 
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas SchÃ¼rger (thomas@schuerger.com)
  */
 
 public class Chord {

@@ -13,7 +13,7 @@ import com.soundhelix.misc.Chord.ChordType;
  * Implements a simple HarmonyEngine that plays a fixed sequence of chords.
  * This is more for educational purposes than for real use. ;-)
  * 
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas SchÃ¼rger (thomas@schuerger.com)
  */
 
 public class SimpleHarmonyEngine extends HarmonyEngine {

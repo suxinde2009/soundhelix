@@ -24,7 +24,7 @@ import com.soundhelix.util.XMLUtils;
  * a "fade-in" of the number of active ActivityVectors and ends with a "fade-out"
  * of the number of active ActivityVectors.
  * 
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas SchÃ¼rger (thomas@schuerger.com)
  */
 
 public class SimpleArrangementEngine extends ArrangementEngine {

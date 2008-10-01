@@ -26,7 +26,7 @@ import com.soundhelix.util.XMLUtils;
  * <tr><th>Tag</th> <th>#</th> <th>Example</th> <th>Description</th> <th>Required</th>
  * <tr><td><code>pattern</code></td> <td>+</td> <td><code>0,-,-,-,1,-,2,-</code></td> <td>Sets the patterns to use. One of the patterns is selected at random.</td> <td>no</td>
  * </table>
- * @author Thomas Sch�rger (thomas@schuerger.com)
+ * @author Thomas Schürger (thomas@schuerger.com)
  */
 
 // TODO: work on this (not really usable yet)

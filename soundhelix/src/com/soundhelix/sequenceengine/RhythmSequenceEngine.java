@@ -13,7 +13,7 @@ import com.soundhelix.misc.Track.TrackType;
 /**
  * Implements a sequence engine for loop players.
  * 
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas SchÃ¼rger (thomas@schuerger.com)
  */
 
 // TODO: make this all configurable or drop the class

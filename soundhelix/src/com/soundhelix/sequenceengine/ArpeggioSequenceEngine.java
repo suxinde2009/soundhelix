@@ -40,7 +40,7 @@ import com.soundhelix.util.XMLUtils;
  * &lt;/sequenceEngine&gt;
  * </pre>
  * 
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas SchÃ¼rger (thomas@schuerger.com)
  */
 
 // TODO: allow specifying velocities in arpeggio patterns (like in the PatternSequenceEngine)

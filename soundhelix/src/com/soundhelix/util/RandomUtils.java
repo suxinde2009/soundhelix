@@ -5,7 +5,7 @@ import java.util.Random;
 /**
  * Implements some static methods for random numbers.
  * 
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas SchÃ¼rger (thomas@schuerger.com)
  */
 
 public class RandomUtils {

@@ -11,7 +11,7 @@ import java.util.Random;
  * parameters the Random class will be seeded differently with a very high
  * probability.
  * 
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas SchÃ¼rger (thomas@schuerger.com)
  */
 
 public class ConsistentRandom {

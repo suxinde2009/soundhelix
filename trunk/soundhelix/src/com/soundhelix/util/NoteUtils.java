@@ -59,6 +59,7 @@ public class NoteUtils {
 		Integer pitch = h.get(name.toLowerCase());
 		
 		if(pitch == null) {
+			return Integer.MIN_VALUE;
 		} else {
 			return pitch;
 		}

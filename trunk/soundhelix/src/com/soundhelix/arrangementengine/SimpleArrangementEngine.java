@@ -21,8 +21,8 @@ import com.soundhelix.util.XMLUtils;
  * Implements a simple ArrangementEngine. From the given set of SequenceEngines
  * the number of needed ActivityVectors is determined and a subset of these
  * vectors is selected to be active for each chord section. The song starts with
- * a "fade-in" of the number of active ActivityVectors and ends with a "fade-out"
- * of the number of active ActivityVectors.
+ * a "fade-in" of the number of active ActivityVectors and ends with a
+ * "fade-out" of the number of active ActivityVectors.
  * 
  * @author Thomas Schürger (thomas@schuerger.com)
  */
@@ -31,82 +31,74 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 	private final Random random = new Random();
 
 	private ArrangementEntry[] arrangementEntries;
-	
+
 	// maximum number of tries before failing
 	private static final int MAX_TRIES = 2500;
-	
+
 	public SimpleArrangementEngine() {
 		super();
 	}
-	
+
 	/*
-	public Arrangement renderOld() {
-       SequenceEngine se;
-       ActivityVector[] av;
-       
-       int ticks = structure.getTicks();
-       
-       do {
-    	   av = createActivityVectors(13);
-       } while(av[3].isActive(0) || av[3].isActive(ticks-1) || 100*av[3].getActiveTicks()/ticks < 50);
-       
-       Arrangement arrangement = new Arrangement(structure);
+	 * public Arrangement renderOld() { SequenceEngine se; ActivityVector[] av;
+	 * 
+	 * int ticks = structure.getTicks();
+	 * 
+	 * do { av = createActivityVectors(13); } while(av[3].isActive(0) ||
+	 * av[3].isActive(ticks-1) || 100av[3].getActiveTicks()/ticks < 50);
+	 * 
+	 * Arrangement arrangement = new Arrangement(structure);
+	 * 
+	 * // arpeggio se = new ArpeggioSequenceEngine(structure);
+	 * arrangement.add(se.render(av[0]),0);
+	 * 
+	 * // pad se = new PadSequenceEngine(structure);
+	 * av[1].shiftIntervalBoundaries(0,-8); arrangement.add(se.render(av[1]),1);
+	 * 
+	 * // bass //se = newPatternSequenceEngine(song,
+	 * "0,-,-,0,-,-,0,-,1,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,-1,-,0,-,-,-,0,-,-,0,-,-,0,-,1,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,-1,-,0,-,4,1"
+	 * ); se = newPatternSequenceEngine(structure,
+	 * "0,-,-,0,-,-,1,-,0,-,-,0,-,-,+,-,0,-,-,0,-,-,2,-,0,-,-,0,-,-,+,-");
+	 * av[2].shiftIntervalBoundaries(0,-1); arrangement.add(se.render(av[2]),2);
+	 * 
+	 * // drums DrumSequenceEngine dse = new DrumSequenceEngine(structure);
+	 * av[3].shiftIntervalBoundaries(0,-4); av[4].shiftIntervalBoundaries(8,8);
+	 * arrangement.add(dse.render(av[3],av[4],av[5],av[6]),3);
+	 * 
+	 * // acid //se = new
+	 * PatternSequenceEngine(song,"0,0,1,-,0,0,-,2,0,0,1,-,-,3,1,4"); se = new
+	 * PatternSequenceEngine(structure,
+	 * "-,-,0,-,-,2,-,-,-,-,0,-,-,-,-,3,-,-,0,-,-,2,-,-,-,-,0,-,-,3,2,4,-,-,0,-,-,2,-,-,-,-,0,-,-,-,-,3,-,-,0,-,-,2,-,-,-,-,0,5,7,3,5,4"
+	 * ); arrangement.add(se.render(av[7]),4);
+	 * 
+	 * // chords se = newChordSequenceEngine(structure,
+	 * "0,-,-,-,0,-,-,0,-,-,0,-,-,0,-,-,0,-,-,-,0,-,-,0,-,-,0,-,3,-,1,-,0,-,-,-,0,-,-,0,-,-,0,-,-,0,-,-,0,-,-,-,0,-,-,0,-,-,0,-,3,1,4,2"
+	 * ); arrangement.add(se.render(av[8]),5);
+	 * 
+	 * // breakbeat se = new RhythmSequenceEngine(structure);
+	 * arrangement.add(se.render(av[9]),7);
+	 * 
+	 * // acid 2 se = newPatternSequenceEngine(structure,
+	 * "0,0,-,0,-,-,0,-,0,-,-,-,-,-,-,-,0,0,-,0,-,-,0,-,0,-,-,-,-,4,2,3,0,0,-,0,-,-,0,-,0,-,-,-,-,-,-,-,0,0,-,0,-,-,0,-,2,-,-,-,-,4,2,3"
+	 * ); arrangement.add(se.render(av[10]),8);
+	 * 
+	 * // coolecho se = new
+	 * PatternSequenceEngine(structure,"0,0,0,-,0,-,-,0,-,-,0,-,3,-,-,-");
+	 * arrangement.add(se.render(av[11]),9);
+	 * 
+	 * // melody //se = newMelodySequenceEngine(structure,
+	 * "0,-,+,-,+,-,0,-,-,-,-,-,+,-,-,-,0,-,+,-,+,-,+,-,-,-,-,-,-,-,-,-"); //se
+	 * = newPatternSequenceEngine(structure,
+	 * "0,-,-,-,1,-,+,-,0,-,-,-,2,-,+,-,0,-,-,-,3,-,+,-,0,-,-,-,+,-,-,-");
+	 * //arrangement.add(se.render(av[12]),6);
+	 * 
+	 * // acid se = newPatternSequenceEngine(structure,
+	 * "0:1,-,0:1,-,0:1,-,-,0:1,-,0:1,-,0:1,1:12000,-,0:1,-,0:1,-,0:1,-,0:1,-,-,0:1,0:1,3:20000,0:1,-,2:1,-,0:1,-,0:1,-,0:1,-,0:1,-,-,0:1,-,0:1,-,0:1,1:18000,-,0:1,-,0:1,-,0:1,-,0:1,-,-,0:1,0:1,3:30000,0:1,-,2:1,-,0:1,-"
+	 * ); arrangement.add(se.render(av[12]),10);
+	 * 
+	 * return arrangement; }
+	 */
 
-       // arpeggio
-       se = new ArpeggioSequenceEngine(structure);       
-       arrangement.add(se.render(av[0]),0);
-       
-       // pad
-       se = new PadSequenceEngine(structure);
-       av[1].shiftIntervalBoundaries(0,-8);
-       arrangement.add(se.render(av[1]),1);
-       
-       // bass
-       //se = new PatternSequenceEngine(song,"0,-,-,0,-,-,0,-,1,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,-1,-,0,-,-,-,0,-,-,0,-,-,0,-,1,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,-1,-,0,-,4,1");       
-       se = new PatternSequenceEngine(structure,"0,-,-,0,-,-,1,-,0,-,-,0,-,-,+,-,0,-,-,0,-,-,2,-,0,-,-,0,-,-,+,-");
-       av[2].shiftIntervalBoundaries(0,-1);
-       arrangement.add(se.render(av[2]),2);
-       
-       // drums 
-       DrumSequenceEngine dse = new DrumSequenceEngine(structure);
-       av[3].shiftIntervalBoundaries(0,-4);
-       av[4].shiftIntervalBoundaries(8,8);
-       arrangement.add(dse.render(av[3],av[4],av[5],av[6]),3);
-           
-       // acid
-       //se = new PatternSequenceEngine(song,"0,0,1,-,0,0,-,2,0,0,1,-,-,3,1,4");  
-       se = new PatternSequenceEngine(structure,"-,-,0,-,-,2,-,-,-,-,0,-,-,-,-,3,-,-,0,-,-,2,-,-,-,-,0,-,-,3,2,4,-,-,0,-,-,2,-,-,-,-,0,-,-,-,-,3,-,-,0,-,-,2,-,-,-,-,0,5,7,3,5,4");  
-       arrangement.add(se.render(av[7]),4);
-
-       // chords
-       se = new ChordSequenceEngine(structure,"0,-,-,-,0,-,-,0,-,-,0,-,-,0,-,-,0,-,-,-,0,-,-,0,-,-,0,-,3,-,1,-,0,-,-,-,0,-,-,0,-,-,0,-,-,0,-,-,0,-,-,-,0,-,-,0,-,-,0,-,3,1,4,2");
-       arrangement.add(se.render(av[8]),5);
-       
-       // breakbeat
-       se = new RhythmSequenceEngine(structure);
-       arrangement.add(se.render(av[9]),7);
-       
-       // acid 2
-       se = new PatternSequenceEngine(structure,"0,0,-,0,-,-,0,-,0,-,-,-,-,-,-,-,0,0,-,0,-,-,0,-,0,-,-,-,-,4,2,3,0,0,-,0,-,-,0,-,0,-,-,-,-,-,-,-,0,0,-,0,-,-,0,-,2,-,-,-,-,4,2,3");  
-       arrangement.add(se.render(av[10]),8);
-
-       // coolecho
-       se = new PatternSequenceEngine(structure,"0,0,0,-,0,-,-,0,-,-,0,-,3,-,-,-");  
-       arrangement.add(se.render(av[11]),9);
-    
-       // melody
-       //se = new MelodySequenceEngine(structure,"0,-,+,-,+,-,0,-,-,-,-,-,+,-,-,-,0,-,+,-,+,-,+,-,-,-,-,-,-,-,-,-");  
-       //se = new PatternSequenceEngine(structure,"0,-,-,-,1,-,+,-,0,-,-,-,2,-,+,-,0,-,-,-,3,-,+,-,0,-,-,-,+,-,-,-");
-       //arrangement.add(se.render(av[12]),6);
-        
-       // acid
-       se = new PatternSequenceEngine(structure,"0:1,-,0:1,-,0:1,-,-,0:1,-,0:1,-,0:1,1:12000,-,0:1,-,0:1,-,0:1,-,0:1,-,-,0:1,0:1,3:20000,0:1,-,2:1,-,0:1,-,0:1,-,0:1,-,0:1,-,-,0:1,-,0:1,-,0:1,1:18000,-,0:1,-,0:1,-,0:1,-,0:1,-,-,0:1,0:1,3:30000,0:1,-,2:1,-,0:1,-");  
-       arrangement.add(se.render(av[12]),10);
-
-       return arrangement;
-	}
-    */
-	
 	public Arrangement render() {
 		int ticks = structure.getTicks();
 		int tracks = arrangementEntries.length;
@@ -117,7 +109,7 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 
 		int vectors = 0;
 
-		for(int i=0;i<tracks;i++) {
+		for (int i = 0; i < tracks; i++) {
 			SequenceEngine sequenceEngine = arrangementEntries[i].sequenceEngine;
 			// SequenceEngines have been instantiated and configured, but the
 			// Structure has not been set yet
@@ -125,13 +117,14 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 			vectors += sequenceEngine.getActivityVectorCount();
 		}
 
-		System.out.println("Creating "+vectors+" ActivityVectors for "+tracks+" tracks");
+		System.out.println("Creating " + vectors + " ActivityVectors for "
+				+ tracks + " tracks");
 
 		ActivityVector[] activityVectors;
 
 		int tries = 0;
 
-		again: while(true) {
+		again: while (true) {
 			// create ActivityVectors at random
 			// then check if the constraints (minimum and maximum
 			// activity ratio) are met for each ActivityVector
@@ -140,7 +133,7 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 
 			int v = 0;
 
-			for(int i=0;i<tracks;i++) {
+			for (int i = 0; i < tracks; i++) {
 				SequenceEngine sequenceEngine = arrangementEntries[i].sequenceEngine;
 
 				// get min/max ratio arrays
@@ -150,17 +143,21 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 
 				int num = sequenceEngine.getActivityVectorCount();
 
-				for(int k=0;k<num;k++) {
+				for (int k = 0; k < num; k++) {
 					// compute current activity ratio
-					double ratio = 100.0d*(double)activityVectors[v].getActiveTicks()/(double)ticks;
+					double ratio = 100.0d
+							* (double) activityVectors[v].getActiveTicks()
+							/ (double) ticks;
 
 					// check if ratio is outside the required bounds
 
-					if(ratio < minRatios[k] || ratio > maxRatios[k]) {
+					if (ratio < minRatios[k] || ratio > maxRatios[k]) {
 						tries++;
 
-						if(tries >= MAX_TRIES) {
-							throw(new RuntimeException("Couldn't satisfy activity constraints within "+tries+" tries"));
+						if (tries >= MAX_TRIES) {
+							throw (new RuntimeException(
+									"Couldn't satisfy activity constraints within "
+											+ tries + " tries"));
 						} else {
 							// one constraint wasn't satisfied, retry
 							continue again;
@@ -182,338 +179,387 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 
 		int vectorNum = 0;
 
-		for(int i=0;i<tracks;i++) {
+		for (int i = 0; i < tracks; i++) {
 			SequenceEngine sequenceEngine = arrangementEntries[i].sequenceEngine;
 			int num = sequenceEngine.getActivityVectorCount();
 
 			ActivityVector[] list = new ActivityVector[num];
 
-			for(int k=0;k<num;k++) {
+			for (int k = 0; k < num; k++) {
 				list[k] = activityVectors[vectorNum++];
 			}
 
 			Track track = sequenceEngine.render(list);
 			track.transpose(arrangementEntries[i].transposition);
-			arrangement.add(track,arrangementEntries[i].channel);
+			arrangement.add(track, arrangementEntries[i].channel);
+			System.out.println("Creating " + vectors + " ActivityVectors for "
+					+ tracks + " tracks");
+			System.out.println("Creating " + vectors + " ActivityVectors for "
+					+ tracks + " tracks");
 		}
 
 		return arrangement;
 	}
-	
+
 	/**
-	 * Sets one random bit in the BitSet, if this is possible (i.e.,
-	 * if not all bits are set already). From the set of false bits,
-	 * one is chosen at random and that bit is set to true. The method
-	 * avoids setting the bit given by avoidBit, unless there is only
-	 * 1 bit left that can be set to true.
+	 * Sets one random bit in the BitSet, if this is possible (i.e., if not all
+	 * bits are set already). From the set of false bits, one is chosen at
+	 * random and that bit is set to true. The method avoids setting the bit
+	 * given by avoidBit, unless there is only 1 bit left that can be set to
+	 * true.
 	 * 
-	 * @param bitSet the BitSet to modify
-	 * @param size the size of the BitSet
-	 * @param avoidBit the bit number to avoid (or -1 to skip this step)
+	 * @param bitSet
+	 *            the BitSet to modify
+	 * @param size
+	 *            the size of the BitSet
+	 * @param avoidBit
+	 *            the bit number to avoid (or -1 to skip this step)
 	 * 
 	 * @return the number of the set bit (or -1 if no clear bit existed)
 	 */
-	
-	private int setRandomBit(BitSet bitset,int size,int avoidBit) {
+
+	private int setRandomBit(BitSet bitset, int size, int avoidBit) {
 		int ones = bitset.cardinality();
-		
-		if(ones >= size) {
+
+		if (ones >= size) {
 			return -1;
 		}
 
-		int zeroes = size-ones;
+		int zeroes = size - ones;
 
 		int bit;
 
-		do {		
+		do {
 			// choose random bit number
 			bit = random.nextInt(zeroes);
-		} while(zeroes > 1 && bit == avoidBit);
+		} while (zeroes > 1 && bit == avoidBit);
 
 		// set the bit'th zero bit
 
 		int pos = bitset.nextClearBit(0);
 
-		while(bit-- > 0) {
-			pos = bitset.nextClearBit(pos+1);
+		while (bit-- > 0) {
+			pos = bitset.nextClearBit(pos + 1);
 		}
 
 		bitset.set(pos);
 
-		return pos;	
+		return pos;
 	}
-	
+
 	/**
-	 * Clears one random bit in the BitSet, if this is possible
-	 * (i.e., if at least one bit is set to true). From the set
-	 * of true bits, one is chosen at random and that bit is cleared.
-	 * The method avoids clearing the bit given by avoidBit, unless
-	 * there is only 1 bit left that can be set to false.
+	 * Clears one random bit in the BitSet, if this is possible (i.e., if at
+	 * least one bit is set to true). From the set of true bits, one is chosen
+	 * at random and that bit is cleared. The method avoids clearing the bit
+	 * given by avoidBit, unless there is only 1 bit left that can be set to
+	 * false.
 	 * 
-	 * @param bitSet the BitSet to modify
-	 * @param avoidBit the bit number to avoid (or -1 to skip this set)
+	 * @param bitSet
+	 *            the BitSet to modify
+	 * @param avoidBit
+	 *            the bit number to avoid (or -1 to skip this set)
 	 * 
 	 * @return the number of the cleared bit (or -1 if no set bit existed)
 	 */
-	
-	private int clearRandomBit(BitSet bitSet,int avoidBit) {
+
+	private int clearRandomBit(BitSet bitSet, int avoidBit) {
 		int ones = bitSet.cardinality();
-		
-		if(ones == 0) {
+
+		if (ones == 0) {
 			return -1;
 		}
 
 		int bit;
-		
+
 		do {
 			// choose random bit number
 			bit = random.nextInt(ones);
-		} while(ones > 1 && bit == avoidBit);
-		
+		} while (ones > 1 && bit == avoidBit);
+
 		// skip to the bit'th one bit
-		
+
 		int pos = bitSet.nextSetBit(0);
-		
-		while(bit-- > 0) {
-			pos = bitSet.nextSetBit(pos+1);
+
+		while (bit-- > 0) {
+			pos = bitSet.nextSetBit(pos + 1);
 		}
-		
+
 		bitSet.clear(pos);
-		
-		return pos;	
+
+		return pos;
 	}
-	
+
 	/**
-	 * Creates num ActivityVectors. A BitSet is used to
-	 * to represent which of the ActivityVectors should be
-	 * active. The BitSet is changed on each new chord
-	 * section by removing or adding bits randomly.
+	 * Creates num ActivityVectors. A BitSet is used to to represent which of
+	 * the ActivityVectors should be active. The BitSet is changed on each new
+	 * chord section by removing or adding bits randomly.
 	 * 
-	 * @param num the number of ActivityVectors to create
-	 *
+	 * @param num
+	 *            the number of ActivityVectors to create
+	 * 
 	 * @return the array of ActivityVectors
 	 */
-	
+
 	private ActivityVector[] createActivityVectors(int num) {
 		HarmonyEngine he = structure.getHarmonyEngine();
 		int sections = he.getChordSectionCount();
-		
+
 		// create num empty ActivityVectors
-		
+
 		ActivityVector[] activityVectors = new ActivityVector[num];
-		
-		for(int i=0;i<num;i++) {
+
+		for (int i = 0; i < num; i++) {
 			activityVectors[i] = new ActivityVector();
 		}
-		
+
 		// start with an empty BitSet
 		// the BitSet contains the number of vectors that are
 		// currently active
 		BitSet bitset = new BitSet();
-		
+
 		int tick = 0;
 
-    	int lastAddedBit = -1;
-    	int lastRemovedBit = -1;
-    	
-    	// the maximum number of ActivityVectors that may be active
-    	// at each point in time
-    	int maxActivityVectors = getActivityVectorMaximum(num,0.65,0.2);
-    	int lastWantedActivityVectors = -1;
-    	
-        for(int section=0;section<sections;section++) {
-        	int len = he.getChordSectionTicks(tick);
-        	
-        	// get the number of ActivityVectors we want active for this chord section
-        	int wantedActivityVectors = getActivityVectorCount(section,sections,maxActivityVectors,lastWantedActivityVectors);
-        	
-        	// get the number of tracks that are currently active
-        	int card = bitset.cardinality();
+		int lastAddedBit = -1;
+		int lastRemovedBit = -1;
 
-        	// add and/or remove bits from the BitSet until tracks
-        	// bits are present
-        	
-        	// we try not to remove a bit that was added in the previous
-        	// section and not to add a bit that was removed in the previous
-        	// section
-        	
-        	if(card < wantedActivityVectors) {
-        		do {lastAddedBit = setRandomBit(bitset,num,lastRemovedBit);} while(bitset.cardinality() < wantedActivityVectors);
-        	} else if(card > wantedActivityVectors) {
-        		do {lastRemovedBit = clearRandomBit(bitset,lastAddedBit);} while(bitset.cardinality() > wantedActivityVectors);
-        	} else if(card > 0 && Math.random() > 0.2) {
-        		lastRemovedBit = clearRandomBit(bitset,lastAddedBit);
-        		lastAddedBit = setRandomBit(bitset,num,lastRemovedBit);
-        	}
-        	
-        	System.out.println("Section: "+section+"  Tracks: "+wantedActivityVectors+"  BitSet: "+bitset);
+		// the maximum number of ActivityVectors that may be active
+		// at each point in time
+		int maxActivityVectors = getActivityVectorMaximum(num, 0.65, 0.2);
+		int lastWantedActivityVectors = -1;
 
-        	// check the BitSet and add activity or inactivity intervals
-        	// for the current section
-        	
-        	for(int i=0;i<num;i++) {
-        		if(bitset.get(i)) {
-        			activityVectors[i].addActivity(len);
-        		} else {
-        			activityVectors[i].addInactivity(len);
-        		}
-        	}
-       	
-            tick += len;
-            
-            lastWantedActivityVectors = wantedActivityVectors;
-        }
-				
-		return activityVectors;	
+		for (int section = 0; section < sections; section++) {
+			int len = he.getChordSectionTicks(tick);
+
+			// get the number of ActivityVectors we want active for this chord
+			// section
+			int wantedActivityVectors = getActivityVectorCount(section,
+					sections, maxActivityVectors, lastWantedActivityVectors);
+
+			// get the number of tracks that are currently active
+			int card = bitset.cardinality();
+
+			// add and/or remove bits from the BitSet until tracks
+			// bits are present
+
+			// we try not to remove a bit that was added in the previous
+			// section and not to add a bit that was removed in the previous
+			// section
+
+			if (card < wantedActivityVectors) {
+				do {
+					lastAddedBit = setRandomBit(bitset, num, lastRemovedBit);
+				} while (bitset.cardinality() < wantedActivityVectors);
+			} else if (card > wantedActivityVectors) {
+				do {
+					lastRemovedBit = clearRandomBit(bitset, lastAddedBit);
+				} while (bitset.cardinality() > wantedActivityVectors);
+			} else if (card > 0 && Math.random() > 0.2) {
+				lastRemovedBit = clearRandomBit(bitset, lastAddedBit);
+				lastAddedBit = setRandomBit(bitset, num, lastRemovedBit);
+			}
+
+			System.out.println("Section: " + section + "  Tracks: "
+					+ wantedActivityVectors + "  BitSet: " + bitset);
+
+			// check the BitSet and add activity or inactivity intervals
+			// for the current section
+
+			for (int i = 0; i < num; i++) {
+				if (bitset.get(i)) {
+					activityVectors[i].addActivity(len);
+				} else {
+					activityVectors[i].addInactivity(len);
+				}
+			}
+
+			tick += len;
+
+			lastWantedActivityVectors = wantedActivityVectors;
+		}
+
+		return activityVectors;
 	}
-	
+
 	/**
 	 * Returns the number of ActivityVectors that should be active during the
 	 * given section. There is always a "fade-in" of ActivityVectors (1, 2, ...)
-	 * for the first number of sections and a "fade-out" of ActivityVectors (..., 2, 1)
-	 * for the last number of sections. In between, the number of ActivityVectors is
-	 * chosen randomly.
+	 * for the first number of sections and a "fade-out" of ActivityVectors
+	 * (..., 2, 1) for the last number of sections. In between, the number of
+	 * ActivityVectors is chosen randomly.
 	 * 
-	 * @param section the section number (between 0 and sections-1)
-	 * @param sections the total number of sections
-	 * @param maxActivityVectors the maximum number of tracks to use
-
+	 * @param section
+	 *            the section number (between 0 and sections-1)
+	 * @param sections
+	 *            the total number of sections
+	 * @param maxActivityVectors
+	 *            the maximum number of tracks to use
+	 * 
 	 * @return the number of tracks
 	 */
-	
-	private int getActivityVectorCount(int section,int sections,int maxActivityVectors,int lastCount) {
+
+	private int getActivityVectorCount(int section, int sections,
+			int maxActivityVectors, int lastCount) {
 		// important: all of this must work properly when only few sections
-        // and few ActivityVectors (or even 1) are available
-		
-		int increaseTill = Math.min(maxActivityVectors,Math.min(sections/2,4))-1;
-		int decreaseFrom = sections-Math.min(maxActivityVectors,Math.min(sections/2,3));
-		
-		if(section <= increaseTill) {
+		// and few ActivityVectors (or even 1) are available
+
+		int increaseTill = Math.min(maxActivityVectors, Math.min(sections / 2,
+				4)) - 1;
+		int decreaseFrom = sections
+				- Math.min(maxActivityVectors, Math.min(sections / 2, 3));
+
+		if (section <= increaseTill) {
 			// in fade-in phase
-			return section+1;
-		} else if(section >= decreaseFrom) {
+			return section + 1;
+		} else if (section >= decreaseFrom) {
 			// in fade-out phase
-			return sections-section;
+			return sections - section;
 		} else {
 			// in between
-			int min = Math.min(maxActivityVectors,2);
-			
+			int min = Math.min(maxActivityVectors, 2);
+
 			int num;
-			
+
 			do {
-				num = min+random.nextInt(maxActivityVectors-min+1);
-			} while(Math.abs(num-lastCount) > 3);
-			
+				num = min + random.nextInt(maxActivityVectors - min + 1);
+			} while (Math.abs(num - lastCount) > 3);
+
 			return num;
 		}
 	}
-	
+
 	public void setArrangementEntries(ArrangementEntry[] arrangementEntries) {
 		this.arrangementEntries = arrangementEntries;
 	}
-	
-	public void configure(Node node,XPath xpath) throws XPathException {
-		NodeList nodeList = (NodeList)xpath.evaluate("track",node,XPathConstants.NODESET);
+
+	public void configure(Node node, XPath xpath) throws XPathException {
+		NodeList nodeList = (NodeList) xpath.evaluate("track", node,
+				XPathConstants.NODESET);
 
 		int tracks = nodeList.getLength();
 
-		if(tracks == 0) {
-			throw(new RuntimeException("Need at least 1 track"));
+		if (tracks == 0) {
+			throw (new RuntimeException("Need at least 1 track"));
 		}
-		
+
 		ArrangementEntry[] arrangementEntries = new ArrangementEntry[tracks];
-		
-		for(int i=0;i<tracks;i++) {
-			int channel = XMLUtils.parseInteger("channel",nodeList.item(i),xpath);
+
+		for (int i = 0; i < tracks; i++) {
+			int channel = XMLUtils.parseInteger("channel", nodeList.item(i),
+					xpath);
 
 			int transposition = 0;
-			
-			try {
-			    transposition = XMLUtils.parseInteger("transposition",nodeList.item(i),xpath);
-			} catch(Exception e) {}
-			
-			String minRatios = XMLUtils.parseString("minRatios",nodeList.item(i),xpath);
-			String maxRatios = XMLUtils.parseString("maxRatios",nodeList.item(i),xpath);
-			
-			Node sequenceEngineNode = (Node)xpath.evaluate("sequenceEngine",nodeList.item(i),XPathConstants.NODE);
 
 			try {
-			    SequenceEngine sequenceEngine = XMLUtils.getInstance(SequenceEngine.class,sequenceEngineNode,xpath);
-			    arrangementEntries[i] = new ArrangementEntry(channel,sequenceEngine,parseRatios(minRatios,sequenceEngine.getActivityVectorCount(),0d),parseRatios(maxRatios,sequenceEngine.getActivityVectorCount(),100d),transposition);
-			} catch(Exception e) {
-				throw(new RuntimeException("Error instantiating SequenceEngine",e));
-			}	
+				transposition = XMLUtils.parseInteger("transposition", nodeList
+						.item(i), xpath);
+			} catch (Exception e) {
+			}
+
+			String minRatios = XMLUtils.parseString("minRatios", nodeList
+					.item(i), xpath);
+			String maxRatios = XMLUtils.parseString("maxRatios", nodeList
+					.item(i), xpath);
+
+			Node sequenceEngineNode = (Node) xpath.evaluate("sequenceEngine",
+					nodeList.item(i), XPathConstants.NODE);
+
+			try {
+				SequenceEngine sequenceEngine = XMLUtils.getInstance(
+						SequenceEngine.class, sequenceEngineNode, xpath);
+				arrangementEntries[i] = new ArrangementEntry(channel,
+						sequenceEngine, parseRatios(minRatios, sequenceEngine
+								.getActivityVectorCount(), 0d), parseRatios(
+								maxRatios, sequenceEngine
+										.getActivityVectorCount(), 100d),
+						transposition);
+			} catch (Exception e) {
+				throw (new RuntimeException(
+						"Error instantiating SequenceEngine", e));
+			}
 		}
-		
+
 		setArrangementEntries(arrangementEntries);
 	}
-	
+
 	/**
-	 * Parses the given ratio string and returns an array with its contents.
-	 * If the ratio string is empty, an array of default ratios is returned.
+	 * Parses the given ratio string and returns an array with its contents. If
+	 * the ratio string is empty, an array of default ratios is returned.
 	 * 
-	 * @param ratioString the ratio string (may also be empty or null)
-	 * @param count the expected number of ratios
-	 * @param defaultRatio the ratio value to use when the string is undefined
-	 *
+	 * @param ratioString
+	 *            the ratio string (may also be empty or null)
+	 * @param count
+	 *            the expected number of ratios
+	 * @param defaultRatio
+	 *            the ratio value to use when the string is undefined
+	 * 
 	 * @return an array of doubles containing the ratios
 	 */
-	
-	private double[] parseRatios(String ratioString,int count,double defaultRatio) {
+
+	private double[] parseRatios(String ratioString, int count,
+			double defaultRatio) {
 		double[] array = new double[count];
 
-		if(ratioString == null || ratioString.equals("")) {
+		if (ratioString == null || ratioString.equals("")) {
 			// use the default ratio for all ActivityVectors
-			
-			for(int i=0;i<count;i++) {
+
+			for (int i = 0; i < count; i++) {
 				array[i] = defaultRatio;
 			}
-			
+
 			return array;
 		} else {
-		
+
 			String[] ratios = ratioString.split(",");
 
-			if(ratios.length != count) {
-				throw(new RuntimeException("Expected "+count+" ratio(s)+, got "+ratios.length));
+			if (ratios.length != count) {
+				throw (new RuntimeException("Expected " + count
+						+ " ratio(s)+, got " + ratios.length));
 			}
 
-			for(int i=0;i<ratios.length;i++) {
+			for (int i = 0; i < ratios.length; i++) {
 				array[i] = Double.parseDouble(ratios[i]);
 			}
 		}
-		
+
 		return array;
 	}
-	
+
 	/**
 	 * Returns the maximum number of ActivityVectors to use at the same time,
 	 * given the total number of ActivityVectors available. The method uses an
 	 * exponential drop-off so that the returned value is 1 for activityVectors
-	 * = 1 and the value converges down to activityVectors*factor as activityVectors goes to infinity.
-	 * The lambda value specifies the speed of the exponential drop-off. The goal
-	 * is to use almost all ActivityVectors when the number of ActivityVectors is small and
-	 * use (in relation) fewer ActivityVectors when the number of ActivityVectors becomes larger.
+	 * = 1 and the value converges down to activityVectors*factor as
+	 * activityVectors goes to infinity. The lambda value specifies the speed of
+	 * the exponential drop-off. The goal is to use almost all ActivityVectors
+	 * when the number of ActivityVectors is small and use (in relation) fewer
+	 * ActivityVectors when the number of ActivityVectors becomes larger.
 	 * 
-	 * @param activityVectors the number of ActivtiyVectors (must be positive)
-	 * @param factor the factor (between 0 and 1)
-	 * @param lambda the drop-off factor (must be positive)
+	 * @param activityVectors
+	 *            the number of ActivtiyVectors (must be positive)
+	 * @param factor
+	 *            the factor (between 0 and 1)
+	 * @param lambda
+	 *            the drop-off factor (must be positive)
 	 * 
 	 * @return the maximum number of ActivityVectors to use
 	 */
-		
-	private int getActivityVectorMaximum(int activityVectors,double factor,double lambda) {
-		return (int)(0.5d+(double)activityVectors*(factor+(1d-factor)*Math.exp(-lambda*(double)(activityVectors-1))));
+
+	private int getActivityVectorMaximum(int activityVectors, double factor,
+			double lambda) {
+		return (int) (0.5d + (double) activityVectors
+				* (factor + (1d - factor)
+						* Math.exp(-lambda * (double) (activityVectors - 1))));
 	}
-	
+
 	private class ArrangementEntry {
 		private int channel;
 		private SequenceEngine sequenceEngine;
 		private double[] minRatios;
 		private double[] maxRatios;
 		private int transposition;
-		
-		private ArrangementEntry(int channel,SequenceEngine sequenceEngine,double[] minRatios,double[] maxRatios,int transposition) {
+
+		private ArrangementEntry(int channel, SequenceEngine sequenceEngine,
+				double[] minRatios, double[] maxRatios, int transposition) {
 			this.channel = channel;
 			this.sequenceEngine = sequenceEngine;
 			this.minRatios = minRatios;

@@ -319,12 +319,13 @@ public class SimpleArrangementEngine extends ArrangementEngine {
     	// the maximum number of ActivityVectors that may be active
     	// at each point in time
     	int maxActivityVectors = getActivityVectorMaximum(num,0.65,0.2);
-   	
+    	int lastWantedActivityVectors = -1;
+    	
         for(int section=0;section<sections;section++) {
         	int len = he.getChordSectionTicks(tick);
         	
         	// get the number of ActivityVectors we want active for this chord section
-        	int wantedActivityVectors = getActivityVectorCount(section,sections,maxActivityVectors);
+        	int wantedActivityVectors = getActivityVectorCount(section,sections,maxActivityVectors,lastWantedActivityVectors);
         	
         	// get the number of tracks that are currently active
         	int card = bitset.cardinality();
@@ -345,7 +346,7 @@ public class SimpleArrangementEngine extends ArrangementEngine {
         		lastAddedBit = setRandomBit(bitset,num,lastRemovedBit);
         	}
         	
-        	//System.out.println("Section: "+section+"  Tracks: "+tracks+"  BitSet: "+bitset);
+        	System.out.println("Section: "+section+"  Tracks: "+wantedActivityVectors+"  BitSet: "+bitset);
 
         	// check the BitSet and add activity or inactivity intervals
         	// for the current section
@@ -359,6 +360,8 @@ public class SimpleArrangementEngine extends ArrangementEngine {
         	}
        	
             tick += len;
+            
+            lastWantedActivityVectors = wantedActivityVectors;
         }
 				
 		return activityVectors;	
@@ -378,7 +381,7 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 	 * @return the number of tracks
 	 */
 	
-	private int getActivityVectorCount(int section,int sections,int maxActivityVectors) {
+	private int getActivityVectorCount(int section,int sections,int maxActivityVectors,int lastCount) {
 		// important: all of this must work properly when only few sections
         // and few ActivityVectors (or even 1) are available
 		
@@ -394,7 +397,14 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 		} else {
 			// in between
 			int min = Math.min(maxActivityVectors,2);
-			return min+random.nextInt(maxActivityVectors-min+1);
+			
+			int num;
+			
+			do {
+				num = min+random.nextInt(maxActivityVectors-min+1);
+			} while(Math.abs(num-lastCount) > 3);
+			
+			return num;
 		}
 	}
 	

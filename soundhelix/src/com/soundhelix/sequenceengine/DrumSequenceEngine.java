@@ -33,20 +33,23 @@ import com.soundhelix.util.XMLUtils;
  * 
  * The following example uses 6 patterns with 4 activity groups:
  * <br>
- * <pre>&lt;sequenceEngine class="DrumSequenceEngine"&gt;
- *   &lt;!-- base drum --&gt;
- *   &lt;pattern pitch="36" activityGroup="0"&gt;10001000100010001000100010001001100010001000100010001000100010101000100010001000100010001000100110001000100010001000100011101011&lt;/pattern&gt;
- *   &lt;!-- clap --&gt;
- *   &lt;pattern pitch="37" activityGroup="1"&gt;00001000000010000000100000001000000010000000100000001000000110100000100000001000000010000000100000001000000010000000100001001000&lt;/pattern&gt;
- *   &lt;!-- closed hi-hat --&gt;
- *   &lt;pattern pitch="40" activityGroup="2"&gt;10001000100010001100100010001000&lt;/pattern&gt;
- *   &lt;!-- open hi-hat --&gt;
- *   &lt;pattern pitch="44" activityGroup="2"&gt;0010001000100010001000100010001000100010001000100010001000100101&lt;/pattern&gt;
- *   &lt;!-- other hi-hat --&gt;
- *   &lt;pattern pitch="39" activityGroup="2"&gt;001&lt;/pattern&gt;
- *   &lt;!-- snare --&gt;
- *   &lt;pattern pitch="42" activityGroup="3"&gt;00001000010010000000100001001010000010000100100000001000010010110000100001001000000010010100101000001000010010000000100101001011&lt;/pattern&gt;
- * &lt;/sequenceEngine&gt;
+ * <pre>
+ * {@literal
+ * <sequenceEngine class="DrumSequenceEngine">
+ *   <!-- base drum -->
+ *   <pattern pitch="36" activityGroup="0">10001000100010001000100010001001100010001000100010001000100010101000100010001000100010001000100110001000100010001000100011101011</pattern>
+ *   <!-- clap -->
+ *   <pattern pitch="37" activityGroup="1">00001000000010000000100000001000000010000000100000001000000110100000100000001000000010000000100000001000000010000000100001001000</pattern>
+ *   <!-- closed hi-hat -->
+ *   <pattern pitch="40" activityGroup="2">10001000100010001100100010001000</pattern>
+ *   <!-- open hi-hat -->
+ *   <pattern pitch="44" activityGroup="2">0010001000100010001000100010001000100010001000100010001000100101</pattern>
+ *   <!-- other hi-hat -->
+ *   <pattern pitch="39" activityGroup="2">001</pattern>
+ *   <!-- snare -->
+ *   <pattern pitch="42" activityGroup="3">00001000010010000000100001001010000010000100100000001000010010110000100001001000000010010100101000001000010010000000100101001011</pattern>
+ * </sequenceEngine>
+ * }
  * </pre>
  * 
  * @author Thomas Schürger (thomas@schuerger.com)
@@ -124,7 +127,10 @@ public class DrumSequenceEngine extends SequenceEngine {
         				tick++;
         		        break;
         		        
-        		case 12:
+        		case 12: seq.addPause(2);
+        		        tick += 2;
+        		        break;
+        		        
         		case 16: seq.addPause(3);
         		         tick += 3;
         		         break;

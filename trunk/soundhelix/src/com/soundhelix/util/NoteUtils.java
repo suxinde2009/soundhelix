@@ -17,6 +17,7 @@ public class NoteUtils {
 		"c","c#","d","d#","e","f","f#","g","g#","a","a#","b"
 	};
 	
+	// maps note names to pitches
 	private static Hashtable<String,Integer> h = new Hashtable<String,Integer>();
 	
 	static {
@@ -27,18 +28,45 @@ public class NoteUtils {
 	
 	private NoteUtils() {}
 
+	/**
+	 * Returns the note name of the given pitch in lower-case. The pitch
+	 * is normalized first (between 0 and 11).
+	 *
+	 * @param pitch the pitch
+	 * 
+	 * @return the pitch name
+	 */
+	
 	public static String getNoteName(int pitch) {
-		int offset = (pitch >= 0 ? pitch%12 : ((pitch%12)+12)%12);
-		return noteNames[offset];
+		return noteNames[((pitch%12)+12)%12];
 	}
 	
+	/**
+	 * Returns the note pitch of the given note (between
+	 * 0 and 11), ignoring case. If the note is invalid,
+     * Integer.MIN_VALUE is returned.
+	 * 
+	 * @param name the note name
+	 *
+	 * @return the note pitch or Integer.MIN_VALUE
+	 */
+	
 	public static int getNotePitch(String name) {
-		return h.get(name.toLowerCase());
+		if(name == null) {
+			return Integer.MIN_VALUE;
+		}
+	
+		Integer pitch = h.get(name.toLowerCase());
+		
+		if(pitch == null) {
+		} else {
+			return pitch;
+		}
 	}
 	
     /**
      * Returns true iff the given pitch is on the C/Am scale
-     * (i.e., a "white key" on the piano keyboard).
+     * (i.e., a white key on the piano keyboard).
      * 
      * @param pitch the pitch to check
      * 

@@ -1,5 +1,7 @@
 package com.soundhelix.harmonyengine;
 
+import java.util.Hashtable;
+
 import org.apache.log4j.Logger;
 
 import com.soundhelix.misc.Chord;
@@ -60,6 +62,7 @@ public abstract class HarmonyEngine implements XMLConfigurable {
 
 	protected Structure structure;	
 	private int chordSections = -1;
+	private int distinctChordSections = -1;
 	
 	public HarmonyEngine() {
 		logger = Logger.getLogger(getClass());
@@ -203,6 +206,32 @@ public abstract class HarmonyEngine implements XMLConfigurable {
 		}
 		
 		return sb.toString();
+	}
+	
+	/**
+	 * Returns the number of distinct chord sections. The return
+	 * value, once calculated, is cached for further method
+	 * calls.
+	 * 
+	 * @return the number of distinct chord sections
+	 */
+	
+	public int getDistinctChordSectionCount() {
+		if(distinctChordSections >= 0) {
+			return distinctChordSections;
+		} else {
+			Hashtable<String,Boolean> ht = new Hashtable<String,Boolean>();
+			int tick = 0;
+
+			while(tick < structure.getTicks()) {
+				ht.put(getChordSectionString(tick),true);
+				tick += getChordSectionTicks(tick);
+			}
+
+			distinctChordSections = ht.size();
+			
+			return distinctChordSections;
+		}
 	}
 	
 	/**

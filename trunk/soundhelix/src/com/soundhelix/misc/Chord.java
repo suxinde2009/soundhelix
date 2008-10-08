@@ -310,6 +310,32 @@ public class Chord {
         }    	
     }
     
+    /**
+     * Returns true if the given pitch is a note that is contained in
+     * the chord, false otherwise. All involved pitches are normalized,
+     * i.e., octave does not matter.
+     * 
+     * @param pitch the pitch
+     * 
+     * @return true if the pitch belongs to the chord, false otherwise
+     */
+    
+    public boolean containsPitch(int pitch) {
+    	pitch = (((pitch%12)+12)%12);
+    	
+    	if(pitch == (((getLowPitch()%12)+12)%12) || 
+    	   pitch == (((getMiddlePitch()%12)+12)%12) ||
+    	   pitch == (((getHighPitch()%12)+12)%12)) {
+    		System.out.println("Chord "+this+" contains pitch "+pitch);
+    		
+    		return true;
+    	} else {
+       		System.out.println("Chord "+this+" does not contain pitch "+pitch);
+   		return false;
+    	}
+    	
+    }
+    
     public int hashCode() {
     	return toString().hashCode();
     }

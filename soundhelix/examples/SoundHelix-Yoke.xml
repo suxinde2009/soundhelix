@@ -26,7 +26,7 @@
       </sequenceEngine>
     </track>
     <track>
-      <channel>9</channel>
+      <channel>3</channel>
       <sequenceEngine class="DrumSequenceEngine">
         <!-- base drum -->
         <pattern pitch="36" activityGroup="0">10001000100010001000100010001001100010001000100010001000100010101000100010001000100010001000100110001000100010001000100011101011</pattern>
@@ -101,7 +101,7 @@
     </track>
   </arrangementEngine>
   <player class="MidiPlayer">
-    <device>Java Sound Synthesizer</device>
+    <device>Out To MIDI Yoke:  1</device>
     <bpm><random min="130" max="150" type="normal" mean="140" variance="6"/></bpm>
 	<transposition><random min="64" max="70"/></transposition>
     <groove><random list="100,100|110,90|115,85|120,80|115,85,120,80"/></groove>

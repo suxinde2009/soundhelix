@@ -1,5 +1,6 @@
 package com.soundhelix.sequenceengine;
 
+import java.util.Hashtable;
 import java.util.Random;
 
 import javax.xml.xpath.XPath;
@@ -15,11 +16,13 @@ import com.soundhelix.misc.Chord;
 import com.soundhelix.misc.Sequence;
 import com.soundhelix.misc.Track;
 import com.soundhelix.misc.Track.TrackType;
+import com.soundhelix.util.NoteUtils;
 import com.soundhelix.util.XMLUtils;
 
 /**
- * Implements a sequence engine plays a randomly generated melody, played
- * with a given rhythmic pattern.
+ * Implements a sequence engine that uses a randomly generated melody, played
+ * with a given rhythmic pattern. For each distinct chord section, a melody
+ * is generated and used for each occurrence of the chord section.
  * <br><br>
  * <b>XML-Configuration</b>
  * <table border=1>
@@ -39,17 +42,12 @@ public class MelodySequenceEngine extends SequenceEngine {
 	// all values at or below this values are special
 	private static final int SPECIAL = FREE;	
 	
-	private static final int[] majorTable = new int[] {0,4,7};
-	private static final int[] minorTable = new int[] {0,3,7};
-	private static final boolean[] scaleTable = new boolean[] {true,false,true,false,true,true,false,true,false,true,false,true};
-
 	private static boolean obeyChordSubtype = false;
-	private static String defaultPatternString = "+,-,-,+,-,-,+,-,+,-,-,+,-,-,+,-,+,-,-,+,-,-,+,-,+,-,+,-,+,-,-,-,+,-,-,+,-,-,+,-,+,-,-,+,-,-,+,-,+,-,-,+,-,-,+,-,+,-,+,-,+,-,+,+";
+	private static String defaultPatternString = "0,-,-,+,-,-,+,-,0,-,-,+,-,-,+,-,0,-,-,+,-,-,+,-,0,-,+,-,+,-,-,-,0,-,-,+,-,-,+,-,0,-,-,+,-,-,+,-,0,-,-,+,-,-,+,-,0,-,+,-,+,-,+,+";
+	//private static String defaultPatternString = "0,-,-,-";
 	private String patternString;
 	private int[] pattern;
 	private int patternLength;
-	
-	private int[] pitchPattern;
 	
 	private static Random random = new Random();
 	
@@ -62,7 +60,7 @@ public class MelodySequenceEngine extends SequenceEngine {
 		setPattern(patternString);
 	}
 
-	public Track render(ActivityVector... activityVectors) {
+	public Track render(ActivityVector[] activityVectors) {
 		ActivityVector activityVector = activityVectors[0];
 
 		Sequence seq = new Sequence();
@@ -72,42 +70,29 @@ public class MelodySequenceEngine extends SequenceEngine {
         
         int ticks = structure.getTicks();
         
-        int pitch = Integer.MIN_VALUE;
-        
-        pitchPattern = new int[ce.getChordSectionTicks(0)];
+        Hashtable<String,int[]> melodyHashtable = createMelodies();
         
 		while(tick < ticks) {
-        	Chord chord = ce.getChord(tick);
-        	int len = ce.getChordTicks(tick);
-        
+        	int len = ce.getChordSectionTicks(tick);
+        	int[] pitchPattern = melodyHashtable.get(ce.getChordSectionString(tick));
+        	       	
         	for(int i=0;i<len;i++) {
         		if(activityVector.isActive(tick)) {
-        			int value = pattern[(tick+i)%patternLength];
+        			int value = pitchPattern[i];
         			
         			if(value == PAUSE) {
             			// add pause
             			seq.addPause(1);
-        				continue;
-        			} else if(value == FREE) {
-        				if((tick+i) >= pitchPattern.length) {
-            				pitch = pitchPattern[(tick+i) % pitchPattern.length];
-        				} else {
-        					pitch = getRandomPitch(pitch == Integer.MIN_VALUE ? chord.getPitch() : pitch);
-        					System.out.println("Using pitch "+pitch);
-        					pitchPattern[(tick+i) % pitchPattern.length] = pitch;
-        				}
-        				seq.addNote(pitch,1);
         			} else {
-        				pitch = chord.getPitch();
-        				seq.addNote(pitch,1);
+        				seq.addNote(value,1);
         			}
         		} else {
         			// add pause
         			seq.addPause(1);
         		}
+        		
+        		tick++;
          	}
-        	
-        	tick += len;
         }
         
 		Track track = new Track(TrackType.MELODY);
@@ -133,83 +118,112 @@ public class MelodySequenceEngine extends SequenceEngine {
 		
 		return array;
 	}
-	
-	/**
-	 * Returns a transition pitch between the chord and the next chord,
-	 * which is based on the base pitches of the two chords.
-	 * If the next chord is null, the pitch of the first chord is used.
-	 * If the pitch difference of the two chords is 2, the halftone in
-	 * between is returned. If the pitch difference of the two chords
-	 * is one or zero, the first pitch is returned. Otherwise, a pitch
-	 * between the two pitches which is on the C/Am scale is returned.
-	 * 
-	 * @param chord the current chord
-	 * @param nextChord the next chord (or null)
-	 * 
-	 * @return a transition pitch
-	 */
-	
-    private static int getTransitionPitch(Chord chord,Chord nextChord) {
-    	if(nextChord == null) {
-    		// next chord is undefined, just return the current pitch
-    		return chord.getPitch();
-    	}
-    	
-    	int pitch1 = chord.getPitch();
-    	int pitch2 = nextChord.getPitch();
-    	
-    	int diff = pitch2-pitch1;
-    	int absdiff = Math.abs(diff);
-    	
-    	if(diff == 0) {
-    		// chords are the same
-    		return pitch1;
-    	} else if(absdiff == 2) {
-    		// pitch difference is one tone,
-    		// use the halftone in between
-    		return((pitch1+pitch2)/2);
-       	} else if(absdiff == 1) {
-    		// pitch difference is one halftone
-    		// use the current pitch
-    		return(pitch1);
-    	} else if(diff > 0) {
-    		pitch1 += Math.min(0,absdiff/2-1);
-    		do {
-    			pitch1++;
-    		} while(!isOnScale(pitch1));
-    	   	return pitch1;
-    	} else {
-    		pitch1 -= Math.min(0,absdiff/2-1);
-    		do {
-    			pitch1--;
-    		} while(!isOnScale(pitch1));
-    		return pitch1;
-    	}
-    }
     
-    // checks if the given pitch is on the C/Am scale
+    /**
+     * Returns a random pitch which is near the given pitch and on the
+     * C/Am scale.
+     * 
+     * @param the starting pitch
+     * 
+     * @return the random pitch
+     */
     
-    private static boolean isOnScale(int pitch) {
-    	pitch = ((pitch%12)+12)%12;
-    	return scaleTable[pitch];
-    }
-    
-    private static int getRandomPitch(int pitch) {
+    private static int getRandomPitch(int pitch,int maxDistanceDown,int maxDistanceUp) {
     	int r = random.nextInt(3);
     	
-    	if(r == 0) {
-    		pitch += random.nextInt(2);
+    	if(r == 0 || pitch < -10) {
+    		pitch += random.nextInt(maxDistanceUp);
     		do {
     		  pitch++;
-    		} while(!isOnScale(pitch));    		
-    	} else if(r==1) {
-    		pitch -= random.nextInt(2);
+    		} while(!NoteUtils.isOnScale(pitch));    		
+    	} else if(r==1 || pitch > 10) {
+    		pitch -= random.nextInt(maxDistanceDown);
     		do {
       		  pitch--;
-      		} while(!isOnScale(pitch));    		
+      		} while(!NoteUtils.isOnScale(pitch));    		
     	}
     	
     	return pitch;
+    }
+
+    /**
+     * Returns a random pitch which is near the given pitch and
+     * is one of the given chords notes.
+     * 
+     * @param the starting pitch
+     * 
+     * @return the random pitch
+     */
+    
+    private static int getRandomPitch(Chord chord,int pitch,int maxDistanceDown,int maxDistanceUp) {
+    	int r = random.nextInt(3);
+    	
+    	if(r == 0 || pitch < -10) {
+    		pitch += random.nextInt(maxDistanceUp);
+    		do {
+    		  pitch++;
+    		} while(!chord.containsPitch(pitch));    		
+    	} else if(r==1 || pitch > 10) {
+    		pitch -= random.nextInt(maxDistanceDown);
+    		do {
+      		  pitch--;
+      		} while(!chord.containsPitch(pitch));    		
+    	}
+    	
+    	return pitch;
+    }
+
+    /**
+     * Creates a melody for each distinct chord section and
+     * returns a hashtable mapping chord section strings to
+     * melody arrays.
+     * 
+     * @return a hashtable mapping chord section strings to melody arrays
+     */
+    
+    private Hashtable<String,int[]> createMelodies() {
+    	HarmonyEngine he = structure.getHarmonyEngine();
+    	
+    	Hashtable<String,int[]> ht = new Hashtable<String,int[]>();
+    	
+    	int tick = 0;
+    	
+    	while(tick < structure.getTicks()) {
+    		String section = he.getChordSectionString(tick);
+    		
+    		if(!ht.containsKey(section)) {
+    			// no melody created yet; create one
+    			
+    			int len = he.getChordSectionTicks(tick);
+    			
+    			int[] pitchList = new int[len];
+    			int pitch = Integer.MIN_VALUE;
+    			
+    			for(int i=0;i<len;i++) {
+    				int value = pattern[i%patternLength];
+        			Chord chord = he.getChord(tick+i);
+        			
+        			if(value == PAUSE) {
+            			pitchList[i] = PAUSE;
+        			} else if(value == FREE) {
+        				pitch = getRandomPitch(pitch == Integer.MIN_VALUE ? chord.getPitch() : pitch,2,2);
+        				pitchList[i] = pitch;
+        			} else {
+        				pitch = getRandomPitch(chord,pitch == Integer.MIN_VALUE ? chord.getPitch() : pitch,2,2);
+    					pitchList[i] = pitch;
+        			}
+    			}
+    			
+    			tick += len;
+    			
+    			ht.put(section,pitchList);
+    		} else {
+    			// melody already created, skip chord section
+    			tick += he.getChordSectionTicks(tick);
+    		}
+    	}
+    	
+    	return ht;
     }
     
     public void configure(Node node,XPath xpath) throws XPathException {

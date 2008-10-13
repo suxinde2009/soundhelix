@@ -36,15 +36,17 @@ import com.soundhelix.util.XMLUtils;
 public class SoundHelix implements Runnable {
 
 	private static Logger logger;
-	private final Structure structure;
 	private XPath xpath;
+	private Node structureNode;
+	private Node harmonyEngineNode;
 	private Node arrangementEngineNode;
 
 	// the queue for generated Arrangements
 	private static BlockingQueue<Arrangement> arrangementQueue;
 	
-	public SoundHelix(Structure structure,Node arrangementEngineNode,XPath xpath) {
-		this.structure = structure;
+	public SoundHelix(Node structureNode,Node harmonyEngineNode,Node arrangementEngineNode,XPath xpath) {
+		this.structureNode = structureNode;
+		this.harmonyEngineNode = harmonyEngineNode;
 		this.arrangementEngineNode = arrangementEngineNode;
 		this.xpath = xpath;
 	}
@@ -96,15 +98,11 @@ public class SoundHelix implements Runnable {
 			Node arrangementEngineNode = (Node)xpath.evaluate("arrangementEngine",mainNode,XPathConstants.NODE);
 			Node playerNode = (Node)xpath.evaluate("player",mainNode,XPathConstants.NODE);
 
-			Structure structure = parseStructure(structureNode,xpath);
-			HarmonyEngine harmonyEngine = XMLUtils.getInstance(HarmonyEngine.class,harmonyEngineNode,xpath);
-			structure.setHarmonyEngine(harmonyEngine);	
-
 			arrangementQueue = new LinkedBlockingQueue<Arrangement>();
 
 			// instantiate this class so than we can launch a thread
 			
-			SoundHelix electro = new SoundHelix(structure,arrangementEngineNode,xpath);
+			SoundHelix electro = new SoundHelix(structureNode,harmonyEngineNode,arrangementEngineNode,xpath);
 			Thread t = new Thread(electro);
 			t.start();
 
@@ -134,6 +132,10 @@ public class SoundHelix implements Runnable {
 					// the queue is empty; render a new song
 
 					System.out.println("Rendering new song");
+
+					Structure structure = parseStructure(structureNode,xpath);
+					HarmonyEngine harmonyEngine = XMLUtils.getInstance(HarmonyEngine.class,harmonyEngineNode,xpath);
+					structure.setHarmonyEngine(harmonyEngine);	
 
 					long startTime = System.nanoTime();
 					ArrangementEngine arrangementEngine = XMLUtils.getInstance(ArrangementEngine.class,arrangementEngineNode,xpath);

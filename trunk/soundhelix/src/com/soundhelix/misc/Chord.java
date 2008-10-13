@@ -326,14 +326,10 @@ public class Chord {
     	if(pitch == (((getLowPitch()%12)+12)%12) || 
     	   pitch == (((getMiddlePitch()%12)+12)%12) ||
     	   pitch == (((getHighPitch()%12)+12)%12)) {
-    		System.out.println("Chord "+this+" contains pitch "+pitch);
-    		
     		return true;
     	} else {
-       		System.out.println("Chord "+this+" does not contain pitch "+pitch);
-   		return false;
+    		return false;
     	}
-    	
     }
     
     public int hashCode() {

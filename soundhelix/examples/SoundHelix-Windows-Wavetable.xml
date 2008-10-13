@@ -6,16 +6,7 @@
      <beatsPerBar>4</beatsPerBar>
      <ticksPerBeat>4</ticksPerBeat>
   </structure>
-  <harmonyEngine class="PatternHarmonyEngine">
-    <chordPattern>0/4,1/4,1/4,2/4</chordPattern>
-    <chordPattern>0/4,1/4,1/4,1/2,2/2</chordPattern>
-    <chordPattern>0/4,1/4,1/2,1/2,1/2,2/2</chordPattern>
-    <chordPattern>0/4,1/4,1/4,1/4,0/4,1/4,1/4,2/4</chordPattern>
-    <chordPattern>0/4,1/4,1/4,1/4,0/4,1/4,1/4,1/2,2/2</chordPattern>
-    <chordPattern>0/4,1/4,1/4,1/2,1/2,0/4,1/4,1/4,1/2,2/2</chordPattern>
-    <chordPattern>0/4,1/4,1/2,1/2,2/4</chordPattern>
-    <chordPattern>0/4,1/4,$0/4,1/2,$1/2</chordPattern>
-  </harmonyEngine> 
+  <include>includes/Standard-HarmonyEngine.xml</include> 
   <arrangementEngine class="SimpleArrangementEngine">
    <track>
       <channel>1</channel>

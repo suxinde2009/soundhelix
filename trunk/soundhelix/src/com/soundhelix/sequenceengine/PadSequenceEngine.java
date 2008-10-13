@@ -68,13 +68,12 @@ public class PadSequenceEngine extends SequenceEngine {
 
         HarmonyEngine ce = structure.getHarmonyEngine();
         
-        //Chord firstChord = ce.getChord(0);
+        Chord firstChord = ce.getChord(0);
         
         int tick = 0;
         
         while(tick < structure.getTicks()) {
-        	//Chord chord = firstChord.findClosestChord(ce.getChord(tick));
-           	Chord chord = ce.getChord(tick);
+        	Chord chord = firstChord.findClosestChord(ce.getChord(tick));
            	int len = ce.getChordTicks(tick);
            	
         	if(activityVector.isActive(tick)) {

@@ -1,7 +1,7 @@
 SoundHelix
 ----------
 
-Author: Thomas Schürger (thomas@schuerger.com)
+Author: Thomas SchÃ¼rger (thomas@schuerger.com)
 
 
 Introduction
@@ -28,7 +28,8 @@ Currently SoundHelix features some basic music creation abilities and a MIDI
 player, which can access any MIDI resource accessible to Java. Note that
 currently some external MIDI software is required for playback. This can be
 any MIDI software or hardware which can be accessed using a MIDI driver on
-your platform.
+your platform. You can even use the standard Java Software Synthesizer. Please
+check the included configuration files.
 
 SoundHelix currently does not provide any internal sound playback capabilities.
 
@@ -72,8 +73,8 @@ up to 8 MIDI ports. It is sufficient to use one of the ports
 for SoundHelix. The name of the MIDI Yoke MIDI output port is
 "Out To MIDI Yoke:  n" (with n from 1 to 8). Note the extra
 space after the colon. This must be used in SoundHelix for
-output. The
-MIDI software can then use "In From MIDI Yoke:  n" for input.
+output. The MIDI software can then use "In From MIDI Yoke:  n" for
+input.
 
 MIDI Yoke can be found here: http://www.midiox.com/myoke.htm
 
@@ -82,7 +83,9 @@ Configuration
 -------------
 
 Configuration is done using an XML file. If no filename is
-provided at startup, the file "SoundHelix.xml" is read.
+provided at startup, the file "SoundHelix.xml" is read. A couple
+of example configuration files are included in the "examples"
+directory.
 
 Details about configuration are still to be written.
 
@@ -94,11 +97,11 @@ the following instead of a plain integer:
   to generate a random integer between minimum and maximum
   (both inclusive) with uniform distribution
   
-- <random min="minimum max="maximum" type="normal" mean="mean" variance="variance"/>
+- <random min="minimum" max="maximum" type="normal" mean="mean" variance="variance"/>
 
   to generate a random integer between minimum and maximum
   (both inclusive) with a Gaussian (normal) distribution having a mean of mean and
-  a variance of variance
+  a variance of variance; mean and variance are doubles
   
 - <random list="value1,value2,..."/>
 
@@ -115,7 +118,7 @@ the following instead of a plain string:
 Sourcecode
 ----------
 
-SoundHelix is OpenSource and is hosted on SourceForge:
+SoundHelix is Open Source Software with GPL v3 license and is hosted on SourceForge:
 
 http://sourceforge.net/projects/soundhelix/
 

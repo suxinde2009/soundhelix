@@ -155,9 +155,10 @@ public class SoundHelix implements Runnable {
 	
 	/**
 	 * Returns the next Arrangement in the Arrangement queue. This method blocks until an
-	 * Arrangement is available.
+	 * Arrangement is available. Note that getNextArrangement() and getNextPlayer() must
+	 * always be called in pairs.
 	 * 
-	 * @return the next Player
+	 * @return the next Arrangement
 	 * 
 	 * @throws InterruptedException
 	 */
@@ -168,7 +169,8 @@ public class SoundHelix implements Runnable {
 
 	/**
 	 * Returns the next Player in the Player queue. This method blocks until a
-	 * Player is available.
+	 * Player is available. Note that getNextArrangement() and getNextPlayer() must
+	 * always be called in pairs.
 	 * 
 	 * @return the next Player
 	 * 

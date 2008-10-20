@@ -445,10 +445,7 @@ public class MidiPlayer extends Player {
 		
 		for(int i=0;i<entries;i++) {
 			String name = (String)xpath.evaluate("attribute::name",nodeList.item(i),XPathConstants.STRING);
-			String midiName = XMLUtils.parseString(nodeList.item(i),xpath);
-
-			System.out.println("Device name: "+name+"  MIDI name: "+midiName);
-			
+			String midiName = XMLUtils.parseString(nodeList.item(i),xpath);			
 			devices[i] = new Device(name,midiName);
 		}
 		
@@ -467,8 +464,6 @@ public class MidiPlayer extends Player {
 			String device = ((String)xpath.evaluate("attribute::device",nodeList.item(i),XPathConstants.STRING));
 			int channel = Integer.parseInt((String)xpath.evaluate("attribute::channel",nodeList.item(i),XPathConstants.STRING));
 
-			System.out.println("Mapping from "+instrument+" to "+device+"/"+channel);
-			
 			if(channelMap.containsKey(instrument)) {
 				throw(new RuntimeException("Instrument "+instrument+" must not be re-mapped"));
 			}

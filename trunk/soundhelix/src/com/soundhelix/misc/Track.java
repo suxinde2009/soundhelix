@@ -13,8 +13,8 @@ import java.util.List;
  * (c' might be the base drum, c#' might be the snare and so on) rather than a frequency
  * of a tone to play.
  * 
- * Only a whole track can be assigned to a channel, so all contained sequences use the
- * same channel for playback. If different channels are needed, the sequences must each
+ * Only a whole track can be assigned to an instrument, so all contained sequences use the
+ * same instrument for playback. If different instruments are needed, the sequences must each
  * be put into a track individually.
  *
  * @author Thomas Schürger (thomas@schuerger.com)

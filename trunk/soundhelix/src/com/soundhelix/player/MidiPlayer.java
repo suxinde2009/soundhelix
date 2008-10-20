@@ -27,29 +27,33 @@ import com.soundhelix.misc.Track.TrackType;
 import com.soundhelix.util.XMLUtils;
 
 /**
- * Implements a MIDI player. Track's channels are mapped to MIDI channels
- * in a 1:1 fashion, unless mapped otherwise explicitly.
+ * Implements a MIDI player, which can distribute instrument playback to an arbitrary
+ * number of MIDI devices. Each instrument used must be mapped to a combination of MIDI
+ * device and MIDI channel. The MIDI programs cannot be selected yet, so the
+ * currently selected programs are used. All specified MIDI devices are opened for
+ * playback, even if they are not used by any instrument.
  * 
  * <h3>XML configuration</h3>
  * <table border=1>
  * <tr><th>Tag</th> <th>#</th> <th>Attributes</th> <th>Description</th> <th>Required</th>
- * <tr><td><code>device</code></td> <td>1</td> <td></td> <td>Specifies the MIDI device to use.</td> <td>yes</td>
+ * <tr><td><code>device</code></td> <td>1</td> <td>name</td> <td>Specifies the MIDI device to make available using the given name.</td> <td>yes</td>
  * <tr><td><code>bpm</code></td> <td>1</td> <td></td> <td>Specifies the beats per minute to use.</td> <td>yes</td>
  * <tr><td><code>transposition</code></td> <td>1</td> <td></td> <td>Specifies the transposition in halftones to use. Pitches are generated at around 0, so for MIDI the transposition must be something around 60.</td> <td>yes</td>
  * <tr><td><code>groove</code></td> <td>1</td> <td></td> <td>Specifies the groove to use. See method setGroove().</td> <td>yes</td>
- * <tr><td><code>map</code></td> <td>*</td> <td><code>from</code>, <code>to</code></td> <td>Maps the virtual channel specified by <i>from</i> to MIDI channel <i>to</i>.</td> <td>no</td>
+ * <tr><td><code>map</code></td> <td>*</td> <td><code>instrument</code>, <code>device</code>, <code>channel</code></td> <td>Maps the instrument specified by <i>instrument</i> to MIDI device <i>device</i> and channel <i>channel</i>.</td> <td>no</td>
  * </table>
  *
  * <h3>Configuration example</h3>
  *
  * <pre>
  * &lt;player class="MidiPlayer"&gt;
- *   &lt;device&gt;Out To MIDI Yoke:  1&lt;/device&gt;
+ *   &lt;device name="device1"&gt;Out To MIDI Yoke:  1&lt;/device&gt;
+ *   &lt;device name="device2"&gt;Out To MIDI Yoke:  2&lt;/device&gt;
  *   &lt;bpm&gt;&lt;random min="130" max="150" type="normal" mean="140" variance="6"/&gt;&lt;/bpm&gt;
  *   &lt;transposition&gt;&lt;random min="64" max="70"/&gt;&lt;/transposition&gt;
  *   &lt;groove&gt;&lt;random list="100,100|110,90|115,85|120,80|115,85,120,80"/&gt;&lt;/groove&gt;
- *   &lt;mapChannel from="0" to="8"/&gt;
- *   &lt;mapChannel from="1" to="7"/&gt;
+ *   &lt;map instrument="0" device="device1" channel="8"/&gt;
+ *   &lt;map instrument="1" device="device2" channel="7"/&gt;
  * &lt;/player&gt;
  * </pre>
  * 
@@ -57,44 +61,47 @@ import com.soundhelix.util.XMLUtils;
  */
 
 // TODO: add possibility to map a virtual channel to several MIDI channels (do we need this)?
-// TODO: add possibility to use more than one MIDI device and map virtual channels to combinations of MIDI channels and MIDI devices
-// TODO: add possibility to choose a program number (i.e., instrument) for each MIDI channel
+// TODO: add possibility to choose a program number (i.e., MIDI instrument) for each MIDI channel
 // TODO: mute all MIDI channels when starting playing (how?)
 // TODO: mute all MIDI channels when player is aborted by ctrl+c (how?)
 // TODO: add MIDI synchronization support (sending clock ticks to target device, how?)
+// TODO: allow setting BPM in a fine-grained fashion (with at least milli-BPM resolution)
 
 public class MidiPlayer extends Player {
-	private String deviceName;
-	private MidiDevice device;
-	private Receiver receiver;
+	private Device[] devices;
+	
 	private int bpm;
 	private int transposition;
 	private int groove[];
 	
-	private Map<Integer,Integer> channelMap;
+	private Map<Integer,DeviceChannel> channelMap;
+	private Map<String,Device> deviceMap;
+	
+	// has open() been called?
+	boolean opened = false;
 	
     public MidiPlayer() {
     	super();
 	}
 	
+    /**
+     * Opens all MIDI devices.
+     */
+    
     public void open() {
-       	try {
-       		device = MidiPlayer.findMidiDevice(deviceName);
-
-    		if(device == null) {
-       			throw(new RuntimeException("Could not find MIDI device \""+deviceName+"\". Available devices with MIDI IN:\n"+getMidiDevices()));
-    		}
-
-    		device.open();
-
-    		receiver = device.getReceiver();
-
-    		if(receiver == null) {
-    			throw(new RuntimeException("MIDI device \""+deviceName+"\" does not have a Receiver. Available devices with MIDI IN:\n"+getMidiDevices()));
+    	if(opened) {
+    		throw(new RuntimeException("open() already called"));
+    	}
+    	
+    	try {
+    		for(int i=0;i<devices.length;i++) {
+    			devices[i].open();
     		}
     	} catch(Exception e) {
-    		throw(new RuntimeException("Error opening MIDI device \""+deviceName+"\"",e));
+    		throw(new RuntimeException("Could not open MIDI devices",e));
     	}
+    	
+    	opened = true;
     }
     
     /**
@@ -128,16 +135,46 @@ public class MidiPlayer extends Player {
     }
     
     public void close() {
-    	if(device != null) {
-    		device.close();
-    		device = null;
-    		receiver = null;
+    	if(devices != null && opened) {
+    		try {
+    			for(int i=0;i<devices.length;i++) {
+    				devices[i].close();
+    			}
+    		} catch(Exception e) {
+    			throw(new RuntimeException("Could not close MIDI devices"));
+    		}
+    		
+    		devices = null;
+    		
+    		opened = false;
     	}
     }
     
-    private void setDevice(String deviceName) {
-    	this.deviceName = deviceName;
+    /**
+     * Sets the MIDI devices.
+     * 
+     * @param devices the MIDI devices
+     */
+    
+    private void setDevices(Device[] devices) {
+    	deviceMap = new HashMap<String,Device>();
+    	
+    	for(int i=0;i<devices.length;i++) {
+    		if(deviceMap.containsKey(devices[i].name)) {
+    			throw(new RuntimeException("Device name \""+devices[i].name+"\" used more than once"));
+    		}
+    		
+    		deviceMap.put(devices[i].name,devices[i]);
+    	}
+    	
+    	this.devices = devices;
     }
+    
+    /**
+     * Sets the number of beats per minute for playback.
+     * 
+     * @param bpm the number of beats per minute
+     */
     
     private void setBPM(int bpm) {
     	if(bpm <= 0) {
@@ -158,7 +195,7 @@ public class MidiPlayer extends Player {
     }
 
     /**
-     * Sets the groove for playback. A groove list a comma-separated
+     * Sets the groove for playback. A groove is a comma-separated
      * list of integers acting as relative weights for tick lengths.
      * The player cycles through this list while playing and uses the
      * list for timing ticks.
@@ -211,14 +248,13 @@ public class MidiPlayer extends Player {
     }
     
     /**
-     * Sets the channel map, which maps virtual channels to MIDI
-     * channels. All virtual channels which are not mapped explicitly
-     * are mapped to the MIDI channel with the same number.
+     * Sets the channel map, which maps instruments to MIDI
+     * devices and channels. All used instruments must be mapped.
      * 
      * @param channelMap the channel map
      */
     
-    public void setChannelMap(Map<Integer,Integer> channelMap) {
+    public void setChannelMap(Map<Integer,DeviceChannel> channelMap) {
     	this.channelMap = channelMap;
     }
     
@@ -237,7 +273,7 @@ public class MidiPlayer extends Player {
     }
       
     public void play(Arrangement arrangement) {
-    	if(receiver == null) {
+    	if(!opened) {
     		throw(new RuntimeException("Must call open() first"));
     	}
     	
@@ -279,14 +315,14 @@ public class MidiPlayer extends Player {
     			for(int k=0;i.hasNext();k++) {
     				ArrangementEntry e = i.next();
     				Track track = e.getTrack();
-    				int channel = e.getChannel();
+    				int instrument = e.getInstrument();
 
-    				// map channel if mapped
-    				
-    				if(channelMap.containsKey(channel)) {
-    					channel = channelMap.get(channel);
+    				DeviceChannel channel = channelMap.get(instrument);
+        			
+    				if(channel == null) {
+    					throw(new RuntimeException("Instrument "+instrument+" not mapped to MIDI device/channel combination"));
     				}
-    				
+
     				int[] t = tickList.get(k);
     				int[] p = posList.get(k);
 
@@ -298,8 +334,8 @@ public class MidiPlayer extends Player {
     						if(p[j] > 0) {
     							SequenceEntry prevse = s.get(p[j]-1);
     							if(prevse.isNote()) {
-    								sm.setMessage(ShortMessage.NOTE_OFF,channel,(track.getType() == TrackType.MELODY ? transposition : 0)+prevse.getPitch(),0);
-    								receiver.send(sm,-1);
+    								sm.setMessage(ShortMessage.NOTE_OFF,channel.channel,(track.getType() == TrackType.MELODY ? transposition : 0)+prevse.getPitch(),0);
+    								channel.device.receiver.send(sm,-1);
     							}
     						}
     					}
@@ -312,8 +348,8 @@ public class MidiPlayer extends Player {
     							SequenceEntry se = s.get(p[j]);
 
     							if(se.isNote()) {
-    								sm.setMessage(ShortMessage.NOTE_ON,channel,(track.getType() == TrackType.MELODY ? transposition : 0)+se.getPitch(),getMidiVelocity(se.getVelocity()));
-    								receiver.send(sm,-1);
+    								sm.setMessage(ShortMessage.NOTE_ON,channel.channel,(track.getType() == TrackType.MELODY ? transposition : 0)+se.getPitch(),getMidiVelocity(se.getVelocity()));
+    								channel.device.receiver.send(sm,-1);
     							}
 
     							p[j]++;
@@ -363,12 +399,12 @@ public class MidiPlayer extends Player {
     		for(int k=0;i.hasNext();k++) {
     			ArrangementEntry e = i.next();
     			Track track = e.getTrack();
-    			int channel = e.getChannel();
+    			int instrument = e.getInstrument();
 
-				// map channel if mapped
-				
-				if(channelMap.containsKey(channel)) {
-					channel = channelMap.get(channel);
+    			DeviceChannel channel = channelMap.get(instrument);
+    			
+				if(channel == null) {
+					throw(new RuntimeException("Instrument "+instrument+" not mapped to MIDI device/channel combination"));
 				}
 
     			int[] p = posList.get(k);
@@ -377,8 +413,8 @@ public class MidiPlayer extends Player {
     				Sequence s = track.get(j);					
     				SequenceEntry prevse = s.get(p[j]-1);
     				if(prevse.isNote()) {
-    					sm.setMessage(ShortMessage.NOTE_OFF,channel,(track.getType() == TrackType.MELODY ? transposition : 0)+prevse.getPitch(),0);
-    					receiver.send(sm,-1);
+    					sm.setMessage(ShortMessage.NOTE_OFF,instrument,(track.getType() == TrackType.MELODY ? transposition : 0)+prevse.getPitch(),0);
+    					channel.device.receiver.send(sm,-1);
     				}
     			}
     		}
@@ -403,28 +439,111 @@ public class MidiPlayer extends Player {
     }
     
     public void configure(Node node,XPath xpath) throws XPathException {
-    	setDevice(XMLUtils.parseString((Node)xpath.evaluate("device",node,XPathConstants.NODE),xpath));	
+		NodeList nodeList = (NodeList)xpath.evaluate("device",node,XPathConstants.NODESET);
+		int entries = nodeList.getLength();
+		Device[] devices = new Device[entries];
+		
+		for(int i=0;i<entries;i++) {
+			String name = (String)xpath.evaluate("attribute::name",nodeList.item(i),XPathConstants.STRING);
+			String midiName = XMLUtils.parseString(nodeList.item(i),xpath);
+
+			System.out.println("Device name: "+name+"  MIDI name: "+midiName);
+			
+			devices[i] = new Device(name,midiName);
+		}
+		
+    	setDevices(devices);	
     	setBPM(XMLUtils.parseInteger((Node)xpath.evaluate("bpm",node,XPathConstants.NODE),xpath));
     	setTransposition(XMLUtils.parseInteger((Node)xpath.evaluate("transposition",node,XPathConstants.NODE),xpath));
     	setGroove(XMLUtils.parseString((Node)xpath.evaluate("groove",node,XPathConstants.NODE),xpath));
     	
-		NodeList nodeList = (NodeList)xpath.evaluate("mapChannel",node,XPathConstants.NODESET);
-
-		int mapEntries = nodeList.getLength();
+		nodeList = (NodeList)xpath.evaluate("map",node,XPathConstants.NODESET);
+		entries = nodeList.getLength();
 		
-		Map<Integer,Integer> channelMap = new HashMap<Integer,Integer>();
+		Map<Integer,DeviceChannel> channelMap = new HashMap<Integer,DeviceChannel>();
 		
-		for(int i=0;i<mapEntries;i++) {
-			int from = Integer.parseInt((String)xpath.evaluate("attribute::from",nodeList.item(i),XPathConstants.STRING));
-			int to = Integer.parseInt((String)xpath.evaluate("attribute::to",nodeList.item(i),XPathConstants.STRING));
+		for(int i=0;i<entries;i++) {
+			int instrument = Integer.parseInt((String)xpath.evaluate("attribute::instrument",nodeList.item(i),XPathConstants.STRING));
+			String device = ((String)xpath.evaluate("attribute::device",nodeList.item(i),XPathConstants.STRING));
+			int channel = Integer.parseInt((String)xpath.evaluate("attribute::channel",nodeList.item(i),XPathConstants.STRING));
 
-			if(channelMap.containsKey(from)) {
-				throw(new RuntimeException("Channel "+from+" must not be re-mapped"));
+			System.out.println("Mapping from "+instrument+" to "+device+"/"+channel);
+			
+			if(channelMap.containsKey(instrument)) {
+				throw(new RuntimeException("Instrument "+instrument+" must not be re-mapped"));
 			}
 			
-			channelMap.put(from,to);
+			if(!deviceMap.containsKey(device)) {
+				throw(new RuntimeException("Device \""+device+"\" unknown"));
+			}
+			
+			// TODO: add support for MIDI program selection
+			DeviceChannel ch = new DeviceChannel(deviceMap.get(device),channel,-1);
+			
+			channelMap.put(instrument,ch);
 		}
 		
 		setChannelMap(channelMap);
+    }
+    
+    public class Device
+    {
+    	private final String name;
+    	private final String midiName;
+    	private MidiDevice midiDevice;
+    	private Receiver receiver;
+    	
+    	public Device(String name,String midiName) {
+    		if(name == null || name.equals("")) {
+    			throw(new IllegalArgumentException("Name must not be null or empty"));
+    		}
+
+    		if(midiName == null || midiName.equals("")) {
+    			throw(new IllegalArgumentException("MIDI device name must not be null or empty"));
+    		}
+
+    		this.name = name;
+    		this.midiName = midiName;
+    	}
+    	
+    	public void open() {
+           	try {
+           		midiDevice = MidiPlayer.findMidiDevice(midiName);
+
+        		if(midiDevice == null) {
+           			throw(new RuntimeException("Could not find MIDI device \""+midiName+"\". Available devices with MIDI IN:\n"+getMidiDevices()));
+        		}
+
+        		midiDevice.open();
+
+        		receiver = midiDevice.getReceiver();
+
+        		if(receiver == null) {
+        			throw(new RuntimeException("MIDI device \""+midiName+"\" does not have a Receiver. Available devices with MIDI IN:\n"+getMidiDevices()));
+        		}
+        	} catch(Exception e) {
+        		throw(new RuntimeException("Error opening MIDI device \""+midiName+"\"",e));
+        	}
+    	}
+    	
+    	public void close() {
+    		if(midiDevice != null) {
+    			midiDevice.close();
+    			midiDevice = null;
+    		}
+    	}
+    }
+    
+    public class DeviceChannel
+    {
+    	private final Device device;
+    	private final int channel;
+    	private final int program;
+     	
+    	public DeviceChannel(Device device,int channel,int program) {
+    		this.device = device;
+    		this.channel = channel;
+    		this.program = program;
+    	}
     }
 }

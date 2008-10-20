@@ -26,7 +26,7 @@
         <pattern pitch="44" activityGroup="2">0010001000100010001000100010001000100010001000100010001000100101</pattern>
         <!-- other hi-hat -->
         <pattern pitch="39" activityGroup="2">001</pattern>
-	    <!-- snare -->
+        <!-- snare -->
         <pattern pitch="42" activityGroup="3">00001000010010000000100001001010000010000100100000001000010010110000100001001000000010010100101000001000010010000000100101001011</pattern>
       </sequenceEngine>
       <minRatios>50,25,25,0</minRatios>
@@ -91,7 +91,7 @@
   <player class="MidiPlayer">
     <device>Java Sound Synthesizer</device>
     <bpm><random min="130" max="150" type="normal" mean="140" variance="6"/></bpm>
-	<transposition><random min="64" max="70"/></transposition>
+    <transposition><random min="64" max="70"/></transposition>
     <groove><random list="100,100|110,90|115,85|120,80|115,85,120,80"/></groove>
   </player>
 </soundhelix>

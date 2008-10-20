@@ -21,13 +21,13 @@
   </harmonyEngine> 
   <arrangementEngine class="SimpleArrangementEngine">
     <track>
-      <channel>1</channel>
+      <instrument>1</instrument>
       <sequenceEngine class="PadSequenceEngine">
         <offsets><random list="0,1,2|0,1,2,3|-1,0,1|-2,-1,0,1,2|1,2,3"/></offsets>
       </sequenceEngine>
     </track>
     <track>
-      <channel>3</channel>
+      <instrument>3</instrument>
       <sequenceEngine class="DrumSequenceEngine">
         <!-- base drum -->
         <pattern pitch="36" activityGroup="0">100</pattern>
@@ -46,7 +46,7 @@
       <maxRatios>90,100,100,100</maxRatios>
     </track>
     <track>
-      <channel>0</channel>
+      <instrument>0</instrument>
       <sequenceEngine class="ArpeggioSequenceEngine">
         <pattern>0</pattern>
         <pattern>0,1</pattern>
@@ -57,51 +57,63 @@
       </sequenceEngine>
     </track>
    <track>
-      <channel>2</channel>
+      <instrument>2</instrument>
       <sequenceEngine class="PatternSequenceEngine">
         <pattern>0,-,-,0,-,-,1,-,-,0,-,+</pattern>
       </sequenceEngine>
       <minRatios>60</minRatios>
     </track>
     <track>
-      <channel>4</channel>
+      <instrument>4</instrument>
       <sequenceEngine class="PatternSequenceEngine">
         <pattern>0,-,-,0,-,-,0,-,1,0,-,2,0,-,1,2,-,0,-,2,3,1,4,2</pattern>
       </sequenceEngine>
     </track>
     <track>
-      <channel>5</channel>
+      <instrument>5</instrument>
       <sequenceEngine class="ChordSequenceEngine">
         <pattern>0,-,-,0,-,-,0,-,-,0,-,-,0,-,-,0,-,-,0,-,-,0,2,1,0,-,-,0,-,-,0,-,-,0,-,-,0,-,-,0,-,-,0,-,2,1,3,4</pattern>
       </sequenceEngine>
     </track>-->
     <!--<track>
-      <channel>7</channel>
+      <instrument>7</instrument>
       <sequenceEngine class="RhythmSequenceEngine"/>
     </track>-->
     <track>
-      <channel>8</channel>
+      <instrument>8</instrument>
       <sequenceEngine class="PatternSequenceEngine">
         <pattern>0,-,-</pattern>
       </sequenceEngine>
     </track>
     <track>
-      <channel>9</channel>
+      <instrument>9</instrument>
       <sequenceEngine class="PatternSequenceEngine">
         <pattern>0,0,0,-,0,-,-,0,-,-,0,-</pattern>
       </sequenceEngine>
     </track>
     <track>
-      <channel>10</channel>
+      <instrument>10</instrument>
       <sequenceEngine class="PatternSequenceEngine">
         <pattern>0:1,-,0:1,-,0:1,-,-,0:1,-,0:1,-,0:1</pattern>
       </sequenceEngine>
     </track>
   </arrangementEngine>
   <player class="MidiPlayer">
-    <device>Out To MIDI Yoke:  1</device>
     <bpm><random min="130" max="150" type="normal" mean="140" variance="6"/></bpm>
 	<transposition><random min="64" max="70"/></transposition>
     <groove><random list="1,1,1"/></groove>
+    <!-- <device name="device3">Out To MIDI Yoke:  1</device> -->
+    <device name="device1">Java Sound Synthesizer</device>
+    <map instrument="0" device="device1" channel="0"/>
+    <map instrument="1" device="device1" channel="1"/>
+    <map instrument="2" device="device1" channel="2"/>
+    <map instrument="3" device="device1" channel="3"/>
+    <map instrument="4" device="device1" channel="4"/>
+    <map instrument="5" device="device1" channel="5"/>
+    <map instrument="6" device="device1" channel="6"/>
+    <map instrument="7" device="device1" channel="7"/>
+    <map instrument="8" device="device1" channel="8"/>
+    <map instrument="9" device="device1" channel="9"/>
+    <map instrument="10" device="device1" channel="10"/>
   </player>
 </soundHelix>

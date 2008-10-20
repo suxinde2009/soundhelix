@@ -126,7 +126,7 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 
 			Track track = sequenceEngine.render(list);
 			track.transpose(arrangementEntries[i].transposition);
-			arrangement.add(track,arrangementEntries[i].channel);
+			arrangement.add(track,arrangementEntries[i].instrument);
 		}
 
 		return arrangement;
@@ -356,7 +356,7 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 		ArrangementEntry[] arrangementEntries = new ArrangementEntry[tracks];
 		
 		for(int i=0;i<tracks;i++) {
-			int channel = XMLUtils.parseInteger("channel",nodeList.item(i),xpath);
+			int instrument = XMLUtils.parseInteger("instrument",nodeList.item(i),xpath);
 
 			int transposition = 0;
 			
@@ -371,7 +371,7 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 
 			try {
 			    SequenceEngine sequenceEngine = XMLUtils.getInstance(SequenceEngine.class,sequenceEngineNode,xpath);
-			    arrangementEntries[i] = new ArrangementEntry(channel,sequenceEngine,parseRatios(minRatios,sequenceEngine.getActivityVectorCount(),0d),parseRatios(maxRatios,sequenceEngine.getActivityVectorCount(),100d),transposition);
+			    arrangementEntries[i] = new ArrangementEntry(instrument,sequenceEngine,parseRatios(minRatios,sequenceEngine.getActivityVectorCount(),0d),parseRatios(maxRatios,sequenceEngine.getActivityVectorCount(),100d),transposition);
 			} catch(Exception e) {
 				throw(new RuntimeException("Error instantiating SequenceEngine",e));
 			}	
@@ -439,14 +439,14 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 	}
 	
 	private class ArrangementEntry {
-		private int channel;
+		private int instrument;
 		private SequenceEngine sequenceEngine;
 		private double[] minRatios;
 		private double[] maxRatios;
 		private int transposition;
 		
-		private ArrangementEntry(int channel,SequenceEngine sequenceEngine,double[] minRatios,double[] maxRatios,int transposition) {
-			this.channel = channel;
+		private ArrangementEntry(int instrument,SequenceEngine sequenceEngine,double[] minRatios,double[] maxRatios,int transposition) {
+			this.instrument = instrument;
 			this.sequenceEngine = sequenceEngine;
 			this.minRatios = minRatios;
 			this.maxRatios = maxRatios;

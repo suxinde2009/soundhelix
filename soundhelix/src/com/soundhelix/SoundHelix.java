@@ -33,6 +33,8 @@ import com.soundhelix.util.XMLUtils;
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
+// TODO: provide a DTD or XML Schema for the configuration file
+
 public class SoundHelix implements Runnable {
 
 	private static Logger logger;

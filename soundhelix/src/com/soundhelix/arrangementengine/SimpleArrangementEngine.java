@@ -27,6 +27,10 @@ import com.soundhelix.util.XMLUtils;
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
+// TODO: extend the activity group scheme from the DrumSequenceEngine to this class
+//       so that arbitrary combinations of sequences across tracks can be put into an
+//       activity group
+
 public class SimpleArrangementEngine extends ArrangementEngine {
 	private final Random random = new Random();
 

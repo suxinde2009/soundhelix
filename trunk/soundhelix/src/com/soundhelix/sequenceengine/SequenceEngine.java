@@ -1,7 +1,12 @@
 package com.soundhelix.sequenceengine;
 
 /**
- * Represents an abstract generator for note sequences.
+ * Represents an abstract generator for note sequences. This class provides
+ * a dummy implementation of RandomSeedable, which is a no-op (it stores the
+ * random seed and can return the stored seed, but doesn't use the seed). Subclasses
+ * that want to make use of random-seedability must override setRandomSeed() and
+ * getRandomSeed() accordingly. This is to make sure that a subclass is able to
+ * react to calls to setRandomSeed() to re-seed the internal random generators.
  * 
  * @see Sequence
  * 
@@ -11,14 +16,19 @@ package com.soundhelix.sequenceengine;
 import org.apache.log4j.Logger;
 
 import com.soundhelix.misc.ActivityVector;
+import com.soundhelix.misc.RandomSeedable;
 import com.soundhelix.misc.Structure;
 import com.soundhelix.misc.Track;
 import com.soundhelix.misc.XMLConfigurable;
 
-public abstract class SequenceEngine implements XMLConfigurable {
+public abstract class SequenceEngine implements XMLConfigurable,RandomSeedable {
 	protected final Logger logger;
-
+	
 	protected Structure structure;
+	
+	// this is private on intention, because it should
+	// not be read/modified by subclasses
+	private long randomSeed = System.nanoTime();
 	
     public SequenceEngine() {
     	logger = Logger.getLogger(this.getClass());
@@ -52,5 +62,13 @@ public abstract class SequenceEngine implements XMLConfigurable {
      
      public int getActivityVectorCount() {
     	 return 1;
+     }
+     
+     public void setRandomSeed(long randomSeed) {
+    	 this.randomSeed = randomSeed;
+     }
+
+     public long getRandomSeed() {
+    	 return randomSeed;
      }
 }

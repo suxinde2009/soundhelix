@@ -123,7 +123,16 @@ public class XMLUtils {
 
 						return RandomUtils.getUniformInteger(min,max,step);
 					} else if(type.equals("normal")) {
-						double mean = Double.parseDouble((String)xpath.evaluate("attribute::mean",n,XPathConstants.STRING));
+						double mean;
+				    	String meanstr = (String)xpath.evaluate("attribute::mean",n,XPathConstants.STRING);
+						
+						if(meanstr != null && !meanstr.equals("")) {
+							mean = Double.parseDouble(meanstr);
+						} else {
+						    // use arithmetic mean
+							mean = (min+max)/2.0f;
+						}
+						
 						double variance = Double.parseDouble((String)xpath.evaluate("attribute::variance",n,XPathConstants.STRING));
 
 						return RandomUtils.getNormalInteger(min,max,mean,variance);

@@ -5,6 +5,7 @@ import java.util.Hashtable;
 import org.apache.log4j.Logger;
 
 import com.soundhelix.misc.Chord;
+import com.soundhelix.misc.RandomSeedable;
 import com.soundhelix.misc.Structure;
 import com.soundhelix.misc.XMLConfigurable;
 
@@ -57,12 +58,13 @@ import com.soundhelix.misc.XMLConfigurable;
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
-public abstract class HarmonyEngine implements XMLConfigurable {
+public abstract class HarmonyEngine implements XMLConfigurable,RandomSeedable {
 	protected final Logger logger;
 
 	protected Structure structure;	
 	private int chordSections = -1;
 	private int distinctChordSections = -1;
+	private long randomSeed;
 	
 	public HarmonyEngine() {
 		logger = Logger.getLogger(getClass());
@@ -293,5 +295,13 @@ public abstract class HarmonyEngine implements XMLConfigurable {
         if(lastChordSectionTicks != 1) {
         	throw(new RuntimeException("Chord section ticks is not 1 at last tick"));
         }
+    }
+    
+    public void setRandomSeed(long randomSeed) {
+    	this.randomSeed = randomSeed;
+    }
+
+    public long getRandomSeed() {
+    	return randomSeed;
     }
 }

@@ -16,6 +16,7 @@ public abstract class ArrangementEngine implements XMLConfigurable {
 	protected final Logger logger;
 	
 	protected Structure structure;
+	private long randomSeed;
 	
 	public ArrangementEngine() {
 		logger = Logger.getLogger(getClass());
@@ -36,4 +37,12 @@ public abstract class ArrangementEngine implements XMLConfigurable {
 	 */
 	
     public abstract Arrangement render();
+    
+    public void setRandomSeed(long randomSeed) {
+    	 this.randomSeed = randomSeed;
+     }
+
+     public long getRandomSeed() {
+    	 return randomSeed;
+     }
 }

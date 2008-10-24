@@ -11,11 +11,14 @@ package com.soundhelix.player;
 import org.apache.log4j.Logger;
 
 import com.soundhelix.misc.Arrangement;
+import com.soundhelix.misc.RandomSeedable;
 import com.soundhelix.misc.XMLConfigurable;
 
-public abstract class Player implements XMLConfigurable {
+public abstract class Player implements XMLConfigurable,RandomSeedable {
 	protected final Logger logger;
 
+	private long randomSeed;
+	
     public Player() {
     	logger = Logger.getLogger(this.getClass());
     }
@@ -43,4 +46,12 @@ public abstract class Player implements XMLConfigurable {
  	 */
 
       public abstract void close();
+      
+      public void setRandomSeed(long randomSeed) {
+     	 this.randomSeed = randomSeed;
+      }
+
+      public long getRandomSeed() {
+     	 return randomSeed;
+      }
 }

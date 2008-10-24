@@ -141,13 +141,14 @@ You can send your results to me by e-mail.
 Sourcecode and License
 ----------------------
 
-SoundHelix is Open Source Software with GPL v3 license and is hosted on SourceForge:
+SoundHelix is Open Source Software with GPL v3 license (see doc/LICENSE.txt)
+and is hosted on SourceForge:
 
 http://sourceforge.net/projects/soundhelix/
 
 The most recent sourcecode can be checked out using SVN like this:
 
-svn co https://soundhelix.svn.sourceforge.net/svnroot/soundhelix soundhelix 
+svn co https://soundhelix.svn.sourceforge.net/svnroot/soundhelix/trunk/soundhelix soundhelix 
 
 
 More Developers welcome

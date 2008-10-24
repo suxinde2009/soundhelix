@@ -6,7 +6,8 @@ package com.soundhelix.sequenceengine;
  * random seed and can return the stored seed, but doesn't use the seed). Subclasses
  * that want to make use of random-seedability must override setRandomSeed() and
  * getRandomSeed() accordingly. This is to make sure that a subclass is able to
- * react to calls to setRandomSeed() to re-seed the internal random generators.
+ * react to calls to setRandomSeed() to re-seed the internal random generators, if
+ * needed.
  * 
  * @see Sequence
  * 
@@ -25,10 +26,7 @@ public abstract class SequenceEngine implements XMLConfigurable,RandomSeedable {
 	protected final Logger logger;
 	
 	protected Structure structure;
-	
-	// this is private on intention, because it should
-	// not be read/modified by subclasses
-	private long randomSeed = System.nanoTime();
+	private long randomSeed;
 	
     public SequenceEngine() {
     	logger = Logger.getLogger(this.getClass());

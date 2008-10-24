@@ -1,12 +1,9 @@
 package com.soundhelix.misc;
 
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathException;
-
-import org.w3c.dom.Node;
-
 /**
- * Simple interface that adds random-seedability to a class.
+ * Simple interface that adds random-seedability to a class. A class that
+ * implements this interface, but does not want to use it needs to supply at least
+ * a dummy implementation that adheres to the contract described in getRandomSeed().
  *
  * @author Thomas Schürger (thomas@schuerger.com)
  */
@@ -17,7 +14,7 @@ public interface RandomSeedable {
 	 * random seed should produce the same method results when the same methods are
 	 * called with the same parameters and in the same order. If this method is not
 	 * called on a class instance, the random seed should be set to an arbitrary
-	 * value (e.g., to System.nanoTime()).
+	 * value (preferable to something non-constant, e.g., System.nanoTime()).
 	 * 
 	 * @param seed the random seed
 	 */

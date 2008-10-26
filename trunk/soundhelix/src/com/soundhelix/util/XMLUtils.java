@@ -33,6 +33,15 @@ public class XMLUtils {
 
 	private XMLUtils() {}
 	
+	/**
+	 * Returns the first child of the given node that is an element node. If
+	 * such node doesn't exist, null is returned.
+	 * 
+	 * @param the node
+	 * 
+	 * @return the first element child node
+	 */
+		
 	public static Node getFirstElementChild(Node node) {
 		node = node.getFirstChild();
 		
@@ -46,6 +55,15 @@ public class XMLUtils {
 		return null;	
 	}
 
+	/**
+	 * Returns the given node's next element sibling. If such node doesn't exist,
+	 * null is returned.
+	 * 
+	 * @param the node
+	 * 
+	 * @return the next sibling element node
+	 */
+	
 	public static Node getNextElementSibling(Node node) {
 		while(node != null) {
 			node = node.getNextSibling();
@@ -350,6 +368,7 @@ public class XMLUtils {
 	 * file is assumed have standard system encoding.
 	 * 
 	 * @param filename the filename of the file to read
+	 *
 	 * @return the file's contents
 	 * 
 	 * @throws IOException in case of an I/O error
@@ -361,7 +380,7 @@ public class XMLUtils {
 		BufferedReader reader = new BufferedReader(new FileReader(filename));
 		
 		// the buffer used for reading
-		char[] buf = new char[8192];
+		char[] buf = new char[16384];
 		
 		int numRead;
 		

@@ -7,20 +7,13 @@ import org.w3c.dom.Node;
 
 
 /**
- * Implements a low frequency oscillator (LFO) using a sine wave.
+ * Implements a low frequency oscillator (LFO) using a sine wave. A full LFO rotation
+ * corresponds to an angle of 2*Pi radians (360 degrees).
  * 
  * @author Thomas Schürger
  */
 
 public class SineLFO extends LFO {
-	/**
-	 * Returns the LFO's value of the given tick.
-	 * 
-	 * @param tick the tick
-	 * 
-	 * @return the LFO's value
-	 */
-	
 	public int getTickValue(int tick) {
 		double beat = (double)tick*beatsPerTick;
 
@@ -32,14 +25,6 @@ public class SineLFO extends LFO {
 		}
 	}
 
-	/**
-	 * Returns the LFO's value of the given millisecond.
-	 * 
-	 * @param milliSecond the millisecond
-	 * 
-	 * @return the LFO's value
-	 */
-	
 	public int getMilliSecondValue(int milliSecond) {
 		double beat = (double)milliBPM*(double)milliSecond/60000000d;
 

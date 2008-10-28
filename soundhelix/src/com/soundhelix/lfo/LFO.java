@@ -1,9 +1,5 @@
 package com.soundhelix.lfo;
 
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathException;
-
-import org.w3c.dom.Node;
 
 /**
  * Represents an abstract low frequency oscillator (LFO). The oscillator
@@ -18,8 +14,12 @@ import org.w3c.dom.Node;
  * (e.g., sine, triangle, sawtooth or rectangle wave) must be implemented by subclasses.
  * Subclasses can implement any type of waveform (for example, Bezier-spline interpolated
  * random waveforms), but must return their results in a way so that they depend on the selected
- * speed and that they are consistent (same method parameters must return same results for
- * the same configuration of the same instance).
+ * speed in a natural way and that they are consistent (same method parameters must
+ * return same results for the same configuration of the same instance).
+ * 
+ * LFO implementation must be able to handle small values for milli-RPM and milli-RPB
+ * correctly (i.e., without returning jumpy/glitchy values). This could mean using
+ * double arithmetic internally.
  * 
  * @author Thomas Schürger
  */

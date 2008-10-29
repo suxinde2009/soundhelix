@@ -8,14 +8,14 @@ import org.w3c.dom.Node;
 
 /**
  * Implements a low frequency oscillator (LFO) using a sawtooth wave, starting from 0 if
- * up is true, starting down from 1 otherwise. A fullL FO rotation corresponds to an angle
+ * up is true, starting down from 1 otherwise. A full LFO rotation corresponds to an angle
  * of 2*Pi radians (360 degrees).
  * 
  * @author Thomas Schürger
  */
 
 public class SawtoothLFO extends LFO {
-    boolean up;
+    private boolean up;
     
     private SawtoothLFO() {}
     

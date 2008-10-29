@@ -8,7 +8,7 @@ import org.w3c.dom.Node;
 
 /**
  * Implements a low frequency oscillator (LFO) using a rectangle wave, starting with 0.
- * A fullLFO rotation corresponds to an angle of 2*Pi radians (360 degrees).
+ * A full LFO rotation corresponds to an angle of 2*Pi radians (360 degrees).
  * 
  * @author Thomas Schürger
  */

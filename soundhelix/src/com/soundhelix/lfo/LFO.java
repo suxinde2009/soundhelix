@@ -37,6 +37,19 @@ public abstract class LFO {
 	
 	protected boolean relative;
 	
+	boolean speedSet;
+	
+	/**
+     * Returns the LFO's value of the given angle as a double.
+     * The returned value must be between 0 and 1 (both inclusive).
+     * 
+     * @param the angle in radians
+     * 
+     * @return the LFO's value (between 0 and 1, both inclusive)
+     */
+    
+    protected abstract double getValue(double angle);
+
 	/**
 	 * Returns the LFO's value of the given tick.
 	 * 
@@ -44,8 +57,22 @@ public abstract class LFO {
 	 * 
 	 * @return the LFO's value
 	 */
-	
-	public abstract int getTickValue(int tick);
+
+    public int getTickValue(int tick) {
+        if(!speedSet) {
+            throw(new RuntimeException("LFO speed not set yet"));           
+        }
+        
+        double angle;
+        
+        if(relative) {
+            angle = Math.PI*(double)tick*beatsPerTick*(double)milliRPB*0.002d;
+        } else {
+            angle = 2.0d*Math.PI*(double)tick*beatsPerTick/(double)milliBPM*(double)milliRPM;            
+        }
+
+        return minimum+(int)(0.5d+(double)maximum*(getValue(angle)));
+    }
 
 	/**
 	 * Returns the LFO's value of the given millisecond.
@@ -55,8 +82,22 @@ public abstract class LFO {
 	 * @return the LFO's value
 	 */
 	
-	public abstract int getMilliSecondValue(int milliSecond);
+    public int getMilliSecondValue(int milliSecond) {
+        if(!speedSet) {
+            throw(new RuntimeException("LFO speed not set yet"));           
+        }
 
+        double angle;
+        
+        if(relative) {
+            angle = Math.PI*(double)milliBPM*(double)milliSecond*(double)milliRPB/30000000000d;
+        } else {
+            angle = Math.PI*(double)milliBPM*(double)milliSecond/(double)milliBPM*(double)milliRPM/30000000d;            
+        }
+
+        return minimum+(int)(0.5d+(double)maximum*(getValue(angle)));
+    }
+    
 	/**
 	 * Sets the absolute speed of this LFO. Calling this method replaces
 	 * the previous absolute or relative speed.
@@ -71,20 +112,24 @@ public abstract class LFO {
 		this.milliRPM = milliRotationsPerMinute;
 		this.milliBPM = milliBPM;
 		this.relative = false;
+		this.speedSet = true;
 	}
 	
 	/**
 	 * Sets the relative speed of this LFO. Calling this method replaces
 	 * the previous absolute or relative speed.
 	 * 
-	 * @param milliBPM the milli-BPM
+	 * @param milliRotationsPerBeat the millirotations per beat
+     * @param milliBPM the number of milli-BPM
 	 * @param ticksPerBeat the number of ticks per beat
 	 */
 	
-	public void setRelativeSpeed(int milliRotationsPerBeat,int ticksPerBeat) {	
+	public void setRelativeSpeed(int milliRotationsPerBeat,int milliBPM,int ticksPerBeat) {	
 		this.milliRPB = milliRotationsPerBeat;
+		this.milliBPM = milliBPM;
 		this.beatsPerTick = 1.0d/(double)ticksPerBeat;
-		this.relative = true;
+		this.relative = true;		
+		this.speedSet = true;
 	}
 
 	public void setMinimum(int minimum) {

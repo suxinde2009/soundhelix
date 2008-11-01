@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiDevice;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Receiver;
@@ -28,8 +29,8 @@ import com.soundhelix.util.XMLUtils;
 
 /**
  * Implements a MIDI player, which can distribute instrument playback to an arbitrary
- * number of MIDI devices. Each instrument used must be mapped to a combination of MIDI
- * device and MIDI channel. The MIDI programs cannot be selected yet, so the
+ * number of MIDI devices in parallel. Each instrument used must be mapped to a combination
+ * of MIDI device and MIDI channel. The MIDI programs cannot be selected yet, so the
  * currently selected programs are used. All specified MIDI devices are opened for
  * playback, even if they are not used by any instrument.
  * 
@@ -40,7 +41,7 @@ import com.soundhelix.util.XMLUtils;
  * <tr><td><code>bpm</code></td> <td>1</td> <td></td> <td>Specifies the beats per minute to use.</td> <td>yes</td>
  * <tr><td><code>transposition</code></td> <td>1</td> <td></td> <td>Specifies the transposition in halftones to use. Pitches are generated at around 0, so for MIDI the transposition must be something around 60.</td> <td>yes</td>
  * <tr><td><code>groove</code></td> <td>1</td> <td></td> <td>Specifies the groove to use. See method setGroove().</td> <td>yes</td>
- * <tr><td><code>map</code></td> <td>*</td> <td><code>instrument</code>, <code>device</code>, <code>channel</code></td> <td>Maps the instrument specified by <i>instrument</i> to MIDI device <i>device</i> and channel <i>channel</i>.</td> <td>no</td>
+ * <tr><td><code>map</code></td> <td>*</td> <td><code>instrument</code>, <code>device</code>, <code>channel</code>, <code>program</code> (optional)</td> <td>Maps the instrument specified by <i>instrument</i> to MIDI device <i>device</i> and channel <i>channel</i>.</td> <td>no</td>
  * </table>
  *
  * <h3>Configuration example</h3>
@@ -61,7 +62,6 @@ import com.soundhelix.util.XMLUtils;
  */
 
 // TODO: add possibility to map a virtual channel to several MIDI channels (do we need this)?
-// TODO: add possibility to choose a program number (i.e., MIDI instrument) for each MIDI channel
 // TODO: mute all MIDI channels when starting playing (how?)
 // TODO: mute all MIDI channels when player is aborted by ctrl+c (how?)
 // TODO: add MIDI synchronization support (sending clock ticks to target device, how?)
@@ -289,16 +289,18 @@ public class MidiPlayer extends Player {
 
     		ShortMessage sm = new ShortMessage();
 
+    		// initialize internal sequence pointers
+    		
     		while(i.hasNext()) {
     			ArrangementEntry ae = i.next();
     			int size = ae.getTrack().size();
     			tickList.add(new int[size]);
     			posList.add(new int[size]);
-
     			//sm.setMessage(ShortMessage.STOP,ae.getChannel(),0,0);
-
     		}
 
+    		setChannelPrograms();
+    		
     		int tick = 0;
 
     		int ticksPerBar = structure.getTicksPerBar();
@@ -422,6 +424,33 @@ public class MidiPlayer extends Player {
     		throw(new RuntimeException("Playback error",e));
     	}
     }
+
+    /**
+     * Sets the channel programs of all DeviceChannels used. This
+     * method does not set the program of a DeviceChannel more than
+     * once.
+     * 
+     * @throws InvalidMidiDataException
+     */
+    
+	private void setChannelPrograms() throws InvalidMidiDataException {
+		ShortMessage sm = new ShortMessage();
+
+		// we use a Map to track whether a program has been set already
+
+		Map <DeviceChannel,Boolean> map = new HashMap<DeviceChannel,Boolean>();
+		Iterator<DeviceChannel> i = channelMap.values().iterator();
+
+		while(i.hasNext()) {
+			DeviceChannel dc = i.next();
+
+			if(dc.program != -1 && !map.containsKey(dc)) {
+				sm.setMessage(ShortMessage.PROGRAM_CHANGE,dc.channel,dc.program,0);
+				dc.device.receiver.send(sm,-1);
+				map.put(dc,true);
+			}
+		}
+	}
     
     /**
      * Converts our internal velocity (between 0 and Short.MAX_VALUE) to
@@ -471,10 +500,14 @@ public class MidiPlayer extends Player {
 			if(!deviceMap.containsKey(device)) {
 				throw(new RuntimeException("Device \""+device+"\" unknown"));
 			}
+
+			int program = -1;
 			
-			// TODO: add support for MIDI program selection
-			DeviceChannel ch = new DeviceChannel(deviceMap.get(device),channel,-1);
+			try {
+				program = Integer.parseInt((String)xpath.evaluate("attribute::program",nodeList.item(i),XPathConstants.STRING));
+			} catch(Exception e) {}
 			
+			DeviceChannel ch = new DeviceChannel(deviceMap.get(device),channel,program);			
 			channelMap.put(instrument,ch);
 		}
 		
@@ -540,5 +573,17 @@ public class MidiPlayer extends Player {
     		this.channel = channel;
     		this.program = program;
     	}
+
+    	public boolean equals(Object object) {
+    		if(object == null || !(object instanceof DeviceChannel))
+    			return false;
+    		
+    		DeviceChannel other = (DeviceChannel)object;    		
+    		return this == other || device.equals(other.device) && channel == other.channel && program == other.program;
+    	}
+
+    	public int hashCode() {
+    		return device.hashCode() * 4711 + channel*513 + program;
+    	}    	
     }
 }

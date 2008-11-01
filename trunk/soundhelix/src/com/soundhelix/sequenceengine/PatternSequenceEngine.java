@@ -33,6 +33,7 @@ import com.soundhelix.util.XMLUtils;
  * <table border=1>
  * <tr><th>Tag</th> <th>#</th> <th>Example</th> <th>Description</th> <th>Required</th>
  * <tr><td><code>pattern</code></td> <td>+</td> <td><code>0,-,-,-,1,-,2,-</code></td> <td>Sets the patterns to use. One of the patterns is selected at random.</td> <td>yes</td>
+ * <tr><td><code>obeyChordSubtype</code></td> <td>?</td> <td><code>yes</code></td> <td>Specifies whether to obey chord subtypes (defaults to no).</td> <td>no</td>
  * </table>
  * 
  * @author Thomas Schürger (thomas@schuerger.com)
@@ -48,7 +49,7 @@ public class PatternSequenceEngine extends SequenceEngine {
 	private static final int[] majorTable = new int[] {0,4,7};
 	private static final int[] minorTable = new int[] {0,3,7};
 
-	private static boolean obeyChordSubtype = false;
+	private boolean obeyChordSubtype = false;
 	private int[] pattern;
 	private short[] velocity;
 	private int patternLength;
@@ -64,19 +65,30 @@ public class PatternSequenceEngine extends SequenceEngine {
 		this.patternLength = pattern.length;		
 	}
 	
-	public Track render(ActivityVector... activityVectors) {
+	public void setObeyChordSubtype(boolean obeyChordSubtype) {
+		this.obeyChordSubtype = obeyChordSubtype;
+	}
+
+	public Track render(ActivityVector[] activityVectors) {
 		ActivityVector activityVector = activityVectors[0];
 
 		Sequence seq = new Sequence();
-        HarmonyEngine ce = structure.getHarmonyEngine();
+        HarmonyEngine harmonyEngine = structure.getHarmonyEngine();
         
         int tick = 0;
         
         int ticks = structure.getTicks();
         
+        Chord firstChord = harmonyEngine.getChord(0);
+        
 		while(tick < ticks) {
-        	Chord chord = ce.getChord(tick);
-        	int len = ce.getChordTicks(tick);
+        	Chord chord = harmonyEngine.getChord(tick);
+        	
+        	if(obeyChordSubtype) {
+        		chord = firstChord.findClosestChord(chord);
+        	}
+        	
+        	int len = harmonyEngine.getChordTicks(tick);
         
         	for(int i=0;i<len;i++) {
         		if(activityVector.isActive(tick+i)) {
@@ -104,7 +116,7 @@ public class PatternSequenceEngine extends SequenceEngine {
         				Chord nextChord;
         				
         				if(t < ticks && activityVector.isActive(t)) {
-        					nextChord = ce.getChord(t);
+        					nextChord = harmonyEngine.getChord(t);
         				} else {
         					// the next chord would either fall into
         					// an inactivity interval or be at the end
@@ -247,6 +259,10 @@ public class PatternSequenceEngine extends SequenceEngine {
 		if(nodeList.getLength() == 0) {
 			throw(new RuntimeException("Need at least 1 pattern"));
 		}
+		
+		try {
+			setObeyChordSubtype(XMLUtils.parseBoolean("obeyChordSubtype",node,xpath));
+		} catch(Exception e) {}
 		
 		setPattern(XMLUtils.parseString(nodeList.item(new Random().nextInt(nodeList.getLength())),xpath));
     }

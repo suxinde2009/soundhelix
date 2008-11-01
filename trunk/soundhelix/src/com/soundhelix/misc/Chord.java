@@ -95,8 +95,13 @@ public class Chord {
 		return type == ChordType.MINOR;
 	}
 	
-	public boolean equals(Chord otherChord) {
-		return this == otherChord || otherChord != null && this.pitch == otherChord.pitch && this.type == otherChord.type && this.subtype == otherChord.subtype;
+	public boolean equals(Object other) {
+		if(other == null || !(other instanceof Chord)) {
+			return false;
+		}
+		
+		Chord otherChord = (Chord)other;
+		return this == otherChord || this.pitch == otherChord.pitch && this.type == otherChord.type && this.subtype == otherChord.subtype;
 	}
 	
 	public String toString() {

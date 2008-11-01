@@ -165,6 +165,55 @@ public class XMLUtils {
 		}
 	}
 
+	public static boolean parseBoolean(String path,Node parentNode,XPath xpath) {
+		try {
+			Node node = (Node)xpath.evaluate(path,parentNode,XPathConstants.NODE);
+
+			if(node == null) {
+				throw(new RuntimeException("Path \""+path+"\" not found within node "+parentNode.getNodeName()));
+			}
+
+			return XMLUtils.parseBoolean(node,xpath);
+		} catch(Exception e) {
+			throw(new RuntimeException("Error parsing boolean",e));
+		}
+	}
+
+	/**
+	 * Tries to parse the text content of the given node as a boolean.
+	 * If it is a boolean, the boolean. Otherwise, the node
+	 * is checked for valid subelements, which are then evaluated.
+	 * 
+	 * @param node the node to parse
+	 * @param xpath an XPath instance
+	 * 
+	 * @return the boolean
+	 */
+
+	public static boolean parseBoolean(Node node,XPath xpath) {
+		String content = node.getTextContent();
+		
+		if(content != null && !content.equals("")) {
+			if(content.equals("1") || content.equals("yes") || content.equals("true") || content.equals("on")) {
+				return true;
+			} else if(content.equals("0") || content.equals("no") || content.equals("false") || content.equals("off")) {
+				return false;
+			}
+		}
+	
+		Node n = getFirstElementChild(node);
+	
+		if(n.getNodeName().equals("random")) {
+			try {
+				int prob = Integer.parseInt((String)xpath.evaluate("attribute::probability",n,XPathConstants.STRING));
+				return random.nextInt(100) < prob;
+			} catch(Exception e) {throw(new RuntimeException("Error parsing random attributes",e));}
+		}
+		else {
+			throw(new RuntimeException("Invalid element "+n.getNodeName()));
+		}
+	}
+
 	/**
 	 * Searches for the element pointed to by path and tries to parse
 	 * it as a string.

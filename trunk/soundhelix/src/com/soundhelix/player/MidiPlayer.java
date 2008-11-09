@@ -66,6 +66,7 @@ import com.soundhelix.util.XMLUtils;
 // TODO: mute all MIDI channels when player is aborted by ctrl+c (how?)
 // TODO: add MIDI synchronization support (sending clock ticks to target device, how?)
 // TODO: allow setting BPM in a fine-grained fashion (with at least milli-BPM resolution)
+// TODO: on each tick, send all note-offs before sending note-ons (this is currently done per track, but should be done globally)
 
 public class MidiPlayer extends Player {
 	private Device[] devices;

@@ -18,9 +18,8 @@ package com.soundhelix.lfo;
  * return same results for the same configuration of the same instance).
  * 
  * LFO implementation must be able to handle small values for milli-RPM and milli-RPB
- * correctly (i.e., without returning jumpy/glitchy values). This could mean using
- * double arithmetic internally.
- * 
+ * correctly (i.e., without returning jumpy/glitchy values).
+ *
  * @author Thomas Schürger
  */
 
@@ -43,7 +42,7 @@ public abstract class LFO {
      * Returns the LFO's value of the given angle as a double.
      * The returned value must be between 0 and 1 (both inclusive).
      * 
-     * @param the angle in radians
+     * @param the angle in radians (non-negative)
      * 
      * @return the LFO's value (between 0 and 1, both inclusive)
      */
@@ -53,7 +52,7 @@ public abstract class LFO {
 	/**
 	 * Returns the LFO's value of the given tick.
 	 * 
-	 * @param tick the tick
+	 * @param tick the tick (non-negative)
 	 * 
 	 * @return the LFO's value
 	 */
@@ -102,7 +101,7 @@ public abstract class LFO {
 	 * Sets the absolute speed of this LFO. Calling this method replaces
 	 * the previous absolute or relative speed.
 	 * 
-	 * @param milliRotationsPerBeat the number of millirotations per beat
+	 * @param milliRotationsPerMinute the number of millirotations per minute
 	 * @param milliBPM the number of milli-BPM
 	 * @param ticksPerBeat the number of ticks per beat
 	 */

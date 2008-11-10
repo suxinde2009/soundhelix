@@ -162,17 +162,21 @@ public class ActivityVector {
     
 	/**
 	 * Modifies the ActivityVector so that all interval changes
-	 * from inactive to active are preponed by preStartTicks and all
-	 * changes from active to inactive preponed by preStopTicks.
-	 * preStartTicks and preStopTicks may also be negative to postpone
-	 * instead of prepone. The first interval (starting at tick 0) is
-	 * never modified.
+	 * from inactive to active are postponed by startTicks and all
+	 * changes from active to inactive are postponed by stopTicks ticks.
+	 * startTicks and stopTicks may also be negative to prepone
+	 * instead of postpone. The start of the first interval is never
+	 * modified.
 	 * 
-	 * @param preStartTicks the number of ticks to prepone before or postpone after starting
-	 * @param preStopTicks the number of ticks to prepone before or postpone after stopping
+	 * @param startTicks the number of ticks to prepone or postpone starting
+	 * @param stopTicks the number of ticks to prepone or postpone stopping
 	 */
 	
-	public void shiftIntervalBoundaries(int preStartTicks,int preStopTicks) {
+	public void shiftIntervalBoundaries(int startTicks,int stopTicks) {
+		if(startTicks == 0 && stopTicks == 0) {
+			return;
+		}
+
 		int tick = 0;
 		
 		while(tick < totalTicks) {
@@ -180,16 +184,16 @@ public class ActivityVector {
 			
 			boolean active = isActive(tick);
 			
-			if(preStopTicks > 0 && !active) {
-				setActivityState(tick-preStopTicks,tick,false);
-			} else if(preStopTicks < 0 && tick < totalTicks && !active) {
-				setActivityState(tick,tick-preStopTicks,true);
-				tick  -= preStopTicks;
-			} else if(preStartTicks > 0 && active) {				
-				setActivityState(tick-preStartTicks,tick,true);
-			} else if(preStartTicks < 0 && active) {
-				setActivityState(tick,tick-preStartTicks,false);
-				tick  -= preStartTicks;
+			if(stopTicks < 0 && !active) {
+				setActivityState(tick+stopTicks,tick,false);
+			} else if(stopTicks > 0 && tick < totalTicks && !active) {
+				setActivityState(tick,tick+stopTicks,true);
+				tick  += stopTicks;
+			} else if(startTicks < 0 && active) {				
+				setActivityState(tick+startTicks,tick,true);
+			} else if(startTicks > 0 && active) {
+				setActivityState(tick,tick+startTicks,false);
+				tick  += startTicks;
 			}
 		}
 	}

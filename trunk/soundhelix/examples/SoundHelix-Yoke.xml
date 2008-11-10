@@ -12,6 +12,8 @@
       <sequenceEngine class="PadSequenceEngine">
         <offsets><random list="0,1,2|0,1,2,3|-1,0,1|-2,-1,0,1,2|1,2,3|-1,1,3"/></offsets>
       </sequenceEngine>
+      <startShifts>0</startShifts>
+      <stopShifts>2</stopShifts>
     </track>
     <track>
       <instrument>3</instrument>
@@ -21,16 +23,18 @@
         <!-- clap -->
         <pattern pitch="37" activityGroup="1">00001000000010000000100000001000000010000000100000001000000110100000100000001000000010000000100000001000000010000000100001001000</pattern>
         <!-- closed hi-hat -->
-        <pattern pitch="40" activityGroup="2">10001000100010001100100010001000</pattern>
+        <pattern pitch="40" activityGroup="2"><random list="10001000100010001100100010001000|1100|1101|1111"/></pattern>
         <!-- open hi-hat -->
         <pattern pitch="44" activityGroup="2">0010001000100010001000100010001000100010001000100010001000100101</pattern>
         <!-- other hi-hat -->
-        <pattern pitch="39" activityGroup="2">001</pattern>
+        <pattern pitch="39" activityGroup="2"><random list="001|010|100"/></pattern>
 	    <!-- snare -->
         <pattern pitch="42" activityGroup="3">00001000010010000000100001001010000010000100100000001000010010110000100001001000000010010100101000001000010010000000100101001011</pattern>
       </sequenceEngine>
       <minRatios>50,25,25,0</minRatios>
       <maxRatios>90,100,100,100</maxRatios>
+      <startShifts>0,-2,0,0</startShifts>
+      <stopShifts>-4,0,0,0</stopShifts>
     </track>
     <track>
       <instrument>0</instrument>
@@ -49,6 +53,8 @@
         <pattern>0,-,-,0,-,-,1,-,0,-,-,0,-,-,+,-,0,-,-,0,-,-,2,-,0,-,-,0,-,-,+,-</pattern>
         <pattern>0,-,-,-,0,-,-,0,-,-,0,-,-,-1,-,-,0,-,-,-,0,-,-,0,-,-,0,-,-,-,+,-</pattern>
         <pattern>0,-,-,-,0,-,-,-,0,-,-,2,-,-,-1,-,0,-,-,-,0,-,-,-,0,-,-,2,-,-,+,-</pattern>
+        <pattern>0,-,-,0,-,-,0,2,0,-,-,0,-,-,-1,-,0,-,-,0,-,-,0,2,0,-,-,0,-,-,-1,-,0,-,-,0,-,-,0,2,0,-,-,0,-,-,-1,-,0,-,-,0,-,-,0,2,0,-,-,0,-,-,1,-</pattern>
+        <pattern>0,-,0,-,0,-,-,0,-,0,-,0,0,-,+,-</pattern>
       </sequenceEngine>
       <minRatios>60</minRatios>
     </track>
@@ -63,6 +69,7 @@
       <sequenceEngine class="ChordSequenceEngine">
         <offsets>0,1,2</offsets>
         <pattern>0,-,-,-,0,-,-,0,-,-,0,-,-,0,-,-,0,-,-,-,0,-,-,0,-,-,0,-,3,-,1,-,0,-,-,-,0,-,-,0,-,-,0,-,-,0,-,-,0,-,-,-,0,-,-,0,-,-,0,-,3,1,4,2</pattern>
+        <pattern>0,-,-,0,-,-,0,-,-,2,-,-,0,-,-,0,-,-,0,-,-,0,-,-,0,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,-,2,-,-,0,-,-,0,-,-,0,-,-,0,-,-,0,-,-,0,-,1,0,2</pattern>
       </sequenceEngine>
     </track>
     <track>
@@ -87,9 +94,25 @@
         <pattern>0:1,-,0:1,-,0:1,-,-,0:1,-,0:1,-,0:1,1:12000,-,0:1,-,0:1,-,0:1,-,0:1,-,-,0:1,0:1,3:20000,0:1,-,2:1,-,0:1,-,0:1,-,0:1,-,0:1,-,-,0:1,-,0:1,-,0:1,1:18000,-,0:1,-,0:1,-,0:1,-,0:1,-,-,0:1,0:1,3:30000,0:1,-,2:1,-,0:1,-</pattern>
       </sequenceEngine>
     </track>
+    <track>
+      <instrument>11</instrument>
+      <sequenceEngine class="PatternSequenceEngine">
+        <obeyChordSubtype>yes</obeyChordSubtype>
+        <pattern>0,2,1,4</pattern>
+      </sequenceEngine>
+    </track>
+    <track>
+      <instrument>12</instrument>
+      <transposition>12</transposition>
+      <sequenceEngine class="ChordSequenceEngine">
+        <offsets>0,1,2</offsets>
+        <pattern>0,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,-,0,-,-,1,-,</pattern>
+      </sequenceEngine>
+    </track>
+    
   </arrangementEngine>
   <player class="MidiPlayer">
-    <bpm><random min="130" max="150" type="normal" mean="140" variance="6"/></bpm>
+    <bpm><random min="132" max="150" type="normal" variance="6"/></bpm>
 	<transposition><random min="64" max="70"/></transposition>
     <groove><random list="100,100|110,90|115,85|120,80|115,85,120,80"/></groove>
     <device name="device1">Out To MIDI Yoke:  1</device>
@@ -104,5 +127,7 @@
 	<map instrument="8" device="device1" channel="8"/>
 	<map instrument="9" device="device1" channel="9"/>
 	<map instrument="10" device="device1" channel="10"/>
+	<map instrument="11" device="device1" channel="11"/>
+	<map instrument="12" device="device1" channel="12"/>
   </player>
 </soundhelix>

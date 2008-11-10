@@ -37,7 +37,7 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 	private ArrangementEntry[] arrangementEntries;
 	
 	// maximum number of tries before failing
-	private static final int MAX_TRIES = 2500;
+	private static final int MAX_TRIES = 10000;
 	
 	public SimpleArrangementEngine() {
 		super();
@@ -126,6 +126,7 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 
 			for(int k=0;k<num;k++) {
 				list[k] = activityVectors[vectorNum++];
+				list[k].shiftIntervalBoundaries(arrangementEntries[i].startShifts[k],arrangementEntries[i].stopShifts[k]);
 			}
 
 			Track track = sequenceEngine.render(list);
@@ -277,7 +278,7 @@ public class SimpleArrangementEngine extends ArrangementEngine {
         		do {lastAddedBit = setRandomBit(bitset,num,lastRemovedBit);} while(bitset.cardinality() < wantedActivityVectors);
         	} else if(card > wantedActivityVectors) {
         		do {lastRemovedBit = clearRandomBit(bitset,lastAddedBit);} while(bitset.cardinality() > wantedActivityVectors);
-        	} else if(card > 0 && Math.random() > 0.2) {
+        	} else if(card > 0 && Math.random() > 0.5) {
         		lastRemovedBit = clearRandomBit(bitset,lastAddedBit);
         		lastAddedBit = setRandomBit(bitset,num,lastRemovedBit);
         	}
@@ -370,12 +371,14 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 			
 			String minRatios = XMLUtils.parseString("minRatios",nodeList.item(i),xpath);
 			String maxRatios = XMLUtils.parseString("maxRatios",nodeList.item(i),xpath);
+			String startShifts = XMLUtils.parseString("startShifts",nodeList.item(i),xpath);
+			String stopShifts = XMLUtils.parseString("stopShifts",nodeList.item(i),xpath);
 			
 			Node sequenceEngineNode = (Node)xpath.evaluate("sequenceEngine",nodeList.item(i),XPathConstants.NODE);
 
 			try {
 			    SequenceEngine sequenceEngine = XMLUtils.getInstance(SequenceEngine.class,sequenceEngineNode,xpath);
-			    arrangementEntries[i] = new ArrangementEntry(instrument,sequenceEngine,parseRatios(minRatios,sequenceEngine.getActivityVectorCount(),0d),parseRatios(maxRatios,sequenceEngine.getActivityVectorCount(),100d),transposition);
+			    arrangementEntries[i] = new ArrangementEntry(instrument,sequenceEngine,parseRatios(minRatios,sequenceEngine.getActivityVectorCount(),0d),parseRatios(maxRatios,sequenceEngine.getActivityVectorCount(),100d),parseShifts(startShifts,sequenceEngine.getActivityVectorCount()),parseShifts(stopShifts,sequenceEngine.getActivityVectorCount()),transposition);
 			} catch(Exception e) {
 				throw(new RuntimeException("Error instantiating SequenceEngine",e));
 			}	
@@ -421,7 +424,39 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 		
 		return array;
 	}
+
+	/**
+	 * Parses the given shift string and returns an array with its contents.
+	 * If the shift string is empty, an array of 0 shifts is returned.
+	 * 
+	 * @param shiftString the shift string (may also be empty or null)
+	 * @param count the expected number of shifts
+	 *
+	 * @return an array of doubles containing the ratios
+	 */
 	
+	private int[] parseShifts(String shiftString,int count) {
+		int[] array = new int[count];
+
+		if(shiftString == null || shiftString.equals("")) {
+			// use the default shift for all ActivityVectors (0)
+			return array;
+		} else {
+		
+			String[] shifts = shiftString.split(",");
+
+			if(shifts.length != count) {
+				throw(new RuntimeException("Expected "+count+" shift(s)+, got "+shifts.length));
+			}
+
+			for(int i=0;i<shifts.length;i++) {
+				array[i] = Integer.parseInt(shifts[i]);
+			}
+		}
+		
+		return array;
+	}
+
 	/**
 	 * Returns the maximum number of ActivityVectors to use at the same time,
 	 * given the total number of ActivityVectors available. The method uses an
@@ -447,13 +482,17 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 		private SequenceEngine sequenceEngine;
 		private double[] minRatios;
 		private double[] maxRatios;
+		private int[] startShifts;
+		private int[] stopShifts;
 		private int transposition;
 		
-		private ArrangementEntry(int instrument,SequenceEngine sequenceEngine,double[] minRatios,double[] maxRatios,int transposition) {
+		private ArrangementEntry(int instrument,SequenceEngine sequenceEngine,double[] minRatios,double[] maxRatios,int[] startShifts,int[] stopShifts,int transposition) {
 			this.instrument = instrument;
 			this.sequenceEngine = sequenceEngine;
 			this.minRatios = minRatios;
 			this.maxRatios = maxRatios;
+			this.startShifts = startShifts;
+			this.stopShifts = stopShifts;
 			this.transposition = transposition;
 		}
 	}

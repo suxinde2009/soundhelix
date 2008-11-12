@@ -25,13 +25,13 @@
         <!-- closed hi-hat -->
         <pattern pitch="40" activityGroup="2"><random list="10001000100010001100100010001000|1100|1101|1111"/></pattern>
         <!-- open hi-hat -->
-        <pattern pitch="44" activityGroup="2">0010001000100010001000100010001000100010001000100010001000100101</pattern>
+        <pattern pitch="44" activityGroup="2"><random list="0010|0010001000100010001000100010001000100010001000100010001000100101"/></pattern>
         <!-- other hi-hat -->
         <pattern pitch="39" activityGroup="2"><random list="001|010|100"/></pattern>
 	    <!-- snare -->
         <pattern pitch="42" activityGroup="3">00001000010010000000100001001010000010000100100000001000010010110000100001001000000010010100101000001000010010000000100101001011</pattern>
       </sequenceEngine>
-      <minRatios>50,25,25,0</minRatios>
+      <minRatios>50,35,30,0</minRatios>
       <maxRatios>90,100,100,100</maxRatios>
       <startShifts>0,-2,0,0</startShifts>
       <stopShifts>-4,0,0,0</stopShifts>
@@ -55,6 +55,8 @@
         <pattern>0,-,-,-,0,-,-,-,0,-,-,2,-,-,-1,-,0,-,-,-,0,-,-,-,0,-,-,2,-,-,+,-</pattern>
         <pattern>0,-,-,0,-,-,0,2,0,-,-,0,-,-,-1,-,0,-,-,0,-,-,0,2,0,-,-,0,-,-,-1,-,0,-,-,0,-,-,0,2,0,-,-,0,-,-,-1,-,0,-,-,0,-,-,0,2,0,-,-,0,-,-,1,-</pattern>
         <pattern>0,-,0,-,0,-,-,0,-,0,-,0,0,-,+,-</pattern>
+        <pattern>0,-,0,0,-,0,0,-,0,0,-,0,-,0,-,+,0,-,0,0,-,0,0,-,0,-,0,-,0,0,-,+</pattern>
+        <pattern>0,-,-,-,0,-,-,-,0,-,-,0,-,-,+,-,0,-,-,-,0,-,-,0,-,-,0,-,-,0,+,-,0,-,-,-,0,-,-,-,0,-,-,0,-,-,+,-,0,-,-,-,0,-,-,0,-,-,0,-,0,-,+,-</pattern>
       </sequenceEngine>
       <minRatios>60</minRatios>
     </track>
@@ -98,7 +100,7 @@
       <instrument>11</instrument>
       <sequenceEngine class="PatternSequenceEngine">
         <obeyChordSubtype>yes</obeyChordSubtype>
-        <pattern>0,2,1,4</pattern>
+        <pattern><random list="0,2,1,4|0,2,1,3|4,2,0,1|3,1,4,0|0,1,2,3,0,1,2,3,0,1,2,3,1,2,3,4"/></pattern>
       </sequenceEngine>
     </track>
     <track>
@@ -112,8 +114,8 @@
     
   </arrangementEngine>
   <player class="MidiPlayer">
-    <bpm><random min="132" max="150" type="normal" variance="6"/></bpm>
-	<transposition><random min="64" max="70"/></transposition>
+    <bpm><random min="132" max="152" type="normal" variance="6"/></bpm>
+	<transposition><random min="64" max="68"/></transposition>
     <groove><random list="100,100|110,90|115,85|120,80|115,85,120,80"/></groove>
     <device name="device1">Out To MIDI Yoke:  1</device>
 	<map instrument="0" device="device1" channel="0"/>

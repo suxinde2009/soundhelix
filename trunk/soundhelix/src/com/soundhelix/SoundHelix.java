@@ -24,8 +24,8 @@ import com.soundhelix.player.Player;
 import com.soundhelix.util.XMLUtils;
 
 /**
- * Implements the main class. The main() method reads and parses an
- * XML configuration file and generates and plays songs. The
+ * Implements the main class. The main() method determines the configuration
+ * file and then waits for the next generated song and plays it. The
  * configuration parsing and generation of songs is done in a separate
  * thread to guarantee seamless playing.
  * 
@@ -68,8 +68,9 @@ public class SoundHelix implements Runnable {
 		
 		try {
 			// instantiate this class so we can launch a thread
-			
 			SoundHelix soundHelix = new SoundHelix(filename);
+			
+			// launch song generation thread
 			Thread t = new Thread(soundHelix);
 			t.start();
 

@@ -39,7 +39,7 @@ public class PadSequenceEngine extends SequenceEngine {
 	
 	private static boolean obeyChordSubtypes = true;
 	
-	private static int postPauseTicks = 1;
+	private static int postPauseTicks = 0;
 	
 	private int voiceCount = -1;
 	private int[] offsets;

@@ -35,7 +35,9 @@ import com.soundhelix.util.XMLUtils;
  * playback, even if they are not used by any instrument. If clock synchronization is
  * enabled, All target devices are synchronized to the player by sending out TIMING_CLOCK
  * MIDI events to each device 24 times per beat. For the synchronization to work, each
- * device will be sent a START event before playing and a STOP event after playing.
+ * device will be sent a START event before playing and a STOP event after playing. Note
+ * that MIDI synchronization is highly incompatible with setting grooves other than the
+ * standard groove (no groove), at least on most MIDI devices.
  * 
  * <h3>XML configuration</h3>
  * <table border=1>
@@ -66,7 +68,6 @@ import com.soundhelix.util.XMLUtils;
  */
 
 // TODO: add possibility to map a virtual channel to several MIDI channels (do we need this)?
-// TODO: mute all MIDI channels when starting playing (how?)
 // TODO: mute all MIDI channels when player is aborted by ctrl+c (how?)
 // TODO: allow setting BPM in a fine-grained fashion (with at least milli-BPM resolution)
 // TODO: on each tick, send all note-offs before sending note-ons (this is currently done per track, but should be done globally)
@@ -293,10 +294,12 @@ public class MidiPlayer extends Player {
 
     		System.out.println("Song length: "+(structure.getTicks()*60/(structure.getTicksPerBeat()*bpm))+" seconds");
 
+			muteAllChannels();
+
     		if(useClockSynchronization) {
     			sendShortMessageToAll(ShortMessage.START);
     		}
-    			
+
     		ShortMessage sm = new ShortMessage();
 
     		Iterator<ArrangementEntry> i = arrangement.iterator();
@@ -482,7 +485,34 @@ public class MidiPlayer extends Player {
 			iter.next().receiver.send(sm,-1);
 		}
 	}
+
+	/**
+	 * Mutes all channels of all devices. This is done by sending an ALL
+	 * SOUND OFF message to all channels. In addition to that (because this
+	 * is not supported by all devices) a NOTE_OFF is sent for each of the
+	 * 128 possible pitches to each channel.
+	 * 
+	 * @throws InvalidMidiDataException
+	 */
+	
+	private void muteAllChannels() throws InvalidMidiDataException {
+		ShortMessage sm = new ShortMessage();
+		Iterator<DeviceChannel> iter = channelMap.values().iterator();
 		
+		while(iter.hasNext()) {
+			DeviceChannel dc = iter.next();
+			
+			// send ALL SOUND OFF message
+			sm.setMessage(ShortMessage.CONTROL_CHANGE,dc.channel,120,0);
+			dc.device.receiver.send(sm,-1);
+
+			for(int i=0;i<128;i++) {
+				sm.setMessage(ShortMessage.NOTE_OFF,dc.channel,i,0);
+				dc.device.receiver.send(sm,-1);
+			}
+		}
+	}
+
     /**
      * Converts our internal velocity (between 0 and Short.MAX_VALUE) to
      * a MIDI velocity (between 0 and 127).

@@ -32,7 +32,10 @@ import com.soundhelix.util.XMLUtils;
  * number of MIDI devices in parallel. Each instrument used must be mapped to a combination
  * of MIDI device and MIDI channel. The MIDI programs cannot be selected yet, so the
  * currently selected programs are used. All specified MIDI devices are opened for
- * playback, even if they are not used by any instrument.
+ * playback, even if they are not used by any instrument. If clock synchronization is
+ * enabled, All target devices are synchronized to the player by sending out TIMING_CLOCK
+ * MIDI events to each device 24 times per beat. For the synchronization to work, each
+ * device will be sent a START event before playing and a STOP event after playing.
  * 
  * <h3>XML configuration</h3>
  * <table border=1>
@@ -41,6 +44,7 @@ import com.soundhelix.util.XMLUtils;
  * <tr><td><code>bpm</code></td> <td>1</td> <td></td> <td>Specifies the beats per minute to use.</td> <td>yes</td>
  * <tr><td><code>transposition</code></td> <td>1</td> <td></td> <td>Specifies the transposition in halftones to use. Pitches are generated at around 0, so for MIDI the transposition must be something around 60.</td> <td>yes</td>
  * <tr><td><code>groove</code></td> <td>1</td> <td></td> <td>Specifies the groove to use. See method setGroove().</td> <td>yes</td>
+ * <tr><td><code>clockSynchronization</code></td> <td>1</td> <td></td> <td>Specifies if MIDI clock synchronization should be used.</td> <td>yes</td>
  * <tr><td><code>map</code></td> <td>*</td> <td><code>instrument</code>, <code>device</code>, <code>channel</code>, <code>program</code> (optional)</td> <td>Maps the instrument specified by <i>instrument</i> to MIDI device <i>device</i> and channel <i>channel</i>.</td> <td>no</td>
  * </table>
  *
@@ -64,7 +68,6 @@ import com.soundhelix.util.XMLUtils;
 // TODO: add possibility to map a virtual channel to several MIDI channels (do we need this)?
 // TODO: mute all MIDI channels when starting playing (how?)
 // TODO: mute all MIDI channels when player is aborted by ctrl+c (how?)
-// TODO: add MIDI synchronization support (sending clock ticks to target device, how?)
 // TODO: allow setting BPM in a fine-grained fashion (with at least milli-BPM resolution)
 // TODO: on each tick, send all note-offs before sending note-ons (this is currently done per track, but should be done globally)
 
@@ -80,6 +83,8 @@ public class MidiPlayer extends Player {
 	
 	// has open() been called?
 	boolean opened = false;
+	
+	boolean useClockSynchronization = false;
 	
     public MidiPlayer() {
     	super();
@@ -237,7 +242,7 @@ public class MidiPlayer extends Player {
     		groove[i] = 1000*len*Integer.parseInt(grooveList[i])/sum;
     		totalGroove += groove[i];
     	}
-
+    	
     	// we want a total groove of len*1000
     	// totalGroove might be a little off due to rounding
     	// errors
@@ -281,14 +286,20 @@ public class MidiPlayer extends Player {
     	try {
     		Structure structure = arrangement.getStructure();
 
+        	int clockTimingsPerTick = (useClockSynchronization ? 24/structure.getTicksPerBeat() : 1);
+
     		List<int[]> tickList = new ArrayList<int[]>();
     		List<int[]> posList = new ArrayList<int[]>();
 
     		System.out.println("Song length: "+(structure.getTicks()*60/(structure.getTicksPerBeat()*bpm))+" seconds");
 
-    		Iterator<ArrangementEntry> i = arrangement.iterator();
-
+    		if(useClockSynchronization) {
+    			sendShortMessageToAll(ShortMessage.START);
+    		}
+    			
     		ShortMessage sm = new ShortMessage();
+
+    		Iterator<ArrangementEntry> i = arrangement.iterator();
 
     		// initialize internal sequence pointers
     		
@@ -313,8 +324,9 @@ public class MidiPlayer extends Player {
     			i = arrangement.iterator();
 
     			if((tick % ticksPerBar) == 0) {
-    				System.out.printf("Tick: %4d   Seconds: %3d\n",tick,tick*60/(structure.getTicksPerBeat()*bpm));
+    				System.out.printf("Tick: %4d   Seconds: %3d  %5.1f %%\n",tick,tick*60/(structure.getTicksPerBeat()*bpm),(double)tick*100d/(double)structure.getTicks());
     			}
+    			
     			for(int k=0;i.hasNext();k++) {
     				ArrangementEntry e = i.next();
     				Track track = e.getTrack();
@@ -362,37 +374,29 @@ public class MidiPlayer extends Player {
     				}
     			}
 
-    			// sleep the desired time
-    			// this is done by using a simple feedback algorithm that
-    			// tries hard to keep the player exactly in sync with the system clock
+    			for(int s=0;s<clockTimingsPerTick;s++) {    				
+    	    		if(useClockSynchronization) {
+    	    			sendShortMessageToAll(ShortMessage.TIMING_CLOCK);
+    	    		}
+    	    		
+    				// sleep the desired time
+    				// this is done by using a simple feedback algorithm that
+    				// tries hard to keep the player exactly in sync with the system clock
 
-    			// desired length of the current tick in nanoseconds
-    			long length = 1000000000l*60l*(long)groove[tick%groove.length]/1000l/(long)(structure.getTicksPerBeat()*bpm);
+    				// desired length of the current tick in nanoseconds
+    				long length = 1000000000l*60l*(long)groove[tick%groove.length]/1000l/(long)(structure.getTicksPerBeat()*bpm*clockTimingsPerTick);
 
-    			long wantedNanos = lastWantedNanos+length;
+    				long wantedNanos = lastWantedNanos+length;
 
-    			long wait = Math.max(0,wantedNanos-System.nanoTime());
+    				long wait = Math.max(0,wantedNanos-System.nanoTime());
 
-    			Thread.sleep((int)(wait/1000000l),(int)(wait%1000000l));
+    				Thread.sleep((int)(wait/1000000l),(int)(wait%1000000l));
+    				lastWantedNanos = wantedNanos;
+    			}
+
     			tick++;
-
-    			lastWantedNanos = wantedNanos;
-
-    			/*sm.setMessage(ShortMessage.TIMING_CLOCK);
-    		receiver.send(sm,-1);
-    		sm.setMessage(ShortMessage.TIMING_CLOCK);
-    		receiver.send(sm,-1);
-    		sm.setMessage(ShortMessage.TIMING_CLOCK);
-    		receiver.send(sm,-1);
-
-    	    MetaMessage mm = new MetaMessage();
-    		long us = 60000000/(bpm+10);
-    		mm.setMessage(0x51,new byte[] {0x03,(byte)((us >>> 0)&0xff),(byte)((us >>> 8)&0xff),(byte)((us >>> 16)&0xff)},4);
-    	    receiver.send(mm,-1);*/
-
-
     		}
-
+    		
     		// playing finished
     		
     		// send a NOTE_OFF for all current notes
@@ -420,6 +424,10 @@ public class MidiPlayer extends Player {
     					channel.device.receiver.send(sm,-1);
     				}
     			}
+    		}
+    	
+    		if(useClockSynchronization) {
+    			sendShortMessageToAll(ShortMessage.STOP);
     		}
     	} catch(Exception e) {
     		throw(new RuntimeException("Playback error",e));
@@ -452,7 +460,29 @@ public class MidiPlayer extends Player {
 			}
 		}
 	}
-    
+
+	public void setClockSynchronization(boolean useClockSynchronization) {
+		this.useClockSynchronization = useClockSynchronization;
+	}
+	
+	/**
+	 * Sends the given single-byte message to all devices.
+	 * 
+	 * @param message the message
+	 * 
+	 * @throws InvalidMidiDataException
+	 */
+	
+	private void sendShortMessageToAll(int message) throws InvalidMidiDataException {
+		ShortMessage sm = new ShortMessage();
+		Iterator<Device> iter = deviceMap.values().iterator();
+		
+		while(iter.hasNext()) {
+			sm.setMessage(message);
+			iter.next().receiver.send(sm,-1);
+		}
+	}
+		
     /**
      * Converts our internal velocity (between 0 and Short.MAX_VALUE) to
      * a MIDI velocity (between 0 and 127).
@@ -513,6 +543,8 @@ public class MidiPlayer extends Player {
 		}
 		
 		setChannelMap(channelMap);
+		
+		setClockSynchronization(XMLUtils.parseBoolean((Node)xpath.evaluate("clockSynchronization",node,XPathConstants.NODE),xpath));
     }
     
     public class Device

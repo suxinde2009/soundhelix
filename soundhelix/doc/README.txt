@@ -11,7 +11,7 @@ SoundHelix is a framework for algorithmic music creation and playback.
 
 In 1995, I started working on a similar software on the Amiga platform,
 called AlgoMusic, which was published on Aminet and was improved over
-a couple of releases until until 1998. Then I stopped development due
+a couple of releases until 1998. Then I stopped development due
 to lack of time. Due to the focus on and limitations of the standard Amiga
 audio hardware, AlgoMusic itself was very limited and inflexible.
 
@@ -28,13 +28,15 @@ Currently SoundHelix features some basic music creation abilities and a MIDI
 player, which can access any MIDI resource accessible to Java. Note that
 currently some external MIDI software is required for playback. This can be
 any MIDI software or hardware which can be accessed using a MIDI driver on
-your platform. You can even use the standard Java Software Synthesizer. Please
-check the included configuration files.
+your platform. You can even use the standard Java Software Synthesizer or
+the Windows Wavetable Software Synth. Please check the included configuration
+files. It is possible to use any number of MIDI devices in parallel for
+playback.
 
 Note that SoundHelix might require some configuration time to produce good
 results on your MIDI setup. You shouldn't expect excellent music out-of-the-box.
 
-But the best of all: SoundHelix is free and fun!
+The best of all: SoundHelix is free and fun!
 
 
 Requirements
@@ -71,7 +73,8 @@ SoundHelix and the MIDI software. SoundHelix must be configured
 to use MIDI Yoke as the MIDI output device and the MIDI software
 must use MIDI Yoke as the MIDI input device. MIDI Yoke provides
 up to 8 MIDI ports. It is sufficient to use one of the ports
-for SoundHelix. The name of the MIDI Yoke MIDI output port is
+for SoundHelix (provided that you don't want use more than 16 MIDI
+channels). The name of the MIDI Yoke MIDI output port is
 "Out To MIDI Yoke:  n" (with n from 1 to 8). Note the extra
 space after the colon. This must be used in SoundHelix for
 output. The MIDI software can then use "In From MIDI Yoke:  n" for
@@ -115,6 +118,9 @@ of a plain string:
 - <random list="string1|string2|..."/>
 
   to randomly select one of the specified strings with uniform distribution
+
+Note that this is only possible for text nodes in the XML file, i.e., not
+for attribute values.
 
 
 Results wanted

@@ -85,7 +85,7 @@
     <bpm><random min="130" max="150" type="normal" mean="140" variance="6"/></bpm>
 	<transposition><random min="64" max="70"/></transposition>
     <groove><random list="100,100|110,90|115,85|120,80|115,85,120,80"/></groove>
-    <device name="device1">Microsoft GS Wavetable SW Synth</device>
+    <device name="device1" clockSynchronization="false">Microsoft GS Wavetable SW Synth</device>
 	<map instrument="0" device="device1" channel="0"/>
 	<map instrument="1" device="device1" channel="1"/>
 	<map instrument="2" device="device1" channel="2"/>

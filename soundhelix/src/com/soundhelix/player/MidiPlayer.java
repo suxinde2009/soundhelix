@@ -85,11 +85,12 @@ public class MidiPlayer extends Player {
 	// has open() been called?
 	boolean opened = false;
 	
+	// true if at least one MIDI device requires clock synchronization
 	boolean useClockSynchronization = false;
 	
     public MidiPlayer() {
     	super();
-	}
+    }
 	
     /**
      * Opens all MIDI devices.
@@ -166,15 +167,19 @@ public class MidiPlayer extends Player {
     private void setDevices(Device[] devices) {
     	deviceMap = new HashMap<String,Device>();
     	
+    	boolean useClockSynchronization = false;
+    	
     	for(int i=0;i<devices.length;i++) {
     		if(deviceMap.containsKey(devices[i].name)) {
     			throw(new RuntimeException("Device name \""+devices[i].name+"\" used more than once"));
     		}
     		
     		deviceMap.put(devices[i].name,devices[i]);
+    		useClockSynchronization |= devices[i].useClockSynchronization;
     	}
     	
     	this.devices = devices;
+    	this.useClockSynchronization = useClockSynchronization;
     }
     
     /**
@@ -295,10 +300,11 @@ public class MidiPlayer extends Player {
     		System.out.println("Song length: "+(structure.getTicks()*60/(structure.getTicksPerBeat()*bpm))+" seconds");
 
 			muteAllChannels();
+            setChannelPrograms();            
 
-    		if(useClockSynchronization) {
-    			sendShortMessageToAll(ShortMessage.START);
-    		}
+            if(useClockSynchronization) {
+                sendShortMessageToClockSynchronized(ShortMessage.START);
+            }
 
     		ShortMessage sm = new ShortMessage();
 
@@ -314,8 +320,6 @@ public class MidiPlayer extends Player {
     			//sm.setMessage(ShortMessage.STOP,ae.getChannel(),0,0);
     		}
 
-    		setChannelPrograms();
-    		
     		int tick = 0;
 
     		int ticksPerBar = structure.getTicksPerBar();
@@ -379,7 +383,7 @@ public class MidiPlayer extends Player {
 
     			for(int s=0;s<clockTimingsPerTick;s++) {    				
     	    		if(useClockSynchronization) {
-    	    			sendShortMessageToAll(ShortMessage.TIMING_CLOCK);
+    	    			sendShortMessageToClockSynchronized(ShortMessage.TIMING_CLOCK);
     	    		}
     	    		
     				// sleep the desired time
@@ -430,7 +434,7 @@ public class MidiPlayer extends Player {
     		}
     	
     		if(useClockSynchronization) {
-    			sendShortMessageToAll(ShortMessage.STOP);
+    		    sendShortMessageToClockSynchronized(ShortMessage.STOP);
     		}
     	} catch(Exception e) {
     		throw(new RuntimeException("Playback error",e));
@@ -464,27 +468,28 @@ public class MidiPlayer extends Player {
 		}
 	}
 
-	public void setClockSynchronization(boolean useClockSynchronization) {
-		this.useClockSynchronization = useClockSynchronization;
-	}
-	
-	/**
-	 * Sends the given single-byte message to all devices.
-	 * 
-	 * @param message the message
-	 * 
-	 * @throws InvalidMidiDataException
-	 */
-	
-	private void sendShortMessageToAll(int message) throws InvalidMidiDataException {
-		ShortMessage sm = new ShortMessage();
-		Iterator<Device> iter = deviceMap.values().iterator();
-		
-		while(iter.hasNext()) {
-			sm.setMessage(message);
-			iter.next().receiver.send(sm,-1);
-		}
-	}
+    /**
+     * Sends the given single-byte message to all devices that are using
+     * clock synchronization.
+     * 
+     * @param message the message
+     * 
+     * @throws InvalidMidiDataException
+     */
+    
+    private void sendShortMessageToClockSynchronized(int message) throws InvalidMidiDataException {
+        ShortMessage sm = new ShortMessage();
+        Iterator<Device> iter = deviceMap.values().iterator();
+        
+        while(iter.hasNext()) {
+            Device device = iter.next();
+            
+            if(device.useClockSynchronization) {
+                sm.setMessage(message);
+                device.receiver.send(sm,-1);
+            }
+        }
+    }
 
 	/**
 	 * Mutes all channels of all devices. This is done by sending an ALL
@@ -536,7 +541,8 @@ public class MidiPlayer extends Player {
 		for(int i=0;i<entries;i++) {
 			String name = (String)xpath.evaluate("attribute::name",nodeList.item(i),XPathConstants.STRING);
 			String midiName = XMLUtils.parseString(nodeList.item(i),xpath);			
-			devices[i] = new Device(name,midiName);
+            boolean useClockSynchronization = XMLUtils.parseBoolean("attribute::clockSynchronization",nodeList.item(i),xpath);
+			devices[i] = new Device(name,midiName,useClockSynchronization);
 		}
 		
     	setDevices(devices);	
@@ -573,8 +579,6 @@ public class MidiPlayer extends Player {
 		}
 		
 		setChannelMap(channelMap);
-		
-		setClockSynchronization(XMLUtils.parseBoolean((Node)xpath.evaluate("clockSynchronization",node,XPathConstants.NODE),xpath));
     }
     
     public class Device
@@ -583,8 +587,9 @@ public class MidiPlayer extends Player {
     	private final String midiName;
     	private MidiDevice midiDevice;
     	private Receiver receiver;
+    	private boolean useClockSynchronization;
     	
-    	public Device(String name,String midiName) {
+    	public Device(String name,String midiName,boolean useClockSynchronization) {
     		if(name == null || name.equals("")) {
     			throw(new IllegalArgumentException("Name must not be null or empty"));
     		}
@@ -595,6 +600,7 @@ public class MidiPlayer extends Player {
 
     		this.name = name;
     		this.midiName = midiName;
+    		this.useClockSynchronization = useClockSynchronization;
     	}
     	
     	public void open() {

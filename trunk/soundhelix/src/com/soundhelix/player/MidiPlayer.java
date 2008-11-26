@@ -30,23 +30,29 @@ import com.soundhelix.util.XMLUtils;
 /**
  * Implements a MIDI player, which can distribute instrument playback to an arbitrary
  * number of MIDI devices in parallel. Each instrument used must be mapped to a combination
- * of MIDI device and MIDI channel. The MIDI programs cannot be selected yet, so the
- * currently selected programs are used. All specified MIDI devices are opened for
- * playback, even if they are not used by any instrument. If clock synchronization is
- * enabled, All target devices are synchronized to the player by sending out TIMING_CLOCK
- * MIDI events to each device 24 times per beat. For the synchronization to work, each
- * device will be sent a START event before playing and a STOP event after playing. Note
- * that MIDI synchronization is highly incompatible with setting grooves other than the
- * standard groove (no groove), at least on most MIDI devices.
+ * of MIDI device and MIDI channel. For each channel the MIDI program to use can be defined
+ * individually. If no program is specified for a channel, the program is not modified.
+ * All specified MIDI devices are opened for playback, even if they are not used by any
+ * instrument. If clock synchronization is enabled for a device, the devices are synchronized
+ * to the player by sending out TIMING_CLOCK MIDI events to each synchronized device 24 times
+ * per beat. For the synchronization to work, each device will be sent a START event before
+ * playing and a STOP event after playing. Note that MIDI synchronization is highly incompatible
+ * with setting grooves other than the standard groove (no groove), at least on most MIDI devices.
+ * Clock synchronization should be used for devices using synchronized effects (for example, synchronized
+ * echo) in order to communicate the BPM speed to use. As clock synchronization requires some additional
+ * overhead, e.g., sending out MIDI messages 24 times per beat instead of the number of ticks per
+ * beat, it should only be used if really required.
+ * 
+ * Timing the ticks (or clock synchronization ticks) is done by using a feedback algorithm based on
+ * Thread.sleep() calls with nanosecond resolution. 
  * 
  * <h3>XML configuration</h3>
  * <table border=1>
  * <tr><th>Tag</th> <th>#</th> <th>Attributes</th> <th>Description</th> <th>Required</th>
- * <tr><td><code>device</code></td> <td>1</td> <td>name</td> <td>Specifies the MIDI device to make available using the given name.</td> <td>yes</td>
+ * <tr><td><code>device</code></td> <td>1</td> <td><code>name</code>, <code>clockSynchronization</code></td> <td>Specifies the MIDI device to make available using the given name.</td> <td>yes</td>
  * <tr><td><code>bpm</code></td> <td>1</td> <td></td> <td>Specifies the beats per minute to use.</td> <td>yes</td>
  * <tr><td><code>transposition</code></td> <td>1</td> <td></td> <td>Specifies the transposition in halftones to use. Pitches are generated at around 0, so for MIDI the transposition must be something around 60.</td> <td>yes</td>
  * <tr><td><code>groove</code></td> <td>1</td> <td></td> <td>Specifies the groove to use. See method setGroove().</td> <td>yes</td>
- * <tr><td><code>clockSynchronization</code></td> <td>1</td> <td></td> <td>Specifies if MIDI clock synchronization should be used.</td> <td>yes</td>
  * <tr><td><code>map</code></td> <td>*</td> <td><code>instrument</code>, <code>device</code>, <code>channel</code>, <code>program</code> (optional)</td> <td>Maps the instrument specified by <i>instrument</i> to MIDI device <i>device</i> and channel <i>channel</i>.</td> <td>no</td>
  * </table>
  *
@@ -54,12 +60,12 @@ import com.soundhelix.util.XMLUtils;
  *
  * <pre>
  * &lt;player class="MidiPlayer"&gt;
- *   &lt;device name="device1"&gt;Out To MIDI Yoke:  1&lt;/device&gt;
- *   &lt;device name="device2"&gt;Out To MIDI Yoke:  2&lt;/device&gt;
+ *   &lt;device name="device1" clockSynchronization="true"&gt;Out To MIDI Yoke:  1&lt;/device&gt;
+ *   &lt;device name="device2" clockSynchronization="false"&gt;Out To MIDI Yoke:  2&lt;/device&gt;
  *   &lt;bpm&gt;&lt;random min="130" max="150" type="normal" mean="140" variance="6"/&gt;&lt;/bpm&gt;
  *   &lt;transposition&gt;&lt;random min="64" max="70"/&gt;&lt;/transposition&gt;
  *   &lt;groove&gt;&lt;random list="100,100|110,90|115,85|120,80|115,85,120,80"/&gt;&lt;/groove&gt;
- *   &lt;map instrument="0" device="device1" channel="8"/&gt;
+ *   &lt;map instrument="0" device="device1" channel="8" program="13"/&gt;
  *   &lt;map instrument="1" device="device2" channel="7"/&gt;
  * &lt;/player&gt;
  * </pre>

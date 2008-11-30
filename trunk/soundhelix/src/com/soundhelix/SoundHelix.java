@@ -20,6 +20,7 @@ import com.soundhelix.arrangementengine.ArrangementEngine;
 import com.soundhelix.harmonyengine.HarmonyEngine;
 import com.soundhelix.misc.Arrangement;
 import com.soundhelix.misc.Structure;
+import com.soundhelix.player.MidiPlayer;
 import com.soundhelix.player.Player;
 import com.soundhelix.util.XMLUtils;
 
@@ -80,10 +81,14 @@ public class SoundHelix implements Runnable {
 				
 				Arrangement arrangement = entry.arrangement;
 				Player player = entry.player;
+			
+				Thread shutdownHook = new Thread(soundHelix.new ShutdownRunnable(player));
+				Runtime.getRuntime().addShutdownHook(shutdownHook);
 				
 				player.open();
 				player.play(arrangement);
 				player.close();
+				Runtime.getRuntime().removeShutdownHook(shutdownHook);
 			}
 		} catch(Exception e) {
 			logger.warn("Exception detected",e);
@@ -200,6 +205,40 @@ public class SoundHelix implements Runnable {
 		public SongQueueEntry(Arrangement arrangement,Player player) {
 			this.arrangement = arrangement;
 			this.player = player;
+		}
+	}
+	
+	/**
+	 * Implements a simple shutdown hook that can be run when the
+	 * JVM exits. The hook currently mutes all channels if the current
+	 * player is a MIDI player. Note that shutdown hooks are only run when the
+	 * JVM exits normally, e.g., by pressing CTRL+C, calls to System.exit()
+	 * or uncaught exceptions. If the JVM is killed however, (e.g., using
+	 * SIGTERM), shutdown hooks are not run.
+	 */
+	
+	private class ShutdownRunnable implements Runnable {
+		private Player player;
+		
+		public ShutdownRunnable(Player player) {
+			this.player = player;
+		}
+		
+		public void run() {
+			try {
+				// FIXME: this is a quick and dirty solution
+				
+				// the preferred solution would be to call
+				// player.close().  However, calling close()
+				// can cause the player to throw exceptions because
+				// the player thread doesn't seem to be already
+				// terminated when the shutdown hook is called, and
+				// so the player may be using already closed resources.
+				
+				if(player instanceof MidiPlayer) {
+					((MidiPlayer)player).muteAllChannels();
+				}
+			} catch(Exception e) {}
 		}
 	}
 }

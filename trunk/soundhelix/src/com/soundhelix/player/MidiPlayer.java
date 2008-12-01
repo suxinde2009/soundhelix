@@ -506,7 +506,7 @@ public class MidiPlayer extends Player {
 	 * @throws InvalidMidiDataException
 	 */
 	
-	private void muteAllChannels() throws InvalidMidiDataException {
+	public void muteAllChannels() throws InvalidMidiDataException {
 		ShortMessage sm = new ShortMessage();
 		Iterator<DeviceChannel> iter = channelMap.values().iterator();
 		

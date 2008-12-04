@@ -190,12 +190,11 @@ public class MelodySequenceEngine extends SequenceEngine {
     	
     	while(tick < structure.getTicks()) {
     		String section = he.getChordSectionString(tick);
+            int len = he.getChordSectionTicks(tick);
     		
     		if(!ht.containsKey(section)) {
     			// no melody created yet; create one
-    			
-    			int len = he.getChordSectionTicks(tick);
-    			
+    			    			
     			int[] pitchList = new int[len];
     			int pitch = Integer.MIN_VALUE;
     			
@@ -214,13 +213,12 @@ public class MelodySequenceEngine extends SequenceEngine {
         			}
     			}
     			
-    			tick += len;
-    			
     			ht.put(section,pitchList);
     		} else {
     			// melody already created, skip chord section
-    			tick += he.getChordSectionTicks(tick);
     		}
+    		
+    		tick += len;
     	}
     	
     	return ht;

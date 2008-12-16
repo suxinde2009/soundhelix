@@ -322,7 +322,7 @@ public class XMLUtils {
 
 	/**
 	 * Recursively traverses the node and expands any "include" tags it finds
-	 * by replacing it with the corresponding contents of the included files.
+	 * by replacing them with the corresponding contents of the included files.
 	 * An included file must contain an XML fragment (plain XML without an XML header and
 	 * without a document type) and may contain more than one tag at the
 	 * top level. The original include node is replaced by all top-level nodes in the order
@@ -332,7 +332,7 @@ public class XMLUtils {
 	 * other included files).
 	 *
 	 * @param doc the document
-	 * @param node the node to start searching from (must belong to doc)
+	 * @param node the node to start searching from (must be part of doc)
 	 * @param xpath an XPath instance
 	 * @param includedFiles the number of files already included so far
 	 *
@@ -414,7 +414,7 @@ public class XMLUtils {
 	
 	/**
 	 * Reads the given file and returns its contents as a string. The
-	 * file is assumed have standard system encoding.
+	 * file is assumed to have standard system encoding.
 	 * 
 	 * @param filename the filename of the file to read
 	 *

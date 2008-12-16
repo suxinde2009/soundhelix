@@ -50,18 +50,16 @@ public class PatternSequenceEngine extends SequenceEngine {
 	private static final int[] minorTable = new int[] {0,3,7};
 
 	private boolean obeyChordSubtype = false;
-	private int[] pattern;
-	private short[] velocity;
 	private int patternLength;
+	
+	PatternEntry[] pattern;
 	
 	public PatternSequenceEngine() {
 		super();
 	}
 
 	public void setPattern(String patternString) {
-		Object[] p = parsePatternString(patternString);
-		this.pattern = (int[])p[0];
-		this.velocity = (short[])p[1];
+		pattern = parsePatternString(patternString);
 		this.patternLength = pattern.length;		
 	}
 	
@@ -73,13 +71,13 @@ public class PatternSequenceEngine extends SequenceEngine {
 		ActivityVector activityVector = activityVectors[0];
 
 		Sequence seq = new Sequence();
-        HarmonyEngine harmonyEngine = structure.getHarmonyEngine();
-        
-        int tick = 0;
+        HarmonyEngine harmonyEngine = structure.getHarmonyEngine();        
         
         int ticks = structure.getTicks();
-        
         Chord firstChord = harmonyEngine.getChord(0);
+
+        int tick = 0;
+        int pos = 0;
         
 		while(tick < ticks) {
         	Chord chord = harmonyEngine.getChord(tick);
@@ -87,76 +85,77 @@ public class PatternSequenceEngine extends SequenceEngine {
         	if(obeyChordSubtype) {
         		chord = firstChord.findClosestChord(chord);
         	}
-        	
-        	int len = harmonyEngine.getChordTicks(tick);
-        
-        	for(int i=0;i<len;i++) {
-        		if(activityVector.isActive(tick+i)) {
-        			// add next note for major/minor chord
-        			
-        			int value = pattern[(tick+i)%patternLength];
-        			short vel = velocity[(tick+i)%patternLength];
-        			
-        			if(value == PAUSE) {
-            			// add pause
-            			seq.addPause(1);
-        				continue;
-        			}
-        			
-         			if(value == TRANSITION) {
-        				// find the tick of the next note that will
-         				// be played
-         				
-         				int t = tick+i+1;
-        				
-        				while(t < ticks && (pattern[t%patternLength] <= SPECIAL)) {
-        					t++;
-        				}
-        
-        				Chord nextChord;
-        				
-        				if(t < ticks && activityVector.isActive(t)) {
-        					nextChord = harmonyEngine.getChord(t);
-        				} else {
-        					// the next chord would either fall into
-        					// an inactivity interval or be at the end
-        					// of the song
-        					nextChord = null;
-        				}
 
-        				int pitch = getTransitionPitch(chord,nextChord);
-        				
-        			    seq.addNote(pitch,1,vel);
-        			    continue;
-        			}
+        	PatternEntry entry = pattern[pos%patternLength];
+			int len = entry.len;
 
-           			if(obeyChordSubtype) {
-        				if(chord.getSubtype() == ChordSubtype.BASE_4) {
-        					value++;
-        				} else if(chord.getSubtype() == ChordSubtype.BASE_6) {
-        					value--;
-        				}
-        			}
-        			
-        			// split value into octave and offset
-        			// we add 3 to avoid modulo and division issues with
-        			// negative values
-        			
-        			int octave = (value >= 0 ? value/3 : (value-2)/3);
-        			int offset = ((value%3)+3)%3;
-        			
-        	 	    if(chord.isMajor()) {
-        			    seq.addNote(octave*12+majorTable[offset]+chord.getPitch(),1,vel);
-        		    } else {
-           			    seq.addNote(octave*12+minorTable[offset]+chord.getPitch(),1,vel);
-        		    }
-        		} else {
-        			// add pause
-        			seq.addPause(1);
-        		}
-         	}
+       		if(activityVector.isActive(tick)) {
+       			int value = entry.pitch;
+       			short vel = entry.velocity;
+
+       			if(value == PAUSE) {
+       				// add pause
+       				seq.addPause(len);
+       			} else if(value == TRANSITION) {
+       				// find the tick of the next note that will
+       				// be played
+
+       				int p = pos+1;
+       				int t = tick+len;
+
+       				while(t < ticks && (pattern[p%patternLength].pitch <= SPECIAL)) {
+       					t += pattern[p%patternLength].len;
+       					p++;
+       				}
+
+       				Chord nextChord;
+
+       				if(t < ticks && activityVector.isActive(t)) {
+       					nextChord = harmonyEngine.getChord(t);
+       				} else {
+       					// the next chord would either fall into
+       					// an inactivity interval or be at the end
+       					// of the song
+       					nextChord = null;
+       				}
+
+       				System.out.println("Getting pitch between "+chord+" and "+nextChord);
+       				
+       				int pitch = getTransitionPitch(chord,nextChord);
+
+       				seq.addNote(pitch,len,vel);
+       			} else {
+       				// normal note
+       				
+       				if(obeyChordSubtype) {
+       					if(chord.getSubtype() == ChordSubtype.BASE_4) {
+       						value++;
+       					} else if(chord.getSubtype() == ChordSubtype.BASE_6) {
+       						value--;
+       					}
+       				}
+
+       				// split value into octave and offset
+       				// we add 3 to avoid modulo and division issues with
+       				// negative values
+
+       				int octave = (value >= 0 ? value/3 : (value-2)/3);
+       				int offset = ((value%3)+3)%3;
+
+       				if(chord.isMajor()) {
+       					seq.addNote(octave*12+majorTable[offset]+chord.getPitch(),len,vel);
+       				} else {
+       					seq.addNote(octave*12+minorTable[offset]+chord.getPitch(),len,vel);
+       				}
+       			}
+       		} else {
+       			// add pause
+       			seq.addPause(len);
+       		}
         	
         	tick += len;
+        	pos++;
+
         }
         
 		Track track = new Track(TrackType.MELODY);
@@ -172,30 +171,30 @@ public class PatternSequenceEngine extends SequenceEngine {
 	 * @return an array containing the pitch and the velocity array (in that order)
 	 */
 	
-	private static Object[] parsePatternString(String s) {
+	private static PatternEntry[] parsePatternString(String s) {
+		PatternEntry[] pattern;
+		
 		String[] p = s.split(",");
 		int len = p.length;
-		
-		int[] pitch = new int[len];
-		short[] velocity = new short[len];
+
+		pattern = new PatternEntry[len];
 		
 		for(int i=0;i<len;i++) {
 			String[] a = p[i].split(":");
-			String b = a[0];
 			short v = (a.length > 1 ? Short.parseShort(a[1]) : Short.MAX_VALUE);
+			String[] b = a[0].split("/");
+			int t = (b.length > 1 ? Integer.parseInt(b[1]) : 1);
 			
-			if(b.equals("-")) {
-				pitch[i] = PAUSE;
-			} else if(b.equals("+")) {
-				pitch[i] = TRANSITION;
+			if(b[0].equals("-")) {
+				pattern[i] = new PatternEntry(PAUSE,t,(short)-1);
+			} else if(b[0].equals("+")) {
+				pattern[i] = new PatternEntry(TRANSITION,t,v);
 			} else {
-				pitch[i] = Integer.parseInt(b);
+				pattern[i] = new PatternEntry(Integer.parseInt(b[0]),t,v);
 			}
-			
-			velocity[i] = v;
 		}
-		
-		return new Object[] {pitch,velocity};
+
+		return pattern;
 	}
 	
 	/**
@@ -265,5 +264,17 @@ public class PatternSequenceEngine extends SequenceEngine {
 		} catch(Exception e) {}
 		
 		setPattern(XMLUtils.parseString(nodeList.item(new Random().nextInt(nodeList.getLength())),xpath));
+    }
+    
+    private static class PatternEntry {
+    	private int pitch;
+    	private int len;
+    	private short velocity;
+    	
+    	PatternEntry(int pitch,int len,short velocity) {
+    		this.pitch = pitch;
+    		this.len = len;
+    		this.velocity = velocity;
+    	}
     }
 }

@@ -12,6 +12,8 @@
   <chordPattern>0/4,1/4,$0/4,1/2,$1/2</chordPattern> 
   <chordPattern>0/2,1/2,1/2,2/2,$0/2,$1/2,$2/2,2/2</chordPattern>
   <chordPattern>0/2,1/2,$0/2,$1/2,$0/2,$1/2,1/2,1/2</chordPattern>
+  <chordPattern>0/16,1/8,1/8</chordPattern>
+  <chordPattern>0/32,+1/16,1/8,1/4,1/4</chordPattern>
   <chordRandomTable>C,Am</chordRandomTable>
   <chordRandomTable>C,Am,G,F,Em,Dm</chordRandomTable>
   <chordRandomTable>C,Am,G,F,Em,Dm,E</chordRandomTable>

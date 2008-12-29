@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <soundhelix>
   <structure>
-     <bars><random min="96" max="160" step="16"/></bars>
+     <bars><random min="96" max="192" step="16"/></bars> 
      <beatsPerBar>4</beatsPerBar>
      <ticksPerBeat>4</ticksPerBeat>
   </structure>
@@ -10,7 +10,7 @@
     <track>
       <instrument>1</instrument>
       <sequenceEngine class="PadSequenceEngine">
-        <offsets><random list="0,1,2|0,1,2,3|-1,0,1|-2,-1,0,1,2|1,2,3|-1,1,3"/></offsets>
+        <offsets><random list="0,1,2|0,1,2,3|-1,0,1|-2,-1,0,1,2|1,2,3"/></offsets>
       </sequenceEngine>
       <startShifts>0</startShifts>
       <stopShifts>2</stopShifts>
@@ -18,20 +18,14 @@
     <track>
       <instrument>3</instrument>
       <sequenceEngine class="DrumSequenceEngine">
-        <!-- base drum -->
         <pattern pitch="36" activityGroup="0">10001000100010001000100010001001100010001000100010001000100010101000100010001000100010001000100110001000100010001000100011101011</pattern>
-        <!-- clap -->
         <pattern pitch="37" activityGroup="1">00001000000010000000100000001000000010000000100000001000000110100000100000001000000010000000100000001000000010000000100001001000</pattern>
-        <!-- closed hi-hat -->
         <pattern pitch="40" activityGroup="2"><random list="10001000100010001100100010001000|1100|1101|1111"/></pattern>
-        <!-- open hi-hat -->
         <pattern pitch="44" activityGroup="2"><random list="0010|0010001000100010001000100010001000100010001000100010001000100101"/></pattern>
-        <!-- other hi-hat -->
-        <pattern pitch="39" activityGroup="2"><random list="001|010|100"/></pattern>
-	    <!-- snare -->
-        <pattern pitch="42" activityGroup="3">00001000010010000000100001001010000010000100100000001000010010110000100001001000000010010100101000001000010010000000100101001011</pattern>
+        <pattern pitch="39" activityGroup="2"><random list="01000010|0000100100101000"/></pattern>
+        <pattern pitch="42" activityGroup="3"><random list="00001000010010000000100001001010000010000100100000001000010010110000100001001000000010010100101000001000010010000000100101001011|00001000000010000000100000001001000010000000100000001000010010010000100000001000000010000000100100001000000010000000100001001011"/></pattern>
       </sequenceEngine>
-      <minRatios>50,35,30,0</minRatios>
+      <minRatios>50,35,40,0</minRatios>
       <maxRatios>90,100,100,100</maxRatios>
       <startShifts>0,-2,0,0</startShifts>
       <stopShifts>-4,0,0,0</stopShifts>
@@ -57,8 +51,10 @@
         <pattern>0,-,0,-,0,-,-,0,-,0,-,0,0,-,+,-</pattern>
         <pattern>0,-,0,0,-,0,0,-,0,0,-,0,-,0,-,+,0,-,0,0,-,0,0,-,0,-,0,-,0,0,-,+</pattern>
         <pattern>0,-,-,-,0,-,-,-,0,-,-,0,-,-,+,-,0,-,-,-,0,-,-,0,-,-,0,-,-,0,+,-,0,-,-,-,0,-,-,-,0,-,-,0,-,-,+,-,0,-,-,-,0,-,-,0,-,-,0,-,0,-,+,-</pattern>
+        <pattern>-,-,0,-,-,-,0,-,-,-,0,-,-,-,+,-</pattern>
+        <pattern>0,-,0/3,-,-,0,-,-,0,-,-,-1/2,-,0,-,0/2,-,-,-,0,-,-,0,-,-,1/2,-,0,-,0/3,-,-,0,-,-,0,-,-,-1/2,-,0,-,0/2,-,-,-,0,-,-,0,-,-,1,2,-1</pattern>
       </sequenceEngine>
-      <minRatios>60</minRatios>
+      <minRatios>50</minRatios>
     </track>
     <track>
       <instrument>4</instrument>
@@ -69,7 +65,7 @@
     <track>
       <instrument>5</instrument>
       <sequenceEngine class="ChordSequenceEngine">
-        <offsets>0,1,2</offsets>
+        <offsets><random list="0,1,2|-3,1,2|-3,0,1,2"/></offsets>
         <pattern>0,-,-,-,0,-,-,0,-,-,0,-,-,0,-,-,0,-,-,-,0,-,-,0,-,-,0,-,3,-,1,-,0,-,-,-,0,-,-,0,-,-,0,-,-,0,-,-,0,-,-,-,0,-,-,0,-,-,0,-,3,1,4,2</pattern>
         <pattern>0,-,-,0,-,-,0,-,-,2,-,-,0,-,-,0,-,-,0,-,-,0,-,-,0,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,-,2,-,-,0,-,-,0,-,-,0,-,-,0,-,-,0,-,-,0,-,1,0,2</pattern>
       </sequenceEngine>
@@ -79,10 +75,12 @@
       <sequenceEngine class="RhythmSequenceEngine"/>
     </track>
     <track>
-      <instrument>8</instrument>
-      <sequenceEngine class="PatternSequenceEngine">
-        <pattern>0,0,-,0,-,-,0,-,0,-,-,-,-,-,-,-,0,0,-,0,-,-,0,-,0,-,-,-,-,4,2,3,0,0,-,0,-,-,0,-,0,-,-,-,-,-,-,-,0,0,-,0,-,-,0,-,2,-,-,-,-,4,2,3</pattern>
+       <instrument>8</instrument>
+      <sequenceEngine class="PadSequenceEngine">
+        <offsets><random list="0,1,2|0,1,2,3|-1,0,1|-2,-1,0,1,2|1,2,3"/></offsets>
       </sequenceEngine>
+      <startShifts>0</startShifts>
+      <stopShifts>2</stopShifts>
     </track>
     <track>
       <instrument>9</instrument>
@@ -100,7 +98,7 @@
       <instrument>11</instrument>
       <sequenceEngine class="PatternSequenceEngine">
         <obeyChordSubtype>yes</obeyChordSubtype>
-        <pattern><random list="0,2,1,4|0,2,1,3|4,2,0,1|3,1,4,0|0,1,2,3,0,1,2,3,0,1,2,3,1,2,3,4"/></pattern>
+        <pattern><random list="0,2,1,4|0,2,1,3|4,2,0,1|3,1,4,0|0,1,2,3,0,1,2,3,0,1,2,3,1,2,3,4|0,2,3,4"/></pattern>
       </sequenceEngine>
     </track>
     <track>
@@ -111,13 +109,33 @@
         <pattern>0,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,-,0,-,-,1,-,</pattern>
       </sequenceEngine>
     </track>
-    
+    <track>
+      <instrument>13</instrument>
+      <sequenceEngine class="PatternSequenceEngine">
+        <pattern>0,-,-,0,-,-,2,3,0,-,-,-,-,-,-,-,0,-,-,0,-,-,3,2,0,-,-,-,-,-,-,-</pattern>
+      </sequenceEngine>
+    </track>
+    <track>
+      <instrument>14</instrument>
+      <sequenceEngine class="PatternSequenceEngine">
+        <pattern>0,-,0,-,2,-,3,-,0,-,0,-,2,-,4,-,0,-,0,-,2,-,3,-,0,-,0,-,2,-,+,-</pattern>
+      </sequenceEngine>
+    </track>
+   <!--  <track>
+      <instrument>14</instrument>
+      <sequenceEngine class="MelodySequenceEngine">
+        <pattern>0,-,-,-,-,-,-,-,0,-,+,-,0,-,+,-,0,-,-,-,-,-,-,-,0,-,+,-,0,-,+,+</pattern>
+      </sequenceEngine>
+      <minRatios>75</minRatios>
+    </track> -->
   </arrangementEngine>
   <player class="MidiPlayer">
-    <bpm><random min="132" max="152" type="normal" variance="6"/></bpm>
+    <bpm><random min="132" max="156" type="normal" variance="6"/></bpm>
 	<transposition><random min="64" max="68"/></transposition>
-    <groove><random list="100,100|110,90|115,85|120,80|115,85,120,80"/></groove>
-    <device name="device1" clockSynchronization="false">Out To MIDI Yoke:  1</device>
+    <!--<groove><random list="100,100|110,90|115,85|120,80|115,85,120,80"/></groove>-->
+    <groove>100</groove>
+    <clockSynchronization>true</clockSynchronization>
+    <device name="device1" clockSynchronization="true">Out To MIDI Yoke:  1</device>
 	<map instrument="0" device="device1" channel="0"/>
 	<map instrument="1" device="device1" channel="1"/>
 	<map instrument="2" device="device1" channel="2"/>
@@ -131,5 +149,7 @@
 	<map instrument="10" device="device1" channel="10"/>
 	<map instrument="11" device="device1" channel="11"/>
 	<map instrument="12" device="device1" channel="12"/>
+	<map instrument="13" device="device1" channel="13"/>
+	<map instrument="14" device="device1" channel="14"/>
   </player>
 </soundhelix>

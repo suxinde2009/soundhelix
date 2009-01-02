@@ -12,6 +12,7 @@ import org.w3c.dom.NodeList;
 import com.soundhelix.harmonyengine.HarmonyEngine;
 import com.soundhelix.misc.ActivityVector;
 import com.soundhelix.misc.Chord;
+import com.soundhelix.misc.Pattern;
 import com.soundhelix.misc.Sequence;
 import com.soundhelix.misc.Track;
 import com.soundhelix.misc.Chord.ChordSubtype;
@@ -41,10 +42,7 @@ import com.soundhelix.util.XMLUtils;
 
 public class PatternSequenceEngine extends SequenceEngine {
 	
-	private static final int PAUSE = Integer.MIN_VALUE;
-	private static final int TRANSITION = Integer.MIN_VALUE+1;
-	// all values at or below this values are special
-	private static final int SPECIAL = TRANSITION;	
+	private static final char TRANSITION = '+';
 	
 	private static final int[] majorTable = new int[] {0,4,7};
 	private static final int[] minorTable = new int[] {0,3,7};
@@ -52,15 +50,15 @@ public class PatternSequenceEngine extends SequenceEngine {
 	private boolean obeyChordSubtype = false;
 	private int patternLength;
 	
-	PatternEntry[] pattern;
+	Pattern pattern;
 	
 	public PatternSequenceEngine() {
 		super();
 	}
 
 	public void setPattern(String patternString) {
-		pattern = parsePatternString(patternString);
-		this.patternLength = pattern.length;		
+		pattern = Pattern.parseString(patternString,""+TRANSITION);
+		this.patternLength = pattern.size();	
 	}
 	
 	public void setObeyChordSubtype(boolean obeyChordSubtype) {
@@ -86,25 +84,24 @@ public class PatternSequenceEngine extends SequenceEngine {
         		chord = firstChord.findClosestChord(chord);
         	}
 
-        	PatternEntry entry = pattern[pos%patternLength];
-			int len = entry.len;
+        	Pattern.PatternEntry entry = pattern.get(pos%patternLength);
+			int len = entry.getTicks();
 
        		if(activityVector.isActive(tick)) {
-       			int value = entry.pitch;
-       			short vel = entry.velocity;
-
-       			if(value == PAUSE) {
+       			short vel = entry.getVelocity();
+       			
+       			if(entry.isPause()) {
        				// add pause
        				seq.addPause(len);
-       			} else if(value == TRANSITION) {
+       			} else if(entry.isWildcard() && entry.getWildcardCharacter() == TRANSITION) {
        				// find the tick of the next note that will
        				// be played
 
        				int p = pos+1;
        				int t = tick+len;
 
-       				while(t < ticks && (pattern[p%patternLength].pitch <= SPECIAL)) {
-       					t += pattern[p%patternLength].len;
+       				while(t < ticks && (!pattern.get(p%patternLength).isNote())) {
+       					t += pattern.get(p%patternLength).getTicks();
        					p++;
        				}
 
@@ -119,13 +116,12 @@ public class PatternSequenceEngine extends SequenceEngine {
        					nextChord = null;
        				}
 
-       				System.out.println("Getting pitch between "+chord+" and "+nextChord);
-       				
        				int pitch = getTransitionPitch(chord,nextChord);
 
        				seq.addNote(pitch,len,vel);
        			} else {
        				// normal note
+       				int value = entry.getPitch();
        				
        				if(obeyChordSubtype) {
        					if(chord.getSubtype() == ChordSubtype.BASE_4) {
@@ -161,40 +157,6 @@ public class PatternSequenceEngine extends SequenceEngine {
 		Track track = new Track(TrackType.MELODY);
         track.add(seq);
         return track;
-	}
-	
-	/**
-	 * Parses the given pattern and creates pitch and velocity arrays.
-	 * 
-	 * @param s the pattern string
-	 * 
-	 * @return an array containing the pitch and the velocity array (in that order)
-	 */
-	
-	private static PatternEntry[] parsePatternString(String s) {
-		PatternEntry[] pattern;
-		
-		String[] p = s.split(",");
-		int len = p.length;
-
-		pattern = new PatternEntry[len];
-		
-		for(int i=0;i<len;i++) {
-			String[] a = p[i].split(":");
-			short v = (a.length > 1 ? Short.parseShort(a[1]) : Short.MAX_VALUE);
-			String[] b = a[0].split("/");
-			int t = (b.length > 1 ? Integer.parseInt(b[1]) : 1);
-			
-			if(b[0].equals("-")) {
-				pattern[i] = new PatternEntry(PAUSE,t,(short)-1);
-			} else if(b[0].equals("+")) {
-				pattern[i] = new PatternEntry(TRANSITION,t,v);
-			} else {
-				pattern[i] = new PatternEntry(Integer.parseInt(b[0]),t,v);
-			}
-		}
-
-		return pattern;
 	}
 	
 	/**
@@ -264,17 +226,5 @@ public class PatternSequenceEngine extends SequenceEngine {
 		} catch(Exception e) {}
 		
 		setPattern(XMLUtils.parseString(nodeList.item(new Random().nextInt(nodeList.getLength())),xpath));
-    }
-    
-    private static class PatternEntry {
-    	private int pitch;
-    	private int len;
-    	private short velocity;
-    	
-    	PatternEntry(int pitch,int len,short velocity) {
-    		this.pitch = pitch;
-    		this.len = len;
-    		this.velocity = velocity;
-    	}
     }
 }

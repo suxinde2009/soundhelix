@@ -28,23 +28,26 @@ import com.soundhelix.misc.Track.TrackType;
 import com.soundhelix.util.XMLUtils;
 
 /**
- * Implements a MIDI player, which can distribute instrument playback to an arbitrary
- * number of MIDI devices in parallel. Each instrument used must be mapped to a combination
- * of MIDI device and MIDI channel. For each channel the MIDI program to use can be defined
- * individually. If no program is specified for a channel, the program is not modified.
- * All specified MIDI devices are opened for playback, even if they are not used by any
- * instrument. If clock synchronization is enabled for a device, the devices are synchronized
- * to the player by sending out TIMING_CLOCK MIDI events to each synchronized device 24 times
- * per beat. For the synchronization to work, each device will be sent a START event before
- * playing and a STOP event after playing. Note that MIDI synchronization is highly incompatible
- * with setting grooves other than the standard groove (no groove), at least on most MIDI devices.
- * Clock synchronization should be used for devices using synchronized effects (for example, synchronized
- * echo) in order to communicate the BPM speed to use. As clock synchronization requires some additional
- * overhead, e.g., sending out MIDI messages 24 times per beat instead of the number of ticks per
- * beat, it should only be used if really required.
+ * Implements a MIDI player, which can distribute instrument playback to an
+ * arbitrary number of MIDI devices in parallel. Each instrument used must be
+ * mapped to a combination of MIDI device and MIDI channel. For each channel
+ * the MIDI program to use can be defined individually. If no program is
+ * specified for a channel, the program is not modified. All specified MIDI
+ * devices are opened for playback, even if they are not used by any
+ * instrument. If clock synchronization is enabled for a device, the devices
+ * are synchronized to the player by sending out TIMING_CLOCK MIDI events to
+ * each synchronized device 24 times per beat. For the synchronization to work,
+ * each device will be sent a START event before playing and a STOP event after
+ * playing. Note that MIDI synchronization is highly incompatible with setting
+ * grooves other than the standard groove (no groove), at least on most MIDI
+ * devices. Clock synchronization should be used for devices using synchronized
+ * effects (for example, synchronized echo) in order to communicate the BPM
+ * speed to use. As clock synchronization requires some additional overhead,
+ * e.g., sending out MIDI messages 24 times per beat instead of the number of
+ * ticks per beat, it should only be used if really required.
  * 
- * Timing the ticks (or clock synchronization ticks) is done by using a feedback algorithm based on
- * Thread.sleep() calls with nanosecond resolution. 
+ * Timing the ticks (or clock synchronization ticks) is done by using a
+ * feedback algorithm based on Thread.sleep() calls with nanosecond resolution. 
  * 
  * <h3>XML configuration</h3>
  * <table border=1>
@@ -77,8 +80,15 @@ import com.soundhelix.util.XMLUtils;
 // TODO: mute all MIDI channels when player is aborted by ctrl+c (how?)
 // TODO: allow setting BPM in a fine-grained fashion (with at least milli-BPM resolution)
 // TODO: on each tick, send all note-offs before sending note-ons (this is currently done per track, but should be done globally)
+// TODO: make number of ticks to wait before and after playing configurable
 
 public class MidiPlayer extends Player {
+	/** The number of ticks to wait before starting playing. */
+	private static final int WAIT_TICKS_BEFORE_SONG = 32;
+	
+	/** The number of ticks to wait after stopping playing. */
+	private static final int WAIT_TICKS_AFTER_SONG = 64;
+	
 	private Device[] devices;
 	
 	private int bpm;
@@ -151,6 +161,10 @@ public class MidiPlayer extends Player {
     public void close() {
     	if(devices != null && opened) {
     		try {
+    			muteAllChannels();
+    		} catch(Exception e) {}
+    		
+    		try {
     			for(int i=0;i<devices.length;i++) {
     				devices[i].close();
     			}
@@ -213,20 +227,18 @@ public class MidiPlayer extends Player {
     }
 
     /**
-     * Sets the groove for playback. A groove is a comma-separated
-     * list of integers acting as relative weights for tick lengths.
-     * The player cycles through this list while playing and uses the
-     * list for timing ticks.
-     * For example, the string "5,3" results in a ratio of 5:3, namely
-     * 5/8 of the total tick length on every even tick and 3/8 of the tick
-     * length for every odd tick. If even and odd ticks originally had a
-     * length of 100 ms each, then they would be 125 ms and 75 ms, respectively.
-     * The default groove (i.e., no groove) is "1", resulting in equally
-     * timed ticks.	Note that even though the groove is handled correctly
-     * by the player, it might not be handled as expected on the MIDI
-     * device used for playback. For example, if some time-synchronized echo
-     * is used on the MIDI device, it might sound strange if grooved input
-     * is used for a non-grooved echo.
+     * Sets the groove for playback. A groove is a comma-separated list of
+     * integers acting as relative weights for tick lengths. The player cycles
+     * through this list while playing and uses the list for timing ticks. For
+     * example, the string "5,3" results in a ratio of 5:3, namely 5/8 of the
+     * total tick length on every even tick and 3/8 of the tick length for
+     * every odd tick. If even and odd ticks originally had a length of 100 ms
+     * each, then they would be 125 ms and 75 ms, respectively. The default
+     * groove (i.e., no groove) is "1", resulting in equally timed ticks.
+     * Note that even though the groove is handled correctly by the player, it
+     * might not be handled as expected on the MIDI device used for playback.
+     * For example, if some time-synchronized echo is used on the MIDI device,
+     * it might sound strange if grooved input is used for a non-grooved echo.
      * 
      * @param grooveString the groove string
      */
@@ -298,6 +310,13 @@ public class MidiPlayer extends Player {
     	try {
     		Structure structure = arrangement.getStructure();
 
+    		// when clock synchronization is used, we must make sure that
+    		// the ticks per beat divide 24
+    		
+    		if(useClockSynchronization && (24%structure.getTicksPerBeat()) > 0) {
+    			throw(new RuntimeException("Ticks per beat ("+structure.getTicksPerBeat()+") must be a divider of 24 for MIDI clock synchronization"));
+    		}
+    		
         	int clockTimingsPerTick = (useClockSynchronization ? 24/structure.getTicksPerBeat() : 1);
 
     		List<int[]> tickList = new ArrayList<int[]>();
@@ -312,6 +331,9 @@ public class MidiPlayer extends Player {
                 sendShortMessageToClockSynchronized(ShortMessage.START);
             }
 
+    		long referenceTime = System.nanoTime();            
+            referenceTime = waitTicks(referenceTime,WAIT_TICKS_BEFORE_SONG,clockTimingsPerTick,structure.getTicksPerBeat());
+            
     		ShortMessage sm = new ShortMessage();
 
     		Iterator<ArrangementEntry> i = arrangement.iterator();
@@ -323,16 +345,12 @@ public class MidiPlayer extends Player {
     			int size = ae.getTrack().size();
     			tickList.add(new int[size]);
     			posList.add(new int[size]);
-    			//sm.setMessage(ShortMessage.STOP,ae.getChannel(),0,0);
     		}
 
     		int tick = 0;
 
     		int ticksPerBar = structure.getTicksPerBar();
     		
-    		long nanos = System.nanoTime();
-    		long lastWantedNanos = nanos;
-
     		while(tick < structure.getTicks()) {
     			i = arrangement.iterator();
 
@@ -387,25 +405,8 @@ public class MidiPlayer extends Player {
     				}
     			}
 
-    			for(int s=0;s<clockTimingsPerTick;s++) {    				
-    	    		if(useClockSynchronization) {
-    	    			sendShortMessageToClockSynchronized(ShortMessage.TIMING_CLOCK);
-    	    		}
-    	    		
-    				// sleep the desired time
-    				// this is done by using a simple feedback algorithm that
-    				// tries hard to keep the player exactly in sync with the system clock
-
-    				// desired length of the current tick in nanoseconds
-    				long length = 1000000000l*60l*(long)groove[tick%groove.length]/1000l/(long)(structure.getTicksPerBeat()*bpm*clockTimingsPerTick);
-
-    				long wantedNanos = lastWantedNanos+length;
-
-    				long wait = Math.max(0,wantedNanos-System.nanoTime());
-
-    				Thread.sleep((int)(wait/1000000l),(int)(wait%1000000l));
-    				lastWantedNanos = wantedNanos;
-    			}
+    			// wait for 1 tick
+    			referenceTime = waitTicks(referenceTime,1,clockTimingsPerTick,structure.getTicksPerBeat());
 
     			tick++;
     		}
@@ -439,6 +440,8 @@ public class MidiPlayer extends Player {
     			}
     		}
     	
+            referenceTime = waitTicks(referenceTime,WAIT_TICKS_AFTER_SONG,clockTimingsPerTick,structure.getTicksPerBeat());
+
     		if(useClockSynchronization) {
     		    sendShortMessageToClockSynchronized(ShortMessage.STOP);
     		}
@@ -448,9 +451,51 @@ public class MidiPlayer extends Player {
     }
 
     /**
+     * Waits the given number of ticks, sending out TIMING_CLOCK events to
+     * the MIDI devices, if necessary. Waiting is done by using a simple feedback
+     * algorithm that tries hard to keep the player exactly in sync with the
+     * system clock.
+     * 
+     * @param referenceTime the reference time (from System.nanoTime())
+     * @param ticks the number of ticks to wait
+     * @param clockTimingsPerTick the number of clock timings per tick
+     * @param ticksPerBeat the number of ticks per beat
+     *
+     * @return the new reference time
+     * 
+     * @throws InvalidMidiDataException
+     * @throws InterruptedException
+     */
+    
+    private long waitTicks(long referenceTime,int ticks,int clockTimingsPerTick,int ticksPerBeat) throws InvalidMidiDataException,InterruptedException {
+    	long lastWantedNanos = referenceTime;
+    	
+    	for(int tick=0;tick<ticks;tick++) {
+    	    for(int s=0;s<clockTimingsPerTick;s++) {    				
+    		
+    	    	// desired length of the current wait period in nanoseconds
+				long length = 1000000000l*60l*(long)groove[tick%groove.length]/1000l/(long)(ticksPerBeat*bpm*clockTimingsPerTick);
+				long wantedNanos = lastWantedNanos+length;
+				long wait = Math.max(0,wantedNanos-System.nanoTime());
+
+				Thread.sleep((int)(wait/1000000l),(int)(wait%1000000l));
+
+    	    	if(useClockSynchronization) {
+    				sendShortMessageToClockSynchronized(ShortMessage.TIMING_CLOCK);
+        	    }
+
+				lastWantedNanos = wantedNanos;
+			}
+    	}
+ 
+    	return lastWantedNanos;
+    }
+    
+    /**
      * Sets the channel programs of all DeviceChannels used. This
      * method does not set the program of a DeviceChannel more than
-     * once.
+     * once. Channels whose program is set to -1 are ignored, so that
+     * the currently selected program remains active.
      * 
      * @throws InvalidMidiDataException
      */

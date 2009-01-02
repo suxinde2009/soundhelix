@@ -1,6 +1,8 @@
 package com.soundhelix.sequenceengine;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Random;
 
 import javax.xml.xpath.XPath;
@@ -13,8 +15,10 @@ import org.w3c.dom.NodeList;
 import com.soundhelix.harmonyengine.HarmonyEngine;
 import com.soundhelix.misc.ActivityVector;
 import com.soundhelix.misc.Chord;
+import com.soundhelix.misc.Pattern;
 import com.soundhelix.misc.Sequence;
 import com.soundhelix.misc.Track;
+import com.soundhelix.misc.Pattern.PatternEntry;
 import com.soundhelix.misc.Track.TrackType;
 import com.soundhelix.util.NoteUtils;
 import com.soundhelix.util.XMLUtils;
@@ -34,19 +38,11 @@ import com.soundhelix.util.XMLUtils;
 
 // TODO: work on this (not really usable yet)
 
-public class MelodySequenceEngine extends SequenceEngine {
+public class MelodySequenceEngine extends SequenceEngine {	
+	private static final char FREE = '+';
 	
-	private static final int PAUSE = Integer.MIN_VALUE;
-	private static final int TRANSITION = Integer.MIN_VALUE+1;
-	private static final int FREE = Integer.MIN_VALUE+2;
-	// all values at or below this values are special
-	private static final int SPECIAL = FREE;	
-	
-	private static boolean obeyChordSubtype = false;
 	private static String defaultPatternString = "0,-,-,+,-,-,+,-,0,-,-,+,-,-,+,-,0,-,-,+,-,-,+,-,0,-,+,-,+,-,-,-,0,-,-,+,-,-,+,-,0,-,-,+,-,-,+,-,0,-,-,+,-,-,+,-,0,-,+,-,+,-,+,+";
-	//private static String defaultPatternString = "0,-,-,-";
-	private String patternString;
-	private int[] pattern;
+	private Pattern pattern;
 	private int patternLength;
 	
 	private static Random random = new Random();
@@ -67,56 +63,41 @@ public class MelodySequenceEngine extends SequenceEngine {
         HarmonyEngine ce = structure.getHarmonyEngine();
         
         int tick = 0;
-        
         int ticks = structure.getTicks();
         
-        Hashtable<String,int[]> melodyHashtable = createMelodies();
+        Hashtable<String,Pattern> melodyHashtable = createMelodies();
         
 		while(tick < ticks) {
         	int len = ce.getChordSectionTicks(tick);
-        	int[] pitchPattern = melodyHashtable.get(ce.getChordSectionString(tick));
-        	       	
-        	for(int i=0;i<len;i++) {
-        		if(activityVector.isActive(tick)) {
-        			int value = pitchPattern[i];
-        			
-        			if(value == PAUSE) {
+        	Pattern p = melodyHashtable.get(ce.getChordSectionString(tick));
+        	int pos = 0;
+        	
+        	for(int i=0;i<len;) {
+    			PatternEntry entry = p.get(pos);
+    			int l = entry.getTicks();
+
+    			if(activityVector.isActive(tick)) {	
+        			if(entry.isPause()) {
             			// add pause
-            			seq.addPause(1);
+            			seq.addPause(l);
         			} else {
-        				seq.addNote(value,1);
+        				seq.addNote(entry.getPitch(),l);
         			}
         		} else {
         			// add pause
-        			seq.addPause(1);
+        			seq.addPause(l);
         		}
         		
-        		tick++;
+    			pos++;
+    			i += l;
          	}
+        	
+        	tick += len;
         }
         
 		Track track = new Track(TrackType.MELODY);
         track.add(seq);
         return track;
-	}
-	
-	private static int[] parsePatternString(String s) {
-		String[] p = s.split(",");
-		int len = p.length;
-		
-		int[] array = new int[len];
-		
-		for(int i=0;i<len;i++) {
-			if(p[i].equals("-")) {
-				array[i] = PAUSE;
-			} else if(p[i].equals("+")) {
-				array[i] = FREE;
-			} else {
-				array[i] = Integer.parseInt(p[i]);
-			}
-		}
-		
-		return array;
 	}
     
     /**
@@ -129,21 +110,37 @@ public class MelodySequenceEngine extends SequenceEngine {
      */
     
     private static int getRandomPitch(int pitch,int maxDistanceDown,int maxDistanceUp) {
-    	int r = random.nextInt(3);
+    	int p = pitch;
+    	boolean again;
     	
-    	if(r == 0 || pitch < -10) {
-    		pitch += random.nextInt(maxDistanceUp);
-    		do {
-    		  pitch++;
-    		} while(!NoteUtils.isOnScale(pitch));    		
-    	} else if(r==1 || pitch > 10) {
-    		pitch -= random.nextInt(maxDistanceDown);
-    		do {
-      		  pitch--;
-      		} while(!NoteUtils.isOnScale(pitch));    		
-    	}
-    	
-    	return pitch;
+    	do {
+    		again = false;
+    		int r = random.nextInt(3);
+
+    		if(r == 0 || p < -12) {
+    			// move up
+    			p += random.nextInt(maxDistanceUp);
+    			do {
+    				p++;
+    			} while(!NoteUtils.isOnScale(p));    		
+    		} else if(r==1 || p > 12) {
+    			// move down
+    			p -= random.nextInt(maxDistanceDown);
+    			do {
+    				p--;
+    			} while(!NoteUtils.isOnScale(p));    		
+    		} else {
+    			// don't move, but check
+    			if(!NoteUtils.isOnScale(p)) {
+    				// pitch has to be changed, because it is invalid
+    				// we must go up or down, so we'll retry    			
+    				again = true;
+    				continue;
+    			}
+    		}
+    	} while(again || p < -12 || p > 12);
+
+    	return p;
     }
 
     /**
@@ -156,35 +153,51 @@ public class MelodySequenceEngine extends SequenceEngine {
      */
     
     private static int getRandomPitch(Chord chord,int pitch,int maxDistanceDown,int maxDistanceUp) {
-    	int r = random.nextInt(3);
+    	int p;
+    	boolean again;
     	
-    	if(r == 0 || pitch < -10) {
-    		pitch += random.nextInt(maxDistanceUp);
-    		do {
-    		  pitch++;
-    		} while(!chord.containsPitch(pitch));    		
-    	} else if(r==1 || pitch > 10) {
-    		pitch -= random.nextInt(maxDistanceDown);
-    		do {
-      		  pitch--;
-      		} while(!chord.containsPitch(pitch));    		
-    	}
-    	
-    	return pitch;
+    	do {
+    		again = false;
+    		p = pitch;
+    		int r = random.nextInt(3);
+
+    		if(r == 0 || p < -12) {
+    			// move up
+    			p += random.nextInt(maxDistanceUp);
+    			do {
+    				p++;
+    			} while(!chord.containsPitch(p));    		
+    		} else if(r==1 || p > 12) {
+    			// move down
+    			p -= random.nextInt(maxDistanceDown);
+    			do {
+    				p--;
+    			} while(!chord.containsPitch(p));    		
+    		} else {
+    			// don't move, but check
+    			if(!chord.containsPitch(p)) {
+    				// pitch has to be changed, because it is invalid
+    				// we must go up or down, so we'll retry    			
+    				again = true;
+    			}
+    		}
+    	} while(again || p < -12 || p > 12);
+
+    	return p;
     }
 
     /**
      * Creates a melody for each distinct chord section and
      * returns a hashtable mapping chord section strings to
-     * melody arrays.
+     * melody patterns.
      * 
      * @return a hashtable mapping chord section strings to melody arrays
      */
     
-    private Hashtable<String,int[]> createMelodies() {
+    private Hashtable<String,Pattern> createMelodies() {
     	HarmonyEngine he = structure.getHarmonyEngine();
     	
-    	Hashtable<String,int[]> ht = new Hashtable<String,int[]>();
+    	Hashtable<String,Pattern> ht = new Hashtable<String,Pattern>();
     	
     	int tick = 0;
     	
@@ -194,26 +207,31 @@ public class MelodySequenceEngine extends SequenceEngine {
     		
     		if(!ht.containsKey(section)) {
     			// no melody created yet; create one
-    			    			
-    			int[] pitchList = new int[len];
+    			List<PatternEntry> list = new ArrayList<PatternEntry>();    			
+    			
     			int pitch = Integer.MIN_VALUE;
+    			int pos = 0;
     			
-    			for(int i=0;i<len;i++) {
-    				int value = pattern[i%patternLength];
+    			for(int i=0;i<len;) {
+    				PatternEntry entry = pattern.get(pos%patternLength);
         			Chord chord = he.getChord(tick+i);
+        			int t = entry.getTicks();
         			
-        			if(value == PAUSE) {
-            			pitchList[i] = PAUSE;
-        			} else if(value == FREE) {
+        			if(entry.isPause()) {
+        				list.add(new PatternEntry(t));
+        			} else if(entry.isWildcard() && entry.getWildcardCharacter() == FREE) {
         				pitch = getRandomPitch(pitch == Integer.MIN_VALUE ? chord.getPitch() : pitch,2,2);
-        				pitchList[i] = pitch;
+        				list.add(new PatternEntry(pitch,entry.getVelocity(),t));
         			} else {
-        				pitch = getRandomPitch(chord,pitch == Integer.MIN_VALUE ? chord.getPitch() : pitch,2,2);
-    					pitchList[i] = pitch;
+        				pitch = getRandomPitch(chord,pitch == Integer.MIN_VALUE ? chord.getPitch() : pitch,3,3);
+        				list.add(new PatternEntry(pitch,entry.getVelocity(),t));
         			}
+        			
+        			pos++;
+        			i += t;
     			}
-    			
-    			ht.put(section,pitchList);
+   
+    			ht.put(section,new Pattern(list.toArray(new PatternEntry[list.size()])));
     		} else {
     			// melody already created, skip chord section
     		}
@@ -235,8 +253,7 @@ public class MelodySequenceEngine extends SequenceEngine {
     }
     
 	public void setPattern(String patternString) {
-		this.patternString = patternString;
-		this.pattern = parsePatternString(patternString);
-		this.patternLength = pattern.length;
+		this.pattern = Pattern.parseString(patternString,""+FREE);
+		this.patternLength = pattern.size();
 	}
 }

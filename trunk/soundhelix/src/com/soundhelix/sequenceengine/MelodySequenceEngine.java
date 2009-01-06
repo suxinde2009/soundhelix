@@ -40,6 +40,7 @@ import com.soundhelix.util.XMLUtils;
 
 public class MelodySequenceEngine extends SequenceEngine {	
 	private static final char FREE = '+';
+	private static final char REPEAT = '*';
 	
 	private static String defaultPatternString = "0,-,-,+,-,-,+,-,0,-,-,+,-,-,+,-,0,-,-,+,-,-,+,-,0,-,+,-,+,-,-,-,0,-,-,+,-,-,+,-,0,-,-,+,-,-,+,-,0,-,-,+,-,-,+,-,0,-,+,-,+,-,+,+";
 	private Pattern pattern;
@@ -220,10 +221,13 @@ public class MelodySequenceEngine extends SequenceEngine {
         			if(entry.isPause()) {
         				list.add(new PatternEntry(t));
         			} else if(entry.isWildcard() && entry.getWildcardCharacter() == FREE) {
-        				pitch = getRandomPitch(pitch == Integer.MIN_VALUE ? chord.getPitch() : pitch,2,2);
+        				pitch = getRandomPitch(pitch == Integer.MIN_VALUE ? 0 : pitch,2,2);
+        				list.add(new PatternEntry(pitch,entry.getVelocity(),t));
+        			} else if(entry.isWildcard() && entry.getWildcardCharacter() == REPEAT && pitch != Integer.MIN_VALUE && chord.containsPitch(pitch)) {
+        				// reuse the previous pitch
         				list.add(new PatternEntry(pitch,entry.getVelocity(),t));
         			} else {
-        				pitch = getRandomPitch(chord,pitch == Integer.MIN_VALUE ? chord.getPitch() : pitch,3,3);
+        				pitch = getRandomPitch(chord,pitch == Integer.MIN_VALUE ? 0 : pitch,3,3);
         				list.add(new PatternEntry(pitch,entry.getVelocity(),t));
         			}
         			
@@ -253,7 +257,7 @@ public class MelodySequenceEngine extends SequenceEngine {
     }
     
 	public void setPattern(String patternString) {
-		this.pattern = Pattern.parseString(patternString,""+FREE);
+		this.pattern = Pattern.parseString(patternString,""+FREE+REPEAT);
 		this.patternLength = pattern.size();
 	}
 }

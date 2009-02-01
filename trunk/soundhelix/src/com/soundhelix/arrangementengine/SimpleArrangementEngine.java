@@ -37,7 +37,7 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 	private ArrangementEntry[] arrangementEntries;
 	
 	// maximum number of tries before failing
-	private static final int MAX_TRIES = 10000;
+	private static final int MAX_TRIES = 25000;
 	
 	public SimpleArrangementEngine() {
 		super();
@@ -255,7 +255,7 @@ public class SimpleArrangementEngine extends ArrangementEngine {
     	
     	// the maximum number of ActivityVectors that may be active
     	// at each point in time
-    	int maxActivityVectors = getActivityVectorMaximum(num,0.65,0.2);
+    	int maxActivityVectors = getActivityVectorMaximum(num,0.5,0.2);
     	int lastWantedActivityVectors = -1;
     	
         for(int section=0;section<sections;section++) {
@@ -339,8 +339,8 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 			
 			do {
 				num = min+random.nextInt(maxActivityVectors-min+1);
-			} while(Math.abs(num-lastCount) > 3);
-			
+			} while(Math.abs(num-lastCount) > 3 || (num == lastCount && random.nextBoolean()));
+					
 			return num;
 		}
 	}

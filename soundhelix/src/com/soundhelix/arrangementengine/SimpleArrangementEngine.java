@@ -1,6 +1,10 @@
 package com.soundhelix.arrangementengine;
 
+import java.io.StringWriter;
 import java.util.BitSet;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Random;
 
 import javax.xml.xpath.XPath;
@@ -16,6 +20,7 @@ import com.soundhelix.misc.Arrangement;
 import com.soundhelix.misc.Track;
 import com.soundhelix.sequenceengine.SequenceEngine;
 import com.soundhelix.util.XMLUtils;
+import com.sun.org.apache.xerces.internal.util.MessageFormatter;
 
 /**
  * Implements a simple ArrangementEngine. From the given set of SequenceEngines
@@ -35,6 +40,7 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 	private final Random random = new Random();
 
 	private ArrangementEntry[] arrangementEntries;
+	private HashMap<String,ActivityVectorConfiguration> activityVectorConfigurationHashMap;
 	
 	// maximum number of tries before failing
 	private static final int MAX_TRIES = 25000;
@@ -47,19 +53,28 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 		int ticks = structure.getTicks();
 		int tracks = arrangementEntries.length;
 
-		// count the total number of ActivityVectors we need
-		// most SequenceEngines use 1 ActivityVector, but some use
-		// more
-
-		int vectors = 0;
+		HashMap<String,ActivityVectorConfiguration> neededActivityVector = new HashMap<String,ActivityVectorConfiguration>();
 
 		for(int i=0;i<tracks;i++) {
 			SequenceEngine sequenceEngine = arrangementEntries[i].sequenceEngine;
 			// SequenceEngines have been instantiated and configured, but the
 			// Structure has not been set yet
 			sequenceEngine.setStructure(structure);
-			vectors += sequenceEngine.getActivityVectorCount();
+			
+			String[] names = arrangementEntries[i].activityVectorNames;
+			
+			for(int k=0;k<names.length;k++) {
+				ActivityVectorConfiguration avc = activityVectorConfigurationHashMap.get(names[k]);
+				
+				if(avc == null) {
+					throw(new RuntimeException("Unknown ActivityVector \""+names[k]+"\""));
+				}
+				
+				neededActivityVector.put(names[k],avc);
+			}
 		}
+
+		int vectors = neededActivityVector.size();
 
 		System.out.println("Creating "+vectors+" ActivityVectors for "+tracks+" tracks");
 
@@ -76,38 +91,41 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 
 			int v = 0;
 
-			for(int i=0;i<tracks;i++) {
-				SequenceEngine sequenceEngine = arrangementEntries[i].sequenceEngine;
+			Iterator<ActivityVectorConfiguration> it = neededActivityVector.values().iterator();
+			
+			for(int i=0;i<vectors;i++) {
+				ActivityVectorConfiguration avc = it.next();
 
-				// get min/max ratio arrays
+				double active = 100.0d*(double)activityVectors[i].getActiveTicks()/(double)ticks;
 
-				double[] minRatios = arrangementEntries[i].minRatios;
-				double[] maxRatios = arrangementEntries[i].maxRatios;
+				// check if ratio is outside the required bounds
 
-				int num = sequenceEngine.getActivityVectorCount();
+				//System.out.println("avc "+avc.name+"  active: "+active+"  min: "+avc.minActive+"  max: "+avc.maxActive);
+				
+				if(active < avc.minActive || active > avc.maxActive) {
+					tries++;
 
-				for(int k=0;k<num;k++) {
-					// compute current activity ratio
-					double ratio = 100.0d*(double)activityVectors[v].getActiveTicks()/(double)ticks;
-
-					// check if ratio is outside the required bounds
-
-					if(ratio < minRatios[k] || ratio > maxRatios[k]) {
-						tries++;
-
-						if(tries >= MAX_TRIES) {
-							throw(new RuntimeException("Couldn't satisfy activity constraints within "+tries+" tries"));
-						} else {
-							// one constraint wasn't satisfied, retry
-							continue again;
-						}
+					if(tries >= MAX_TRIES) {
+						throw(new RuntimeException("Couldn't satisfy activity constraints within "+tries+" tries"));
+					} else {
+						// one constraint wasn't satisfied, retry
+						continue again;
 					}
-
-					v++;
 				}
+
+				avc.activityVector = activityVectors[i];
 			}
 
 			break;
+		}
+
+		dumpActivityVectors(neededActivityVector);
+
+		Iterator<ActivityVectorConfiguration> it = neededActivityVector.values().iterator();
+		
+		while(it.hasNext()) {
+			ActivityVectorConfiguration avc = it.next();
+			avc.activityVector.shiftIntervalBoundaries(avc.startShift,avc.stopShift);
 		}
 
 		// use each SequenceEngine to render a track
@@ -116,17 +134,19 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 
 		Arrangement arrangement = new Arrangement(structure);
 
-		int vectorNum = 0;
-
 		for(int i=0;i<tracks;i++) {
 			SequenceEngine sequenceEngine = arrangementEntries[i].sequenceEngine;
 			int num = sequenceEngine.getActivityVectorCount();
 
 			ActivityVector[] list = new ActivityVector[num];
-
+			String[] names = arrangementEntries[i].activityVectorNames;
+			
+			if(names.length != num) {
+				throw(new RuntimeException("Need "+num+" ActivityVector"+(num == 1 ? "" : "s")+" for instrument "+arrangementEntries[i].instrument+", found "+names.length));
+			}
+			
 			for(int k=0;k<num;k++) {
-				list[k] = activityVectors[vectorNum++];
-				list[k].shiftIntervalBoundaries(arrangementEntries[i].startShifts[k],arrangementEntries[i].stopShifts[k]);
+				list[k] = neededActivityVector.get(names[k]).activityVector;
 			}
 
 			Track track = sequenceEngine.render(list);
@@ -135,6 +155,54 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 		}
 
 		return arrangement;
+	}
+
+	private void dumpActivityVectors(HashMap<String,ActivityVectorConfiguration> neededActivityVector) {
+		if(!logger.isDebugEnabled()) {
+			return;
+		}
+		
+		StringBuilder sb = new StringBuilder("Song structure\n");
+		
+		int ticks = structure.getTicks();
+		
+		int maxLen = 0;
+		Iterator<ActivityVectorConfiguration> it = neededActivityVector.values().iterator();
+		
+		while(it.hasNext()) {
+			ActivityVectorConfiguration avc = it.next();
+			maxLen = Math.max(maxLen,avc.name.length());
+		}
+
+		it = neededActivityVector.values().iterator();
+
+		while(it.hasNext()) {
+			ActivityVectorConfiguration avc = it.next();
+			sb.append(String.format("%"+maxLen+"s: ",avc.name));
+
+			ActivityVector av = avc.activityVector;
+
+			for(int tick=0;tick<ticks;tick += structure.getHarmonyEngine().getChordSectionTicks(tick)) {
+				if(av.isActive(tick)) {
+					sb.append('*');
+				} else {
+					sb.append('-');
+				}
+			}
+			sb.append('\n');
+		}
+
+		sb.append(String.format("%"+maxLen+"s  ",""));
+		for(int tick=0;tick<ticks;tick += structure.getHarmonyEngine().getChordSectionTicks(tick)) {
+			int c=0;
+			
+			it = neededActivityVector.values().iterator();
+			
+			while(it.hasNext()) {if(it.next().activityVector.isActive(tick)) c++;};
+		    sb.append(Integer.toHexString(c));
+		}
+		
+		logger.debug(sb.toString());
 	}
 	
 	/**
@@ -350,7 +418,51 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 	}
 	
 	public void configure(Node node,XPath xpath) throws XPathException {
-		NodeList nodeList = (NodeList)xpath.evaluate("track",node,XPathConstants.NODESET);
+		NodeList nodeList = (NodeList)xpath.evaluate("activityVector",node,XPathConstants.NODESET);
+
+		int activityVectorCount = nodeList.getLength();
+
+		if(activityVectorCount == 0) {
+			throw(new RuntimeException("Need at least 1 ActivityVector"));
+		}
+
+		LinkedHashMap<String,ActivityVectorConfiguration> activityVectorConfigurationHashMap = new LinkedHashMap<String,ActivityVectorConfiguration>(activityVectorCount);
+		
+		for(int i=0;i<activityVectorCount;i++) {
+			String name = XMLUtils.parseString("attribute::name",nodeList.item(i),xpath);
+
+			if(activityVectorConfigurationHashMap.containsKey(name)) {
+				throw(new RuntimeException("ActivityVector \""+name+"\" already defined"));
+			}
+			
+			double minActive = 0;
+			
+			try {
+				minActive = Double.parseDouble(XMLUtils.parseString("minActive",nodeList.item(i),xpath));
+			} catch(Exception e) {}
+			
+			double maxActive = 100.0d;
+			
+			try {
+				maxActive = Double.parseDouble(XMLUtils.parseString("maxActive",nodeList.item(i),xpath));
+			} catch(Exception e) {}
+			
+			int startShift = 0;
+			try {
+				startShift = XMLUtils.parseInteger("startShift",nodeList.item(i),xpath);
+			} catch(Exception e) {}
+			
+			int stopShift = 0;
+			try {
+				stopShift = XMLUtils.parseInteger("stopShift",nodeList.item(i),xpath);
+			} catch(Exception e) {}
+			
+			activityVectorConfigurationHashMap.put(name,new ActivityVectorConfiguration(name,minActive,maxActive,startShift,stopShift));		
+		}
+				
+		setActivityVectorConfiguration(activityVectorConfigurationHashMap);
+
+		nodeList = (NodeList)xpath.evaluate("track",node,XPathConstants.NODESET);
 
 		int tracks = nodeList.getLength();
 
@@ -369,16 +481,19 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 			    transposition = XMLUtils.parseInteger("transposition",nodeList.item(i),xpath);
 			} catch(Exception e) {}
 			
-			String minRatios = XMLUtils.parseString("minRatios",nodeList.item(i),xpath);
-			String maxRatios = XMLUtils.parseString("maxRatios",nodeList.item(i),xpath);
-			String startShifts = XMLUtils.parseString("startShifts",nodeList.item(i),xpath);
-			String stopShifts = XMLUtils.parseString("stopShifts",nodeList.item(i),xpath);
-			
 			Node sequenceEngineNode = (Node)xpath.evaluate("sequenceEngine",nodeList.item(i),XPathConstants.NODE);
 
+			NodeList nameNodeList = (NodeList)xpath.evaluate("activityVector",nodeList.item(i),XPathConstants.NODESET);
+			
+			String[] activityVectorNames = new String[nameNodeList.getLength()];
+			
+			for(int k=0;k<nameNodeList.getLength();k++) {
+				activityVectorNames[k] = nameNodeList.item(k).getTextContent();
+			}
+			
 			try {
 			    SequenceEngine sequenceEngine = XMLUtils.getInstance(SequenceEngine.class,sequenceEngineNode,xpath);
-			    arrangementEntries[i] = new ArrangementEntry(instrument,sequenceEngine,parseRatios(minRatios,sequenceEngine.getActivityVectorCount(),0d),parseRatios(maxRatios,sequenceEngine.getActivityVectorCount(),100d),parseShifts(startShifts,sequenceEngine.getActivityVectorCount()),parseShifts(stopShifts,sequenceEngine.getActivityVectorCount()),transposition);
+			    arrangementEntries[i] = new ArrangementEntry(instrument,sequenceEngine,transposition,activityVectorNames);
 			} catch(Exception e) {
 				throw(new RuntimeException("Error instantiating SequenceEngine",e));
 			}	
@@ -387,76 +502,6 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 		setArrangementEntries(arrangementEntries);
 	}
 	
-	/**
-	 * Parses the given ratio string and returns an array with its contents.
-	 * If the ratio string is empty, an array of default ratios is returned.
-	 * 
-	 * @param ratioString the ratio string (may also be empty or null)
-	 * @param count the expected number of ratios
-	 * @param defaultRatio the ratio value to use when the string is undefined
-	 *
-	 * @return an array of doubles containing the ratios
-	 */
-	
-	private double[] parseRatios(String ratioString,int count,double defaultRatio) {
-		double[] array = new double[count];
-
-		if(ratioString == null || ratioString.equals("")) {
-			// use the default ratio for all ActivityVectors
-			
-			for(int i=0;i<count;i++) {
-				array[i] = defaultRatio;
-			}
-			
-			return array;
-		} else {
-		
-			String[] ratios = ratioString.split(",");
-
-			if(ratios.length != count) {
-				throw(new RuntimeException("Expected "+count+" ratio(s)+, got "+ratios.length));
-			}
-
-			for(int i=0;i<ratios.length;i++) {
-				array[i] = Double.parseDouble(ratios[i]);
-			}
-		}
-		
-		return array;
-	}
-
-	/**
-	 * Parses the given shift string and returns an array with its contents.
-	 * If the shift string is empty, an array of 0 shifts is returned.
-	 * 
-	 * @param shiftString the shift string (may also be empty or null)
-	 * @param count the expected number of shifts
-	 *
-	 * @return an array of doubles containing the ratios
-	 */
-	
-	private int[] parseShifts(String shiftString,int count) {
-		int[] array = new int[count];
-
-		if(shiftString == null || shiftString.equals("")) {
-			// use the default shift for all ActivityVectors (0)
-			return array;
-		} else {
-		
-			String[] shifts = shiftString.split(",");
-
-			if(shifts.length != count) {
-				throw(new RuntimeException("Expected "+count+" shift(s)+, got "+shifts.length));
-			}
-
-			for(int i=0;i<shifts.length;i++) {
-				array[i] = Integer.parseInt(shifts[i]);
-			}
-		}
-		
-		return array;
-	}
-
 	/**
 	 * Returns the maximum number of ActivityVectors to use at the same time,
 	 * given the total number of ActivityVectors available. The method uses an
@@ -477,23 +522,39 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 		return (int)(0.5d+(double)activityVectors*(factor+(1d-factor)*Math.exp(-lambda*(double)(activityVectors-1))));
 	}
 	
-	private class ArrangementEntry {
+	public void setActivityVectorConfiguration(
+			HashMap<String, ActivityVectorConfiguration> activityVectorConfigurationHashMap) {
+		this.activityVectorConfigurationHashMap = activityVectorConfigurationHashMap;
+	}
+
+	private static class ArrangementEntry {
 		private int instrument;
 		private SequenceEngine sequenceEngine;
-		private double[] minRatios;
-		private double[] maxRatios;
-		private int[] startShifts;
-		private int[] stopShifts;
 		private int transposition;
+		private String[] activityVectorNames;
 		
-		private ArrangementEntry(int instrument,SequenceEngine sequenceEngine,double[] minRatios,double[] maxRatios,int[] startShifts,int[] stopShifts,int transposition) {
+		private ArrangementEntry(int instrument,SequenceEngine sequenceEngine,int transposition,String[] activityVectorNames) {
 			this.instrument = instrument;
 			this.sequenceEngine = sequenceEngine;
-			this.minRatios = minRatios;
-			this.maxRatios = maxRatios;
-			this.startShifts = startShifts;
-			this.stopShifts = stopShifts;
 			this.transposition = transposition;
+			this.activityVectorNames = activityVectorNames;
 		}
+	}
+	
+	private static class ActivityVectorConfiguration {
+		private String name;
+		private double minActive;
+		private double maxActive;
+		private int startShift;
+		private int stopShift;
+		private ActivityVector activityVector;
+
+		private ActivityVectorConfiguration(String name,double minActive,double maxActive,int startShift,int stopShift) {
+			this.name = name;
+			this.minActive = minActive;
+			this.maxActive = maxActive;
+			this.startShift = startShift;
+			this.stopShift = stopShift;
+		}	
 	}
 }

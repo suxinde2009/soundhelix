@@ -332,7 +332,7 @@ public class MidiPlayer extends Player {
             }
 
     		long referenceTime = System.nanoTime();            
-            referenceTime = waitTicks(referenceTime,WAIT_TICKS_BEFORE_SONG,clockTimingsPerTick,structure.getTicksPerBeat());
+            referenceTime = waitTicks(referenceTime,WAIT_TICKS_BEFORE_SONG,clockTimingsPerTick,structure.getTicksPerBeat(),0);
             
     		ShortMessage sm = new ShortMessage();
 
@@ -406,7 +406,7 @@ public class MidiPlayer extends Player {
     			}
 
     			// wait for 1 tick
-    			referenceTime = waitTicks(referenceTime,1,clockTimingsPerTick,structure.getTicksPerBeat());
+    			referenceTime = waitTicks(referenceTime,1,clockTimingsPerTick,structure.getTicksPerBeat(),tick);
 
     			tick++;
     		}
@@ -440,7 +440,7 @@ public class MidiPlayer extends Player {
     			}
     		}
     	
-            referenceTime = waitTicks(referenceTime,WAIT_TICKS_AFTER_SONG,clockTimingsPerTick,structure.getTicksPerBeat());
+            referenceTime = waitTicks(referenceTime,WAIT_TICKS_AFTER_SONG,clockTimingsPerTick,structure.getTicksPerBeat(),0);
 
     		if(useClockSynchronization) {
     		    sendShortMessageToClockSynchronized(ShortMessage.STOP);
@@ -460,6 +460,7 @@ public class MidiPlayer extends Player {
      * @param ticks the number of ticks to wait
      * @param clockTimingsPerTick the number of clock timings per tick
      * @param ticksPerBeat the number of ticks per beat
+     * @param startTick the start tick (used for accessing the groove table)
      *
      * @return the new reference time
      * 
@@ -467,14 +468,15 @@ public class MidiPlayer extends Player {
      * @throws InterruptedException
      */
     
-    private long waitTicks(long referenceTime,int ticks,int clockTimingsPerTick,int ticksPerBeat) throws InvalidMidiDataException,InterruptedException {
+    private long waitTicks(long referenceTime,int ticks,int clockTimingsPerTick,int ticksPerBeat,int startTick) throws InvalidMidiDataException,InterruptedException {
     	long lastWantedNanos = referenceTime;
     	
-    	for(int tick=0;tick<ticks;tick++) {
+    	for(int t=0;t<ticks;t++) {
     	    for(int s=0;s<clockTimingsPerTick;s++) {    				
     		
     	    	// desired length of the current wait period in nanoseconds
-				long length = 1000000000l*60l*(long)groove[tick%groove.length]/1000l/(long)(ticksPerBeat*bpm*clockTimingsPerTick);
+				long length = 1000000000l*60l*(long)groove[(startTick+t)%groove.length]/1000l/(long)(ticksPerBeat*bpm*clockTimingsPerTick);
+				
 				long wantedNanos = lastWantedNanos+length;
 				long wait = Math.max(0,wantedNanos-System.nanoTime());
 

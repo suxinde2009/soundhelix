@@ -37,7 +37,7 @@ public class PadSequenceEngine extends SequenceEngine {
 	private static final int[] majorTable = new int[] {0,4,7};
 	private static final int[] minorTable = new int[] {0,3,7};
 	
-	private static boolean obeyChordSubtypes = true;
+	private boolean obeyChordSubtype = true;
 	
 	private static int postPauseTicks = 0;
 	
@@ -57,6 +57,10 @@ public class PadSequenceEngine extends SequenceEngine {
     	this.voiceCount = offsets.length;
 	}
 	
+	public void setObeyChordSubtype(boolean obeyChordSubtype) {
+		this.obeyChordSubtype = obeyChordSubtype;
+	}
+
 	public Track render(ActivityVector[] activityVectors) {
 		ActivityVector activityVector = activityVectors[0];
 
@@ -82,7 +86,7 @@ public class PadSequenceEngine extends SequenceEngine {
         	
         	int shift = 0;
 
-        	if(obeyChordSubtypes) {
+        	if(obeyChordSubtype) {
         		if(chord.getSubtype() == ChordSubtype.BASE_4) {
         			shift = 1;
         		} else if(chord.getSubtype() == ChordSubtype.BASE_6) {
@@ -139,5 +143,9 @@ public class PadSequenceEngine extends SequenceEngine {
     	}
     	
     	setOffsets(offsets);
+    	
+		try {
+			setObeyChordSubtype(XMLUtils.parseBoolean("obeyChordSubtype",node,xpath));
+		} catch(Exception e) {}
     }
 }

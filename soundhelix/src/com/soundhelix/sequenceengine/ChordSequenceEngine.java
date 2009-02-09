@@ -48,7 +48,7 @@ public class ChordSequenceEngine extends SequenceEngine {
 	private static final int[] majorTable = new int[] {0,4,7};
 	private static final int[] minorTable = new int[] {0,3,7};
 
-	private static boolean obeyChordSubtype = true;
+	private boolean obeyChordSubtype = true;
 	private int[] pattern;
 	private int patternLength;
 	
@@ -71,6 +71,10 @@ public class ChordSequenceEngine extends SequenceEngine {
 		
 		this.offsets = offsets;
     	this.voiceCount = offsets.length;
+	}
+	
+	public void setObeyChordSubtype(boolean obeyChordSubtype) {
+		this.obeyChordSubtype = obeyChordSubtype;
 	}
 
 	public Track render(ActivityVector[] activityVectors) {
@@ -182,5 +186,9 @@ public class ChordSequenceEngine extends SequenceEngine {
     	}
     	
     	setOffsets(offsets);
+    	
+		try {
+			setObeyChordSubtype(XMLUtils.parseBoolean("obeyChordSubtype",node,xpath));
+		} catch(Exception e) {}
     }
 }

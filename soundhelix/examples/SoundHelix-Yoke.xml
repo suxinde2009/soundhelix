@@ -58,17 +58,18 @@
     <activityVector name="arpeggio3"/>
     <activityVector name="distort2"/>
     <activityVector name="melody">
-      <minRatios>0</minRatios>
-      <maxRatios>25</maxRatios>
+      <minActive>0</minActive>
+      <maxActive>30</maxActive>
       <stopShifts>1</stopShifts>
     </activityVector>
     <activityVector name="sawtooth">
       <stopShifts>1</stopShifts>
     </activityVector>
+    <activityVector name="shortchord"/>
     <track>
       <instrument>1</instrument>
       <sequenceEngine class="PadSequenceEngine">
-        <offsets><random list="0,1,2|0,1,2,3|-1,0,1|-2,-1,0,1,2|1,2,3"/></offsets>
+        <offsets><random list="0,1,2|0,1,2,3|-1,0,1|1,2,3"/></offsets>
       </sequenceEngine>
       <activityVector>pad1</activityVector>
     </track>
@@ -215,12 +216,20 @@
       </sequenceEngine>
       <activityVector>sawtooth</activityVector>
     </track>
+    <track>
+      <instrument>17</instrument>
+      <sequenceEngine class="ChordSequenceEngine">
+        <obeyChordSubtype>no</obeyChordSubtype>
+        <offsets>0,4</offsets>
+        <pattern>-,-,0,-,-,0,-,-,0,-,-,0,-,-,1,-,-,-,0,-,-,0,-,-,0,-,-,0,-,-,1,-,-,-,0,-,-,0,-,-,0,-,-,0,-,-,1,-,-,-,0,-,-,0,-,-,0,-,-,0,1,-,0,-</pattern>
+      </sequenceEngine>
+      <activityVector>shortchord</activityVector>
+    </track>
   </arrangementEngine>
   <player class="MidiPlayer">
     <bpm><random min="136" max="148" type="normal" variance="6"/></bpm>
-    <transposition><random min="64" max="69"/></transposition>
-    <!--<groove><random list="100,100|110,90|115,85|120,80|115,85,120,80"/></groove>-->
-    <groove>100</groove>
+    <transposition><random min="65" max="69"/></transposition>
+    <!--<groove><random list="100,100|110,90|115,85|120,80|115,85,120,80"/></groove> -->
     <device name="device1" clockSynchronization="true">Out To MIDI Yoke:  1</device>
     <device name="device2" clockSynchronization="true">Out To MIDI Yoke:  2</device>
 	<map instrument="0" device="device1" channel="0"/>
@@ -240,5 +249,6 @@
 	<map instrument="14" device="device1" channel="14"/>
 	<map instrument="15" device="device1" channel="15"/>
 	<map instrument="16" device="device2" channel="0"/>
+	<map instrument="17" device="device2" channel="1"/>
   </player>
 </soundhelix>

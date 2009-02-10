@@ -50,6 +50,8 @@ public class PatternHarmonyEngine extends HarmonyEngine {
 	private String[] chordPatterns;
 	private String[][] chordRandomTables;
 	
+	private Random random;
+	
 	public PatternHarmonyEngine() {
 		super();
 	}
@@ -218,7 +220,6 @@ public class PatternHarmonyEngine extends HarmonyEngine {
 	 */
 	
 	private String createPattern() {
-		Random random = new Random();
 		StringBuilder sb = new StringBuilder(80);
 		
 		// choose a chord pattern at random
@@ -291,12 +292,14 @@ public class PatternHarmonyEngine extends HarmonyEngine {
 		return sb.toString();	
 	}
 	
-	public void configure(Node node,XPath xpath) throws XPathException {
+	public void configure(Node node,XPath xpath) throws XPathException {		
+		random = new Random(randomSeed);
+
 		NodeList nodeList = (NodeList)xpath.evaluate("chordPattern",node,XPathConstants.NODESET);
 		String[] chordPatterns = new String[nodeList.getLength()];
 		
 		for(int i=0;i<nodeList.getLength();i++) {
-			chordPatterns[i] = XMLUtils.parseString(nodeList.item(i),xpath);
+			chordPatterns[i] = XMLUtils.parseString(random,nodeList.item(i),xpath);
 		}
 
 		setChordPatterns(chordPatterns);
@@ -305,7 +308,7 @@ public class PatternHarmonyEngine extends HarmonyEngine {
 		String[][] chordRandomTables = new String[nodeList.getLength()][];
 		
 		for(int i=0;i<nodeList.getLength();i++) {
-			String table = XMLUtils.parseString(nodeList.item(i),xpath);
+			String table = XMLUtils.parseString(random,nodeList.item(i),xpath);
 			chordRandomTables[i] = table.split(",");
 		}
 		

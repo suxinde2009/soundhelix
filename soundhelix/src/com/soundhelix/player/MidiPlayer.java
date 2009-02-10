@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiDevice;
@@ -88,6 +89,8 @@ public class MidiPlayer extends Player {
 	
 	/** The number of ticks to wait after stopping playing. */
 	private static final int WAIT_TICKS_AFTER_SONG = 64;
+	
+	private Random random;
 	
 	private Device[] devices;
 	
@@ -587,21 +590,23 @@ public class MidiPlayer extends Player {
     }
     
     public void configure(Node node,XPath xpath) throws XPathException {
+    	random = new Random(randomSeed);
+    	
 		NodeList nodeList = (NodeList)xpath.evaluate("device",node,XPathConstants.NODESET);
 		int entries = nodeList.getLength();
 		Device[] devices = new Device[entries];
 		
 		for(int i=0;i<entries;i++) {
 			String name = (String)xpath.evaluate("attribute::name",nodeList.item(i),XPathConstants.STRING);
-			String midiName = XMLUtils.parseString(nodeList.item(i),xpath);			
-            boolean useClockSynchronization = XMLUtils.parseBoolean("attribute::clockSynchronization",nodeList.item(i),xpath);
+			String midiName = XMLUtils.parseString(random,nodeList.item(i),xpath);			
+            boolean useClockSynchronization = XMLUtils.parseBoolean(random,"attribute::clockSynchronization",nodeList.item(i),xpath);
 			devices[i] = new Device(name,midiName,useClockSynchronization);
 		}
 		
     	setDevices(devices);	
-    	setBPM(XMLUtils.parseInteger((Node)xpath.evaluate("bpm",node,XPathConstants.NODE),xpath));
-    	setTransposition(XMLUtils.parseInteger((Node)xpath.evaluate("transposition",node,XPathConstants.NODE),xpath));
-    	setGroove(XMLUtils.parseString((Node)xpath.evaluate("groove",node,XPathConstants.NODE),xpath));
+    	setBPM(XMLUtils.parseInteger(random,(Node)xpath.evaluate("bpm",node,XPathConstants.NODE),xpath));
+    	setTransposition(XMLUtils.parseInteger(random,(Node)xpath.evaluate("transposition",node,XPathConstants.NODE),xpath));
+    	setGroove(XMLUtils.parseString(random,(Node)xpath.evaluate("groove",node,XPathConstants.NODE),xpath));
     	
 		nodeList = (NodeList)xpath.evaluate("map",node,XPathConstants.NODESET);
 		entries = nodeList.getLength();

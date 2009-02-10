@@ -48,6 +48,8 @@ public class ChordSequenceEngine extends SequenceEngine {
 	private static final int[] majorTable = new int[] {0,4,7};
 	private static final int[] minorTable = new int[] {0,3,7};
 
+	private Random random;
+	
 	private boolean obeyChordSubtype = true;
 	private int[] pattern;
 	private int patternLength;
@@ -163,15 +165,17 @@ public class ChordSequenceEngine extends SequenceEngine {
 	}
 	
     public void configure(Node node,XPath xpath) throws XPathException {
+    	random = new Random(randomSeed);
+    	
 		NodeList nodeList = (NodeList)xpath.evaluate("pattern",node,XPathConstants.NODESET);
 
 		if(nodeList.getLength() == 0) {
 			throw(new RuntimeException("Need at least 1 pattern"));
 		}
 		
-		setPattern(XMLUtils.parseString(nodeList.item(new Random().nextInt(nodeList.getLength())),xpath));
+		setPattern(XMLUtils.parseString(random,nodeList.item(random.nextInt(nodeList.getLength())),xpath));
 
-    	String offsetString = XMLUtils.parseString("offsets",node,xpath);
+    	String offsetString = XMLUtils.parseString(random,"offsets",node,xpath);
     	
     	if(offsetString == null || offsetString.equals("")) {
     		offsetString = "0,1,2";
@@ -188,7 +192,7 @@ public class ChordSequenceEngine extends SequenceEngine {
     	setOffsets(offsets);
     	
 		try {
-			setObeyChordSubtype(XMLUtils.parseBoolean("obeyChordSubtype",node,xpath));
+			setObeyChordSubtype(XMLUtils.parseBoolean(random,"obeyChordSubtype",node,xpath));
 		} catch(Exception e) {}
     }
 }

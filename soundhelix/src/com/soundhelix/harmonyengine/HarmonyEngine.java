@@ -64,7 +64,7 @@ public abstract class HarmonyEngine implements XMLConfigurable,RandomSeedable {
 	protected Structure structure;	
 	private int chordSections = -1;
 	private int distinctChordSections = -1;
-	private long randomSeed;
+	protected long randomSeed;
 	
 	public HarmonyEngine() {
 		logger = Logger.getLogger(getClass());

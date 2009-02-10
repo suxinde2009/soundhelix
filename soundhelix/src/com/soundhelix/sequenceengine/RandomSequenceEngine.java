@@ -21,7 +21,6 @@ import com.soundhelix.misc.Track;
 import com.soundhelix.misc.Chord.ChordSubtype;
 import com.soundhelix.misc.Pattern.PatternEntry;
 import com.soundhelix.misc.Track.TrackType;
-import com.soundhelix.util.NoteUtils;
 import com.soundhelix.util.XMLUtils;
 
 /**
@@ -49,7 +48,7 @@ public class RandomSequenceEngine extends SequenceEngine {
 	private static final int[] majorTable = new int[] {0,4,7};
 	private static final int[] minorTable = new int[] {0,3,7};
 
-	private static Random random = new Random();
+	private Random random;
 	
 	public RandomSequenceEngine() {
 		this(defaultPatternString);
@@ -180,10 +179,12 @@ public class RandomSequenceEngine extends SequenceEngine {
     }
     
     public void configure(Node node,XPath xpath) throws XPathException {
+    	random = new Random(randomSeed);
+    	
 		NodeList nodeList = (NodeList)xpath.evaluate("pattern",node,XPathConstants.NODESET);
-		setPattern(XMLUtils.parseString(nodeList.item(new Random().nextInt(nodeList.getLength())),xpath));
+		setPattern(XMLUtils.parseString(random,nodeList.item(random.nextInt(nodeList.getLength())),xpath));
 		
-		String offsetString = XMLUtils.parseString("offsets",node,xpath);
+		String offsetString = XMLUtils.parseString(random,"offsets",node,xpath);
     	
     	if(offsetString == null || offsetString.equals("")) {
     		offsetString = "0,1,2";

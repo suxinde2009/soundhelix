@@ -1,5 +1,7 @@
 package com.soundhelix.sequenceengine;
 
+import java.util.Random;
+
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathException;
@@ -61,6 +63,8 @@ public class DrumSequenceEngine extends SequenceEngine {
 
 	private DrumEntry[] drumEntries;
 	private int activityVectors;
+	
+	private Random random;
 	
 	public DrumSequenceEngine() {
 		super();
@@ -148,6 +152,8 @@ public class DrumSequenceEngine extends SequenceEngine {
 	}
 	
     public void configure(Node node,XPath xpath) throws XPathException {
+    	random = new Random(randomSeed);
+    	
 		NodeList nodeList = (NodeList)xpath.evaluate("pattern",node,XPathConstants.NODESET);
 
 		int patterns = nodeList.getLength();
@@ -159,7 +165,7 @@ public class DrumSequenceEngine extends SequenceEngine {
 		}
 		
 		for(int i=0;i<patterns;i++) {
-			String pattern = XMLUtils.parseString(nodeList.item(i),xpath);
+			String pattern = XMLUtils.parseString(random,nodeList.item(i),xpath);
 			int pitch = Integer.parseInt((String)xpath.evaluate("attribute::pitch",nodeList.item(i),XPathConstants.STRING));
 			int activityGroup = Integer.parseInt((String)xpath.evaluate("attribute::activityGroup",nodeList.item(i),XPathConstants.STRING));
 

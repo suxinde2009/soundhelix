@@ -46,7 +46,7 @@ public class MelodySequenceEngine extends SequenceEngine {
 	private Pattern pattern;
 	private int patternLength;
 	
-	private static Random random = new Random();
+	private Random random;
 	
 	public MelodySequenceEngine() {
 		this(defaultPatternString);
@@ -110,7 +110,7 @@ public class MelodySequenceEngine extends SequenceEngine {
      * @return the random pitch
      */
     
-    private static int getRandomPitch(int pitch,int maxDistanceDown,int maxDistanceUp) {
+    private int getRandomPitch(int pitch,int maxDistanceDown,int maxDistanceUp) {
     	int p = pitch;
     	boolean again;
     	
@@ -153,7 +153,7 @@ public class MelodySequenceEngine extends SequenceEngine {
      * @return the random pitch
      */
     
-    private static int getRandomPitch(Chord chord,int pitch,int maxDistanceDown,int maxDistanceUp) {
+    private int getRandomPitch(Chord chord,int pitch,int maxDistanceDown,int maxDistanceUp) {
     	int p;
     	boolean again;
     	
@@ -247,13 +247,15 @@ public class MelodySequenceEngine extends SequenceEngine {
     }
     
     public void configure(Node node,XPath xpath) throws XPathException {
+    	random = new Random(randomSeed);
+    	
 		NodeList nodeList = (NodeList)xpath.evaluate("pattern",node,XPathConstants.NODESET);
 
 		if(nodeList.getLength() == 0) {
 			return; // Use default pattern
 		}
 		
-		setPattern(XMLUtils.parseString(nodeList.item(new Random().nextInt(nodeList.getLength())),xpath));
+		setPattern(XMLUtils.parseString(random,nodeList.item(random.nextInt(nodeList.getLength())),xpath));
     }
     
 	public void setPattern(String patternString) {

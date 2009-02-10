@@ -16,15 +16,16 @@ import java.util.Random;
 
 public class ConsistentRandom {
 	// main seed
-	private long constantSeed = System.nanoTime();
+	private long constantSeed;
     
 	// pertubation seed for booleans
 	// nanoTime() and currentTimeMillis() are correlated,
 	// but this should be fine for our purposes
 	private long millis = System.currentTimeMillis();
     
-    public ConsistentRandom()
+    public ConsistentRandom(long randomSeed)
     {
+    	this.constantSeed = randomSeed;
     }
     
     /**

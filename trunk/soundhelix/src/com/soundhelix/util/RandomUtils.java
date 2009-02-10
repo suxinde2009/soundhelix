@@ -9,8 +9,6 @@ import java.util.Random;
  */
 
 public class RandomUtils {
-	private static final Random random = new Random();
-
 	private RandomUtils() {}
 	
 	/**
@@ -27,7 +25,7 @@ public class RandomUtils {
 	 * @return a uniformly distributed integer
 	 */
 	
-	public static int getUniformInteger(int min,int max,int step) {
+	public static int getUniformInteger(Random random,int min,int max,int step) {
 		return min+step*random.nextInt((max-min)/step+1);
 	}
 
@@ -44,7 +42,7 @@ public class RandomUtils {
 	 * @return a uniformly distributed integer
 	 */
 	
-	public static double getUniformDouble(double min,double max) {
+	public static double getUniformDouble(Random random,double min,double max) {
 		return min+(max-min)*random.nextDouble();
 	}
 
@@ -62,7 +60,7 @@ public class RandomUtils {
 	 * @return a uniformly distributed double
 	 */
 	
-	public static double getUniformDouble(double min,double max,double step) {
+	public static double getUniformDouble(Random random,double min,double max,double step) {
 		return min+step*Math.floor((max-min)*random.nextDouble()/step);
 	}
 
@@ -81,7 +79,7 @@ public class RandomUtils {
 	 * @return a normally distributed integer 
 	 */
 	
-	public static int getNormalInteger(int min,int max,double mean,double variance) {
+	public static int getNormalInteger(Random random,int min,int max,double mean,double variance) {
 		int value;
 		
 		do {
@@ -106,7 +104,7 @@ public class RandomUtils {
 	 * @return a normally distributed double
 	 */
 	
-	public static double getNormalDouble(double min,double max,double mean,double variance) {
+	public static double getNormalDouble(Random random,double min,double max,double mean,double variance) {
 		double value;
 		
 		do {

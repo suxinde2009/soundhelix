@@ -1,6 +1,7 @@
 package com.soundhelix;
 
 import java.io.File;
+import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -46,32 +47,42 @@ public class SoundHelix implements Runnable {
 
 	// the XML configuration file
 	private String filename;
-	
-	public SoundHelix(String filename) {
+
+	// the random seed
+	private long randomSeed;
+
+	public SoundHelix(String filename,long randomSeed) {
 		this.filename = filename;
+		this.randomSeed = randomSeed;
 	}
 	
 	public static void main(String[] args) throws Exception {		
-		if(args.length == 1 && args[0].equals("-h") || args.length > 1) {
-			System.out.println("java SoundHelix [XML-File]");
+		if(args.length == 1 && args[0].equals("-h") || args.length > 2) {
+			System.out.println("java SoundHelix [XML-File [Songtitle]] ");
 			System.exit(0);
 		}
 
-		String filename = (args.length == 1 ? args[0] : "SoundHelix.xml");
+		String filename = (args.length >= 1 ? args[0] : "SoundHelix.xml");
 		
 		if(!new File(filename).exists()) {
 			throw(new RuntimeException("Configuration file \""+filename+"\" doesn't exist"));
 		}
-		
+
+		String songtitle = (args.length == 2 ? args[1] : null);
+
 		// initialize log4j
 		PropertyConfigurator.configureAndWatch("log4j.properties",60*1000);
 
 		logger = Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
 		logger.debug("Starting");
+
+		long randomSeed = (songtitle != null ? songtitle.toLowerCase().hashCode() : System.nanoTime());
+		
+		logger.debug("Main random seed: "+randomSeed);
 		
 		try {
 			// instantiate this class so we can launch a thread
-			SoundHelix soundHelix = new SoundHelix(filename);
+			SoundHelix soundHelix = new SoundHelix(filename,randomSeed);
 			
 			// launch song generation thread with low priority
 			Thread t = new Thread(soundHelix);
@@ -123,6 +134,8 @@ public class SoundHelix implements Runnable {
 
 					System.out.println("Rendering new song");
 
+					Random random = new Random(randomSeed);
+					
 					File file = new File(filename);
 
 					logger.debug("Reading and parsing XML file");
@@ -133,7 +146,7 @@ public class SoundHelix implements Runnable {
 					XPath xpath = XPathFactory.newInstance().newXPath();
 
 					// preprocess document tree by expanding include tags, if present
-					XMLUtils.expandIncludeTags(doc,doc.getFirstChild(),xpath);
+					XMLUtils.expandIncludeTags(random,doc,doc.getFirstChild(),xpath);
 					
 					// get the root element of the file (we don't care what it's called)
 					Node mainNode = (Node)xpath.evaluate("/*",doc,XPathConstants.NODE);
@@ -143,19 +156,21 @@ public class SoundHelix implements Runnable {
 					Node arrangementEngineNode = (Node)xpath.evaluate("arrangementEngine",mainNode,XPathConstants.NODE);
 					Node playerNode = (Node)xpath.evaluate("player",mainNode,XPathConstants.NODE);
 
-					Structure structure = parseStructure(structureNode,xpath);
-					HarmonyEngine harmonyEngine = XMLUtils.getInstance(HarmonyEngine.class,harmonyEngineNode,xpath);
+					Structure structure = parseStructure(random,structureNode,xpath);
+					HarmonyEngine harmonyEngine = XMLUtils.getInstance(HarmonyEngine.class,harmonyEngineNode,xpath,randomSeed^47357892832l);
 					structure.setHarmonyEngine(harmonyEngine);	
 
 					long startTime = System.nanoTime();
-					ArrangementEngine arrangementEngine = XMLUtils.getInstance(ArrangementEngine.class,arrangementEngineNode,xpath);
+					ArrangementEngine arrangementEngine = XMLUtils.getInstance(ArrangementEngine.class,arrangementEngineNode,xpath,randomSeed^123454893l);
 					arrangementEngine.setStructure(structure);
 					Arrangement arrangement = arrangementEngine.render();
 					long time = System.nanoTime()-startTime;
 
 					System.out.println("Rendering took "+(time/1000000)+" ms");
-					Player player = XMLUtils.getInstance(Player.class,playerNode,xpath);					
+					Player player = XMLUtils.getInstance(Player.class,playerNode,xpath,randomSeed^5915925127l);					
 					songQueue.add(new SongQueueEntry(arrangement,player));
+					
+					randomSeed = randomSeed^random.nextLong();
 				}
 			} catch(Exception e) {e.printStackTrace();}
 			
@@ -188,10 +203,10 @@ public class SoundHelix implements Runnable {
 	 * @throws XPathException
 	 */
 	
-	public static Structure parseStructure(Node node,XPath xpath) throws XPathException {
-		int bars = XMLUtils.parseInteger("bars",node,xpath);
-		int beatsPerBar = XMLUtils.parseInteger("beatsPerBar",node,xpath);
-		int ticksPerBeat = XMLUtils.parseInteger("ticksPerBeat",node,xpath);
+	public static Structure parseStructure(Random random,Node node,XPath xpath) throws XPathException {
+		int bars = XMLUtils.parseInteger(random,"bars",node,xpath);
+		int beatsPerBar = XMLUtils.parseInteger(random,"beatsPerBar",node,xpath);
+		int ticksPerBeat = XMLUtils.parseInteger(random,"ticksPerBeat",node,xpath);
 
 		if(bars <= 0) {
 			throw(new RuntimeException("Number of bars must be > 0"));

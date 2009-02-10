@@ -1,5 +1,7 @@
 package com.soundhelix.sequenceengine;
 
+import java.util.Random;
+
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathException;
 
@@ -36,6 +38,8 @@ public class PadSequenceEngine extends SequenceEngine {
 	
 	private static final int[] majorTable = new int[] {0,4,7};
 	private static final int[] minorTable = new int[] {0,3,7};
+	
+	private Random random;
 	
 	private boolean obeyChordSubtype = true;
 	
@@ -128,7 +132,9 @@ public class PadSequenceEngine extends SequenceEngine {
 	}
 	
     public void configure(Node node,XPath xpath) throws XPathException {
-    	String offsetString = XMLUtils.parseString("offsets",node,xpath);
+    	random = new Random();
+    	
+    	String offsetString = XMLUtils.parseString(random,"offsets",node,xpath);
     	
     	if(offsetString == null || offsetString.equals("")) {
     		offsetString = "0,1,2";
@@ -145,7 +151,7 @@ public class PadSequenceEngine extends SequenceEngine {
     	setOffsets(offsets);
     	
 		try {
-			setObeyChordSubtype(XMLUtils.parseBoolean("obeyChordSubtype",node,xpath));
+			setObeyChordSubtype(XMLUtils.parseBoolean(random,"obeyChordSubtype",node,xpath));
 		} catch(Exception e) {}
     }
 }

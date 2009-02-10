@@ -21,6 +21,8 @@ import com.soundhelix.util.NoteUtils;
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
+// TODO: improve usage of ConsistentRandom class
+
 public class Chord {
 	
 	public enum ChordType {
@@ -170,7 +172,7 @@ public class Chord {
 						// randomly, but consistently
 
 						if(random == null) {
-							random = new ConsistentRandom();
+							random = new ConsistentRandom(577385l);
 						}
 						
 						if(random.getBoolean(lastChord.toString()+"#"+chord.toString())) {
@@ -208,7 +210,7 @@ public class Chord {
 						// randomly, but consistently
 						
 						if(random == null) {
-							random = new ConsistentRandom();
+							random = new ConsistentRandom(577385577385l);
 						}
 						
 						if(random.getBoolean(lastChord.toString()+"#"+chord.toString())) {

@@ -1,6 +1,5 @@
 package com.soundhelix.arrangementengine;
 
-import java.io.StringWriter;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -17,10 +16,10 @@ import org.w3c.dom.NodeList;
 import com.soundhelix.harmonyengine.HarmonyEngine;
 import com.soundhelix.misc.ActivityVector;
 import com.soundhelix.misc.Arrangement;
+import com.soundhelix.misc.RandomSeedable;
 import com.soundhelix.misc.Track;
 import com.soundhelix.sequenceengine.SequenceEngine;
 import com.soundhelix.util.XMLUtils;
-import com.sun.org.apache.xerces.internal.util.MessageFormatter;
 
 /**
  * Implements a simple ArrangementEngine. From the given set of SequenceEngines
@@ -37,7 +36,7 @@ import com.sun.org.apache.xerces.internal.util.MessageFormatter;
 //       activity group
 
 public class SimpleArrangementEngine extends ArrangementEngine {
-	private final Random random = new Random();
+	private Random random;
 
 	private ArrangementEntry[] arrangementEntries;
 	private HashMap<String,ActivityVectorConfiguration> activityVectorConfigurationHashMap;
@@ -53,7 +52,7 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 		int ticks = structure.getTicks();
 		int tracks = arrangementEntries.length;
 
-		HashMap<String,ActivityVectorConfiguration> neededActivityVector = new HashMap<String,ActivityVectorConfiguration>();
+		HashMap<String,ActivityVectorConfiguration> neededActivityVector = new LinkedHashMap<String,ActivityVectorConfiguration>();
 
 		for(int i=0;i<tracks;i++) {
 			SequenceEngine sequenceEngine = arrangementEntries[i].sequenceEngine;
@@ -199,7 +198,7 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 			it = neededActivityVector.values().iterator();
 			
 			while(it.hasNext()) {if(it.next().activityVector.isActive(tick)) c++;};
-		    sb.append(Integer.toHexString(c));
+		    sb.append(Integer.toString(c,36));
 		}
 		
 		logger.debug(sb.toString());
@@ -323,7 +322,8 @@ public class SimpleArrangementEngine extends ArrangementEngine {
     	
     	// the maximum number of ActivityVectors that may be active
     	// at each point in time
-    	int maxActivityVectors = getActivityVectorMaximum(num,0.5,0.2);
+    	int maxActivityVectors = getActivityVectorMaximum(num,0.40,0.2);
+    	
     	int lastWantedActivityVectors = -1;
     	
         for(int section=0;section<sections;section++) {
@@ -346,7 +346,7 @@ public class SimpleArrangementEngine extends ArrangementEngine {
         		do {lastAddedBit = setRandomBit(bitset,num,lastRemovedBit);} while(bitset.cardinality() < wantedActivityVectors);
         	} else if(card > wantedActivityVectors) {
         		do {lastRemovedBit = clearRandomBit(bitset,lastAddedBit);} while(bitset.cardinality() > wantedActivityVectors);
-        	} else if(card > 0 && Math.random() > 0.5) {
+        	} else if(card > 0 && random.nextFloat() > 0.5) {
         		lastRemovedBit = clearRandomBit(bitset,lastAddedBit);
         		lastAddedBit = setRandomBit(bitset,num,lastRemovedBit);
         	}
@@ -418,6 +418,8 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 	}
 	
 	public void configure(Node node,XPath xpath) throws XPathException {
+		random = new Random(randomSeed);
+		
 		NodeList nodeList = (NodeList)xpath.evaluate("activityVector",node,XPathConstants.NODESET);
 
 		int activityVectorCount = nodeList.getLength();
@@ -429,7 +431,7 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 		LinkedHashMap<String,ActivityVectorConfiguration> activityVectorConfigurationHashMap = new LinkedHashMap<String,ActivityVectorConfiguration>(activityVectorCount);
 		
 		for(int i=0;i<activityVectorCount;i++) {
-			String name = XMLUtils.parseString("attribute::name",nodeList.item(i),xpath);
+			String name = XMLUtils.parseString(random,"attribute::name",nodeList.item(i),xpath);
 
 			if(activityVectorConfigurationHashMap.containsKey(name)) {
 				throw(new RuntimeException("ActivityVector \""+name+"\" already defined"));
@@ -438,23 +440,23 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 			double minActive = 0;
 			
 			try {
-				minActive = Double.parseDouble(XMLUtils.parseString("minActive",nodeList.item(i),xpath));
+				minActive = Double.parseDouble(XMLUtils.parseString(random,"minActive",nodeList.item(i),xpath));
 			} catch(Exception e) {}
 			
 			double maxActive = 100.0d;
 			
 			try {
-				maxActive = Double.parseDouble(XMLUtils.parseString("maxActive",nodeList.item(i),xpath));
+				maxActive = Double.parseDouble(XMLUtils.parseString(random,"maxActive",nodeList.item(i),xpath));
 			} catch(Exception e) {}
 			
 			int startShift = 0;
 			try {
-				startShift = XMLUtils.parseInteger("startShift",nodeList.item(i),xpath);
+				startShift = XMLUtils.parseInteger(random,"startShift",nodeList.item(i),xpath);
 			} catch(Exception e) {}
 			
 			int stopShift = 0;
 			try {
-				stopShift = XMLUtils.parseInteger("stopShift",nodeList.item(i),xpath);
+				stopShift = XMLUtils.parseInteger(random,"stopShift",nodeList.item(i),xpath);
 			} catch(Exception e) {}
 			
 			activityVectorConfigurationHashMap.put(name,new ActivityVectorConfiguration(name,minActive,maxActive,startShift,stopShift));		
@@ -473,12 +475,12 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 		ArrangementEntry[] arrangementEntries = new ArrangementEntry[tracks];
 		
 		for(int i=0;i<tracks;i++) {
-			int instrument = XMLUtils.parseInteger("instrument",nodeList.item(i),xpath);
+			int instrument = XMLUtils.parseInteger(random,"instrument",nodeList.item(i),xpath);
 
 			int transposition = 0;
 			
 			try {
-			    transposition = XMLUtils.parseInteger("transposition",nodeList.item(i),xpath);
+			    transposition = XMLUtils.parseInteger(random,"transposition",nodeList.item(i),xpath);
 			} catch(Exception e) {}
 			
 			Node sequenceEngineNode = (Node)xpath.evaluate("sequenceEngine",nodeList.item(i),XPathConstants.NODE);
@@ -492,7 +494,7 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 			}
 			
 			try {
-			    SequenceEngine sequenceEngine = XMLUtils.getInstance(SequenceEngine.class,sequenceEngineNode,xpath);
+			    SequenceEngine sequenceEngine = XMLUtils.getInstance(SequenceEngine.class,sequenceEngineNode,xpath,randomSeed+1+i);
 			    arrangementEntries[i] = new ArrangementEntry(instrument,sequenceEngine,transposition,activityVectorNames);
 			} catch(Exception e) {
 				throw(new RuntimeException("Error instantiating SequenceEngine",e));

@@ -26,7 +26,7 @@ public abstract class SequenceEngine implements XMLConfigurable,RandomSeedable {
 	protected final Logger logger;
 	
 	protected Structure structure;
-	private long randomSeed;
+	protected long randomSeed;
 	
     public SequenceEngine() {
     	logger = Logger.getLogger(this.getClass());

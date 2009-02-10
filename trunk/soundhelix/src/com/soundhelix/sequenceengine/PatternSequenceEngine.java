@@ -47,6 +47,8 @@ public class PatternSequenceEngine extends SequenceEngine {
 	private static final int[] majorTable = new int[] {0,4,7};
 	private static final int[] minorTable = new int[] {0,3,7};
 
+	private Random random;
+	
 	private boolean obeyChordSubtype = false;
 	private int patternLength;
 	
@@ -215,6 +217,8 @@ public class PatternSequenceEngine extends SequenceEngine {
     }
     	
     public void configure(Node node,XPath xpath) throws XPathException {
+    	random = new Random(randomSeed);
+    	
 		NodeList nodeList = (NodeList)xpath.evaluate("pattern",node,XPathConstants.NODESET);
 
 		if(nodeList.getLength() == 0) {
@@ -222,9 +226,9 @@ public class PatternSequenceEngine extends SequenceEngine {
 		}
 		
 		try {
-			setObeyChordSubtype(XMLUtils.parseBoolean("obeyChordSubtype",node,xpath));
+			setObeyChordSubtype(XMLUtils.parseBoolean(random,"obeyChordSubtype",node,xpath));
 		} catch(Exception e) {}
 		
-		setPattern(XMLUtils.parseString(nodeList.item(new Random().nextInt(nodeList.getLength())),xpath));
+		setPattern(XMLUtils.parseString(random,nodeList.item(random.nextInt(nodeList.getLength())),xpath));
     }
 }

@@ -1,5 +1,7 @@
 package com.soundhelix.sequenceengine;
 
+import java.util.Random;
+
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathException;
@@ -51,6 +53,8 @@ public class ArpeggioSequenceEngine extends SequenceEngine {
 
 	private static final boolean obeyChordSubtype = true;
 
+	private Random random;
+	
 	private int[][] patterns;
 
 	public ArpeggioSequenceEngine() {
@@ -167,6 +171,8 @@ public class ArpeggioSequenceEngine extends SequenceEngine {
 	}
 	
     public void configure(Node node,XPath xpath) throws XPathException {
+    	Random random = new Random(randomSeed);
+    	
 		NodeList nodeList = (NodeList)xpath.evaluate("pattern",node,XPathConstants.NODESET);
 
 		int patterns = nodeList.getLength();
@@ -178,7 +184,7 @@ public class ArpeggioSequenceEngine extends SequenceEngine {
 		int[][] array = new int[patterns][];
 		
 		for(int i=0;i<patterns;i++) {
-			String pattern = XMLUtils.parseString(nodeList.item(i),xpath);
+			String pattern = XMLUtils.parseString(random,nodeList.item(i),xpath);
 
 			String[] p = pattern.split(",");
 			

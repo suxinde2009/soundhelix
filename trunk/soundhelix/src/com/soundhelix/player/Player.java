@@ -17,7 +17,7 @@ import com.soundhelix.misc.XMLConfigurable;
 public abstract class Player implements XMLConfigurable,RandomSeedable {
 	protected final Logger logger;
 
-	private long randomSeed;
+	protected long randomSeed;
 	
     public Player() {
     	logger = Logger.getLogger(this.getClass());

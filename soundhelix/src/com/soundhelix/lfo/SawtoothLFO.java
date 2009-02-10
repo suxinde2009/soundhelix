@@ -1,11 +1,5 @@
 package com.soundhelix.lfo;
 
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathException;
-
-import org.w3c.dom.Node;
-
-
 /**
  * Implements a low frequency oscillator (LFO) using a sawtooth wave, starting from 0 if
  * up is true, starting down from 1 otherwise. A full LFO rotation corresponds to an angle
@@ -17,7 +11,9 @@ import org.w3c.dom.Node;
 public class SawtoothLFO extends LFO {
     private boolean up;
     
-    private SawtoothLFO() {}
+    public SawtoothLFO() {
+    	this(true);
+    }
     
     public SawtoothLFO(boolean up) {
         this.up = up;

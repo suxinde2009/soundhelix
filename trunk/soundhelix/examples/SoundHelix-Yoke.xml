@@ -14,26 +14,26 @@
     <activityVector name="base">
       <minActive>60</minActive>
       <maxActive>90</maxActive>
-      <startShifts>0</startShifts>
-      <stopShifts>-4</stopShifts>
+      <startShift>0</startShift>
+      <stopShift>-4</stopShift>
     </activityVector>
     <activityVector name="clap">
       <minActive>35</minActive>
       <maxActive>100</maxActive>
-      <startShifts>-2</startShifts>
-      <stopShifts>0</stopShifts>
+      <startShift>-2</startShift>
+      <stopShift>0</stopShift>
     </activityVector>
     <activityVector name="hihat">
       <minActive>40</minActive>
       <maxActive>100</maxActive>
-      <startShifts>0</startShifts>
-      <stopShifts>0</stopShifts>
+      <startShift>0</startShift>
+      <stopShift>0</stopShift>
     </activityVector>
     <activityVector name="snare">
       <minActive>0</minActive>
       <maxActive>100</maxActive>
-      <startShifts>0</startShifts>
-      <stopShifts>0</stopShifts>
+      <startShift>0</startShift>
+      <stopShift>0</stopShift>
     </activityVector>
     <activityVector name="arpeggio1"/>
     <activityVector name="bass">
@@ -44,7 +44,7 @@
     <activityVector name="chord1"/>
     <activityVector name="random">
       <minActive>0</minActive>
-      <stopShifts>1</stopShifts>
+      <stopShift>1</stopShift>
     </activityVector>
     <activityVector name="rhythm"/>
     <activityVector name="pad2">
@@ -60,10 +60,10 @@
     <activityVector name="melody">
       <minActive>0</minActive>
       <maxActive>30</maxActive>
-      <stopShifts>1</stopShifts>
+      <stopShift>1</stopShift>
     </activityVector>
     <activityVector name="sawtooth">
-      <stopShifts>1</stopShifts>
+      <stopShift>1</stopShift>
     </activityVector>
     <activityVector name="shortchord"/>
     <track>

@@ -128,14 +128,14 @@ public class SoundHelix implements Runnable {
 	
 	public void run() {
 		while(true) {
+			Random random = new Random(randomSeed);
+			
 			try {
 				if(songQueue.size() < 1) {
 					// the queue is empty; render a new song
 
 					System.out.println("Rendering new song");
 
-					Random random = new Random(randomSeed);
-					
 					File file = new File(filename);
 
 					logger.debug("Reading and parsing XML file");
@@ -169,11 +169,11 @@ public class SoundHelix implements Runnable {
 					System.out.println("Rendering took "+(time/1000000)+" ms");
 					Player player = XMLUtils.getInstance(Player.class,playerNode,xpath,randomSeed^5915925127l);					
 					songQueue.add(new SongQueueEntry(arrangement,player));
-					
-					randomSeed = randomSeed^random.nextLong();
 				}
 			} catch(Exception e) {e.printStackTrace();}
 			
+			randomSeed ^= random.nextLong();
+
 			try {
 				Thread.sleep(5000);
 			} catch(Exception e) {}

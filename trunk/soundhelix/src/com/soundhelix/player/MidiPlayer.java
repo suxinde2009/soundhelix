@@ -436,8 +436,9 @@ public class MidiPlayer extends Player {
     			for(int j=0;j<p.length;j++) {
     				Sequence s = track.get(j);					
     				SequenceEntry prevse = s.get(p[j]-1);
+
     				if(prevse.isNote()) {
-    					sm.setMessage(ShortMessage.NOTE_OFF,instrument,(track.getType() == TrackType.MELODY ? transposition : 0)+prevse.getPitch(),0);
+    					sm.setMessage(ShortMessage.NOTE_OFF,channel.channel,(track.getType() == TrackType.MELODY ? transposition : 0)+prevse.getPitch(),0);
     					channel.device.receiver.send(sm,-1);
     				}
     			}

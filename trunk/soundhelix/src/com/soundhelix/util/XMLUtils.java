@@ -10,6 +10,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathException;
+import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
@@ -329,7 +331,7 @@ public class XMLUtils {
 	 * @throws Exception
 	 */
 	
-	public static <T> T getInstance(Class<T> superclass,Node node,XPath xpath,long randomSeed) throws Exception {
+	public static <T> T getInstance(Class<T> superclass,Node node,XPath xpath,long randomSeed) throws InstantiationException,XPathException,XPathExpressionException,ClassNotFoundException,IllegalAccessException {
 		String className = (String)xpath.evaluate("attribute::class",node,XPathConstants.STRING);
 
 		if(className.indexOf('.') < 0) {

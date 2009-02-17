@@ -1,18 +1,21 @@
 package com.soundhelix.player;
 
+import org.apache.log4j.Logger;
+
+import com.soundhelix.misc.Arrangement;
+import com.soundhelix.misc.RandomSeedable;
+import com.soundhelix.misc.XMLConfigurable;
+
 /**
- * Represents an abstract player for Arrangements.
+ * Represents an abstract real-time player for Arrangements.
  * 
  * @see Arrangement
  * 
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
-import org.apache.log4j.Logger;
-
-import com.soundhelix.misc.Arrangement;
-import com.soundhelix.misc.RandomSeedable;
-import com.soundhelix.misc.XMLConfigurable;
+// TODO: check if more methods should be available, for example,
+// getting the current tick, setting the current tick
 
 public abstract class Player implements XMLConfigurable,RandomSeedable {
 	protected final Logger logger;

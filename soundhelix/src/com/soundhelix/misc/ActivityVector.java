@@ -125,6 +125,18 @@ public class ActivityVector {
     }
 
     /**
+     * Returns the tick where the ActivityVector is active for the
+     * last time. If the ActvityVector never becomes active, -1 is
+     * returned.
+     * 
+     * @return the last activity tick (or -1)
+     */
+    
+    public int getLastActiveTick() {
+        return bitSet.length()-1;
+    }
+
+    /**
      * Returns the tick where the ActivityVector becomes inactive for
      * the first time. If the ActvityVector never becomes in inactive,
      * -1 is returned.

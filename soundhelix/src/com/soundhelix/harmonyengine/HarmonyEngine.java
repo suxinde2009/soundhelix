@@ -1,13 +1,15 @@
 package com.soundhelix.harmonyengine;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
-
-import org.apache.log4j.Logger;
+import java.util.List;
 
 import com.soundhelix.misc.Chord;
 import com.soundhelix.misc.RandomSeedable;
 import com.soundhelix.misc.Structure;
 import com.soundhelix.misc.XMLConfigurable;
+
+import org.apache.log4j.Logger;
 
 /**
  * Represents an abstract generator for song harmonies. Normally, song harmonies are a sequence
@@ -234,6 +236,26 @@ public abstract class HarmonyEngine implements XMLConfigurable,RandomSeedable {
 			
 			return distinctChordSections;
 		}
+	}
+	
+	/**
+	 * Returns a list of start ticks for all chord sections, in ascending order.
+	 * The first chord section will always start at tick 0. The number of list
+	 * entries always equals getChordSectionCount().
+	 * 
+	 * @return a list of start ticks for all chord sections
+	 */
+		
+	public List<Integer> getChordSectionStartTicks() {
+	    ArrayList<Integer> list = new ArrayList<Integer>(20);
+
+	    int ticks = structure.getTicks();
+	    
+	    for(int tick=0;tick<ticks;tick += getChordSectionTicks(tick)) {
+	        list.add(tick);
+	    }
+	    
+	    return list;
 	}
 	
 	/**

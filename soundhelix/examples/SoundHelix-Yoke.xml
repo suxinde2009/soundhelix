@@ -16,7 +16,7 @@
       <maxActive>90</maxActive>
       <startShift>0</startShift>
       <stopShift>-4</stopShift>
-      <startAfterSection>0</startAfterSection>
+      <startAfterSection>1</startAfterSection>
       <stopBeforeSection>0</stopBeforeSection>
     </activityVector>
     <activityVector name="clap">
@@ -45,7 +45,7 @@
     </activityVector>
     <activityVector name="arpeggio1"/>
     <activityVector name="bass">
-      <minActive>50</minActive>
+      <minActive>40</minActive>
       <maxActive>100</maxActive>
     </activityVector>
     <activityVector name="distort1"/>
@@ -69,6 +69,7 @@
       <minActive>0</minActive>
       <maxActive>30</maxActive>
       <stopShift>1</stopShift>
+      <startAfterSection>2</startAfterSection>
     </activityVector>
     <activityVector name="sawtooth">
       <stopShift>1</stopShift>
@@ -211,6 +212,10 @@
       <sequenceEngine class="MelodySequenceEngine">
         <pattern>0,-,-,-,-,-,-,-,0,-,+,-,0,-,+,-,0,-,-,-,-,-,-,-,0,-,+,-,0,-,+,-,0,-,-,-,-,-,-,-,0,-,+,-,0,-,+,-,0,-,-,-,-,-,-,-,0,-,+,-,0,-,+,+,0,-,-,-,-,-,-,-,0,-,+,-,0,-,+,-,0,-,-,-,-,-,-,-,0,-,+,-,0,-,+,-,0,-,-,-,-,-,-,-,0,-,+,-,0,-,+,-,0,-,-,-,-,-,-,0,-,-,+,-,-,0,-,+</pattern>
         <pattern>0,-,-,0,-,-,+,-,0,-,-,0,-,-,+,-,0,-,-,0,-,-,+,-,0,-,-,0,-,+,0,+</pattern>
+        <pattern>0,-,-,-,0,-,-,-,0,-,0,-,-,-,-,-,0,-,+,-,+,-,+,-,0,-,-,-,-,-,-,-,0,-,-,-,0,-,-,-,0,-,0,-,-,-,-,-,0,-,+,-,+,-,+,-,0,-,+,-,-,0,-,0</pattern>
+        <pattern>0,-,-,-,0,-,-,-,0,-,-,+,-,-,-,+,0,-,-,-,0,-,-,-,-,+,-,0,-,-,0,-,0,-,-,-,0,-,-,-,0,-,-,+,-,-,-,+,0,-,-,-,0,-,-,-,+,-,-,0,-,0,-,+</pattern>
+        <pattern>0,-,+,-,0,-,+,-,0,+,-,0,-,-,-,+,0,-,+,-,0,-,+,-,0,+,-,0,-,-,-,-</pattern>
+        <pattern>0,-,-,-,0,-,-,0,-,-,+,-,-,0,-,-,0,-,-,+,-,-,-,0,-,-,+,-,-,0,-,+,0,-,-,+,-,-,-,0,-,-,+,-,-,0,-,-,0,-,-,+,-,-,-,0,-,-,+,-,0,-,0,-</pattern>
       </sequenceEngine>
       <activityVector>melody</activityVector>
     </track>
@@ -230,12 +235,13 @@
         <obeyChordSubtype>no</obeyChordSubtype>
         <offsets>0,4</offsets>
         <pattern>-,-,0,-,-,0,-,-,0,-,-,0,-,-,1,-,-,-,0,-,-,0,-,-,0,-,-,0,-,-,1,-,-,-,0,-,-,0,-,-,0,-,-,0,-,-,1,-,-,-,0,-,-,0,-,-,0,-,-,0,1,-,0,-</pattern>
+        <pattern>0,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,0,0,-,-,1,-,0,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,0,-,1,-,0,-,0,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,0,0,-,-,1,-,0,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,0,-,2,-,1,-</pattern>
       </sequenceEngine>
       <activityVector>shortchord</activityVector>
     </track>
   </arrangementEngine>
   <player class="MidiPlayer">
-    <bpm><random min="136" max="148" type="normal" variance="6"/></bpm>
+    <bpm><random min="134" max="150" type="normal" variance="6"/></bpm>
     <transposition><random min="65" max="69"/></transposition>
     <!--<groove><random list="100,100|110,90|115,85|120,80|115,85,120,80"/></groove> -->
     <device name="device1" clockSynchronization="true">Out To MIDI Yoke:  1</device>

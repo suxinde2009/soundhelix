@@ -31,9 +31,8 @@ import com.soundhelix.util.XMLUtils;
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
-// TODO: extend the activity group scheme from the DrumSequenceEngine to this class
-//       so that arbitrary combinations of sequences across tracks can be put into an
-//       activity group
+// TODO: make ActivityVector constraint-compliance more efficient by ensuring the constraints
+// (or aborting as early as possible) during creation instead of checking afterwards
 
 public class SimpleArrangementEngine extends ArrangementEngine {
 	private Random random;
@@ -49,10 +48,9 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 	}
 	
 	public Arrangement render() {
-		int ticks = structure.getTicks();
-		int tracks = arrangementEntries.length;
-
 		HashMap<String,ActivityVectorConfiguration> neededActivityVector = new LinkedHashMap<String,ActivityVectorConfiguration>();
+
+		int tracks = arrangementEntries.length;
 
 		for(int i=0;i<tracks;i++) {
 			SequenceEngine sequenceEngine = arrangementEntries[i].sequenceEngine;
@@ -73,12 +71,61 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 			}
 		}
 
+		createConstrainedActivityVectors(structure.getTicks(),tracks,neededActivityVector);
+		dumpActivityVectors(neededActivityVector);
+		shiftIntervalBoundaries(neededActivityVector);
+		Arrangement arrangement = createArrangement(neededActivityVector,tracks);
+
+		return arrangement;
+	}
+
+	private Arrangement createArrangement(HashMap<String, ActivityVectorConfiguration> neededActivityVector,int tracks) {
+		// use each SequenceEngine to render a track
+		// each SequenceEngine is given the number of ActivityVectors it
+		// requires
+
+		Arrangement arrangement = new Arrangement(structure);
+
+		for(int i=0;i<tracks;i++) {
+			SequenceEngine sequenceEngine = arrangementEntries[i].sequenceEngine;
+			int num = sequenceEngine.getActivityVectorCount();
+
+			ActivityVector[] list = new ActivityVector[num];
+			String[] names = arrangementEntries[i].activityVectorNames;
+			
+			if(names.length != num) {
+				throw(new RuntimeException("Need "+num+" ActivityVector"+(num == 1 ? "" : "s")+" for instrument "+arrangementEntries[i].instrument+", found "+names.length));
+			}
+			
+			for(int k=0;k<num;k++) {
+				list[k] = neededActivityVector.get(names[k]).activityVector;
+			}
+
+			Track track = sequenceEngine.render(list);
+			track.transpose(arrangementEntries[i].transposition);
+			arrangement.add(track,arrangementEntries[i].instrument);
+		}
+		
+		return arrangement;
+	}
+
+	private void shiftIntervalBoundaries(HashMap<String, ActivityVectorConfiguration> neededActivityVector) {
+		Iterator<ActivityVectorConfiguration> it = neededActivityVector.values().iterator();
+		
+		while(it.hasNext()) {
+			ActivityVectorConfiguration avc = it.next();
+			avc.activityVector.shiftIntervalBoundaries(avc.startShift,avc.stopShift);
+		}
+	}
+
+	private void createConstrainedActivityVectors(int ticks, int tracks,
+			HashMap<String, ActivityVectorConfiguration> neededActivityVector) {
 		List<Integer> chordSectionStartTicks = structure.getHarmonyEngine().getChordSectionStartTicks();
 		int chordSections = chordSectionStartTicks.size();
 		
 		int vectors = neededActivityVector.size();
 
-		System.out.println("Creating "+vectors+" ActivityVectors for "+tracks+" tracks");
+		logger.debug("Creating "+vectors+" ActivityVectors for "+tracks+" tracks");
 
 		ActivityVector[] activityVectors;
 
@@ -123,43 +170,8 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 
 			break;
 		}
-
-		dumpActivityVectors(neededActivityVector);
-
-		Iterator<ActivityVectorConfiguration> it = neededActivityVector.values().iterator();
 		
-		while(it.hasNext()) {
-			ActivityVectorConfiguration avc = it.next();
-			avc.activityVector.shiftIntervalBoundaries(avc.startShift,avc.stopShift);
-		}
-
-		// use each SequenceEngine to render a track
-		// each SequenceEngine is given the number of ActivityVectors it
-		// requires
-
-		Arrangement arrangement = new Arrangement(structure);
-
-		for(int i=0;i<tracks;i++) {
-			SequenceEngine sequenceEngine = arrangementEntries[i].sequenceEngine;
-			int num = sequenceEngine.getActivityVectorCount();
-
-			ActivityVector[] list = new ActivityVector[num];
-			String[] names = arrangementEntries[i].activityVectorNames;
-			
-			if(names.length != num) {
-				throw(new RuntimeException("Need "+num+" ActivityVector"+(num == 1 ? "" : "s")+" for instrument "+arrangementEntries[i].instrument+", found "+names.length));
-			}
-			
-			for(int k=0;k<num;k++) {
-				list[k] = neededActivityVector.get(names[k]).activityVector;
-			}
-
-			Track track = sequenceEngine.render(list);
-			track.transpose(arrangementEntries[i].transposition);
-			arrangement.add(track,arrangementEntries[i].instrument);
-		}
-
-		return arrangement;
+		logger.debug("Needed "+(tries+1)+" iteration"+(tries > 0 ? "s" : "")+" to satisfy constraints");
 	}
 
 	private void dumpActivityVectors(HashMap<String,ActivityVectorConfiguration> neededActivityVector) {

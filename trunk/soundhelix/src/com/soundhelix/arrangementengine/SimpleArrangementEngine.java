@@ -118,8 +118,7 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 		}
 	}
 
-	private void createConstrainedActivityVectors(int ticks, int tracks,
-			HashMap<String, ActivityVectorConfiguration> neededActivityVector) {
+	private void createConstrainedActivityVectors(int ticks,int tracks,HashMap<String, ActivityVectorConfiguration> neededActivityVector) {
 		List<Integer> chordSectionStartTicks = structure.getHarmonyEngine().getChordSectionStartTicks();
 		int chordSections = chordSectionStartTicks.size();
 		
@@ -164,7 +163,7 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 				        continue again;
 				    }				        
 				}
-								
+
 				avc.activityVector = av;
 			}
 
@@ -187,8 +186,7 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 		Iterator<ActivityVectorConfiguration> it = neededActivityVector.values().iterator();
 		
 		while(it.hasNext()) {
-			ActivityVectorConfiguration avc = it.next();
-			maxLen = Math.max(maxLen,avc.name.length());
+			maxLen = Math.max(maxLen,it.next().name.length());
 		}
 
 		it = neededActivityVector.values().iterator();
@@ -206,7 +204,9 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 					sb.append('-');
 				}
 			}
-			sb.append('\n');
+			
+			int activeTicks = av.getActiveTicks();
+			sb.append(activeTicks > 0 ? String.format(" %5.1f%%\n",100.0d*(double)activeTicks/(double)ticks) : "\n");
 		}
 
 		sb.append(String.format("%"+maxLen+"s  ",""));

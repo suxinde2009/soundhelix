@@ -251,8 +251,6 @@ public class MidiPlayer extends Player {
     		grooveString = "1";
     	}
     	
-    	System.out.println("Setting groove to "+grooveString);
-    	
     	String[] grooveList = grooveString.split(",");
     	int len = grooveList.length;
 

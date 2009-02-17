@@ -54,7 +54,10 @@
       <minActive>0</minActive>
       <stopShift>1</stopShift>
     </activityVector>
-    <activityVector name="rhythm"/>
+    <activityVector name="rhythm">
+      <startAfterSection>0</startAfterSection>
+      <stopBeforeSection>0</stopBeforeSection>
+    </activityVector>
     <activityVector name="pad2">
       <startShift>0</startShift>
       <stopShift>2</stopShift>

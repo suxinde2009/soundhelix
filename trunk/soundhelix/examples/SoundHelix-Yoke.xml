@@ -16,24 +16,32 @@
       <maxActive>90</maxActive>
       <startShift>0</startShift>
       <stopShift>-4</stopShift>
+      <startAfterSection>0</startAfterSection>
+      <stopBeforeSection>0</stopBeforeSection>
     </activityVector>
     <activityVector name="clap">
       <minActive>35</minActive>
       <maxActive>100</maxActive>
       <startShift>-2</startShift>
       <stopShift>0</stopShift>
+      <startAfterSection>0</startAfterSection>
+      <stopBeforeSection>0</stopBeforeSection>
     </activityVector>
     <activityVector name="hihat">
       <minActive>40</minActive>
       <maxActive>100</maxActive>
       <startShift>0</startShift>
       <stopShift>0</stopShift>
+      <startAfterSection>0</startAfterSection>
+      <stopBeforeSection>0</stopBeforeSection>
     </activityVector>
     <activityVector name="snare">
       <minActive>0</minActive>
       <maxActive>100</maxActive>
       <startShift>0</startShift>
       <stopShift>0</stopShift>
+      <startAfterSection>0</startAfterSection>
+      <stopBeforeSection>0</stopBeforeSection>
     </activityVector>
     <activityVector name="arpeggio1"/>
     <activityVector name="bass">

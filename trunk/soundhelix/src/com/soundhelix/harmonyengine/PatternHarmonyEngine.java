@@ -182,7 +182,7 @@ public class PatternHarmonyEngine extends HarmonyEngine {
 		
 		sectionVector.add(sTicks);
 		
-		System.out.println("Sections: "+sectionVector.size());
+		logger.debug("Chord sections: "+sectionVector.size());
 		
 		tick = 0;
 		for(int section=0;section<sectionVector.size();section++) {

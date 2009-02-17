@@ -178,7 +178,7 @@ public class ActivityVector {
 	 * changes from active to inactive are postponed by stopTicks ticks.
 	 * startTicks and stopTicks may also be negative to prepone
 	 * instead of postpone. The start of the first interval is never
-	 * modified.
+	 * modified, whereas the end of the last interval is never postponed.
 	 * 
 	 * @param startTicks the number of ticks to prepone or postpone starting
 	 * @param stopTicks the number of ticks to prepone or postpone stopping

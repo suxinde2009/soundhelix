@@ -8,8 +8,8 @@
         <mkdir dir="${build}"/>
     </target>
 
-    <target name="compile" depends="init" description="compile the source" >
-        <javac classpath="${classpath}" srcdir="${src}" destdir="${build}" target="1.5"/>
+    <target name="compile" depends="init" description="compile the source">
+        <javac encoding="UTF-8" classpath="${classpath}" srcdir="${src}" destdir="${build}" debug="yes" target="1.5"/>
     </target>
 
     <target name="jar" depends="compile" description="generate the JAR">

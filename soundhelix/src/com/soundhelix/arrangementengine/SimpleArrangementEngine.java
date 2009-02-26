@@ -218,7 +218,7 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 			while(it.hasNext()) {if(it.next().activityVector.isActive(tick)) c++;};
 		    sb.append(Integer.toString(c,36));
 		}
-		
+
 		logger.debug(sb.toString());
 	}
 	
@@ -493,12 +493,16 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 				
 		setActivityVectorConfiguration(activityVectorConfigurationHashMap);
 
-		nodeList = (NodeList)xpath.evaluate("track",node,XPathConstants.NODESET);
-
+		nodeList = (NodeList)xpath.evaluate("track[@solo=\"true\"]",node,XPathConstants.NODESET);
 		int tracks = nodeList.getLength();
 
 		if(tracks == 0) {
-			throw(new RuntimeException("Need at least 1 track"));
+			nodeList = (NodeList)xpath.evaluate("track",node,XPathConstants.NODESET);
+			tracks = nodeList.getLength();
+
+			if(tracks == 0) {
+				throw(new RuntimeException("Need at least 1 track"));
+			}
 		}
 		
 		ArrangementEntry[] arrangementEntries = new ArrangementEntry[tracks];

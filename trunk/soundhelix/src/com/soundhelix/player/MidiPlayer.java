@@ -89,7 +89,14 @@ public class MidiPlayer extends Player {
 	
 	/** The number of ticks to wait after stopping playing. */
 	private static final int WAIT_TICKS_AFTER_SONG = 64;
-	
+
+	/**
+	 * The number of MIDI clock synchronization ticks per beat.
+	 * 24 is the standard MIDI synchronization, 480 is the
+	 * professional MIDI synchronization.
+	 */
+	private static final int CLOCK_SYNCHRONIZATION_TICKS_PER_BEAT = 24;
+
 	private Random random;
 	
 	private Device[] devices;
@@ -312,13 +319,13 @@ public class MidiPlayer extends Player {
     		Structure structure = arrangement.getStructure();
 
     		// when clock synchronization is used, we must make sure that
-    		// the ticks per beat divide 24
+    		// the ticks per beat divide CLOCK_SYNCHRONIZATION_TICKS_PER_BEAT
     		
-    		if(useClockSynchronization && (24%structure.getTicksPerBeat()) > 0) {
-    			throw(new RuntimeException("Ticks per beat ("+structure.getTicksPerBeat()+") must be a divider of 24 for MIDI clock synchronization"));
+    		if(useClockSynchronization && (CLOCK_SYNCHRONIZATION_TICKS_PER_BEAT%structure.getTicksPerBeat()) != 0) {
+    			throw(new RuntimeException("Ticks per beat ("+structure.getTicksPerBeat()+") must be a divider of "+CLOCK_SYNCHRONIZATION_TICKS_PER_BEAT+" for MIDI clock synchronization"));
     		}
     		
-        	int clockTimingsPerTick = (useClockSynchronization ? 24/structure.getTicksPerBeat() : 1);
+        	int clockTimingsPerTick = (useClockSynchronization ? CLOCK_SYNCHRONIZATION_TICKS_PER_BEAT/structure.getTicksPerBeat() : 1);
 
     		List<int[]> tickList = new ArrayList<int[]>();
     		List<int[]> posList = new ArrayList<int[]>();
@@ -355,7 +362,7 @@ public class MidiPlayer extends Player {
     		while(tick < structure.getTicks()) {
     			i = arrangement.iterator();
 
-    			if((tick % ticksPerBar) == 0) {
+    			if((tick % (2*ticksPerBar)) == 0) {
     				System.out.printf("Tick: %4d   Seconds: %3d  %5.1f %%\n",tick,tick*60/(structure.getTicksPerBeat()*bpm),(double)tick*100d/(double)structure.getTicks());
     			}
     			

@@ -91,9 +91,8 @@ public class MelodySequenceEngine extends SequenceEngine {
         		
     			pos++;
     			i += l;
+    			tick++;
          	}
-        	
-        	tick += len;
         }
         
 		Track track = new Track(TrackType.MELODY);

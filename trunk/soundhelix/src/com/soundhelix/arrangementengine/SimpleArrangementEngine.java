@@ -437,10 +437,10 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 			int firstStop = stopActivityCounts[section-decreaseFrom];
 			int count = (lastCount+firstStop)/2;
 			
-			if(count == firstStop && count < maxActivityVectors) {
+			while((count == lastCount || count == firstStop) && count < maxActivityVectors) {
 				count++;
 			}
-			
+
 			return count;
 		} else if(section >= decreaseFrom+1) {
 			// in fade-out phase

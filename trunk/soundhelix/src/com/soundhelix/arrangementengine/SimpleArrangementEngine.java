@@ -22,9 +22,7 @@ import com.soundhelix.sequenceengine.SequenceEngine;
 import com.soundhelix.util.XMLUtils;
 
 /**
- * Implements a simple ArrangementEngine. From the given set of SequenceEngines
- * the number of needed ActivityVectors is determined and a subset of these
- * vectors is selected to be active for each chord section. The song starts with
+ * Implements a simple ArrangementEngine. The song starts with
  * a "fade-in" of the number of active ActivityVectors and ends with a "fade-out"
  * of the number of active ActivityVectors.
  * 
@@ -36,6 +34,15 @@ import com.soundhelix.util.XMLUtils;
 
 public class SimpleArrangementEngine extends ArrangementEngine {
 	private Random random;
+
+	private int[] startActivityCounts = {};
+	private int[] stopActivityCounts = {};
+	private int maxActivityChangeCount = 3;
+	private int minActivityCount = 2;
+	private int maxActivityCount = 0;   // determined dynamically if <= 0
+	
+	private String startActivityCountsString;
+	private String stopActivityCountsString;
 
 	private ArrangementEntry[] arrangementEntries;
 	private HashMap<String,ActivityVectorConfiguration> activityVectorConfigurationHashMap;
@@ -126,6 +133,9 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 
 		logger.debug("Creating "+vectors+" ActivityVectors for "+tracks+" tracks");
 
+		startActivityCounts = parseActivityCounts(startActivityCountsString,vectors);
+		stopActivityCounts = parseActivityCounts(stopActivityCountsString,vectors);
+		
 		ActivityVector[] activityVectors;
 
 		int tries = 0;
@@ -341,7 +351,12 @@ public class SimpleArrangementEngine extends ArrangementEngine {
     	
     	// the maximum number of ActivityVectors that may be active
     	// at each point in time
-    	int maxActivityVectors = getActivityVectorMaximum(num,0.40,0.2);
+
+    	int maxActivityVectors = Math.min(maxActivityCount,num);
+    	
+    	if(maxActivityVectors <= 0) {
+    		maxActivityVectors = getActivityVectorMaximum(num,0.40,0.2);
+    	}
     	
     	int lastWantedActivityVectors = -1;
     	
@@ -393,8 +408,8 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 	
 	/**
 	 * Returns the number of ActivityVectors that should be active during the
-	 * given section. There is always a "fade-in" of ActivityVectors (1, 2, ...)
-	 * for the first number of sections and a "fade-out" of ActivityVectors (..., 2, 1)
+	 * given section. There is always a "fade-in" of ActivityVectors (as specified by startActivityCounts array)
+	 * for the first number of sections and a "fade-out" of ActivityVectors (as specified by stopActivityCounts array)
 	 * for the last number of sections. In between, the number of ActivityVectors is
 	 * chosen randomly.
 	 * 
@@ -409,24 +424,36 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 		// important: all of this must work properly when only few sections
         // and few ActivityVectors (or even 1) are available
 		
-		int increaseTill = Math.min(maxActivityVectors,Math.min(sections/2,4))-1;
-		int decreaseFrom = sections-Math.min(maxActivityVectors,Math.min(sections/2,3));
+		int increaseTill = Math.min(maxActivityVectors,Math.min(sections/2,startActivityCounts.length))-1;
+		int decreaseFrom = sections-Math.min(maxActivityVectors,Math.min(sections/2,stopActivityCounts.length+1));
+		
+		//System.out.println("IncreaseTIll: "+increaseTill);
+		//System.out.println("DecreaseFrom: "+decreaseFrom);
 		
 		if(section <= increaseTill) {
 			// in fade-in phase
-			return section+1;
-		} else if(section >= decreaseFrom) {
+			return startActivityCounts[section];
+		} else if(section == decreaseFrom) {
+			int firstStop = stopActivityCounts[section-decreaseFrom];
+			int count = (lastCount+firstStop)/2;
+			
+			if(count == firstStop && count < maxActivityVectors) {
+				count++;
+			}
+			
+			return count;
+		} else if(section >= decreaseFrom+1) {
 			// in fade-out phase
-			return sections-section;
+			return stopActivityCounts[section-decreaseFrom-1];
 		} else {
 			// in between
-			int min = Math.min(maxActivityVectors,2);
+			int min = Math.min(maxActivityVectors,minActivityCount);
 			
 			int num;
 			
 			do {
 				num = min+random.nextInt(maxActivityVectors-min+1);
-			} while(Math.abs(num-lastCount) > 3 || (num == lastCount && random.nextBoolean()));
+			} while(Math.abs(num-lastCount) > maxActivityChangeCount || (num == lastCount && random.nextBoolean()));
 					
 			return num;
 		}
@@ -436,9 +463,42 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 		this.arrangementEntries = arrangementEntries;
 	}
 	
+	public void setStartActivityCountsString(String startActivityCountsString) {
+		this.startActivityCountsString = startActivityCountsString;
+	}
+
+	public void setStopActivityCountsString(String stopActivityCountsString) {
+		this.stopActivityCountsString = stopActivityCountsString;
+	}
+	
 	public void configure(Node node,XPath xpath) throws XPathException {
 		random = new Random(randomSeed);
+
+		String activityString = XMLUtils.parseString(random,"startActivityCounts",node,xpath);
+
+		if(activityString == null) {
+			activityString = "1,2,3";
+		}
+
+		setStartActivityCountsString(activityString);
 		
+		activityString = XMLUtils.parseString(random,"stopActivityCounts",node,xpath);
+
+		if(activityString == null) {
+			activityString = "3,2,1";
+		}
+
+		setStopActivityCountsString(activityString);
+
+		int minActivityCount = XMLUtils.parseInteger(random,"minActivityCount",node,xpath);
+		setMinActivityCount(minActivityCount);
+
+		int maxActivityCount = XMLUtils.parseInteger(random,"maxActivityCount",node,xpath);
+		setMaxActivityCount(maxActivityCount);
+
+		int maxActivityChangeCount= XMLUtils.parseInteger(random,"maxActivityChangeCount",node,xpath);
+		setMaxActivityChangeCount(maxActivityChangeCount);
+
 		NodeList nodeList = (NodeList)xpath.evaluate("activityVector",node,XPathConstants.NODESET);
 
 		int activityVectorCount = nodeList.getLength();
@@ -562,6 +622,27 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 		this.activityVectorConfigurationHashMap = activityVectorConfigurationHashMap;
 	}
 
+	private int[] parseActivityCounts(String string,int maxCount) {
+		String[] c = string.split(",");
+		int[] activityCounts = new int[c.length];
+		
+		for(int i=0;i<c.length;i++) {
+			try {
+				activityCounts[i] = Integer.parseInt(c[i]);
+			} catch(NumberFormatException e) {
+				throw(new RuntimeException("Element \""+c[i]+"\" in activity count string \""+string+"\" is not a number"));
+			}
+		
+			if(activityCounts[i] <= 0) {
+				throw(new RuntimeException("Element \""+activityCounts[i]+"\" in activity count string \""+string+"\" is not positive"));
+			} else if(activityCounts[i] > maxCount) {
+				activityCounts[i] = maxCount;
+			}	
+		}
+		
+		return activityCounts;
+	}
+	
 	private static class ArrangementEntry {
 		private int instrument;
 		private SequenceEngine sequenceEngine;
@@ -595,5 +676,17 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 			this.startAfterSection = startAfterSection;
 			this.stopBeforeSection = stopBeforeSection;
 		}	
+	}
+
+	public void setMinActivityCount(int minActiveCount) {
+		this.minActivityCount = minActiveCount;
+	}
+
+	public void setMaxActivityCount(int maxActiveCount) {
+		this.maxActivityCount = maxActiveCount;
+	}
+
+	public void setMaxActivityChangeCount(int maxActivityChangeCount) {
+		this.maxActivityChangeCount = maxActivityChangeCount;
 	}
 }

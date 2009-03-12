@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<soundhelix>
+<soundHelix>
   <structure>
      <bars><random min="128" max="192" step="16"/></bars> 
      <beatsPerBar>4</beatsPerBar>
@@ -7,12 +7,17 @@
   </structure>
   <include>includes/Standard-HarmonyEngine.xml</include> 
   <arrangementEngine class="SimpleArrangementEngine">
+    <minActivityCount>2</minActivityCount>
+    <maxActivityCount>9</maxActivityCount>
+    <maxActivityChangeCount>4</maxActivityChangeCount>
+    <startActivityCounts><random list="1,2,3|1,2,3,4"/></startActivityCounts>
+	<stopActivityCounts><random list="3,2,1|4,2,1"/></stopActivityCounts>
     <activityVector name="pad1">
       <startShift>0</startShift>
       <stopShift>2</stopShift>
     </activityVector>
     <activityVector name="base">
-      <minActive>60</minActive>
+      <minActive>55</minActive>
       <maxActive>90</maxActive>
       <startShift>0</startShift>
       <stopShift>-4</stopShift>
@@ -71,7 +76,7 @@
     <activityVector name="melody">
       <minActive>0</minActive>
       <maxActive>30</maxActive>
-      <stopShift>1</stopShift>
+      <stopShift>0</stopShift>
       <startAfterSection>2</startAfterSection>
     </activityVector>
     <activityVector name="sawtooth">
@@ -81,7 +86,7 @@
     <track>
       <instrument>1</instrument>
       <sequenceEngine class="PadSequenceEngine">
-        <offsets><random list="0,1,2|0,1,2,3|-1,0,1|1,2,3"/></offsets>
+        <offsets><random list="0,1,2|-1,0,1|-2,-1,0,1"/></offsets>
       </sequenceEngine>
       <activityVector>pad1</activityVector>
     </track>
@@ -117,13 +122,11 @@
       <sequenceEngine class="PatternSequenceEngine">
         <pattern>0,-,-,0,-,-,1,-,0,-,-,0,-,-,+,-,0,-,-,0,-,-,2,-,0,-,-,0,-,-,+,-</pattern>
         <pattern>0,-,-,-,0,-,-,0,-,-,0,-,-,-1,-,-,0,-,-,-,0,-,-,0,-,-,0,-,-,-,+,-</pattern>
-        <pattern>0,-,-,-,0,-,-,-,0,-,-,2,-,-,-1,-,0,-,-,-,0,-,-,-,0,-,-,2,-,-,+,-</pattern>
         <pattern>0,-,-,0,-,-,0,2,0,-,-,0,-,-,-1,-,0,-,-,0,-,-,0,2,0,-,-,0,-,-,-1,-,0,-,-,0,-,-,0,2,0,-,-,0,-,-,-1,-,0,-,-,0,-,-,0,2,0,-,-,0,-,-,1,-</pattern>
-        <pattern>0,-,0,-,0,-,-,0,-,0,-,0,0,-,+,-</pattern>
+        <pattern>0,-,0,-,0,-,-,0,-,0,-,0,0,-,+,-</pattern> 
         <pattern>0,-,0,0,-,0,0,-,0,0,-,0,-,0,-,+,0,-,0,0,-,0,0,-,0,-,0,-,0,0,-,+</pattern>
         <pattern>0,-,-,-,0,-,-,-,0,-,-,0,-,-,+,-,0,-,-,-,0,-,-,0,-,-,0,-,-,0,+,-,0,-,-,-,0,-,-,-,0,-,-,0,-,-,+,-,0,-,-,-,0,-,-,0,-,-,0,-,0,-,+,-</pattern>
         <pattern>-,-,0,-,-,-,0,-,-,-,0,-,-,-,+,-</pattern>
-        <pattern>0,-,0/3,-,-,0,-,-,0,-,-,-1/2,-,0,-,0/2,-,-,-,0,-,-,0,-,-,1/2,-,0,-,0/3,-,-,0,-,-,0,-,-,-1/2,-,0,-,0/2,-,-,-,0,-,-,0,-,-,1,2,-1</pattern>
       </sequenceEngine>
       <activityVector>bass</activityVector>
     </track>
@@ -160,7 +163,7 @@
     <track>
        <instrument>8</instrument>
       <sequenceEngine class="PadSequenceEngine">
-        <offsets><random list="0,1,2|0,1,2,3|-1,0,1|-2,-1,0,1,2|1,2,3"/></offsets>
+        <offsets><random list="0,1,2|-1,0,1|-2,-1,0,1,2"/></offsets>
       </sequenceEngine>
       <activityVector>pad2</activityVector>
     </track>
@@ -236,17 +239,17 @@
       <instrument>17</instrument>
       <sequenceEngine class="ChordSequenceEngine">
         <obeyChordSubtype>no</obeyChordSubtype>
-        <offsets>0,4</offsets>
+        <offsets><random list="0,4|3,5"/></offsets>
         <pattern>-,-,0,-,-,0,-,-,0,-,-,0,-,-,1,-,-,-,0,-,-,0,-,-,0,-,-,0,-,-,1,-,-,-,0,-,-,0,-,-,0,-,-,0,-,-,1,-,-,-,0,-,-,0,-,-,0,-,-,0,1,-,0,-</pattern>
-        <pattern>0,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,0,0,-,-,1,-,0,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,0,-,1,-,0,-,0,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,0,0,-,-,1,-,0,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,0,-,2,-,1,-</pattern>
+        <pattern>0,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,0,-,-,-,1,-,0,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,0,-,1,-,0,-,0,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,0,0,-,-,1,-,0,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,0,-,2,-,1,-</pattern>
       </sequenceEngine>
       <activityVector>shortchord</activityVector>
     </track>
   </arrangementEngine>
   <player class="MidiPlayer">
     <bpm><random min="134" max="150" type="normal" variance="6"/></bpm>
-    <transposition><random min="65" max="69"/></transposition>
-    <!--<groove><random list="100,100|110,90|115,85|120,80|115,85,120,80"/></groove> -->
+    <transposition><random min="66" max="70"/></transposition>
+    <!-- <groove><random list="100,100|110,90|115,85|120,80|115,85,120,80"/></groove> -->
     <device name="device1" clockSynchronization="true">Out To MIDI Yoke:  1</device>
     <device name="device2" clockSynchronization="true">Out To MIDI Yoke:  2</device>
 	<map instrument="0" device="device1" channel="0"/>
@@ -267,5 +270,6 @@
 	<map instrument="15" device="device1" channel="15"/>
 	<map instrument="16" device="device2" channel="0"/>
 	<map instrument="17" device="device2" channel="1"/>
+	<map instrument="18" device="device2" channel="2"/>
   </player>
-</soundhelix>
+</soundHelix>

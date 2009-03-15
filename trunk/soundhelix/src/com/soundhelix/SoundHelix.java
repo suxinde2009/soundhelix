@@ -146,7 +146,7 @@ public class SoundHelix implements Runnable {
 					XPath xpath = XPathFactory.newInstance().newXPath();
 
 					// preprocess document tree by expanding include tags, if present
-					XMLUtils.expandIncludeTags(random,doc,doc.getFirstChild(),xpath);
+					XMLUtils.expandIncludeTags(random,doc,xpath);
 					
 					// get the root element of the file (we don't care what it's called)
 					Node mainNode = (Node)xpath.evaluate("/*",doc,XPathConstants.NODE);

@@ -372,8 +372,16 @@ public class XMLUtils {
 		}
 	}
 
-	public static int expandIncludeTags(Random random,Document doc,Node node,XPath xpath) {
-		return expandIncludeTags(random,doc,node,xpath,0);
+	public static int expandIncludeTags(Random random,Document doc,XPath xpath) {
+	    Node node = doc.getFirstChild();
+	    int includedFiles = 0;
+	    
+	    while(node != null) {
+	        includedFiles += expandIncludeTags(random,doc,node,xpath,includedFiles);
+	        node = node.getNextSibling();
+	    }
+	    
+	    return includedFiles;
 	}
 
 	/**
@@ -396,12 +404,20 @@ public class XMLUtils {
 	 */
 	
 	private static int expandIncludeTags(Random random,Document doc,Node node,XPath xpath,int includedFiles) {
-		NodeList nodeList = null;
+	    if(node == null || node.getNodeType() == Node.DOCUMENT_TYPE_NODE) {
+	        return 0;
+	    }
+	    
+	    NodeList nodeList = null;
+		
+		logger.debug("Node: "+node.getNodeName()+"  type: "+node.getNodeType());
 		
 		try {
 		    // recursively search all "include" tags, starting from node
 			nodeList = (NodeList)xpath.evaluate("//include",node,XPathConstants.NODESET);
-		} catch(Exception e) {}
+		} catch(Exception e) {logger.warn("Exception: ",e);}
+		
+		System.out.println("Nodelist: "+nodeList);
 		
 		int nodes = nodeList.getLength();
 	

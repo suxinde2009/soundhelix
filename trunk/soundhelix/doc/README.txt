@@ -24,17 +24,17 @@ flexibility and customization capabilities. It is also a framework
 which allows other developers to easily write their own music creation
 components and use them within SoundHelix.
 
-Currently SoundHelix features some basic music creation abilities and a MIDI
+SoundHelix features some basic music creation abilities and a MIDI
 player, which can access any MIDI resource accessible to Java. Currently,
 some external MIDI software is required for playback. This can be any
 MIDI software or hardware which can be accessed using a MIDI driver on
 your platform. You can even use the standard Java Software Synthesizer or
-the Windows Wavetable Software Synth. Please check the included configuration
-files. It is possible to use any number of MIDI devices in parallel for
-playback.
+the Windows Wavetable Software Synth.  It is possible to use any number of
+MIDI devices in parallel for playback. Please check the included configuration
+files.
 
 Note that SoundHelix might require some configuration time to produce good
-results on your MIDI setup. You shouldn't expect excellent music out-of-the-box.
+results on your MIDI setup. You shouldn't expect excellent results out-of-the-box.
 
 The best of all: SoundHelix is free and fun!
 
@@ -56,19 +56,32 @@ Developers:
 - Eclipse (optional)
 
 
+Building and running SoundHelix
+-------------------------------
+
+Download the source code (or get it using a Subversion client) and store
+it in any location on your harddrive. Then just run "ant" in SoundHelix'
+main directory, which is the directory containing the ant build script
+(build.xml). After building, a JAR file (SoundHelix.jar) will have been
+created in that directory.
+
+In order to run SoundHelix, simply run "run.bat" (Windows) or "run.sh"
+(Unix/Linux). You can optionally provide the name of the configuration file
+to use as a parameter.
+
+
 Installing a MIDI Hub
 ---------------------
 
 Some MIDI software (like Propellerhead Reason) does not offer a
 MIDI device itself, but can connect to a present MIDI device to receive
 MIDI messages. SoundHelix also does not make itself visible as a MIDI device,
-so neither can SoundHelix connect to the MIDI software
-nor can the MIDI software connect to SoundHelix. In this case, you
-must install some MIDI hub software as a man-in-the-middle, for example
-MIDI Yoke (available for Windows, other platforms offer similar MIDI hub
-software).
+so neither can SoundHelix connect to the MIDI software nor can the MIDI
+software connect to SoundHelix. In this case, you must install some MIDI hub
+software as a man-in-the-middle, for example MIDI Yoke (available for
+Windows, other platforms offer similar MIDI hub software).
 
-This software simply sets up a MIDI device that is visible from Java
+This software simply sets up a MIDI device that is visible from both Java
 and from any other MIDI software and relays MIDI messages between
 SoundHelix and the MIDI software. SoundHelix must be configured
 to use MIDI Yoke as the MIDI output device and the MIDI software
@@ -76,7 +89,7 @@ must use MIDI Yoke as the MIDI input device. MIDI Yoke provides
 up to 8 MIDI ports. It is sufficient to use one of the ports
 for SoundHelix (provided that you don't want use more than 16 MIDI
 channels). The name of the MIDI Yoke MIDI output port is
-"Out To MIDI Yoke:  n" (with n from 1 to 8). Note the extra
+"Out To MIDI Yoke:  n" (with n from 1 to 8) - note the extra
 space after the colon. This must be used in SoundHelix for
 output. The MIDI software can then use "In From MIDI Yoke:  n" for
 input.
@@ -88,15 +101,15 @@ Configuration
 -------------
 
 Configuration is done using an XML file. If no filename is
-provided at startup, the file "SoundHelix.xml" is read, otherwise
-the first parameter given is used as the XML filename. A couple
-of example configuration files are included in the "examples"
-directory.
+provided at startup, the file "SoundHelix.xml" is read from the current
+directory, otherwise the first parameter given is used as the XML filename
+and that file is read. A couple of example configuration files are included
+in the "examples" directory.
 
 Details about configuration are still to be written.
 
-Within each XML tag that requires an integer you can use
-the following instead of a plain integer:
+Within each XML tag that requires an integer you can use the following
+syntax instead of a plain integer:
 
 - <random min="minimum" max="maximum"/>
 

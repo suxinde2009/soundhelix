@@ -22,9 +22,9 @@ import com.soundhelix.sequenceengine.SequenceEngine;
 import com.soundhelix.util.XMLUtils;
 
 /**
- * Implements a simple ArrangementEngine. The song starts with
- * a "fade-in" of the number of active ActivityVectors and ends with a "fade-out"
- * of the number of active ActivityVectors.
+ * Implements a simple ArrangementEngine. The song starts with  * a configurable
+ * "fade-in" of the number of active ActivityVectors and ends with a
+ * configurable "fade-out" of the number of active ActivityVectors.
  * 
  * @author Thomas Schürger (thomas@schuerger.com)
  */

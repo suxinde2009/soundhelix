@@ -19,10 +19,11 @@ import com.soundhelix.misc.Track.TrackType;
 import com.soundhelix.util.XMLUtils;
 
 /**
- * Implements a sequence engine that repeats user-specified patterns. Patterns are comma-separated integers (notes from chords) or minus signs (pauses).
- * For each chord section the pattern with the best-matching length is used. The best-matching pattern
- * is the one with the smallest length that is equal to or larger than the required length or
- * the pattern with the largest length if the former doesn't exist.
+ * Implements a sequence engine that repeats user-specified patterns. Patterns are comma-separated integers (notes
+ * from chords) or minus signs (pauses). For each chord the pattern with the best-matching length is used. The
+ * best-matching pattern is the one with the smallest length that is equal to or larger than the required length or
+ * the pattern with the largest length if the former doesn't exist. At least some patterns with lengths of powers
+ * of two should be provided.
  *
  * <h3>XML configuration</h3>
  * <table border=1>
@@ -133,10 +134,9 @@ public class ArpeggioSequenceEngine extends SequenceEngine {
 	
 	private int[] getArpeggioPattern(int len) {
 		// slow implementation, but this method is only called
-		// once per chord section and we normally don't have
-		// a whole lot of patterns
+		// once per chord and we normally don't have a whole lot of patterns
 		
-		// might use binary search or a hashtable later
+		// might use binary search or caching later
 		
 		int bestIndex = -1;
 		int bestIndexLen = Integer.MAX_VALUE;
@@ -149,9 +149,7 @@ public class ArpeggioSequenceEngine extends SequenceEngine {
 			if(l >= len && l < bestIndexLen) {
 				bestIndex = i;
 				bestIndexLen = l;
-			}
-			
-			if(l >= maxIndexLen) {
+			} else if(l >= maxIndexLen) {
 				maxIndex = i;
 				maxIndexLen = l;
 			}		

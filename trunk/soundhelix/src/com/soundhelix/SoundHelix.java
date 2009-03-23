@@ -5,17 +5,23 @@ import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Source;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathException;
 import javax.xml.xpath.XPathFactory;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 import com.soundhelix.arrangementengine.ArrangementEngine;
 import com.soundhelix.harmonyengine.HarmonyEngine;
@@ -24,6 +30,9 @@ import com.soundhelix.misc.Structure;
 import com.soundhelix.player.MidiPlayer;
 import com.soundhelix.player.Player;
 import com.soundhelix.util.XMLUtils;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 /**
  * Implements the main class. The main() method determines the configuration
@@ -39,8 +48,10 @@ import com.soundhelix.util.XMLUtils;
 // TODO: provide a DTD or XML Schema for the configuration file
 
 public class SoundHelix implements Runnable {
+    private static final boolean enableSchemaValidation = false;
+	private static final String validationSchemaFilename = "SoundHelix.xsd";
 
-	private static Logger logger;
+    private static Logger logger;
 
 	private static boolean generateNew = false;
 	
@@ -78,7 +89,7 @@ public class SoundHelix implements Runnable {
 		logger = Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
 		logger.debug("Starting");
 
-		long randomSeed = (songtitle != null ? songtitle.toLowerCase().hashCode() : System.nanoTime());
+		long randomSeed = (songtitle != null ? songtitle.trim().toLowerCase().hashCode() : System.nanoTime());
 		
 		logger.debug("Main random seed: "+randomSeed);
 		
@@ -91,7 +102,7 @@ public class SoundHelix implements Runnable {
 			t.setPriority(Thread.MIN_PRIORITY);
 			t.start();
 
-			// increase priority of the current thread
+            // increase priority of the current thread
 			Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 			
 			while(true) {
@@ -246,14 +257,30 @@ public class SoundHelix implements Runnable {
 
 		logger.debug("Reading and parsing XML file");
 		
-		DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-		Document doc = builder.parse(file);
-		
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware (true);
+        dbf.setXIncludeAware(true);
+        dbf.setValidating(false);
+        DocumentBuilder builder = dbf.newDocumentBuilder();
+        Document doc = builder.parse(file);
+
+        if(enableSchemaValidation) {
+            // create a SchemaFactory capable of understanding WXS schemas
+            SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            Schema schema = factory.newSchema(new StreamSource(new File(validationSchemaFilename)));
+
+            // validate the DOM tree against the schema
+            
+            try {
+                schema.newValidator().validate(new DOMSource(doc));
+            } catch (SAXException e) {
+                throw(e);
+                // instance document is invalid!
+            }
+        }
+        
 		XPath xpath = XPathFactory.newInstance().newXPath();
 
-		// preprocess document tree by expanding include tags, if present
-		XMLUtils.expandIncludeTags(random,doc,xpath);
-		
 		// get the root element of the file (we don't care what it's called)
 		Node mainNode = (Node)xpath.evaluate("/*",doc,XPathConstants.NODE);
 
@@ -263,12 +290,13 @@ public class SoundHelix implements Runnable {
 		Node playerNode = (Node)xpath.evaluate("player",mainNode,XPathConstants.NODE);
 
 		Structure structure = parseStructure(random,structureNode,xpath);
+
 		HarmonyEngine harmonyEngine = XMLUtils.getInstance(HarmonyEngine.class,harmonyEngineNode,xpath,randomSeed^47357892832l);
 		structure.setHarmonyEngine(harmonyEngine);	
 
-		long startTime = System.nanoTime();
 		ArrangementEngine arrangementEngine = XMLUtils.getInstance(ArrangementEngine.class,arrangementEngineNode,xpath,randomSeed^123454893l);
 		arrangementEngine.setStructure(structure);
+        long startTime = System.nanoTime();
 		Arrangement arrangement = arrangementEngine.render();
 		long time = System.nanoTime()-startTime;
 

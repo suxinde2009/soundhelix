@@ -19,6 +19,7 @@ import javax.xml.xpath.XPathException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.soundhelix.lfo.LFO;
 import com.soundhelix.misc.Arrangement;
 import com.soundhelix.misc.Sequence;
 import com.soundhelix.misc.Structure;
@@ -108,11 +109,16 @@ public class MidiPlayer extends Player {
 	private Map<Integer,DeviceChannel> channelMap;
 	private Map<String,Device> deviceMap;
 	
+	private ControllerLFO[] controllerLFOs;
+	
 	// has open() been called?
 	boolean opened = false;
 	
 	// true if at least one MIDI device requires clock synchronization
 	boolean useClockSynchronization = false;
+	
+	
+	
 	
     public MidiPlayer() {
     	super();
@@ -315,9 +321,41 @@ public class MidiPlayer extends Player {
     		throw(new RuntimeException("Must call open() first"));
     	}
     	
+     	
     	try {
     		Structure structure = arrangement.getStructure();
 
+    		for(int i=0;i<controllerLFOs.length;i++) {
+    			ControllerLFO clfo = controllerLFOs[i];
+
+    			if(clfo.rotationUnit.equals("song")) {
+    				clfo.lfo.setPhase((int)(1000000d*clfo.phase));
+    				clfo.lfo.setSongSpeed((int)(1000f*clfo.speed),structure.getTicks(),1000*bpm);
+    				
+    			} else if(clfo.rotationUnit.equals("activity")) {
+    				int[] ticks = getInstrumentActivity(arrangement,clfo.instrument);    				
+    				int startTick = ticks[0];
+    				int endTick = ticks[1];
+    				
+    				if(startTick >= endTick) {
+    					// track belonging to instrument is silent all the time
+    					startTick = 0;
+    					endTick = 1;
+    				}
+    				
+    				clfo.lfo.setPhase((int)(1000000d*clfo.phase));
+    				clfo.lfo.setActivitySpeed((int)(1000f*clfo.speed),startTick,endTick,1000*bpm);    				
+    			} else if(clfo.rotationUnit.equals("beat")) {
+    				clfo.lfo.setPhase((int)(1000000d*clfo.phase));
+    				clfo.lfo.setBeatSpeed((int)(1000f*clfo.speed),structure.getTicksPerBeat(),1000*bpm);
+    			} else if(clfo.rotationUnit.equals("second")) {
+    				clfo.lfo.setPhase((int)(1000000d*clfo.phase));
+    				clfo.lfo.setTimeSpeed((int)(1000f*clfo.speed),structure.getTicksPerBeat(),1000*bpm);
+    			} else {
+    				throw(new RuntimeException("Invalid rotation unit \""+clfo.rotationUnit+"\""));
+    			}
+    		}
+    		
     		// when clock synchronization is used, we must make sure that
     		// the ticks per beat divide CLOCK_SYNCHRONIZATION_TICKS_PER_BEAT
     		
@@ -413,6 +451,23 @@ public class MidiPlayer extends Player {
     				}
     			}
 
+    			for(int k=0;k<controllerLFOs.length;k++) {
+    				ControllerLFO clfo = controllerLFOs[k];
+    				Device device = deviceMap.get(clfo.deviceName);
+    				
+    				int value = clfo.lfo.getTickValue(tick);
+    				    				
+    				if(clfo.controller.equals("pitchBend")) {
+    					sm.setMessage(ShortMessage.PITCH_BEND,clfo.channel,value%128,value/128);
+    				} else if(clfo.controller.equals("modulationWheel")) {
+    					sm.setMessage(ShortMessage.CONTROL_CHANGE,clfo.channel,1,value);
+    				} else {
+    					throw(new RuntimeException("Invalid LFO controller \""+clfo.controller+"\""));
+    				}
+    				
+    				device.receiver.send(sm,-1);
+    			}
+    			    			
     			// wait for 1 tick
     			referenceTime = waitTicks(referenceTime,1,clockTimingsPerTick,structure.getTicksPerBeat(),tick);
 
@@ -595,6 +650,51 @@ public class MidiPlayer extends Player {
     	return(1+(velocity-1)*126/(Short.MAX_VALUE-126));  	
     }
     
+    public void setControllerLFOs(ControllerLFO[] controllerLFOs) {
+    	this.controllerLFOs = controllerLFOs;
+    }
+    
+    private static int[] getInstrumentActivity(Arrangement arrangement,int instrument) {
+    	Iterator<ArrangementEntry> i = arrangement.iterator();
+    	
+    	while(i.hasNext()) {
+    		ArrangementEntry entry = i.next();
+    		
+    		if(entry.getInstrument() == instrument) {
+    			Track track = entry.getTrack();
+    			
+    			int startTick = Integer.MAX_VALUE;
+    			int endTick = Integer.MIN_VALUE;
+    			
+    			for(int k=0;k<track.size();k++) {
+    				Sequence seq = track.get(k);
+    				int ticks = seq.getTicks();
+    				
+    				int tick = 0;
+    				int j = 0;
+    				
+    				while(tick < ticks) {
+    					SequenceEntry se = seq.get(j++);
+    					
+    					if(se.isNote()) {
+    						if(tick < startTick) {
+    							startTick = tick;
+    						} else if(tick+se.getTicks() > endTick) {
+    							endTick = tick+se.getTicks();
+    						}
+    					}
+    					
+    					tick += se.getTicks();
+    				}
+    			}
+    			
+    			return new int[] {startTick,endTick};
+    		}
+    	}
+    	
+    	return null;
+    }
+    
     public void configure(Node node,XPath xpath) throws XPathException {
     	random = new Random(randomSeed);
     	
@@ -641,8 +741,56 @@ public class MidiPlayer extends Player {
 			DeviceChannel ch = new DeviceChannel(deviceMap.get(device),channel,program);			
 			channelMap.put(instrument,ch);
 		}
-		
+	
 		setChannelMap(channelMap);
+		
+		nodeList = (NodeList)xpath.evaluate("lfo",node,XPathConstants.NODESET);
+		entries = nodeList.getLength();
+		ControllerLFO[] controllerLFOs = new ControllerLFO[entries];
+		
+		for(int i=0;i<entries;i++) {
+			System.out.println("Parsing entry "+i);
+			int minimum = XMLUtils.parseInteger(random,(Node)xpath.evaluate("minimum",nodeList.item(i),XPathConstants.NODE),xpath);
+			int maximum = XMLUtils.parseInteger(random,(Node)xpath.evaluate("maximum",nodeList.item(i),XPathConstants.NODE),xpath);
+			double speed = XMLUtils.parseDouble(random,(Node)xpath.evaluate("speed",nodeList.item(i),XPathConstants.NODE),xpath);
+			
+			String device = XMLUtils.parseString(random,(Node)xpath.evaluate("device",nodeList.item(i),XPathConstants.NODE),xpath);
+			int channel = XMLUtils.parseInteger(random,(Node)xpath.evaluate("channel",nodeList.item(i),XPathConstants.NODE),xpath);
+			String controller = XMLUtils.parseString(random,(Node)xpath.evaluate("controller",nodeList.item(i),XPathConstants.NODE),xpath);
+			String rotationUnit = XMLUtils.parseString(random,(Node)xpath.evaluate("rotationUnit",nodeList.item(i),XPathConstants.NODE),xpath);
+			
+			double phase = 0.0d;
+			int instrument = -1;
+			
+			try {
+				phase = XMLUtils.parseDouble(random,(Node)xpath.evaluate("phase",nodeList.item(i),XPathConstants.NODE),xpath);
+			} catch(Exception e) {}
+			
+			try {
+				instrument = XMLUtils.parseInteger(random,(Node)xpath.evaluate("instrument",nodeList.item(i),XPathConstants.NODE),xpath);
+			} catch(Exception e) {}
+			
+			String className = (String)xpath.evaluate("attribute::class",nodeList.item(i),XPathConstants.STRING);
+
+			if(className.indexOf('.') < 0) {
+				// prefix the class name with the package name of the superclass
+				className = LFO.class.getName().substring(0,LFO.class.getName().lastIndexOf('.')+1)+className;
+			}
+			
+			try {
+				Class<LFO> cl = (Class<LFO>)Class.forName(className);
+				LFO lfo = cl.newInstance();
+
+				lfo.setMinimum(minimum);
+				lfo.setMaximum(maximum);
+
+				controllerLFOs[i] = new ControllerLFO(lfo,device,channel,controller,instrument,speed,rotationUnit,phase);
+			} catch(Exception e) {
+				throw(new RuntimeException("Could not instantiate LFO",e));
+			}
+		}
+		
+		setControllerLFOs(controllerLFOs);
     }
     
     public class Device
@@ -718,5 +866,28 @@ public class MidiPlayer extends Player {
     	public int hashCode() {
     		return device.hashCode() * 4711 + channel*513 + program;
     	}    	
+    }
+    
+    public class ControllerLFO
+    {
+    	private LFO lfo;
+    	private final String deviceName;
+    	private int channel;
+    	private String controller;
+    	private int instrument;
+    	private double speed;
+    	private String rotationUnit;
+    	private double phase;
+    	
+    	public ControllerLFO(LFO lfo,String deviceName,int channel,String controller,int instrument,double speed,String rotationUnit,double phase) {
+    		this.lfo = lfo;
+    		this.deviceName = deviceName;
+    		this.channel = channel;
+    		this.controller = controller;
+    		this.instrument = instrument;
+    		this.speed = speed;
+    		this.rotationUnit = rotationUnit;
+    		this.phase = phase;
+    	}
     }
 }

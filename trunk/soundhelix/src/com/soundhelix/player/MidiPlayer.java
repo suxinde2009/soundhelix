@@ -51,6 +51,11 @@ import com.soundhelix.util.XMLUtils;
  * Timing the ticks (or clock synchronization ticks) is done by using a
  * feedback algorithm based on Thread.sleep() calls with nanosecond resolution. 
  * 
+ * This player supports LFOs for MIDI controllers, whose speed can be based on a second,
+ * a beat, the whole song or on the activity of an instrument. The granularity of an
+ * LFO is always a tick. With every tick, each LFO will send out a MIDI message with
+ * the new value for the target controller.
+ * 
  * <h3>XML configuration</h3>
  * <table border=1>
  * <tr><th>Tag</th> <th>#</th> <th>Attributes</th> <th>Description</th> <th>Required</th>

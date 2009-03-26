@@ -17,7 +17,7 @@
       <stopShift>2</stopShift>
     </activityVector>
     <activityVector name="base">
-      <minActive>55</minActive>
+      <minActive>50</minActive>
       <maxActive>90</maxActive>
       <startShift>0</startShift>
       <stopShift>-4</stopShift>
@@ -75,7 +75,7 @@
     <activityVector name="distort2"/>
     <activityVector name="melody">
       <minActive>0</minActive>
-      <maxActive>30</maxActive>
+      <maxActive>20</maxActive>
       <stopShift>0</stopShift>
       <startAfterSection>2</startAfterSection>
     </activityVector>
@@ -113,6 +113,8 @@
         <pattern>0,1,2,1</pattern>
         <pattern>0,1,2,1,2,3,2,1</pattern>
         <pattern>0,1,2,1,2,3,2,3,4,3,4,5,4,3,2,1</pattern>
+		<pattern>0,1,2,1,2,3,2,3,4,3,4,5,4,5,6,5,6,7,6,5,4,3,2,1</pattern>
+		<pattern>0,1,2,1,2,3,2,3,4,3,4,5,4,5,6,5,6,7,6,7,8,7,6,5,4,3,2,1</pattern>
         <pattern>0,1,2,1,2,3,2,3,4,3,4,5,4,5,6,5,6,7,6,7,8,7,8,9,8,7,6,5,4,3,2,1</pattern>
       </sequenceEngine>
       <activityVector>arpeggio1</activityVector>
@@ -189,7 +191,7 @@
       <instrument>11</instrument>
       <sequenceEngine class="PatternSequenceEngine">
         <obeyChordSubtype>yes</obeyChordSubtype>
-        <pattern><random list="0,2,1,4|0,2,1,3|4,2,0,1|3,1,4,0|0,1,2,3,0,1,2,3,0,1,2,3,1,2,3,4|0,2,3,4|2,0,1,0|0,2,3,5,0,2,3,4"/></pattern>
+        <pattern><random list="0,2,1,4|0,2,1,3|4,2,0,1|0,1,2,3,0,1,2,3,0,1,2,3,1,2,3,4|0,2,3,4|2,0,1,0|0,2,3,5,0,2,3,4"/></pattern>
       </sequenceEngine>
       <activityVector>arpeggio2</activityVector>
     </track>
@@ -275,5 +277,16 @@
 	<map instrument="16" device="device2" channel="0"/>
 	<map instrument="17" device="device2" channel="1"/>
 	<map instrument="18" device="device2" channel="2"/>
+    <lfo class="SineLFO">
+	  <rotationUnit>activity</rotationUnit>
+	  <instrument>10</instrument>
+	  <speed>1</speed>
+	  <phase>-.25</phase>
+	  <minimum>0</minimum>
+	  <maximum>127</maximum>
+	  <controller>modulationWheel</controller>
+	  <channel>10</channel>
+	  <device>device1</device>
+	</lfo>
   </player>
 </soundHelix>

@@ -338,14 +338,24 @@ public class MidiPlayer extends Player {
     				clfo.lfo.setSongSpeed((int)(1000f*clfo.speed),structure.getTicks(),1000*bpm);
     				
     			} else if(clfo.rotationUnit.equals("activity")) {
-    				int[] ticks = getInstrumentActivity(arrangement,clfo.instrument);    				
-    				int startTick = ticks[0];
-    				int endTick = ticks[1];
     				
-    				if(startTick >= endTick) {
-    					// track belonging to instrument is silent all the time
-    					startTick = 0;
-    					endTick = 1;
+    				// if the instrument is inactive or not part of the song, we
+    				// use the whole song as the length (this LFO is then a no-op)
+    				
+    				int[] ticks = getInstrumentActivity(arrangement,clfo.instrument);
+    				
+    				int startTick = 0;
+    				int endTick = structure.getTicks();
+    				
+    				if(ticks != null) {
+    					startTick = ticks[0];
+    					endTick = ticks[1];
+
+    					if(startTick >= endTick) {
+    						// track belonging to instrument is silent all the time
+    						startTick = 0;
+    						endTick = structure.getTicks();
+    					}
     				}
     				
     				clfo.lfo.setPhase((int)(1000000d*clfo.phase));
@@ -659,6 +669,18 @@ public class MidiPlayer extends Player {
     	this.controllerLFOs = controllerLFOs;
     }
     
+    /**
+     * Checks if the given instrument is part of the arrangement and if so, determines the
+     * tick of the first note and the tick of the end of the last note plus 1. The start and
+     * end ticks are returned as a two-dimensional array. If the instrument is not found or
+     * the instrument's track contains no note, null is returned.
+     * 
+     * @param arrangement the arrangement
+     * @param instrument the number of the instrument
+     * 
+     * @return a two-dimensional array containing start and end tick (or null)
+     */
+    
     private static int[] getInstrumentActivity(Arrangement arrangement,int instrument) {
     	Iterator<ArrangementEntry> i = arrangement.iterator();
     	
@@ -684,7 +706,8 @@ public class MidiPlayer extends Player {
     					if(se.isNote()) {
     						if(tick < startTick) {
     							startTick = tick;
-    						} else if(tick+se.getTicks() > endTick) {
+    						}
+    						if(tick+se.getTicks() > endTick) {
     							endTick = tick+se.getTicks();
     						}
     					}
@@ -693,7 +716,11 @@ public class MidiPlayer extends Player {
     				}
     			}
     			
-    			return new int[] {startTick,endTick};
+    			if(startTick == Integer.MAX_VALUE) {
+    				return null;
+    			} else {
+    				return new int[] {startTick,endTick};
+    			}
     		}
     	}
     	

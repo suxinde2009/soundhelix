@@ -23,7 +23,7 @@ import com.soundhelix.sequenceengine.SequenceEngine;
 import com.soundhelix.util.XMLUtils;
 
 /**
- * Implements a simple ArrangementEngine. The song starts with  * a configurable
+ * Implements a simple ArrangementEngine. The song starts with a configurable
  * "fade-in" of the number of active ActivityVectors and ends with a
  * configurable "fade-out" of the number of active ActivityVectors.
  * 
@@ -429,8 +429,6 @@ public class SimpleArrangementEngine extends ArrangementEngine {
         		lastAddedBit = setRandomBit(bitset,num,lastRemovedBit);
         	}
         	
-        	//System.out.println("Section: "+section+"  Tracks: "+wantedActivityVectors+"  BitSet: "+bitset);
-
         	// check the BitSet and add activity or inactivity intervals
         	// for the current section
         	
@@ -470,9 +468,6 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 		
 		int increaseTill = Math.min(maxActivityVectors,Math.min(sections/2,startActivityCounts.length))-1;
 		int decreaseFrom = sections-Math.min(maxActivityVectors,Math.min(sections/2,stopActivityCounts.length+1));
-		
-		//System.out.println("IncreaseTIll: "+increaseTill);
-		//System.out.println("DecreaseFrom: "+decreaseFrom);
 		
 		if(section <= increaseTill) {
 			// in fade-in phase
@@ -570,7 +565,6 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 
 			try {
 				allowInactive = XMLUtils.parseBoolean(random,"minActive/attribute::allowInactive",nodeList.item(i),xpath);
-				System.out.println("AllowInactive for "+i+": "+allowInactive);
 			} catch(Exception e) {}
 
 			double maxActive = 100.0d;

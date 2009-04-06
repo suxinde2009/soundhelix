@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import javax.xml.xpath.XPath;
@@ -48,7 +49,7 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 	private HashMap<String,ActivityVectorConfiguration> activityVectorConfigurationHashMap;
 	
 	// maximum number of tries before failing
-	private static final int MAX_TRIES = 50000;
+	private static final int MAX_TRIES = 25000;
 	
 	public SimpleArrangementEngine() {
 		super();
@@ -140,6 +141,14 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 
 		int tries = 0;
 
+		Map<String,Integer> constraintFailure = null;
+		
+		boolean isDebug = logger.isDebugEnabled();
+		
+		if(isDebug) {
+			constraintFailure = new HashMap<String,Integer>();
+		}
+		
 		again: while(true) {
 			// create ActivityVectors at random
 			// then check if the constraints (minimum and maximum
@@ -160,13 +169,48 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 
 				// check if one of the constraints is violated
 
-				if(active < avc.minActive || active > avc.maxActive ||
+				if(active < avc.minActive && (!avc.allowInactive || active > 0) || active > avc.maxActive ||
 				   avc.startAfterSection+1 >= chordSections || avc.stopBeforeSection+1 >= chordSections ||
 				   avc.startAfterSection >= 0 && av.getFirstActiveTick() < chordSectionStartTicks.get(avc.startAfterSection+1) ||
  	               avc.stopBeforeSection >= 0 && av.getLastActiveTick()+1 > chordSectionStartTicks.get(chordSections-1-avc.stopBeforeSection)) {
-				    tries++;
+				    
+					if(isDebug) {
+						String reason;
+						
+						if(active < avc.minActive && (!avc.allowInactive || active > 0)) {
+							reason = "minActive";
+						} else if(active > avc.maxActive) {
+							reason = "maxActive";
+						} else if(avc.startAfterSection+1 >= chordSections) {
+							reason = "startAfterSection";
+						} else if(avc.stopBeforeSection+1 >= chordSections) {
+							reason = "stopBeforeSection";
+						} else if(avc.startAfterSection >= 0 && av.getFirstActiveTick() < chordSectionStartTicks.get(avc.startAfterSection+1)) {
+							reason = "startAfterSection";
+						} else if(avc.stopBeforeSection >= 0 && av.getLastActiveTick()+1 > chordSectionStartTicks.get(chordSections-1-avc.stopBeforeSection)) {
+							reason = "stopAfterSection";
+						} else {
+							reason = "unknown";
+						}
+						
+						String key = avc.name+"/"+reason;
+						Integer current = constraintFailure.get(key);
+						
+						constraintFailure.put(key,current != null ? current+1 : 1);
+					}
+										
+					tries++;
 
 				    if(tries >= MAX_TRIES) {
+				    	if(logger.isDebugEnabled()) {
+				    		Iterator<String> it2 = constraintFailure.keySet().iterator();
+
+				    		while(it2.hasNext()) {
+				    			String k = it2.next();
+				    			logger.debug("Constraint failures for "+k+": "+constraintFailure.get(k));
+				    		}
+				    	}
+				    					    	
 				        throw(new RuntimeException("Couldn't satisfy activity constraints within "+tries+" tries"));
 				    } else {
 				        // one constraint wasn't satisfied, retry
@@ -522,6 +566,13 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 				minActive = Double.parseDouble(XMLUtils.parseString(random,"minActive",nodeList.item(i),xpath));
 			} catch(Exception e) {}
 			
+			boolean allowInactive = false;
+
+			try {
+				allowInactive = XMLUtils.parseBoolean(random,"minActive/attribute::allowInactive",nodeList.item(i),xpath);
+				System.out.println("AllowInactive for "+i+": "+allowInactive);
+			} catch(Exception e) {}
+
 			double maxActive = 100.0d;
 			
 			try {
@@ -548,7 +599,7 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 			    stopBeforeSection = XMLUtils.parseInteger(random,"stopBeforeSection",nodeList.item(i),xpath);
 			} catch(Exception e) {}
 
-			activityVectorConfigurationHashMap.put(name,new ActivityVectorConfiguration(name,minActive,maxActive,startShift,stopShift,startAfterSection,stopBeforeSection));		
+			activityVectorConfigurationHashMap.put(name,new ActivityVectorConfiguration(name,minActive,allowInactive,maxActive,startShift,stopShift,startAfterSection,stopBeforeSection));		
 		}
 				
 		setActivityVectorConfiguration(activityVectorConfigurationHashMap);
@@ -660,6 +711,7 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 	private static class ActivityVectorConfiguration {
 		private String name;
 		private double minActive;
+		private boolean allowInactive;
 		private double maxActive;
 		private int startShift;
 		private int stopShift;
@@ -667,9 +719,10 @@ public class SimpleArrangementEngine extends ArrangementEngine {
         private int stopBeforeSection;
 		private ActivityVector activityVector;
 
-		private ActivityVectorConfiguration(String name,double minActive,double maxActive,int startShift,int stopShift,int startAfterSection,int stopBeforeSection) {
+		private ActivityVectorConfiguration(String name,double minActive,boolean allowInactive,double maxActive,int startShift,int stopShift,int startAfterSection,int stopBeforeSection) {
 			this.name = name;
 			this.minActive = minActive;
+			this.allowInactive = allowInactive;
 			this.maxActive = maxActive;
 			this.startShift = startShift;
 			this.stopShift = stopShift;

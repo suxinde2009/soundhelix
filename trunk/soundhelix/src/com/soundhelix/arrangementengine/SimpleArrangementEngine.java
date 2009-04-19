@@ -56,9 +56,22 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 	}
 	
 	public Arrangement render() {
-		HashMap<String,ActivityVectorConfiguration> neededActivityVector = new LinkedHashMap<String,ActivityVectorConfiguration>();
-
+		HashMap<String, ActivityVectorConfiguration> neededActivityVectors = getNeededActivityVectors();
+		
 		int tracks = arrangementEntries.length;
+
+		createConstrainedActivityVectors(structure.getTicks(),tracks,neededActivityVectors);
+		dumpActivityVectors(neededActivityVectors);
+		shiftIntervalBoundaries(neededActivityVectors);
+
+		Arrangement arrangement = createArrangement(neededActivityVectors,tracks);
+		return arrangement;
+	}
+
+	private HashMap<String, ActivityVectorConfiguration> getNeededActivityVectors() {
+		int tracks = arrangementEntries.length;
+		
+		HashMap<String,ActivityVectorConfiguration> neededActivityVector = new LinkedHashMap<String,ActivityVectorConfiguration>();
 
 		for(int i=0;i<tracks;i++) {
 			SequenceEngine sequenceEngine = arrangementEntries[i].sequenceEngine;
@@ -78,13 +91,7 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 				neededActivityVector.put(names[k],avc);
 			}
 		}
-
-		createConstrainedActivityVectors(structure.getTicks(),tracks,neededActivityVector);
-		dumpActivityVectors(neededActivityVector);
-		shiftIntervalBoundaries(neededActivityVector);
-		Arrangement arrangement = createArrangement(neededActivityVector,tracks);
-
-		return arrangement;
+		return neededActivityVector;
 	}
 
 	private Arrangement createArrangement(HashMap<String, ActivityVectorConfiguration> neededActivityVector,int tracks) {

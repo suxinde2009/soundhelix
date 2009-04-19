@@ -10,9 +10,9 @@
   <arrangementEngine class="SimpleArrangementEngine">
     <minActivityCount>2</minActivityCount>
     <maxActivityCount>9</maxActivityCount>
-    <maxActivityChangeCount>4</maxActivityChangeCount>
+    <maxActivityChangeCount>3</maxActivityChangeCount>
     <startActivityCounts><random list="1,2,3|1,2,3,4"/></startActivityCounts>
-	<stopActivityCounts><random list="3,2,1|4,2,1"/></stopActivityCounts>
+	<stopActivityCounts><random list="3,2,1|4,2,1|4,3,2"/></stopActivityCounts>
     <activityVector name="pad1">
       <startShift>0</startShift>
       <stopShift>2</stopShift>
@@ -23,7 +23,7 @@
       <startShift>0</startShift>
       <stopShift>-4</stopShift>
       <startAfterSection>1</startAfterSection>
-      <stopBeforeSection>0</stopBeforeSection>
+      <stopBeforeSection>0</stopBeforeSection> -->
     </activityVector>
     <activityVector name="clap">
       <minActive>35</minActive>
@@ -69,14 +69,16 @@
       <stopShift>2</stopShift>
     </activityVector>
     <activityVector name="strange"/>
-    <activityVector name="acid"/>
+    <activityVector name="acid">
+	  <minActive allowInactive="true">20</minActive>
+	</activityVector>
     <activityVector name="arpeggio2"/>
     <activityVector name="chord2"/>
     <activityVector name="arpeggio3"/>
     <activityVector name="distort2"/>
     <activityVector name="melody">
-      <minActive>0</minActive>
-      <maxActive>20</maxActive>
+      <minActive allowInactive="true">10</minActive>
+      <maxActive>25</maxActive>
       <stopShift>0</stopShift>
       <startAfterSection>2</startAfterSection>
     </activityVector>
@@ -84,6 +86,8 @@
       <stopShift>1</stopShift>
     </activityVector>
     <activityVector name="shortchord"/>
+	<activityVector name="acidbass"/>
+	<activityVector name="arpeggio4"/>
     <track>
       <instrument>1</instrument>
       <sequenceEngine class="PadSequenceEngine">
@@ -246,15 +250,34 @@
       <instrument>17</instrument>
       <sequenceEngine class="ChordSequenceEngine">
         <obeyChordSubtype>no</obeyChordSubtype>
-        <offsets><random list="0,4|3,5"/></offsets>
+        <offsets><random list="0,4|0,4|3,5"/></offsets>
         <pattern>-,-,0,-,-,0,-,-,0,-,-,0,-,-,1,-,-,-,0,-,-,0,-,-,0,-,-,0,-,-,1,-,-,-,0,-,-,0,-,-,0,-,-,0,-,-,1,-,-,-,0,-,-,0,-,-,0,-,-,0,1,-,0,-</pattern>
         <pattern>0,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,0,-,-,-,1,-,0,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,0,-,1,-,0,-,0,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,0,0,-,-,1,-,0,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,-,0,-,-,0,-,0,-,0,-,2,-,1,-</pattern>
       </sequenceEngine>
       <activityVector>shortchord</activityVector>
     </track>
+	<track>
+      <instrument>18</instrument>
+      <sequenceEngine class="PatternSequenceEngine">
+        <obeyChordSubtype>no</obeyChordSubtype>
+		<pattern>3:10000,-,0:1,0:1,2:1,0:1,0:1,-</pattern>
+        <!-- <pattern>3,-,-,-,0,-,0,-,2,-,0,-,0,-,-,-</pattern> -->
+      </sequenceEngine>
+      <activityVector>acidbass</activityVector>
+    </track>
+	<track>
+      <instrument>19</instrument>
+      <sequenceEngine class="PatternSequenceEngine">
+        <obeyChordSubtype>yes</obeyChordSubtype>
+		<pattern>0,2,3,0,2,3,0,2,3,0,2,3,0,2,3,5,0,2,3,0,2,3,0,2,3,0,2,3,0,2,3,4</pattern>
+		<pattern>0,2,3,5,0,2,3,4</pattern>
+      </sequenceEngine>
+      <activityVector>arpeggio4</activityVector>
+    </track>
+
   </arrangementEngine>
   <player class="MidiPlayer">
-    <bpm><random min="134" max="150" type="normal" variance="6"/></bpm>
+    <bpm><random min="134" max="156" type="normal" variance="6"/></bpm>
     <transposition><random min="66" max="70"/></transposition>
     <!-- <groove><random list="100,100|110,90|115,85|120,80|115,85,120,80"/></groove> -->
     <device name="device1" clockSynchronization="true">Out To MIDI Yoke:  1</device>
@@ -278,6 +301,7 @@
 	<map instrument="16" device="device2" channel="0"/>
 	<map instrument="17" device="device2" channel="1"/>
 	<map instrument="18" device="device2" channel="2"/>
+	<map instrument="19" device="device2" channel="3"/>
     <lfo class="SineLFO">
 	  <rotationUnit>activity</rotationUnit>
 	  <instrument>10</instrument>
@@ -288,6 +312,15 @@
 	  <controller>modulationWheel</controller>
 	  <channel>10</channel>
 	  <device>device1</device>
+	</lfo>
+	<lfo class="SineLFO">
+	  <rotationUnit>beat</rotationUnit>
+	  <speed>0.0075</speed>
+	  <minimum>0</minimum>
+	  <maximum>127</maximum>
+	  <controller>modulationWheel</controller>
+	  <channel>2</channel>
+	  <device>device2</device>
 	</lfo>
   </player>
 </SoundHelix>

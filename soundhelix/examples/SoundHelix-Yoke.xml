@@ -1,11 +1,12 @@
 <?xml version="1.0"?>
-<soundHelix>
+
+<SoundHelix xmlns:xi="http://www.w3.org/2001/XInclude">
   <structure>
      <bars><random min="128" max="192" step="16"/></bars> 
      <beatsPerBar>4</beatsPerBar>
      <ticksPerBeat>4</ticksPerBeat>
   </structure>
-  <include>includes/Standard-HarmonyEngine.xml</include> 
+  <xi:include href="../includes/Standard-HarmonyEngine.xml"/>
   <arrangementEngine class="SimpleArrangementEngine">
     <minActivityCount>2</minActivityCount>
     <maxActivityCount>9</maxActivityCount>
@@ -289,4 +290,4 @@
 	  <device>device1</device>
 	</lfo>
   </player>
-</soundHelix>
+</SoundHelix>

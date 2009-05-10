@@ -325,8 +325,7 @@ public class MidiPlayer extends Player {
     	if(!opened) {
     		throw(new RuntimeException("Must call open() first"));
     	}
-    	
-     	
+    		
     	try {
     		Structure structure = arrangement.getStructure();
 
@@ -411,6 +410,8 @@ public class MidiPlayer extends Player {
     		int tick = 0;
 
     		int ticksPerBar = structure.getTicksPerBar();
+
+    		List<Integer> legatoList = new ArrayList<Integer>();
     		
     		while(tick < structure.getTicks()) {
     			i = arrangement.iterator();
@@ -418,6 +419,8 @@ public class MidiPlayer extends Player {
     			if((tick % (2*ticksPerBar)) == 0) {
     				System.out.printf("Tick: %4d   Seconds: %3d  %5.1f %%\n",tick,tick*60/(structure.getTicksPerBeat()*bpm),(double)tick*100d/(double)structure.getTicks());
     			}
+
+    			sendControllerLFOMessages(tick);
     			
     			for(int k=0;i.hasNext();k++) {
     				ArrangementEntry e = i.next();
@@ -433,6 +436,8 @@ public class MidiPlayer extends Player {
     				int[] t = tickList.get(k);
     				int[] p = posList.get(k);
 
+    				legatoList.clear();
+    				
     				for(int j=0;j<t.length;j++) {
 
     					if(--t[j] <= 0) {
@@ -441,8 +446,15 @@ public class MidiPlayer extends Player {
     						if(p[j] > 0) {
     							SequenceEntry prevse = s.get(p[j]-1);
     							if(prevse.isNote()) {
-    								sm.setMessage(ShortMessage.NOTE_OFF,channel.channel,(track.getType() == TrackType.MELODY ? transposition : 0)+prevse.getPitch(),0);
-    								channel.device.receiver.send(sm,-1);
+    								int pitch = (track.getType() == TrackType.MELODY ? transposition : 0)+prevse.getPitch();
+    								
+    								if(!prevse.isLegato()) {
+    									sm.setMessage(ShortMessage.NOTE_OFF,channel.channel,pitch,0);
+    									channel.device.receiver.send(sm,-1);
+    								} else  {
+    									// remember pitch for NOTE_OFF after the next NOTE_ON
+    									legatoList.add(pitch);
+    								}
     							}
     						}
     					}
@@ -455,8 +467,12 @@ public class MidiPlayer extends Player {
     							SequenceEntry se = s.get(p[j]);
 
     							if(se.isNote()) {
-    								sm.setMessage(ShortMessage.NOTE_ON,channel.channel,(track.getType() == TrackType.MELODY ? transposition : 0)+se.getPitch(),getMidiVelocity(se.getVelocity()));
+    								int pitch = ((track.getType() == TrackType.MELODY ? transposition : 0)+se.getPitch());
+    								sm.setMessage(ShortMessage.NOTE_ON,channel.channel,pitch,getMidiVelocity(se.getVelocity()));
     								channel.device.receiver.send(sm,-1);
+    								
+    								// remove pitch if it is on the legato list
+    								legatoList.remove((Integer)pitch);
     							}
 
     							p[j]++;
@@ -464,25 +480,15 @@ public class MidiPlayer extends Player {
     						} catch(Exception x) {throw new RuntimeException("Error at k="+k+"  j="+j+"  p[j]="+p[j],x);}
     					}
     				}
+
+    				// send NOTE_OFFs for all pitches on the legato list
+    				
+    				for(int pitch : legatoList) {
+    					sm.setMessage(ShortMessage.NOTE_OFF,channel.channel,pitch,0);
+    					channel.device.receiver.send(sm,-1);
+    				}	
     			}
 
-    			for(int k=0;k<controllerLFOs.length;k++) {
-    				ControllerLFO clfo = controllerLFOs[k];
-    				Device device = deviceMap.get(clfo.deviceName);
-    				
-    				int value = clfo.lfo.getTickValue(tick);
-    				    				
-    				if(clfo.controller.equals("pitchBend")) {
-    					sm.setMessage(ShortMessage.PITCH_BEND,clfo.channel,value%128,value/128);
-    				} else if(clfo.controller.equals("modulationWheel")) {
-    					sm.setMessage(ShortMessage.CONTROL_CHANGE,clfo.channel,1,value);
-    				} else {
-    					throw(new RuntimeException("Invalid LFO controller \""+clfo.controller+"\""));
-    				}
-    				
-    				device.receiver.send(sm,-1);
-    			}
-    			    			
     			// wait for 1 tick
     			referenceTime = waitTicks(referenceTime,1,clockTimingsPerTick,structure.getTicksPerBeat(),tick);
 
@@ -528,6 +534,39 @@ public class MidiPlayer extends Player {
     		throw(new RuntimeException("Playback error",e));
     	}
     }
+
+    /**
+     * Sends messages to all configured controllers based on the LFOs.
+     * A message is only send to a controller if its LFO value has changed or if tick is 0.
+     *
+     * @param tick the tick
+     */
+    
+	private void sendControllerLFOMessages(int tick) throws InvalidMidiDataException {
+		ShortMessage sm = new ShortMessage();
+		
+		for(ControllerLFO clfo : controllerLFOs) {
+			Device device = deviceMap.get(clfo.deviceName);
+			
+			int value = clfo.lfo.getTickValue(tick);
+			
+			if(tick == 0 || value != clfo.lastValue) {
+				// value has changed, send message
+				
+				if(clfo.controller.equals("pitchBend")) {
+					sm.setMessage(ShortMessage.PITCH_BEND,clfo.channel,value%128,value/128);
+				} else if(clfo.controller.equals("modulationWheel")) {
+					sm.setMessage(ShortMessage.CONTROL_CHANGE,clfo.channel,1,value);
+				} else {
+					throw(new RuntimeException("Invalid LFO controller \""+clfo.controller+"\""));
+				}
+
+				device.receiver.send(sm,-1);
+				
+				clfo.lastValue = value;
+			}
+		}
+	}
 
     /**
      * Waits the given number of ticks, sending out TIMING_CLOCK events to
@@ -910,6 +949,7 @@ public class MidiPlayer extends Player {
     	private double speed;
     	private String rotationUnit;
     	private double phase;
+    	private int lastValue;
     	
     	public ControllerLFO(LFO lfo,String deviceName,int channel,String controller,int instrument,double speed,String rotationUnit,double phase) {
     		this.lfo = lfo;

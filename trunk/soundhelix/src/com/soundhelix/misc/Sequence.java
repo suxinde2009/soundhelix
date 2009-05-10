@@ -20,7 +20,8 @@ import java.util.List;
 public class Sequence {
 	private List<Sequence.SequenceEntry> sequence = new ArrayList<Sequence.SequenceEntry>();
 	private int totalTicks;
-	boolean lastWasPause = false;
+	
+	private boolean lastWasPause = false;
 
 	/**
 	 * Calls addNote(pitch,Short.MAX_VALUE,ticks).
@@ -33,6 +34,10 @@ public class Sequence {
 
 	public void addNote(int pitch, int ticks) {
 		addNote(pitch,ticks,Short.MAX_VALUE);
+	}
+
+	public void addNote(int pitch, int ticks, short velocity) {
+		addNote(pitch, ticks, velocity, false);
 	}
 
 	/**
@@ -49,12 +54,12 @@ public class Sequence {
 	 *            the ticks
 	 */
 
-	public void addNote(int pitch, int ticks, short velocity) {
+	public void addNote(int pitch, int ticks, short velocity, boolean legato) {
 		if (ticks > 0) {
 			if (velocity == 0) {
 				addPause(ticks);
 			} else {
-				sequence.add(new SequenceEntry(pitch, velocity, ticks));
+				sequence.add(new SequenceEntry(pitch, velocity, ticks, legato));
 				this.totalTicks += ticks;
 				lastWasPause = false;
 			}
@@ -78,7 +83,7 @@ public class Sequence {
 				e.ticks += ticks;
 			} else {
 				// add a new pause
-				sequence.add(new SequenceEntry(0, (short) -1, ticks));
+				sequence.add(new SequenceEntry(0, (short) -1, ticks, false));
 				lastWasPause = true;
 			}
 
@@ -173,16 +178,18 @@ public class Sequence {
 			}
 		}
 	}
-	
+
 	public class SequenceEntry {
 		private int pitch;
 		private short velocity;
 		private int ticks;
+		boolean legato;
 
-		public SequenceEntry(int pitch, short velocity, int ticks) {
+		public SequenceEntry(int pitch, short velocity, int ticks, boolean legato) {
 			this.pitch = pitch;
 			this.velocity = velocity;
 			this.ticks = ticks;
+			this.legato = legato;
 		}
 
 		public int getPitch() {
@@ -205,6 +212,10 @@ public class Sequence {
 			return velocity <= 0;
 		}
 
+		public boolean isLegato() {
+			return legato;
+		}
+		
 		public String toString() {
 			return pitch + "/" + ticks + "/" + velocity;
 		}

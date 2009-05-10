@@ -120,7 +120,8 @@ public class PatternSequenceEngine extends SequenceEngine {
 
        				int pitch = getTransitionPitch(chord,nextChord);
 
-       				seq.addNote(pitch,len,vel);
+       				boolean useLegato = entry.isLegato() ? pattern.isLegatoLegal(activityVector, tick+len, pos+1) : false;
+       				seq.addNote(pitch,len,vel,useLegato);
        			} else {
        				// normal note
        				int value = entry.getPitch();
@@ -140,10 +141,12 @@ public class PatternSequenceEngine extends SequenceEngine {
        				int octave = (value >= 0 ? value/3 : (value-2)/3);
        				int offset = ((value%3)+3)%3;
 
+       				boolean useLegato = entry.isLegato() ? pattern.isLegatoLegal(activityVector, tick+len, pos+1) : false;
+
        				if(chord.isMajor()) {
-       					seq.addNote(octave*12+majorTable[offset]+chord.getPitch(),len,vel);
+       					seq.addNote(octave*12+majorTable[offset]+chord.getPitch(),len,vel,useLegato);
        				} else {
-       					seq.addNote(octave*12+minorTable[offset]+chord.getPitch(),len,vel);
+       					seq.addNote(octave*12+minorTable[offset]+chord.getPitch(),len,vel,useLegato);
        				}
        			}
        		} else {

@@ -40,7 +40,7 @@ import com.soundhelix.util.XMLUtils;
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
-public class PatternSequenceEngine extends SequenceEngine {
+public class PatternSequenceEngine extends AbstractSequenceEngine {
 	
 	private static final char TRANSITION = '+';
 	

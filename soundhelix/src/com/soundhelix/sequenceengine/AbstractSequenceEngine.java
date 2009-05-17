@@ -14,15 +14,26 @@ package com.soundhelix.sequenceengine;
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
+import org.apache.log4j.Logger;
+
 import com.soundhelix.misc.ActivityVector;
-import com.soundhelix.misc.RandomSeedable;
 import com.soundhelix.misc.Structure;
 import com.soundhelix.misc.Track;
-import com.soundhelix.misc.XMLConfigurable;
 
-public interface SequenceEngine extends XMLConfigurable,RandomSeedable {
-    public void setStructure(Structure structure);
+public abstract class AbstractSequenceEngine implements SequenceEngine {
+	protected final Logger logger;
+	
+	protected Structure structure;
+	protected long randomSeed;
+	
+    public AbstractSequenceEngine() {
+    	logger = Logger.getLogger(this.getClass());
+    }
 
+    public void setStructure(Structure structure) {
+    	this.structure = structure;
+    }
+    
 	/**
 	 * Renders one or more sequences (i.e., voices). The
 	 * method should check the given ActivityVectors to decide when to insert
@@ -34,7 +45,7 @@ public interface SequenceEngine extends XMLConfigurable,RandomSeedable {
 	 * song's HarmonyEngine into consideration.
 	 */
 
-     public Track render(ActivityVector[] activityVectors);
+     public abstract Track render(ActivityVector[] activityVectors);
 
      /**
       * Returns the required number of ActivityVectors. For most implementations,
@@ -45,5 +56,15 @@ public interface SequenceEngine extends XMLConfigurable,RandomSeedable {
       * @return the number of ActivityVectors
       */
      
-     public int getActivityVectorCount();     
+     public int getActivityVectorCount() {
+    	 return 1;
+     }
+     
+     public void setRandomSeed(long randomSeed) {
+    	 this.randomSeed = randomSeed;
+     }
+
+     public long getRandomSeed() {
+    	 return randomSeed;
+     }
 }

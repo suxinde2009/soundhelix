@@ -7,7 +7,7 @@ package com.soundhelix.lfo;
  * @author Thomas Schürger
  */
 
-public class RectangleLFO extends LFO {
+public class RectangleLFO extends AbstractLFO {
 	public double getValue(double angle) {
 	    angle = (angle%(2.0d*Math.PI));
 	    return angle < Math.PI ? 0d : 1d;

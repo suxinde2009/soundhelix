@@ -20,6 +20,7 @@ import com.soundhelix.misc.ActivityVector;
 import com.soundhelix.misc.Arrangement;
 import com.soundhelix.misc.Track;
 import com.soundhelix.sequenceengine.SequenceEngine;
+import com.soundhelix.util.HarmonyEngineUtils;
 import com.soundhelix.util.XMLUtils;
 
 /**
@@ -33,7 +34,7 @@ import com.soundhelix.util.XMLUtils;
 // TODO: make ActivityVector constraint-compliance more efficient by ensuring the constraints
 // (or aborting as early as possible) during creation instead of checking afterwards
 
-public class SimpleArrangementEngine extends ArrangementEngine {
+public class SimpleArrangementEngine extends AbstractArrangementEngine {
 	private Random random;
 
 	private int[] startActivityCounts = {};
@@ -49,7 +50,7 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 	private HashMap<String,ActivityVectorConfiguration> activityVectorConfigurationHashMap;
 	
 	// maximum number of tries before failing
-	private static final int MAX_TRIES = 25000;
+	private static final int MAX_TRIES = 100000;
 	
 	public SimpleArrangementEngine() {
 		super();
@@ -134,7 +135,7 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 	}
 
 	private void createConstrainedActivityVectors(int ticks,int tracks,HashMap<String, ActivityVectorConfiguration> neededActivityVector) {
-		List<Integer> chordSectionStartTicks = structure.getHarmonyEngine().getChordSectionStartTicks();
+		List<Integer> chordSectionStartTicks = HarmonyEngineUtils.getChordSectionStartTicks(structure);
 		int chordSections = chordSectionStartTicks.size();
 		
 		int vectors = neededActivityVector.size();
@@ -380,7 +381,7 @@ public class SimpleArrangementEngine extends ArrangementEngine {
 	
 	private ActivityVector[] createActivityVectors(int num) {
 		HarmonyEngine he = structure.getHarmonyEngine();
-		int sections = he.getChordSectionCount();
+		int sections = HarmonyEngineUtils.getChordSectionCount(structure);
 		
 		// create num empty ActivityVectors
 		

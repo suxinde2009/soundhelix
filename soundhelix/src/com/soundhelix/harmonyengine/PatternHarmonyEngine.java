@@ -42,7 +42,7 @@ import com.soundhelix.util.XMLUtils;
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
-public class PatternHarmonyEngine extends HarmonyEngine {
+public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 	private Chord[] chord;
 	private int[] ticks;
 	private int[] sectionTicks;
@@ -163,7 +163,7 @@ public class PatternHarmonyEngine extends HarmonyEngine {
 				ch = firstChord.findClosestChord(ch);
 			} else {
 				// previousChord is always non-null here
-				ch = previousChord.findClosestChord(ch);
+				ch = firstChord.findClosestChord(ch);
 			}
 			
 			int songTicks = structure.getTicks();

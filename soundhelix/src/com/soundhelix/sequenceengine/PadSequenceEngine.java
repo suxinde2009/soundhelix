@@ -34,7 +34,7 @@ import com.soundhelix.util.XMLUtils;
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
-public class PadSequenceEngine extends SequenceEngine {
+public class PadSequenceEngine extends AbstractSequenceEngine {
 	
 	private static final int[] majorTable = new int[] {0,4,7};
 	private static final int[] minorTable = new int[] {0,3,7};

@@ -1,6 +1,7 @@
 package com.soundhelix.lfo;
 
 
+
 /**
  * Represents an abstract low frequency oscillator (LFO). The oscillator can run in one of four
  * modes: synchronized to time (e.g, a full rotation every 5 seconds), synchronized to beat
@@ -24,26 +25,9 @@ package com.soundhelix.lfo;
  * @author Thomas Schürger
  */
 
-public abstract class LFO {
-	protected int minimum;
-	protected int maximum;
-	
-	private long microRotationsPerTick;
-	private long microRotationShift;
-	
-	boolean speedSet;
-	
-	/**
-     * Returns the LFO's value of the given angle as a double.
-     * The returned value must be between 0 and 1 (both inclusive).
-     * 
-     * @param the angle in radians (non-negative)
-     * 
-     * @return the LFO's value (between 0 and 1, both inclusive)
-     */
-    
-    protected abstract double getValue(double angle);
+// TODO: make this interface and implementations XML-configurable
 
+public interface LFO {
 	/**
 	 * Returns the LFO's value of the given tick.
 	 * 
@@ -52,58 +36,13 @@ public abstract class LFO {
 	 * @return the LFO's value
 	 */
 
-    public int getTickValue(int tick) {
-        if(!speedSet) {
-            throw(new RuntimeException("LFO speed not set yet"));           
-        }
-        
-        double angle = 2.0d*Math.PI*((double)tick*(double)microRotationsPerTick/1000000.0d + (double)microRotationShift/1000000d);
-        
-        return minimum+(int)(0.5d+(double)maximum*(getValue(angle)));
-    }
+    public int getTickValue(int tick);
 
-	public void setBeatSpeed(int milliRotationsPerBeat,int ticksPerBeat,int milliBPM) {
-		this.microRotationsPerTick = milliRotationsPerBeat*1000L/ticksPerBeat; 
-		speedSet = true;
-	}
-
-	public void setSongSpeed(int milliRotationsPerSong,int ticksPerSong,int milliBPM) {
-		this.microRotationsPerTick = milliRotationsPerSong*1000L/ticksPerSong; 
-		speedSet = true;
-	}
-
-	public void setActivitySpeed(int milliRotationsPerActivity,int startTick,int endTick,int milliBPM) {
-		this.microRotationsPerTick = milliRotationsPerActivity*1000L/(endTick-startTick);		
-		this.microRotationShift -= microRotationsPerTick*startTick;
-		speedSet = true;
-	}
-
-	public void setTimeSpeed(int milliRotationsPerSecond,int ticksPerBeat,int milliBPM) {
-		this.microRotationsPerTick = milliRotationsPerSecond*60000000L/milliBPM/ticksPerBeat;
-		speedSet = true;
-	}
-	
-	public void setPhase(int microRotations) {
-		this.microRotationShift = microRotations;
-	}
-
-	/**
-	 * Sets the minimum value to return.
-	 * 
-	 * @param minimum the minimum value
-	 */
-	
-	public void setMinimum(int minimum) {
-		this.minimum = minimum;
-	}
-
-	/**
-	 * Sets the maximum value to return.
-	 * 
-	 * @param maximum the maximum value
-	 */
-	
-	public void setMaximum(int maximum) {
-		this.maximum = maximum;
-	}
+	public void setBeatSpeed(int milliRotationsPerBeat,int ticksPerBeat,int milliBPM);
+	public void setSongSpeed(int milliRotationsPerSong,int ticksPerSong,int milliBPM);
+	public void setActivitySpeed(int milliRotationsPerActivity,int startTick,int endTick,int milliBPM);
+	public void setTimeSpeed(int milliRotationsPerSecond,int ticksPerBeat,int milliBPM);
+	public void setPhase(int microRotations);	
+	public void setMinimum(int minimum);
+	public void setMaximum(int maximum);
 }

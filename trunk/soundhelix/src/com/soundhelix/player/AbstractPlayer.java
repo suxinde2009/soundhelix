@@ -1,11 +1,13 @@
 package com.soundhelix.player;
 
+import org.apache.log4j.Logger;
+
 import com.soundhelix.misc.Arrangement;
 import com.soundhelix.misc.RandomSeedable;
 import com.soundhelix.misc.XMLConfigurable;
 
 /**
- * Represents an interface for playing Arrangements.
+ * Represents an abstract real-time player for Arrangements.
  * 
  * @see Arrangement
  * 
@@ -15,12 +17,20 @@ import com.soundhelix.misc.XMLConfigurable;
 // TODO: check if more methods should be available, for example,
 // getting the current tick, setting the current tick
 
-public interface Player extends XMLConfigurable,RandomSeedable {
+public abstract class AbstractPlayer implements XMLConfigurable,RandomSeedable {
+	protected final Logger logger;
+
+	protected long randomSeed;
+	
+    public AbstractPlayer() {
+    	logger = Logger.getLogger(this.getClass());
+    }
+
 	/**
 	 * Opens all required resources for playing.
 	 */
 
-    public void open();
+    public abstract void open();
     
 	/**
 	 * Plays the given arrangement. The method will play the arrangement
@@ -30,7 +40,7 @@ public interface Player extends XMLConfigurable,RandomSeedable {
 	 * @param arrangement the Arrangement to play
 	 */
 
-    public void play(Arrangement arrangement);
+     public abstract void play(Arrangement arrangement);
 
  	/**
  	 * Closes all required resources. The method play() must
@@ -38,5 +48,13 @@ public interface Player extends XMLConfigurable,RandomSeedable {
  	 * open() has been called after that.
  	 */
 
-    public abstract void close();
+      public abstract void close();
+      
+      public void setRandomSeed(long randomSeed) {
+     	 this.randomSeed = randomSeed;
+      }
+
+      public long getRandomSeed() {
+     	 return randomSeed;
+      }
 }

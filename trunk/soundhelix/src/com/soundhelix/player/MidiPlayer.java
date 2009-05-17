@@ -89,7 +89,7 @@ import com.soundhelix.util.XMLUtils;
 // TODO: on each tick, send all note-offs before sending note-ons (this is currently done per track, but should be done globally)
 // TODO: make number of ticks to wait before and after playing configurable
 
-public class MidiPlayer extends Player {
+public class MidiPlayer extends AbstractPlayer {
 	/** The number of ticks to wait before starting playing. */
 	private static final int WAIT_TICKS_BEFORE_SONG = 32;
 	

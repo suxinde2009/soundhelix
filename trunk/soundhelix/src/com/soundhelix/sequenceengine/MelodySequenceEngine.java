@@ -20,6 +20,7 @@ import com.soundhelix.misc.Sequence;
 import com.soundhelix.misc.Track;
 import com.soundhelix.misc.Pattern.PatternEntry;
 import com.soundhelix.misc.Track.TrackType;
+import com.soundhelix.util.HarmonyEngineUtils;
 import com.soundhelix.util.NoteUtils;
 import com.soundhelix.util.XMLUtils;
 
@@ -38,7 +39,7 @@ import com.soundhelix.util.XMLUtils;
 
 // TODO: work on this (not really usable yet)
 
-public class MelodySequenceEngine extends SequenceEngine {	
+public class MelodySequenceEngine extends AbstractSequenceEngine {	
 	private static final char FREE = '+';
 	private static final char REPEAT = '*';
 	
@@ -61,7 +62,7 @@ public class MelodySequenceEngine extends SequenceEngine {
 		ActivityVector activityVector = activityVectors[0];
 
 		Sequence seq = new Sequence();
-        HarmonyEngine ce = structure.getHarmonyEngine();
+        HarmonyEngine harmonyEngine = structure.getHarmonyEngine();
         
         int tick = 0;
         int ticks = structure.getTicks();
@@ -69,8 +70,8 @@ public class MelodySequenceEngine extends SequenceEngine {
         Hashtable<String,Pattern> melodyHashtable = createMelodies();
         
 		while(tick < ticks) {
-        	int len = ce.getChordSectionTicks(tick);
-        	Pattern p = melodyHashtable.get(ce.getChordSectionString(tick));
+        	int len = harmonyEngine.getChordSectionTicks(tick);
+        	Pattern p = melodyHashtable.get(HarmonyEngineUtils.getChordSectionString(structure,tick));
         	int pos = 0;
         	
         	for(int i=0;i<len;) {
@@ -202,7 +203,7 @@ public class MelodySequenceEngine extends SequenceEngine {
     	int tick = 0;
     	
     	while(tick < structure.getTicks()) {
-    		String section = he.getChordSectionString(tick);
+    		String section = HarmonyEngineUtils.getChordSectionString(structure,tick);
             int len = he.getChordSectionTicks(tick);
     		
     		if(!ht.containsKey(section)) {

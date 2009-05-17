@@ -7,7 +7,7 @@ package com.soundhelix.lfo;
  * @author Thomas Schürger
  */
 
-public class SineLFO extends LFO {
+public class SineLFO extends AbstractLFO {
 	public double getValue(double angle) {
 	    return 0.5d+Math.sin(angle)*0.5d;
 	}

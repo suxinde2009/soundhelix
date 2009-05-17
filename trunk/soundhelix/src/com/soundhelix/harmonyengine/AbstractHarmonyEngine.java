@@ -1,18 +1,18 @@
 package com.soundhelix.harmonyengine;
 
+import org.apache.log4j.Logger;
+
 import com.soundhelix.misc.Chord;
-import com.soundhelix.misc.RandomSeedable;
 import com.soundhelix.misc.Structure;
-import com.soundhelix.misc.XMLConfigurable;
 
 /**
- * Interface for song harmony generators. Normally, song harmonies are a sequence
+ * Represents an abstract generator for song harmonies. Normally, song harmonies are a sequence
  * of chords (often with the same length) with a certain pattern.
  * The song's complete chord sequence can be divided into repeating sections.
  * For example, a chord sequence might consist of a chord section for
  * a verse and a (possibly longer or shorter) chord section for a refrain,
  * which could each be repeated a couple of times. These chord sections
- * split the chord sequence into a number of logical parts.
+ * splits the chord sequence into a number of logical parts.
  * 
  * For each tick, this generator must return the current chord, the remaining
  * number of ticks this chord will be played before a chord change occurs (or the
@@ -54,8 +54,21 @@ import com.soundhelix.misc.XMLConfigurable;
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
-public interface HarmonyEngine extends XMLConfigurable,RandomSeedable {
-	public void setSongStructure(Structure structure);
+public abstract class AbstractHarmonyEngine implements HarmonyEngine {
+	protected transient final Logger logger;
+
+	protected Structure structure;	
+	private int chordSections = -1;
+	private int distinctChordSections = -1;
+	protected long randomSeed;
+	
+	public AbstractHarmonyEngine() {
+		logger = Logger.getLogger(getClass());
+	}
+	
+	public void setSongStructure(Structure structure) {
+		this.structure = structure;
+	}
 	
     /**
      * Returns the chord to use at the specified point in time.
@@ -66,7 +79,7 @@ public interface HarmonyEngine extends XMLConfigurable,RandomSeedable {
      * @return the Chord
      */
 	
-	public Chord getChord(int tick);
+	public abstract Chord getChord(int tick);
 	
 	/**
 	 * Returns the number of ticks the current chord will
@@ -82,7 +95,7 @@ public interface HarmonyEngine extends XMLConfigurable,RandomSeedable {
 	 * @return the number of ticks before the next chord change
 	 */
 	
-	public int getChordTicks(int tick);
+	public abstract int getChordTicks(int tick);
 
 	/**
 	 * Returns the number of ticks the current chord section will be played from
@@ -97,5 +110,100 @@ public interface HarmonyEngine extends XMLConfigurable,RandomSeedable {
 	 * @return the number of ticks before the next chord section begins or the song will end
 	 */
 	
-	public int getChordSectionTicks(int tick);
+	public abstract int getChordSectionTicks(int tick);
+	
+	/**
+	 * Dumps all chords and their lengths in ticks.
+	 */
+	
+	public void dumpChords() {
+		int tick = 0;
+         
+        while(tick < structure.getTicks()) {
+        	Chord chord = getChord(tick);
+        	int len = getChordTicks(tick);
+
+        	if(tick > 0) {
+        		System.out.print(","+chord+"/"+len);
+        	} else {
+                System.out.print(chord+"/"+len);
+        	}
+        	
+         	tick += len;
+        }
+        
+        System.out.println();
+	}
+	
+
+	
+
+	/**
+	 * Checks if the 3 abstract methods return consistent and correct
+	 * results. In case of a detected problem, a RuntimeException will
+	 * be thrown.
+	 * 
+	 * @throws RuntimeException in case of an error
+	 */
+	
+    public void checkSanity() {
+         
+        Chord lastChord = null;
+        int lastChordTicks = 1;
+        int lastChordSectionTicks = 1;
+ 
+        int ticks = structure.getTicks();
+        
+        for(int tick=0;tick<ticks;tick++) {
+        	Chord chord = getChord(tick);
+        	
+        	if(chord == null) {
+        		throw(new RuntimeException("Null chord returned at tick "+tick));
+        	}
+
+        	int chordTicks = getChordTicks(tick);
+        	
+        	if(chordTicks <= 0) {
+        		throw(new RuntimeException("Chord ticks <= 0 at tick "+tick));
+        	}
+
+        	if(lastChordTicks > 1 && chordTicks != lastChordTicks-1) {
+        		throw(new RuntimeException("Chord tick not decremented at "+tick));        		
+        	}
+        	
+        	int chordSectionTicks = getChordSectionTicks(tick);
+
+        	if(chordSectionTicks <= 0) {
+        		throw(new RuntimeException("Chord section ticks <= 0 at tick "+tick));
+        	}
+
+        	if(lastChordSectionTicks > 1 && chordSectionTicks != lastChordSectionTicks-1) {
+        		throw(new RuntimeException("Chord section tick not decremented at "+tick));        		
+        	}
+
+        	if(!chord.equals(lastChord) && lastChordTicks != 1) {
+        		throw(new RuntimeException("Chord changes unexpectedly from "+lastChord+" to "+chord+" at tick "+tick));
+        	}
+        	
+        	lastChord = chord;
+        	lastChordTicks = chordTicks;
+        	lastChordSectionTicks = chordSectionTicks;
+        }
+        
+        if(lastChordTicks != 1) {
+        	throw(new RuntimeException("Chord ticks is not 1 at last tick"));
+        }
+        
+        if(lastChordSectionTicks != 1) {
+        	throw(new RuntimeException("Chord section ticks is not 1 at last tick"));
+        }
+    }
+    
+    public void setRandomSeed(long randomSeed) {
+    	this.randomSeed = randomSeed;
+    }
+
+    public long getRandomSeed() {
+    	return randomSeed;
+    }
 }

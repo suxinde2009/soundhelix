@@ -43,7 +43,7 @@ import com.soundhelix.util.XMLUtils;
 
 // TODO: allow specifying velocities in patterns (like in the PatternSequenceEngine)
 
-public class ChordSequenceEngine extends SequenceEngine {
+public class ChordSequenceEngine extends AbstractSequenceEngine {
 	
 	private static final int[] majorTable = new int[] {0,4,7};
 	private static final int[] minorTable = new int[] {0,3,7};

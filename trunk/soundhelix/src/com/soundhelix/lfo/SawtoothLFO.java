@@ -8,7 +8,7 @@ package com.soundhelix.lfo;
  * @author Thomas Schürger
  */
 
-public class SawtoothLFO extends LFO {
+public class SawtoothLFO extends AbstractLFO {
     private boolean up;
     
     public SawtoothLFO() {

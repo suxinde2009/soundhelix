@@ -23,8 +23,7 @@ public class ConsistentRandom {
 	// but this should be fine for our purposes
 	private long millis = System.currentTimeMillis();
     
-    public ConsistentRandom(long randomSeed)
-    {
+    public ConsistentRandom(long randomSeed) {
     	this.constantSeed = randomSeed;
     }
     

@@ -45,8 +45,8 @@ import com.soundhelix.util.XMLUtils;
 
 public class ChordSequenceEngine extends AbstractSequenceEngine {
 	
-	private static final int[] majorTable = new int[] {0,4,7};
-	private static final int[] minorTable = new int[] {0,3,7};
+	private static final int[] MAJOR_TABLE = new int[] {0,4,7};
+	private static final int[] MINOR_TABLE = new int[] {0,3,7};
 
 	private Random random;
 	
@@ -82,7 +82,7 @@ public class ChordSequenceEngine extends AbstractSequenceEngine {
 	public Track render(ActivityVector[] activityVectors) {
 		ActivityVector activityVector = activityVectors[0];
 		
-        Sequence seq[] = new Sequence[voiceCount];
+        Sequence[] seq = new Sequence[voiceCount];
         HarmonyEngine ce = structure.getHarmonyEngine();
         
         int tick = 0;
@@ -123,9 +123,9 @@ public class ChordSequenceEngine extends AbstractSequenceEngine {
         				int offset = ((value%3)+3)%3;
 
         				if(chord.isMajor()) {
-        					seq[k].addNote(octave*12+majorTable[offset]+chord.getPitch(),1);
+        					seq[k].addNote(octave*12+MAJOR_TABLE[offset]+chord.getPitch(),1);
         				} else {
-        					seq[k].addNote(octave*12+minorTable[offset]+chord.getPitch(),1);
+        					seq[k].addNote(octave*12+MINOR_TABLE[offset]+chord.getPitch(),1);
         				}
         			}
         		} else {

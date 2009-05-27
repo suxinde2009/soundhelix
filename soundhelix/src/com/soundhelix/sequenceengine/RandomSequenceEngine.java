@@ -46,8 +46,8 @@ public class RandomSequenceEngine extends AbstractSequenceEngine {
 	private int patternLength;
 	private int[] offsets;
 
-	private static final int[] majorTable = new int[] {0,4,7};
-	private static final int[] minorTable = new int[] {0,3,7};
+	private static final int[] MAJOR_TABLE = new int[] {0,4,7};
+	private static final int[] MINOR_TABLE = new int[] {0,3,7};
 
 	private Random random;
 	
@@ -156,9 +156,9 @@ public class RandomSequenceEngine extends AbstractSequenceEngine {
             			int offset = ((value%3)+3)%3;
             			
             	 	    if(chord.isMajor()) {
-            			    list.add(new PatternEntry(octave*12+majorTable[offset]+chord.getPitch(),entry.getVelocity(),t));
+            			    list.add(new PatternEntry(octave*12+MAJOR_TABLE[offset]+chord.getPitch(),entry.getVelocity(),t));
             		    } else {
-            			    list.add(new PatternEntry(octave*12+minorTable[offset]+chord.getPitch(),entry.getVelocity(),t));
+            			    list.add(new PatternEntry(octave*12+MINOR_TABLE[offset]+chord.getPitch(),entry.getVelocity(),t));
             		    }
         				
         				lastValue = value;

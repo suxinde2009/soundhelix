@@ -6,7 +6,7 @@ import com.soundhelix.misc.Structure;
 import com.soundhelix.misc.XMLConfigurable;
 
 /**
- * Interface generator for song arrangement generators.
+ * Interface for song arrangement generators.
  * 
  * @author Thomas Schürger (thomas@schuerger.com)
  */

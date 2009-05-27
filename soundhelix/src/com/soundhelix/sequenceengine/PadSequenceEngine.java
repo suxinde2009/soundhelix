@@ -36,8 +36,8 @@ import com.soundhelix.util.XMLUtils;
 
 public class PadSequenceEngine extends AbstractSequenceEngine {
 	
-	private static final int[] majorTable = new int[] {0,4,7};
-	private static final int[] minorTable = new int[] {0,3,7};
+	private static final int[] MAJOR_TABLE = new int[] {0,4,7};
+	private static final int[] MINOR_TABLE = new int[] {0,3,7};
 	
 	private Random random;
 	
@@ -107,10 +107,10 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
         		int offset = ((pos%3)+3)%3;
         		
         		if(chord.isMajor()) {
-        			seq.addNote(octave*12+majorTable[offset]+chord.getPitch(),Math.min(activityLen,len)-postPauseTicks);
+        			seq.addNote(octave*12+MAJOR_TABLE[offset]+chord.getPitch(),Math.min(activityLen,len)-postPauseTicks);
         			seq.addPause(len-Math.min(activityLen,len));
         		} else {
-        			seq.addNote(octave*12+minorTable[offset]+chord.getPitch(),Math.min(activityLen,len)-postPauseTicks);        			
+        			seq.addNote(octave*12+MINOR_TABLE[offset]+chord.getPitch(),Math.min(activityLen,len)-postPauseTicks);        			
         			seq.addPause(len-Math.min(activityLen,len));
         		}
         		

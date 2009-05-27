@@ -44,8 +44,8 @@ public class PatternSequenceEngine extends AbstractSequenceEngine {
 	
 	private static final char TRANSITION = '+';
 	
-	private static final int[] majorTable = new int[] {0,4,7};
-	private static final int[] minorTable = new int[] {0,3,7};
+	private static final int[] MAJOR_TABLE = new int[] {0,4,7};
+	private static final int[] MINOR_TABLE = new int[] {0,3,7};
 
 	private Random random;
 	
@@ -144,9 +144,9 @@ public class PatternSequenceEngine extends AbstractSequenceEngine {
        				boolean useLegato = entry.isLegato() ? pattern.isLegatoLegal(activityVector, tick+len, pos+1) : false;
 
        				if(chord.isMajor()) {
-       					seq.addNote(octave*12+majorTable[offset]+chord.getPitch(),len,vel,useLegato);
+       					seq.addNote(octave*12+MAJOR_TABLE[offset]+chord.getPitch(),len,vel,useLegato);
        				} else {
-       					seq.addNote(octave*12+minorTable[offset]+chord.getPitch(),len,vel,useLegato);
+       					seq.addNote(octave*12+MINOR_TABLE[offset]+chord.getPitch(),len,vel,useLegato);
        				}
        			}
        		} else {

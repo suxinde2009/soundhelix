@@ -34,30 +34,31 @@ import com.soundhelix.util.XMLUtils;
  * arbitrary number of MIDI devices in parallel. Each instrument used must be
  * mapped to a combination of MIDI device and MIDI channel. For each channel
  * the MIDI program to use can be defined individually. If no program is
- * specified for a channel, the program is not modified. All specified MIDI
- * devices are opened for playback, even if they are not used by any
- * instrument. If clock synchronization is enabled for a device, the devices
+ * specified for a channel, the program is not modified, i.e., the currently selected program is used.
+ * All specified MIDI devices are opened for playback, even if they are not used by any
+ * instrument. If clock synchronization is enabled for at least one device, the devices
  * are synchronized to the player by sending out TIMING_CLOCK MIDI events to
  * each synchronized device 24 times per beat. For the synchronization to work,
  * each device will be sent a START event before playing and a STOP event after
- * playing. Note that MIDI synchronization is highly incompatible with setting
- * grooves other than the standard groove (no groove), at least on most MIDI
- * devices. Clock synchronization should be used for devices using synchronized
+ * playing. MIDI synchronization works independent of the selected groove. Timing ticks are sent out
+ * using a fixed frequency, even though sending out note MIDI messages can vary depending on the
+ * selected groove. Clock synchronization should be used for devices using synchronized
  * effects (for example, synchronized echo) in order to communicate the BPM
  * speed to use. As clock synchronization requires some additional overhead,
  * e.g., sending out MIDI messages 24 times per beat instead of the number of
  * ticks per beat, it should only be used if really required.
  * 
  * Timing the ticks (or clock synchronization ticks) is done by using a
- * feedback algorithm based on Thread.sleep() calls with nanosecond resolution. 
+ * feedback algorithm based on Thread.sleep() calls with nanosecond resolution. As mentioned, sending out
+ * timing ticks is not groove-dependent, whereas sending out note MIDI messages is groove-dependent. 
  * 
- * This player supports LFOs for MIDI controllers, whose speed can be based on a second,
- * a beat, the whole song or on the activity of an instrument. The granularity of an
- * LFO is always a tick. With every tick, each LFO will send out a MIDI message with
- * the new value for the target controller.
+ * This player supports LFOs, whose frequency can be based on a second, a beat, the whole song or on the activity (first
+ * activity until last activity) of an instrument. The granularity of an LFO is always a tick. With every tick, each
+ * LFO will send out a MIDI message with the new value for the target controller, but only if the LFO value has
+ * changed.
  * 
- * Instances of this class are not thread-safe. They must not be used in multiple
- * threads without external synchronization.
+ * Instances of this class are not thread-safe. They must not be used in multiple threads without external
+ * synchronization.
  * 
  * <h3>XML configuration</h3>
  * <table border=1>
@@ -332,7 +333,8 @@ public class MidiPlayer extends AbstractPlayer {
             setChannelPrograms();            
 
        		Structure structure = arrangement.getStructure();
-
+       		int ticksPerBeat = structure.getTicksPerBeat();
+       		
     		// when clock synchronization is used, we must make sure that
     		// the ticks per beat divide CLOCK_SYNCHRONIZATION_TICKS_PER_BEAT
     		
@@ -352,7 +354,7 @@ public class MidiPlayer extends AbstractPlayer {
             }
 
     		long referenceTime = System.nanoTime();            
-            referenceTime = waitTicks(referenceTime,WAIT_TICKS_BEFORE_SONG,clockTimingsPerTick,structure.getTicksPerBeat(),0);
+            referenceTime = waitTicks(referenceTime,WAIT_TICKS_BEFORE_SONG,clockTimingsPerTick,structure.getTicksPerBeat());
             
     		ShortMessage sm = new ShortMessage();
 
@@ -371,13 +373,25 @@ public class MidiPlayer extends AbstractPlayer {
 
     		int tick = 0;
     		
+    		long tickReferenceTime = referenceTime;
+    		long timingTickReferenceTime = useClockSynchronization ? referenceTime : Long.MAX_VALUE;
+    		
     		while(tick < structure.getTicks()) {
-    			playTick(arrangement, tick, tickList, posList, legatoList);
+    			// in each iteration, at least one of the following two conditions should be true
+    			
+    			if(referenceTime >= timingTickReferenceTime) {
+       				sendShortMessageToClockSynchronized(ShortMessage.TIMING_CLOCK);
+    				timingTickReferenceTime += getTimingTickNanos(clockTimingsPerTick, ticksPerBeat);
+    			}
 
-    			// wait for 1 tick
-    			referenceTime = waitTicks(referenceTime,1,clockTimingsPerTick,structure.getTicksPerBeat(),tick);
+    			if(referenceTime >= tickReferenceTime) {
+    				playTick(arrangement, tick, tickList, posList, legatoList);
+    				tickReferenceTime += getTickNanos(tick, ticksPerBeat);
+    				tick++;
+    			}
 
-    			tick++;
+    			// wait until the next event
+    			referenceTime = waitNanos(tickReferenceTime,timingTickReferenceTime);
     		}
     		
     		// playing finished	
@@ -385,7 +399,7 @@ public class MidiPlayer extends AbstractPlayer {
     		
     		muteActiveChannels(arrangement, posList);
     	
-            referenceTime = waitTicks(referenceTime,WAIT_TICKS_AFTER_SONG,clockTimingsPerTick,structure.getTicksPerBeat(),0);
+            referenceTime = waitTicks(referenceTime,WAIT_TICKS_AFTER_SONG,clockTimingsPerTick,structure.getTicksPerBeat());
 
     		if(useClockSynchronization) {
     		    sendShortMessageToClockSynchronized(ShortMessage.STOP);
@@ -572,8 +586,8 @@ public class MidiPlayer extends AbstractPlayer {
 			
 			int value = clfo.lfo.getTickValue(tick);
 			
-			if(tick == 0 || value != clfo.lastValue) {
-				// value has changed, send message
+			if(tick == 0 || value != clfo.lastSentValue) {
+				// value has changed or is the first value, send message
 				
 				if(clfo.controller.equals("pitchBend")) {
 					sm.setMessage(ShortMessage.PITCH_BEND,clfo.channel,value%128,value/128);
@@ -585,7 +599,7 @@ public class MidiPlayer extends AbstractPlayer {
 
 				device.receiver.send(sm,-1);
 				
-				clfo.lastValue = value;
+				clfo.lastSentValue = value;
 			}
 		}
 	}
@@ -608,14 +622,13 @@ public class MidiPlayer extends AbstractPlayer {
      * @throws InterruptedException in case of sleep interruption
      */
     
-    private long waitTicks(long referenceTime,int ticks,int clockTimingsPerTick,int ticksPerBeat,
-    		int startTick) throws InvalidMidiDataException,InterruptedException {
+    private long waitTicks(long referenceTime,int ticks,int clockTimingsPerTick,int ticksPerBeat) throws InvalidMidiDataException,InterruptedException {
     	long lastWantedNanos = referenceTime;
     	
     	for(int t=0;t<ticks;t++) {
     	    for(int s=0;s<clockTimingsPerTick;s++) {    				
     		
-    	    	long length = getTimingTickNanos(startTick+t, ticksPerBeat, clockTimingsPerTick, true);
+    	    	long length = getTimingTickNanos(ticksPerBeat, clockTimingsPerTick);
 				
 				long wantedNanos = lastWantedNanos + length;
 				long wait = Math.max(0,wantedNanos - System.nanoTime());
@@ -634,24 +647,42 @@ public class MidiPlayer extends AbstractPlayer {
     }
 
     /**
+     * Waits until either time1 or time2 (both are given in nano seconds) is reached, whichever comes first. Both
+     * times are based on System.nanos().
+     * 
+     * @param time1 the first point in time
+     * @param time2 the second point in time
+     * 
+     * @return the point in time waited on (minimum of time1 and time2)
+     *
+     * @throws Interrupted exception in case of sleep interruption
+     */
+    
+    private long waitNanos(long time1,long time2) throws InterruptedException {
+    	long wantedNanos = Math.min(time1,time2);
+    	long wait = Math.max(0,wantedNanos - System.nanoTime());
+
+		if(wait > 0) {
+			Thread.sleep((int)(wait/1000000l),(int)(wait%1000000l));
+		}
+		
+    	return wantedNanos;
+    }
+     
+    /**
      * Returns the number of nanos of the given tick.
      */
     
 	private long getTickNanos(int tick,int ticksPerBeat) {
-		return 1000000000l*60l*groove[tick%groove.length]/1000l/(ticksPerBeat*bpm);
+		return 60000000000l*groove[tick%groove.length]/1000l/(ticksPerBeat*bpm);
 	}
 
 	/**
 	 * Returns the number of nanos of the given timing tick.
 	 */
 	
-	private long getTimingTickNanos(int tick,int ticksPerBeat,int clockTimingsPerTick,boolean useGroove) {
-		if(useGroove) {		
-			return 60000000l*groove[tick%groove.length]/(ticksPerBeat*bpm*clockTimingsPerTick);
-		} else {
-			return 60000000000l/(ticksPerBeat*bpm*clockTimingsPerTick);
-			
-		}
+	private long getTimingTickNanos(int ticksPerBeat,int clockTimingsPerTick) {
+		return 60000000000l/(ticksPerBeat*bpm*clockTimingsPerTick);
 	}
     
     /**
@@ -992,7 +1023,7 @@ public class MidiPlayer extends AbstractPlayer {
     	private double speed;
     	private String rotationUnit;
     	private double phase;
-    	private int lastValue;
+    	private int lastSentValue;
     	
     	public ControllerLFO(LFO lfo,String deviceName,int channel,String controller,int instrument,double speed,String rotationUnit,double phase) {
     		this.lfo = lfo;

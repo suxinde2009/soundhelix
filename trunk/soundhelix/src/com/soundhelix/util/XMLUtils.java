@@ -160,8 +160,7 @@ public class XMLUtils {
 					}
 				}
 			} catch(Exception e) {throw(new RuntimeException("Error parsing random attributes",e));}
-		}
-		else {
+		} else {
 			throw(new RuntimeException("Invalid element "+n.getNodeName()));
 		}
 	}
@@ -249,8 +248,7 @@ public class XMLUtils {
 				int prob = Integer.parseInt((String)xpath.evaluate("attribute::probability",n,XPathConstants.STRING));
 				return random.nextInt(100) < prob;
 			} catch(Exception e) {throw(new RuntimeException("Error parsing random attributes",e));}
-		}
-		else {
+		} else {
 			throw(new RuntimeException("Invalid element "+n.getNodeName()));
 		}
 	}
@@ -366,8 +364,7 @@ public class XMLUtils {
 			}
 
 			return inst;
-		}
-		else {
+		} else {
 			throw(new RuntimeException("Class "+className+" is not a subclass of "+superclass));
 		}
 	}

@@ -145,13 +145,19 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 			
 			if(cho.endsWith("m")) {
 				pitch = NoteUtils.getNotePitch(cho.substring(0,cho.length()-1));
-				if(pitch > 0)
+				
+				if(pitch > 0) {
 					pitch -= 12;
+				}
+				
 				ch = new Chord(pitch,ChordType.MINOR,Chord.ChordSubtype.BASE_0);
 			} else {
 				pitch = NoteUtils.getNotePitch(cho);
-				if(pitch > 0)
+				
+				if(pitch > 0) {
 					pitch -= 12;
+				}
+				
 				ch = new Chord(pitch,ChordType.MAJOR,Chord.ChordSubtype.BASE_0);;
 			}
 

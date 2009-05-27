@@ -27,7 +27,7 @@ public class Track {
 	// the sequence list
 	List<Sequence> seqList = new ArrayList<Sequence>();
 	
-	public enum TrackType {
+	public static enum TrackType {
 		// the track contains melodic sequences, subject to transposition
 		MELODY,
 		// the track contains fixed-pitch sequences, which must not be transposed

@@ -6,7 +6,8 @@ import com.soundhelix.misc.Arrangement;
 import com.soundhelix.misc.Structure;
 
 /**
- * Represents an abstract generator for song arrangements.
+ * Abstract implementation of an ArrangementEngine, which provides some basic
+ * functionality. 
  * 
  * @author Thomas Schürger (thomas@schuerger.com)
  */

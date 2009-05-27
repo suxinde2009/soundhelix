@@ -55,8 +55,9 @@ public class ActivityVector {
      */
     
     public boolean isActive(int tick) {
-    	if(tick >= totalTicks)
+    	if(tick >= totalTicks) {
     		return false;
+    	}
     	
     	return bitSet.get(tick);
     }
@@ -219,7 +220,10 @@ public class ActivityVector {
 			
 			int len = getIntervalLength(tick);
 			
-			if(sb.length() > 0) sb.append(',');
+			if(sb.length() > 0) {
+				sb.append(',');
+			}
+			
 			sb.append(isActive(tick) ? "1/"+len : "0/"+len);
 			
 			tick += len;

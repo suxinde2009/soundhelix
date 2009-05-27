@@ -277,7 +277,12 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 			
 			it = neededActivityVector.values().iterator();
 			
-			while(it.hasNext()) {if(it.next().activityVector.isActive(tick)) c++;};
+			while(it.hasNext()) {
+				if(it.next().activityVector.isActive(tick)) {
+					c++;
+				}
+			}
+			
 		    sb.append(Integer.toString(c,36));
 		}
 

@@ -201,6 +201,7 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
     	Hashtable<String,Pattern> ht = new Hashtable<String,Pattern>();
     	
     	int tick = 0;
+    	int pos = 0;
     	
     	while(tick < structure.getTicks()) {
     		String section = HarmonyEngineUtils.getChordSectionString(structure,tick);
@@ -211,8 +212,7 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
     			List<PatternEntry> list = new ArrayList<PatternEntry>();    			
     			
     			int pitch = Integer.MIN_VALUE;
-    			int pos = 0;
-    			
+    			 			
     			for(int i=0;i<len;) {
     				PatternEntry entry = pattern.get(pos%patternLength);
         			Chord chord = he.getChord(tick+i);

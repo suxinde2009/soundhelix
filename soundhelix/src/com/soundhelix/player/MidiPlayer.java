@@ -56,6 +56,9 @@ import com.soundhelix.util.XMLUtils;
  * LFO is always a tick. With every tick, each LFO will send out a MIDI message with
  * the new value for the target controller.
  * 
+ * Instances of this class are not thread-safe. They must not be used in multiple
+ * threads without external synchronization.
+ * 
  * <h3>XML configuration</h3>
  * <table border=1>
  * <tr><th>Tag</th> <th>#</th> <th>Attributes</th> <th>Description</th> <th>Required</th>
@@ -601,8 +604,8 @@ public class MidiPlayer extends AbstractPlayer {
      *
      * @return the new reference time
      * 
-     * @throws InvalidMidiDataException
-     * @throws InterruptedException
+     * @throws InvalidMidiDataException in case of invalid MIDI data
+     * @throws InterruptedException in case of sleep interruption
      */
     
     private long waitTicks(long referenceTime,int ticks,int clockTimingsPerTick,int ticksPerBeat,
@@ -612,11 +615,10 @@ public class MidiPlayer extends AbstractPlayer {
     	for(int t=0;t<ticks;t++) {
     	    for(int s=0;s<clockTimingsPerTick;s++) {    				
     		
-    	    	// desired length of the current wait period in nanoseconds
-				long length = 1000000000l*60l*(long)groove[(startTick+t)%groove.length]/1000l/(long)(ticksPerBeat*bpm*clockTimingsPerTick);
+    	    	long length = getTimingTickNanos(startTick+t, ticksPerBeat, clockTimingsPerTick, true);
 				
-				long wantedNanos = lastWantedNanos+length;
-				long wait = Math.max(0,wantedNanos-System.nanoTime());
+				long wantedNanos = lastWantedNanos + length;
+				long wait = Math.max(0,wantedNanos - System.nanoTime());
 
 				Thread.sleep((int)(wait/1000000l),(int)(wait%1000000l));
 
@@ -630,6 +632,27 @@ public class MidiPlayer extends AbstractPlayer {
  
     	return lastWantedNanos;
     }
+
+    /**
+     * Returns the number of nanos of the given tick.
+     */
+    
+	private long getTickNanos(int tick,int ticksPerBeat) {
+		return 1000000000l*60l*groove[tick%groove.length]/1000l/(ticksPerBeat*bpm);
+	}
+
+	/**
+	 * Returns the number of nanos of the given timing tick.
+	 */
+	
+	private long getTimingTickNanos(int tick,int ticksPerBeat,int clockTimingsPerTick,boolean useGroove) {
+		if(useGroove) {		
+			return 60000000l*groove[tick%groove.length]/(ticksPerBeat*bpm*clockTimingsPerTick);
+		} else {
+			return 60000000000l/(ticksPerBeat*bpm*clockTimingsPerTick);
+			
+		}
+	}
     
     /**
      * Sets the channel programs of all DeviceChannels used. This

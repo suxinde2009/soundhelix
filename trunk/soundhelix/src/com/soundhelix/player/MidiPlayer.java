@@ -109,7 +109,7 @@ public class MidiPlayer extends AbstractPlayer {
 	
 	private int bpm;
 	private int transposition;
-	private int groove[];
+	private int[] groove;
 	
 	private Map<Integer,DeviceChannel> channelMap;
 	private Map<String,Device> deviceMap;
@@ -121,10 +121,7 @@ public class MidiPlayer extends AbstractPlayer {
 	
 	// true if at least one MIDI device requires clock synchronization
 	boolean useClockSynchronization = false;
-	
-	
-	
-	
+		
     public MidiPlayer() {
     	super();
     }
@@ -150,7 +147,7 @@ public class MidiPlayer extends AbstractPlayer {
     }
     
     /**
-     * Returns a string containing all MIDI devices that can receive MIDI
+     * Returns a string containing all available MIDI devices in the system that can receive MIDI
      * messages.
      * 
      * @return the string of MIDI devices
@@ -161,7 +158,7 @@ public class MidiPlayer extends AbstractPlayer {
 
     	MidiDevice.Info[] info = MidiSystem.getMidiDeviceInfo();
 
-    	int num = 1;
+    	int num = 0;
 
     	for(int i=0;i<info.length;i++) {
     		try {
@@ -171,7 +168,7 @@ public class MidiPlayer extends AbstractPlayer {
     				if(sb.length() > 0) {
     					sb.append('\n');
     				}
-    				sb.append("MIDI device "+(num++)+": \""+info[i].getName()+"\"");
+    				sb.append("MIDI device "+(++num)+": \""+info[i].getName()+"\"");
     			}
     		} catch(Exception e) {}
     	}
@@ -179,7 +176,7 @@ public class MidiPlayer extends AbstractPlayer {
     	return sb.toString();
     }
     
-    public void close() {
+    public final void close() {
     	if(devices != null && opened) {
     		try {
     			muteAllChannels();
@@ -264,7 +261,7 @@ public class MidiPlayer extends AbstractPlayer {
      * @param grooveString the groove string
      */
 
-    public void setGroove(String grooveString) {
+    public final void setGroove(String grooveString) {
     	if(grooveString == null || grooveString.equals("")) {
     		grooveString = "1";
     	}
@@ -321,55 +318,18 @@ public class MidiPlayer extends AbstractPlayer {
     	return null;
     }
       
-    public void play(Arrangement arrangement) {
+    public final void play(Arrangement arrangement) {
     	if(!opened) {
     		throw(new RuntimeException("Must call open() first"));
     	}
     		
     	try {
-    		Structure structure = arrangement.getStructure();
+     		initializeControllerLFOs(arrangement);
+ 			muteAllChannels();
+            setChannelPrograms();            
 
-    		for(int i=0;i<controllerLFOs.length;i++) {
-    			ControllerLFO clfo = controllerLFOs[i];
+       		Structure structure = arrangement.getStructure();
 
-    			if(clfo.rotationUnit.equals("song")) {
-    				clfo.lfo.setPhase((int)(1000000d*clfo.phase));
-    				clfo.lfo.setSongSpeed((int)(1000f*clfo.speed),structure.getTicks(),1000*bpm);
-    				
-    			} else if(clfo.rotationUnit.equals("activity")) {
-    				
-    				// if the instrument is inactive or not part of the song, we
-    				// use the whole song as the length (this LFO is then a no-op)
-    				
-    				int[] ticks = getInstrumentActivity(arrangement,clfo.instrument);
-    				
-    				int startTick = 0;
-    				int endTick = structure.getTicks();
-    				
-    				if(ticks != null) {
-    					startTick = ticks[0];
-    					endTick = ticks[1];
-
-    					if(startTick >= endTick) {
-    						// track belonging to instrument is silent all the time
-    						startTick = 0;
-    						endTick = structure.getTicks();
-    					}
-    				}
-    				
-    				clfo.lfo.setPhase((int)(1000000d*clfo.phase));
-    				clfo.lfo.setActivitySpeed((int)(1000f*clfo.speed),startTick,endTick,1000*bpm);    				
-    			} else if(clfo.rotationUnit.equals("beat")) {
-    				clfo.lfo.setPhase((int)(1000000d*clfo.phase));
-    				clfo.lfo.setBeatSpeed((int)(1000f*clfo.speed),structure.getTicksPerBeat(),1000*bpm);
-    			} else if(clfo.rotationUnit.equals("second")) {
-    				clfo.lfo.setPhase((int)(1000000d*clfo.phase));
-    				clfo.lfo.setTimeSpeed((int)(1000f*clfo.speed),structure.getTicksPerBeat(),1000*bpm);
-    			} else {
-    				throw(new RuntimeException("Invalid rotation unit \""+clfo.rotationUnit+"\""));
-    			}
-    		}
-    		
     		// when clock synchronization is used, we must make sure that
     		// the ticks per beat divide CLOCK_SYNCHRONIZATION_TICKS_PER_BEAT
     		
@@ -383,9 +343,6 @@ public class MidiPlayer extends AbstractPlayer {
     		List<int[]> posList = new ArrayList<int[]>();
 
     		System.out.println("Song length: "+(structure.getTicks()*60/(structure.getTicksPerBeat()*bpm))+" seconds");
-
-			muteAllChannels();
-            setChannelPrograms();            
 
             if(useClockSynchronization) {
                 sendShortMessageToClockSynchronized(ShortMessage.START);
@@ -407,87 +364,12 @@ public class MidiPlayer extends AbstractPlayer {
     			posList.add(new int[size]);
     		}
 
-    		int tick = 0;
-
-    		int ticksPerBar = structure.getTicksPerBar();
-
     		List<Integer> legatoList = new ArrayList<Integer>();
+
+    		int tick = 0;
     		
     		while(tick < structure.getTicks()) {
-    			i = arrangement.iterator();
-
-    			if((tick % (2*ticksPerBar)) == 0) {
-    				System.out.printf("Tick: %4d   Seconds: %3d  %5.1f %%\n",tick,tick*60/(structure.getTicksPerBeat()*bpm),(double)tick*100d/(double)structure.getTicks());
-    			}
-
-    			sendControllerLFOMessages(tick);
-    			
-    			for(int k=0;i.hasNext();k++) {
-    				ArrangementEntry e = i.next();
-    				Track track = e.getTrack();
-    				int instrument = e.getInstrument();
-
-    				DeviceChannel channel = channelMap.get(instrument);
-        			
-    				if(channel == null) {
-    					throw(new RuntimeException("Instrument "+instrument+" not mapped to MIDI device/channel combination"));
-    				}
-
-    				int[] t = tickList.get(k);
-    				int[] p = posList.get(k);
-
-    				legatoList.clear();
-    				
-    				for(int j=0;j<t.length;j++) {
-
-    					if(--t[j] <= 0) {
-    						Sequence s = track.get(j);
-
-    						if(p[j] > 0) {
-    							SequenceEntry prevse = s.get(p[j]-1);
-    							if(prevse.isNote()) {
-    								int pitch = (track.getType() == TrackType.MELODY ? transposition : 0)+prevse.getPitch();
-    								
-    								if(!prevse.isLegato()) {
-    									sm.setMessage(ShortMessage.NOTE_OFF,channel.channel,pitch,0);
-    									channel.device.receiver.send(sm,-1);
-    								} else  {
-    									// remember pitch for NOTE_OFF after the next NOTE_ON
-    									legatoList.add(pitch);
-    								}
-    							}
-    						}
-    					}
-    				}
-
-    				for(int j=0;j<t.length;j++) {
-    					if(t[j] <= 0) {
-    						try {
-    							Sequence s = track.get(j);
-    							SequenceEntry se = s.get(p[j]);
-
-    							if(se.isNote()) {
-    								int pitch = ((track.getType() == TrackType.MELODY ? transposition : 0)+se.getPitch());
-    								sm.setMessage(ShortMessage.NOTE_ON,channel.channel,pitch,getMidiVelocity(se.getVelocity()));
-    								channel.device.receiver.send(sm,-1);
-    								
-    								// remove pitch if it is on the legato list
-    								legatoList.remove((Integer)pitch);
-    							}
-
-    							p[j]++;
-    							t[j] = se.getTicks();
-    						} catch(Exception x) {throw new RuntimeException("Error at k="+k+"  j="+j+"  p[j]="+p[j],x);}
-    					}
-    				}
-
-    				// send NOTE_OFFs for all pitches on the legato list
-    				
-    				for(int pitch : legatoList) {
-    					sm.setMessage(ShortMessage.NOTE_OFF,channel.channel,pitch,0);
-    					channel.device.receiver.send(sm,-1);
-    				}	
-    			}
+    			playTick(arrangement, tick, tickList, posList, legatoList);
 
     			// wait for 1 tick
     			referenceTime = waitTicks(referenceTime,1,clockTimingsPerTick,structure.getTicksPerBeat(),tick);
@@ -495,35 +377,10 @@ public class MidiPlayer extends AbstractPlayer {
     			tick++;
     		}
     		
-    		// playing finished
-    		
+    		// playing finished	
     		// send a NOTE_OFF for all current notes
     		
-    		i = arrangement.iterator();
-
-    		for(int k=0;i.hasNext();k++) {
-    			ArrangementEntry e = i.next();
-    			Track track = e.getTrack();
-    			int instrument = e.getInstrument();
-
-    			DeviceChannel channel = channelMap.get(instrument);
-    			
-				if(channel == null) {
-					throw(new RuntimeException("Instrument "+instrument+" not mapped to MIDI device/channel combination"));
-				}
-
-    			int[] p = posList.get(k);
-
-    			for(int j=0;j<p.length;j++) {
-    				Sequence s = track.get(j);					
-    				SequenceEntry prevse = s.get(p[j]-1);
-
-    				if(prevse.isNote()) {
-    					sm.setMessage(ShortMessage.NOTE_OFF,channel.channel,(track.getType() == TrackType.MELODY ? transposition : 0)+prevse.getPitch(),0);
-    					channel.device.receiver.send(sm,-1);
-    				}
-    			}
-    		}
+    		muteActiveChannels(arrangement, posList);
     	
             referenceTime = waitTicks(referenceTime,WAIT_TICKS_AFTER_SONG,clockTimingsPerTick,structure.getTicksPerBeat(),0);
 
@@ -535,11 +392,173 @@ public class MidiPlayer extends AbstractPlayer {
     	}
     }
 
+	private void muteActiveChannels(Arrangement arrangement, List<int[]> posList) throws InvalidMidiDataException {
+		ShortMessage sm = new ShortMessage();
+		
+		Iterator<ArrangementEntry> i;
+		i = arrangement.iterator();
+
+		for(int k=0;i.hasNext();k++) {
+			ArrangementEntry e = i.next();
+			Track track = e.getTrack();
+			int instrument = e.getInstrument();
+
+			DeviceChannel channel = channelMap.get(instrument);
+			
+			if(channel == null) {
+				throw(new RuntimeException("Instrument "+instrument+" not mapped to MIDI device/channel combination"));
+			}
+
+			int[] p = posList.get(k);
+
+			for(int j=0;j<p.length;j++) {
+				Sequence s = track.get(j);					
+				SequenceEntry prevse = s.get(p[j]-1);
+
+				if(prevse.isNote()) {
+					sm.setMessage(ShortMessage.NOTE_OFF,channel.channel,(track.getType() == TrackType.MELODY ? transposition : 0)+prevse.getPitch(),0);
+					channel.device.receiver.send(sm,-1);
+				}
+			}
+		}
+	}
+
+	private void playTick(Arrangement arrangement, int tick, List<int[]> tickList, List<int[]> posList,
+			List<Integer> legatoList)
+			throws InvalidMidiDataException {
+		final ShortMessage sm = new ShortMessage();
+		
+		Structure structure = arrangement.getStructure();
+		int ticksPerBar = structure.getTicksPerBar();
+		Iterator<ArrangementEntry> i;
+		i = arrangement.iterator();
+
+		if((tick % (2*ticksPerBar)) == 0) {
+			System.out.printf("Tick: %4d   Seconds: %3d  %5.1f %%\n",tick,tick*60/(structure.getTicksPerBeat()*bpm),(double)tick*100d/(double)structure.getTicks());
+		}
+
+		sendControllerLFOMessages(tick);
+		
+		for(int k=0;i.hasNext();k++) {
+			ArrangementEntry e = i.next();
+			Track track = e.getTrack();
+			int instrument = e.getInstrument();
+
+			DeviceChannel channel = channelMap.get(instrument);
+			
+			if(channel == null) {
+				throw(new RuntimeException("Instrument "+instrument+" not mapped to MIDI device/channel combination"));
+			}
+
+			int[] t = tickList.get(k);
+			int[] p = posList.get(k);
+
+			legatoList.clear();
+			
+			for(int j=0;j<t.length;j++) {
+
+				if(--t[j] <= 0) {
+					Sequence s = track.get(j);
+
+					if(p[j] > 0) {
+						SequenceEntry prevse = s.get(p[j]-1);
+						if(prevse.isNote()) {
+							int pitch = (track.getType() == TrackType.MELODY ? transposition : 0)+prevse.getPitch();
+							
+							if(!prevse.isLegato()) {
+								sm.setMessage(ShortMessage.NOTE_OFF,channel.channel,pitch,0);
+								channel.device.receiver.send(sm,-1);
+							} else  {
+								// remember pitch for NOTE_OFF after the next NOTE_ON
+								legatoList.add(pitch);
+							}
+						}
+					}
+				}
+			}
+
+			for(int j=0;j<t.length;j++) {
+				if(t[j] <= 0) {
+					try {
+						Sequence s = track.get(j);
+						SequenceEntry se = s.get(p[j]);
+
+						if(se.isNote()) {
+							int pitch = ((track.getType() == TrackType.MELODY ? transposition : 0)+se.getPitch());
+							sm.setMessage(ShortMessage.NOTE_ON,channel.channel,pitch,getMidiVelocity(se.getVelocity()));
+							channel.device.receiver.send(sm,-1);
+							
+							// remove pitch if it is on the legato list
+							legatoList.remove((Integer)pitch);
+						}
+
+						p[j]++;
+						t[j] = se.getTicks();
+					} catch(Exception x) {throw new RuntimeException("Error at k="+k+"  j="+j+"  p[j]="+p[j],x);}
+				}
+			}
+
+			// send NOTE_OFFs for all pitches on the legato list
+			
+			for(int pitch : legatoList) {
+				sm.setMessage(ShortMessage.NOTE_OFF,channel.channel,pitch,0);
+				channel.device.receiver.send(sm,-1);
+			}	
+		}
+	}
+
+	private void initializeControllerLFOs(Arrangement arrangement) {
+		Structure structure = arrangement.getStructure();
+		
+		for(int i=0;i<controllerLFOs.length;i++) {
+			ControllerLFO clfo = controllerLFOs[i];
+
+			if(clfo.rotationUnit.equals("song")) {
+				clfo.lfo.setPhase((int)(1000000d*clfo.phase));
+				clfo.lfo.setSongSpeed((int)(1000f*clfo.speed),structure.getTicks(),1000*bpm);
+				
+			} else if(clfo.rotationUnit.equals("activity")) {
+				
+				// if the instrument is inactive or not part of the song, we
+				// use the whole song as the length (this LFO is then a no-op)
+				
+				int[] ticks = getInstrumentActivity(arrangement,clfo.instrument);
+				
+				int startTick = 0;
+				int endTick = structure.getTicks();
+				
+				if(ticks != null) {
+					startTick = ticks[0];
+					endTick = ticks[1];
+
+					if(startTick >= endTick) {
+						// track belonging to instrument is silent all the time
+						startTick = 0;
+						endTick = structure.getTicks();
+					}
+				}
+				
+				clfo.lfo.setPhase((int)(1000000d*clfo.phase));
+				clfo.lfo.setActivitySpeed((int)(1000f*clfo.speed),startTick,endTick,1000*bpm);    				
+			} else if(clfo.rotationUnit.equals("beat")) {
+				clfo.lfo.setPhase((int)(1000000d*clfo.phase));
+				clfo.lfo.setBeatSpeed((int)(1000f*clfo.speed),structure.getTicksPerBeat(),1000*bpm);
+			} else if(clfo.rotationUnit.equals("second")) {
+				clfo.lfo.setPhase((int)(1000000d*clfo.phase));
+				clfo.lfo.setTimeSpeed((int)(1000f*clfo.speed),structure.getTicksPerBeat(),1000*bpm);
+			} else {
+				throw(new RuntimeException("Invalid rotation unit \""+clfo.rotationUnit+"\""));
+			}
+		}
+	}
+
     /**
      * Sends messages to all configured controllers based on the LFOs.
      * A message is only send to a controller if its LFO value has changed or if tick is 0.
      *
      * @param tick the tick
+     * 
+     * @throws InvalidMidiDataException
      */
     
 	private void sendControllerLFOMessages(int tick) throws InvalidMidiDataException {
@@ -586,7 +605,8 @@ public class MidiPlayer extends AbstractPlayer {
      * @throws InterruptedException
      */
     
-    private long waitTicks(long referenceTime,int ticks,int clockTimingsPerTick,int ticksPerBeat,int startTick) throws InvalidMidiDataException,InterruptedException {
+    private long waitTicks(long referenceTime,int ticks,int clockTimingsPerTick,int ticksPerBeat,
+    		int startTick) throws InvalidMidiDataException,InterruptedException {
     	long lastWantedNanos = referenceTime;
     	
     	for(int t=0;t<ticks;t++) {
@@ -671,7 +691,7 @@ public class MidiPlayer extends AbstractPlayer {
 	 * @throws InvalidMidiDataException
 	 */
 	
-	public void muteAllChannels() throws InvalidMidiDataException {
+	public final void muteAllChannels() throws InvalidMidiDataException {
 		ShortMessage sm = new ShortMessage();
 		Iterator<DeviceChannel> iter = channelMap.values().iterator();
 		
@@ -699,12 +719,14 @@ public class MidiPlayer extends AbstractPlayer {
      */
     
     private static int getMidiVelocity(short velocity) {
-    	if(velocity == 0) return 0;
-    	
+    	if(velocity == 0) {
+    		return 0;
+    	}
+
     	return(1+(velocity-1)*126/(Short.MAX_VALUE-126));  	
     }
     
-    public void setControllerLFOs(ControllerLFO[] controllerLFOs) {
+    public final void setControllerLFOs(ControllerLFO[] controllerLFOs) {
     	this.controllerLFOs = controllerLFOs;
     }
     
@@ -766,7 +788,7 @@ public class MidiPlayer extends AbstractPlayer {
     	return null;
     }
     
-    public void configure(Node node,XPath xpath) throws XPathException {
+    public final void configure(Node node,XPath xpath) throws XPathException {
     	random = new Random(randomSeed);
     	
 		NodeList nodeList = (NodeList)xpath.evaluate("device",node,XPathConstants.NODESET);
@@ -864,8 +886,7 @@ public class MidiPlayer extends AbstractPlayer {
 		setControllerLFOs(controllerLFOs);
     }
     
-    public class Device
-    {
+    private final class Device {
     	private final String name;
     	private final String midiName;
     	private MidiDevice midiDevice;
@@ -914,8 +935,7 @@ public class MidiPlayer extends AbstractPlayer {
     	}
     }
     
-    public class DeviceChannel
-    {
+    public class DeviceChannel {
     	private final Device device;
     	private final int channel;
     	private final int program;
@@ -926,21 +946,21 @@ public class MidiPlayer extends AbstractPlayer {
     		this.program = program;
     	}
 
-    	public boolean equals(Object object) {
-    		if(object == null || !(object instanceof DeviceChannel))
+    	public final boolean equals(Object object) {
+    		if(object == null || !(object instanceof DeviceChannel)) {
     			return false;
+    		}
     		
     		DeviceChannel other = (DeviceChannel)object;    		
     		return this == other || device.equals(other.device) && channel == other.channel && program == other.program;
     	}
 
-    	public int hashCode() {
+    	public final int hashCode() {
     		return device.hashCode() * 4711 + channel*513 + program;
     	}    	
     }
     
-    public class ControllerLFO
-    {
+    public class ControllerLFO {
     	private LFO lfo;
     	private final String deviceName;
     	private int channel;

@@ -164,8 +164,6 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
 			activityVectors = createActivityVectors(vectors);
 
-			int v = 0;
-
 			Iterator<ActivityVectorConfiguration> it = neededActivityVector.values().iterator();
 			
 			for(int i=0;i<vectors;i++) {
@@ -173,7 +171,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
 				ActivityVector av = activityVectors[i];
 				
-				double active = 100.0d*(double)av.getActiveTicks()/(double)ticks;
+				double active = 100.0d*av.getActiveTicks()/ticks;
 
 				// check if one of the constraints is violated
 
@@ -268,7 +266,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 			}
 			
 			int activeTicks = av.getActiveTicks();
-			sb.append(activeTicks > 0 ? String.format(" %5.1f%%\n",100.0d*(double)activeTicks/(double)ticks) : "\n");
+			sb.append(activeTicks > 0 ? String.format(" %5.1f%%\n",100.0d*activeTicks/ticks) : "\n");
 		}
 
 		sb.append(String.format("%"+maxLen+"s  ",""));
@@ -672,7 +670,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 	 */
 		
 	private int getActivityVectorMaximum(int activityVectors,double factor,double lambda) {
-		return (int)(0.5d+(double)activityVectors*(factor+(1d-factor)*Math.exp(-lambda*(double)(activityVectors-1))));
+		return (int)(0.5d+activityVectors*(factor+(1d-factor)*Math.exp(-lambda*(activityVectors-1))));
 	}
 	
 	public void setActivityVectorConfiguration(

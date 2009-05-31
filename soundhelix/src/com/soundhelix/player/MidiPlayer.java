@@ -41,7 +41,7 @@ import com.soundhelix.util.XMLUtils;
  * each synchronized device 24 times per beat. For the synchronization to work,
  * each device will be sent a START event before playing and a STOP event after
  * playing. MIDI synchronization works independent of the selected groove. Timing ticks are sent out
- * using a fixed frequency, even though sending out note MIDI messages can vary depending on the
+ * using a fixed frequency according to the BPM, even though sending out note MIDI messages can vary depending on the
  * selected groove. Clock synchronization should be used for devices using synchronized
  * effects (for example, synchronized echo) in order to communicate the BPM
  * speed to use. As clock synchronization requires some additional overhead,
@@ -322,7 +322,7 @@ public class MidiPlayer extends AbstractPlayer {
     	return null;
     }
       
-    public final void play(Arrangement arrangement) {
+    public void play(Arrangement arrangement) {
     	if(!opened) {
     		throw(new RuntimeException("Must call open() first"));
     	}
@@ -628,16 +628,19 @@ public class MidiPlayer extends AbstractPlayer {
     	for(int t=0;t<ticks;t++) {
     	    for(int s=0;s<clockTimingsPerTick;s++) {    				
     		
-    	    	long length = getTimingTickNanos(ticksPerBeat, clockTimingsPerTick);
-				
-				long wantedNanos = lastWantedNanos + length;
-				long wait = Math.max(0,wantedNanos - System.nanoTime());
-
-				Thread.sleep((int)(wait/1000000l),(int)(wait%1000000l));
-
     	    	if(useClockSynchronization) {
     				sendShortMessageToClockSynchronized(ShortMessage.TIMING_CLOCK);
         	    }
+
+    	    	long length = getTimingTickNanos(clockTimingsPerTick, ticksPerBeat);
+    	    	
+				long wantedNanos = lastWantedNanos + length;
+				long wait = Math.max(0,wantedNanos - System.nanoTime());
+
+
+				if(wait > 0) {
+				    Thread.sleep((int)(wait/1000000l),(int)(wait%1000000l));
+				}
 
 				lastWantedNanos = wantedNanos;
 			}
@@ -648,14 +651,15 @@ public class MidiPlayer extends AbstractPlayer {
 
     /**
      * Waits until either time1 or time2 (both are given in nano seconds) is reached, whichever comes first. Both
-     * times are based on System.nanos().
+     * times are based on System.nanoTime(). If time1 or time2 is in the past, this method returns immediately.
+     * In all cases, the time waited on is returned (either time1 or time2).
      * 
      * @param time1 the first point in time
      * @param time2 the second point in time
      * 
      * @return the point in time waited on (minimum of time1 and time2)
      *
-     * @throws Interrupted exception in case of sleep interruption
+     * @throws InterruptedException in case of sleep interruption
      */
     
     private long waitNanos(long time1,long time2) throws InterruptedException {

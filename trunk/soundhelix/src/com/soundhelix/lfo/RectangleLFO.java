@@ -8,8 +8,10 @@ package com.soundhelix.lfo;
  */
 
 public class RectangleLFO extends AbstractLFO {
+	private static final double TWO_PI = 2.0d*Math.PI;
+
 	public double getValue(double angle) {
-	    angle = (angle%(2.0d*Math.PI));
+		angle = ((angle % TWO_PI) + TWO_PI) % TWO_PI;
 	    return angle < Math.PI ? 0d : 1d;
 	}
 }

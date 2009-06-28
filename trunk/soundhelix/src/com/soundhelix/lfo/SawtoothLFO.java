@@ -9,7 +9,9 @@ package com.soundhelix.lfo;
  */
 
 public class SawtoothLFO extends AbstractLFO {
-    private boolean up;
+	private static final double TWO_PI = 2.0d*Math.PI;
+
+	private boolean up;
     
     public SawtoothLFO() {
     	this(true);
@@ -20,7 +22,7 @@ public class SawtoothLFO extends AbstractLFO {
     }
     
 	public double getValue(double angle) {
-	    angle = (angle%(2.0d*Math.PI));
+		angle = ((angle % TWO_PI) + TWO_PI) % TWO_PI;
 	    
 	    if(up) {
 	        return 1.0d-angle/2.0d/Math.PI;

@@ -900,7 +900,6 @@ public class MidiPlayer extends AbstractPlayer {
 		ControllerLFO[] controllerLFOs = new ControllerLFO[entries];
 		
 		for(int i=0;i<entries;i++) {
-			System.out.println("Parsing entry "+i);
 			int minimum = XMLUtils.parseInteger(random,(Node)xpath.evaluate("minimum",nodeList.item(i),XPathConstants.NODE),xpath);
 			int maximum = XMLUtils.parseInteger(random,(Node)xpath.evaluate("maximum",nodeList.item(i),XPathConstants.NODE),xpath);
 			double speed = XMLUtils.parseDouble(random,(Node)xpath.evaluate("speed",nodeList.item(i),XPathConstants.NODE),xpath);

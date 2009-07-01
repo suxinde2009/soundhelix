@@ -49,8 +49,8 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 	private ArrangementEntry[] arrangementEntries;
 	private HashMap<String,ActivityVectorConfiguration> activityVectorConfigurationHashMap;
 	
-	// maximum number of tries before failing
-	private static final int MAX_TRIES = 100000;
+	// maximum number of iterations before failing
+	private int maxIterations;
 	
 	public SimpleArrangementEngine() {
 		super();
@@ -207,7 +207,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 										
 					tries++;
 
-				    if(tries >= MAX_TRIES) {
+				    if(tries >= maxIterations) {
 				    	if(logger.isDebugEnabled()) {
 				    		Iterator<String> it2 = constraintFailure.keySet().iterator();
 
@@ -217,9 +217,9 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 				    		}
 				    	}
 				    					    	
-				        throw(new RuntimeException("Couldn't satisfy activity constraints within "+tries+" tries"));
+				        throw(new RuntimeException("Couldn't satisfy activity constraints within "+tries+" iterations"));
 				    } else {
-				        // one constraint wasn't satisfied, retry
+				        // we haven't reached the iteration limit yet, retry
 				        continue again;
 				    }				        
 				}
@@ -524,6 +524,14 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 	public void configure(Node node,XPath xpath) throws XPathException {
 		random = new Random(randomSeed);
 
+		int maxIterations = 100000;
+		
+		try {
+			maxIterations = XMLUtils.parseInteger(random,"maxIterations",node,xpath);
+		} catch(Exception e) {}
+		
+		setMaxIterations(maxIterations);
+
 		String activityString = XMLUtils.parseString(random,"startActivityCounts",node,xpath);
 
 		if(activityString == null) {
@@ -746,5 +754,9 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
 	public void setMaxActivityChangeCount(int maxActivityChangeCount) {
 		this.maxActivityChangeCount = maxActivityChangeCount;
+	}
+
+	public void setMaxIterations(int maxIterations) {
+		this.maxIterations = maxIterations;
 	}
 }

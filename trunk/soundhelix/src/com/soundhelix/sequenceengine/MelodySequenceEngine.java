@@ -117,7 +117,11 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
     	do {
     		again = false;
     		int r = random.nextInt(3);
-
+    		
+    		if(r == 2 && random.nextFloat() > 0.4f) {
+    			r = random.nextInt(2);
+    		}
+    		
     		if(r == 0 || p < -12) {
     			// move up
     			p += random.nextInt(maxDistanceUp);
@@ -161,6 +165,10 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
     		again = false;
     		p = pitch;
     		int r = random.nextInt(3);
+
+    		if(r == 2 && random.nextFloat() > 0.4f) {
+    			r = random.nextInt(2);
+    		}
 
     		if(r == 0 || p < -12) {
     			// move up
@@ -227,7 +235,7 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
         				// reuse the previous pitch
         				list.add(new PatternEntry(pitch,entry.getVelocity(),t));
         			} else {
-        				pitch = getRandomPitch(chord,pitch == Integer.MIN_VALUE ? 0 : pitch,3,3);
+        				pitch = getRandomPitch(chord,pitch == Integer.MIN_VALUE ? 0 : pitch,2,2);
         				list.add(new PatternEntry(pitch,entry.getVelocity(),t));
         			}
         			

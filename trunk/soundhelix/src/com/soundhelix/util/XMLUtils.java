@@ -38,7 +38,7 @@ public class XMLUtils {
 	 * Returns the first child of the given node that is an element node. If
 	 * such node doesn't exist, null is returned.
 	 * 
-	 * @param the node
+	 * @param node the node
 	 * 
 	 * @return the first element child node
 	 */
@@ -60,7 +60,7 @@ public class XMLUtils {
 	 * Returns the given node's next element sibling. If such node doesn't exist,
 	 * null is returned.
 	 * 
-	 * @param the node
+	 * @param node the node
 	 * 
 	 * @return the next sibling element node
 	 */

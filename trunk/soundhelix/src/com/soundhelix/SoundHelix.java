@@ -8,17 +8,17 @@ import java.util.concurrent.LinkedBlockingQueue;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathException;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
@@ -30,9 +30,6 @@ import com.soundhelix.misc.Structure;
 import com.soundhelix.player.MidiPlayer;
 import com.soundhelix.player.Player;
 import com.soundhelix.util.XMLUtils;
-
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 
 /**
  * Implements the main class. The main() method determines the configuration
@@ -48,8 +45,8 @@ import org.apache.log4j.PropertyConfigurator;
 // TODO: provide a DTD or XML Schema for the configuration file
 
 public class SoundHelix implements Runnable {
-    private static final boolean enableSchemaValidation = false;
-	private static final String validationSchemaFilename = "SoundHelix.xsd";
+    private static final boolean ENABLE_SCHEMA_VALIDATION = false;
+	private static final String VALIDATION_SCHEMA_FILENAME = "SoundHelix.xsd";
 
     private static Logger logger;
 
@@ -205,8 +202,7 @@ public class SoundHelix implements Runnable {
 		return structure;
 	}
 	
-	private class SongQueueEntry
-	{
+	private class SongQueueEntry {
 		Arrangement arrangement;
 		Player player;
 		
@@ -264,10 +260,10 @@ public class SoundHelix implements Runnable {
         DocumentBuilder builder = dbf.newDocumentBuilder();
         Document doc = builder.parse(file);
 
-        if(enableSchemaValidation) {
+        if(ENABLE_SCHEMA_VALIDATION) {
             // create a SchemaFactory capable of understanding WXS schemas
             SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            Schema schema = factory.newSchema(new StreamSource(new File(validationSchemaFilename)));
+            Schema schema = factory.newSchema(new StreamSource(new File(VALIDATION_SCHEMA_FILENAME)));
 
             // validate the DOM tree against the schema
             
@@ -290,7 +286,7 @@ public class SoundHelix implements Runnable {
 		Node playerNode = (Node)xpath.evaluate("player",mainNode,XPathConstants.NODE);
 
 		Structure structure = parseStructure(random,structureNode,xpath);
-
+	
 		HarmonyEngine harmonyEngine = XMLUtils.getInstance(HarmonyEngine.class,harmonyEngineNode,xpath,randomSeed^47357892832l);
 		structure.setHarmonyEngine(harmonyEngine);	
 
@@ -303,6 +299,10 @@ public class SoundHelix implements Runnable {
 		if(logger.isDebugEnabled()) {
 			logger.debug("Rendering took "+(time/1000000)+" ms");
 		}
+		
+		//Arrangement.saveArrangement(arrangement,"songs/"+Long.toHexString(randomSeed));
+
+		//arrangement = Arrangement.loadArrangement("songs/73f29f5b0d51b000");	
 		
 		Player player = XMLUtils.getInstance(Player.class,playerNode,xpath,randomSeed^5915925127l);					
 		return new SongQueueEntry(arrangement,player);

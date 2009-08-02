@@ -180,6 +180,10 @@ public class MidiPlayer extends AbstractPlayer {
     	return sb.toString();
     }
     
+    /**
+     * Closes all MIDI devices.
+     */
+    
     public final void close() {
     	if(devices != null && opened) {
     		try {

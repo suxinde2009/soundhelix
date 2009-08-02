@@ -37,7 +37,7 @@ public abstract class AbstractLFO implements LFO {
      * Returns the LFO's value of the given angle as a double.
      * The returned value must be between 0 and 1 (both inclusive).
      * 
-     * @param the angle in radians (non-negative)
+     * @param angle the angle in radians (non-negative)
      * 
      * @return the LFO's value (between 0 and 1, both inclusive)
      */

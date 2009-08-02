@@ -435,7 +435,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         		do {lastAddedBit = setRandomBit(bitset,num,lastRemovedBit);} while(bitset.cardinality() < wantedActivityVectors);
         	} else if(card > wantedActivityVectors) {
         		do {lastRemovedBit = clearRandomBit(bitset,lastAddedBit);} while(bitset.cardinality() > wantedActivityVectors);
-        	} else if(card > 0 && random.nextFloat() > 0.5) {
+        	} else if(card > 0 && random.nextFloat() < 0.5f) {
         		lastRemovedBit = clearRandomBit(bitset,lastAddedBit);
         		lastAddedBit = setRandomBit(bitset,num,lastRemovedBit);
         	}
@@ -503,8 +503,8 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 			
 			do {
 				num = min+random.nextInt(maxActivityVectors-min+1);
-			} while(Math.abs(num-lastCount) > maxActivityChangeCount || (num == lastCount && random.nextBoolean()));
-					
+			} while(Math.abs(num-lastCount) > maxActivityChangeCount || (num == lastCount && random.nextFloat() >= 0.1f));
+
 			return num;
 		}
 	}

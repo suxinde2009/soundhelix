@@ -22,23 +22,23 @@
       <maxActive>90</maxActive>
       <startShift>0</startShift>
       <stopShift>-4</stopShift>
-      <startAfterSection>1</startAfterSection>
-      <stopBeforeSection>0</stopBeforeSection>
+      <startAfterSection>3</startAfterSection>
+      <stopBeforeSection>2</stopBeforeSection>
     </activityVector>
     <activityVector name="clap">
-      <minActive>35</minActive>
-      <maxActive>100</maxActive>
-      <startShift>-2</startShift>
-      <stopShift>0</stopShift>
-      <startAfterSection>1</startAfterSection>
-      <stopBeforeSection>0</stopBeforeSection>
-    </activityVector>
-    <activityVector name="hihat">
-      <minActive>35</minActive>
+      <minActive>40</minActive>
       <maxActive>100</maxActive>
       <startShift>0</startShift>
       <stopShift>0</stopShift>
-      <startAfterSection>0</startAfterSection>
+      <startAfterSection>2</startAfterSection>
+      <stopBeforeSection>0</stopBeforeSection>
+    </activityVector>
+    <activityVector name="hihat">
+      <minActive>40</minActive>
+      <maxActive>100</maxActive>
+      <startShift>0</startShift>
+      <stopShift>0</stopShift>
+      <startAfterSection>1</startAfterSection>
       <stopBeforeSection>0</stopBeforeSection>
     </activityVector>
     <activityVector name="snare">
@@ -46,14 +46,14 @@
       <maxActive>100</maxActive>
       <startShift>0</startShift>
       <stopShift>0</stopShift>
-      <startAfterSection>1</startAfterSection>
+      <startAfterSection>2</startAfterSection>
       <stopBeforeSection>0</stopBeforeSection>
     </activityVector>
     <activityVector name="arpeggio1"/>
     <activityVector name="bass">
       <minActive>40</minActive>
       <maxActive>85</maxActive>
-	  <startAfterSection>0</startAfterSection>
+	  <startAfterSection>1</startAfterSection>
     </activityVector>
     <activityVector name="distort1"/>
     <activityVector name="chord1"/>
@@ -62,7 +62,7 @@
       <stopShift>1</stopShift>
     </activityVector>
     <activityVector name="rhythm">
-      <startAfterSection>0</startAfterSection>
+      <startAfterSection>2</startAfterSection>
       <stopBeforeSection>0</stopBeforeSection>
     </activityVector>
     <activityVector name="pad2">
@@ -72,7 +72,7 @@
     <activityVector name="strange"/>
     <activityVector name="acid">
 	  <minActive allowInactive="true">20</minActive>
-	  <startAfterSection>0</startAfterSection>
+	  <startAfterSection>2</startAfterSection>
       <stopBeforeSection>0</stopBeforeSection>
 	</activityVector>
     <activityVector name="arpeggio2"/>
@@ -83,15 +83,23 @@
       <minActive allowInactive="true">10</minActive>
       <maxActive>25</maxActive>
       <stopShift>0</stopShift>
-      <startAfterSection>2</startAfterSection>
+      <startAfterSection>4</startAfterSection>
       <stopBeforeSection>0</stopBeforeSection>
     </activityVector>
     <activityVector name="sawtooth">
       <stopShift>1</stopShift>
     </activityVector>
     <activityVector name="shortchord"/>
-	<activityVector name="acidbass"/>
+	<activityVector name="acidbass">
+	  <startAfterSection>2</startAfterSection>
+	</activityVector>
 	<activityVector name="arpeggio4"/>
+	<activityVector name="bass2">
+	  <startAfterSection>0</startAfterSection>
+      <stopBeforeSection>-1</stopBeforeSection>
+	  <minActive allowInactive="true">30</minActive>
+	</activityVector>
+
     <track>
       <instrument>1</instrument>
       <sequenceEngine class="PadSequenceEngine">
@@ -103,7 +111,7 @@
       <instrument>3</instrument>
       <sequenceEngine class="DrumSequenceEngine">
         <pattern pitch="36" activityGroup="0"><random list="10001000100010001000100010001001100010001000100010001000100010101000100010001000100010001000100110001000100010001000100011101011|10001000100010001000100010001010|1000100010001000100010001000101010001000100010001000100010001001|10001000100010001000100010001000100010001000100010001000100010101000100010001000100010001000100010001000100010001000101010011011|10001000100010001000100010001001100010001000100010001000100010101000100010001000100010001000100110001000100010001000100010010101"/></pattern>
-        <pattern pitch="37" activityGroup="1"><random list="00001000000010000000100000001000000010000000100000001000000110100000100000001000000010000000100000001000000010000000100001001000|0000100000001000000010000000100000001000000010000000100000001001|00001000000010000000100000001001000010000000100000001000010010100000100000001000000010000000100100001000000010000000100001001011|10001000100010001000100010001001100010001000100010001000100010011000100010001000100010001000100110001000100010011010101010101010"/></pattern>
+        <pattern pitch="37" activityGroup="1"><random list="00001000000010000000100000001000000010000000100000001000000110100000100000001000000010000000100000001000000010000000100001001000|0000100000001000000010000000100000001000000010000000100000001001|00001000000010000000100000001001000010000000100000001000010010100000100000001000000010000000100100001000000010000000100001001011"/></pattern>
         <pattern pitch="40" activityGroup="2"><random list="10001000100010001100100010001000|1100|1101|1111"/></pattern>
         <pattern pitch="44" activityGroup="2"><random list="0010|0010|0010001000100010001000100010001000100010001000100010001000100101|00100010001001000010001000100101"/></pattern>
         <pattern pitch="39" activityGroup="2"><random list="01000010|0000100100101000"/></pattern>
@@ -302,6 +310,15 @@
       </sequenceEngine>
       <activityVector>arpeggio4</activityVector>
     </track>
+	<track>
+      <instrument>20</instrument>
+      <sequenceEngine class="PatternSequenceEngine">
+        <obeyChordSubtype>no</obeyChordSubtype>
+		<pattern>0:1,-,0:1,-,0:1,0:1,-,0:1,0:1,-,0:1,-,0:1,0:1,-,0:1,0:1,-,0:1,-,0:1,0:1,-,0:1,0:1,-,0:1,-,0:1,0:1,-,3:20000,0:1,-,0:1,-,0:1,0:1,-,0:1,0:1,-,0:1,-,0:1,0:1,-,0:1,0:1,-,0:1,-,0:1,0:1,-,0:1,0:1,-,0:1,0:1,-,0:1,-,3:20000</pattern>
+        <pattern>-,-,0:1,-,-,0:1,-,-,-,-,0:1,-,-,0:1,-,-,-,-,0:1,-,-,0:1,-,-,-,-,0:1,-,-,0:1,-,0:1,-,-,0:1,-,-,0:1,-,-,-,-,0:1,-,-,0:1,-,-,-,-,0:1,-,-,0:1,-,-,-,-,0:1,-,-,0:1,4:20000,2:10000</pattern>
+		</sequenceEngine>
+      <activityVector>bass2</activityVector>
+	</track>
 
   </arrangementEngine>
   <player class="MidiPlayer">
@@ -330,6 +347,7 @@
 	<map instrument="17" device="device2" channel="1"/>
 	<map instrument="18" device="device2" channel="2"/>
 	<map instrument="19" device="device2" channel="3"/>
+	<map instrument="20" device="device2" channel="4"/>
     <lfo class="TriangleLFO">
 	  <rotationUnit>activity</rotationUnit>
 	  <instrument>10</instrument>
@@ -348,6 +366,15 @@
 	  <maximum>127</maximum>
 	  <controller>modulationWheel</controller>
 	  <channel>2</channel>
+	  <device>device2</device>
+	</lfo>
+		<lfo class="TriangleLFO">
+	  <rotationUnit>beat</rotationUnit>
+	  <speed>0.0025</speed>
+	  <minimum>0</minimum>
+	  <maximum>127</maximum>
+	  <controller>modulationWheel</controller>
+	  <channel>4</channel>
 	  <device>device2</device>
 	</lfo>
   </player>

@@ -61,7 +61,9 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 		
 		int tracks = arrangementEntries.length;
 
-		createConstrainedActivityVectors(structure.getTicks(),tracks,neededActivityVectors);
+		ActivityVectorConfiguration[] vectors = neededActivityVectors.values().toArray(new ActivityVectorConfiguration[neededActivityVectors.size()]);
+		
+		createConstrainedActivityVectors(structure.getTicks(),tracks,vectors);
 		dumpActivityVectors(neededActivityVectors);
 		shiftIntervalBoundaries(neededActivityVectors);
 
@@ -134,19 +136,17 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 		}
 	}
 
-	private void createConstrainedActivityVectors(int ticks,int tracks,HashMap<String, ActivityVectorConfiguration> neededActivityVector) {
+	private void createConstrainedActivityVectors(int ticks,int tracks,ActivityVectorConfiguration[] activityVectorConfigurations) {
 		List<Integer> chordSectionStartTicks = HarmonyEngineUtils.getChordSectionStartTicks(structure);
 		int chordSections = chordSectionStartTicks.size();
 		
-		int vectors = neededActivityVector.size();
+		int vectors = activityVectorConfigurations.length;
 
 		logger.debug("Creating "+vectors+" ActivityVectors for "+tracks+" tracks");
 
 		startActivityCounts = parseActivityCounts(startActivityCountsString,vectors);
 		stopActivityCounts = parseActivityCounts(stopActivityCountsString,vectors);
 		
-		ActivityVector[] activityVectors;
-
 		int tries = 0;
 
 		Map<String,Integer> constraintFailure = null;
@@ -159,26 +159,26 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 		
 		again: while(true) {
 			// create ActivityVectors at random
-			// then check if the constraints (minimum and maximum
-			// activity ratio) are met for each ActivityVector
+			// then check if the constraints are met for each ActivityVector
 
-			activityVectors = createActivityVectors(vectors);
+			// note that the constraint startAfterSection is already taken care of in the following method
+			// (unfortunately, it's not simple to do the same for stopBeforeSection)
 
-			Iterator<ActivityVectorConfiguration> it = neededActivityVector.values().iterator();
+			ActivityVector[] activityVectors = createActivityVectors(activityVectorConfigurations);
 			
 			for(int i=0;i<vectors;i++) {
-				ActivityVectorConfiguration avc = it.next();
-
 				ActivityVector av = activityVectors[i];
+				ActivityVectorConfiguration avc = activityVectorConfigurations[i];
 				
-				double active = 100.0d*av.getActiveTicks()/ticks;
-
 				// check if one of the constraints is violated
 
+				double active = 100.0d*av.getActiveTicks()/ticks;
+				int firstActiveTick = av.getFirstActiveTick();
+				
 				if(active < avc.minActive && (!avc.allowInactive || active > 0) || active > avc.maxActive ||
 				   avc.startAfterSection+1 >= chordSections || avc.stopBeforeSection+1 >= chordSections ||
-				   avc.startAfterSection >= 0 && av.getFirstActiveTick() < chordSectionStartTicks.get(avc.startAfterSection+1) ||
- 	               avc.stopBeforeSection >= 0 && av.getLastActiveTick()+1 > chordSectionStartTicks.get(chordSections-1-avc.stopBeforeSection)) {
+				   avc.stopBeforeSection >= 0 && av.getLastActiveTick() >= chordSectionStartTicks.get(chordSections-1-avc.stopBeforeSection) ||
+				   avc.startAfterSection >= 0 && firstActiveTick >= 0 && firstActiveTick < chordSectionStartTicks.get(avc.startAfterSection+1)) {
 				    
 					if(isDebug) {
 						String reason;
@@ -191,10 +191,11 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 							reason = "startAfterSection";
 						} else if(avc.stopBeforeSection+1 >= chordSections) {
 							reason = "stopBeforeSection";
-						} else if(avc.startAfterSection >= 0 && av.getFirstActiveTick() < chordSectionStartTicks.get(avc.startAfterSection+1)) {
-							reason = "startAfterSection";
-						} else if(avc.stopBeforeSection >= 0 && av.getLastActiveTick()+1 > chordSectionStartTicks.get(chordSections-1-avc.stopBeforeSection)) {
+						} else if(avc.stopBeforeSection >= 0 && av.getLastActiveTick() >= chordSectionStartTicks.get(chordSections-1-avc.stopBeforeSection)) {
 							reason = "stopAfterSection";
+						} else if(avc.startAfterSection >= 0 && firstActiveTick >= 0 && firstActiveTick < chordSectionStartTicks.get(avc.startAfterSection+1)) {
+							// should not happen as this is already checked in createActivityVectors()
+							reason = "startAfterSection";
 						} else {
 							reason = "unknown";
 						}
@@ -301,8 +302,8 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 	 * @return the number of the set bit (or -1 if no clear bit existed)
 	 */
 	
-	private int setRandomBit(BitSet bitset,int size,int avoidBit) {
-		int ones = bitset.cardinality();
+	private int setRandomBit(BitSet bitSet,int size,int avoidBit,int section,ActivityVectorConfiguration[] activityVectorConfigurations) {
+		int ones = bitSet.cardinality();
 		
 		if(ones >= size) {
 			return -1;
@@ -311,21 +312,25 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 		int zeroes = size-ones;
 
 		int bit;
+		int pos;
+		
+		do {
+			do {		
+				// choose random bit number
+				bit = random.nextInt(zeroes);
+			} while(zeroes > 1 && bit == avoidBit);
 
-		do {		
-			// choose random bit number
-			bit = random.nextInt(zeroes);
-		} while(zeroes > 1 && bit == avoidBit);
+			// set the bit'th zero bit
 
-		// set the bit'th zero bit
+			pos = bitSet.nextClearBit(0);
 
-		int pos = bitset.nextClearBit(0);
-
-		while(bit-- > 0) {
-			pos = bitset.nextClearBit(pos+1);
-		}
-
-		bitset.set(pos);
+			while(bit-- > 0) {
+				pos = bitSet.nextClearBit(pos+1);
+			}
+			// retry if we are trying to set a bit which shouldn't be set yet
+		} while(section <= activityVectorConfigurations[pos].startAfterSection);
+		
+		bitSet.set(pos);
 
 		return pos;	
 	}
@@ -382,15 +387,16 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 	 * @return the array of ActivityVectors
 	 */
 	
-	private ActivityVector[] createActivityVectors(int num) {
+	private ActivityVector[] createActivityVectors(ActivityVectorConfiguration[] activityVectorConfigurations) {
 		HarmonyEngine he = structure.getHarmonyEngine();
 		int sections = HarmonyEngineUtils.getChordSectionCount(structure);
+		int vectors = activityVectorConfigurations.length;
 		
-		// create num empty ActivityVectors
+		// create empty ActivityVectors
 		
-		ActivityVector[] activityVectors = new ActivityVector[num];
+		ActivityVector[] activityVectors = new ActivityVector[vectors];
 		
-		for(int i=0;i<num;i++) {
+		for(int i=0;i<vectors;i++) {
 			activityVectors[i] = new ActivityVector();
 		}
 		
@@ -407,10 +413,10 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
     	// the maximum number of ActivityVectors that may be active
     	// at each point in time
 
-    	int maxActivityVectors = Math.min(maxActivityCount,num);
+    	int maxActivityVectors = Math.min(maxActivityCount,vectors);
     	
     	if(maxActivityVectors <= 0) {
-    		maxActivityVectors = getActivityVectorMaximum(num,0.40,0.2);
+    		maxActivityVectors = getActivityVectorMaximum(vectors,0.40,0.2);
     	}
     	
     	int lastWantedActivityVectors = -1;
@@ -421,8 +427,8 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         	// get the number of ActivityVectors we want active for this chord section
         	int wantedActivityVectors = getActivityVectorCount(section,sections,maxActivityVectors,lastWantedActivityVectors);
         	
-        	// get the number of tracks that are currently active
-        	int card = bitset.cardinality();
+        	// get the number of ActivityVectors that are currently active
+        	int active = bitset.cardinality();
 
         	// add and/or remove bits from the BitSet until tracks
         	// bits are present
@@ -431,19 +437,19 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         	// section and not to add a bit that was removed in the previous
         	// section
         	
-        	if(card < wantedActivityVectors) {
-        		do {lastAddedBit = setRandomBit(bitset,num,lastRemovedBit);} while(bitset.cardinality() < wantedActivityVectors);
-        	} else if(card > wantedActivityVectors) {
+        	if(active < wantedActivityVectors) {
+        		do {lastAddedBit = setRandomBit(bitset,vectors,lastRemovedBit,section,activityVectorConfigurations);} while(bitset.cardinality() < wantedActivityVectors);
+        	} else if(active > wantedActivityVectors) {
         		do {lastRemovedBit = clearRandomBit(bitset,lastAddedBit);} while(bitset.cardinality() > wantedActivityVectors);
-        	} else if(card > 0 && random.nextFloat() < 0.5f) {
+        	} else if(active > 0 && random.nextFloat() < 0.5f) {
         		lastRemovedBit = clearRandomBit(bitset,lastAddedBit);
-        		lastAddedBit = setRandomBit(bitset,num,lastRemovedBit);
+        		lastAddedBit = setRandomBit(bitset,vectors,lastRemovedBit,section,activityVectorConfigurations);
         	}
         	
         	// check the BitSet and add activity or inactivity intervals
         	// for the current section
         	
-        	for(int i=0;i<num;i++) {
+        	for(int i=0;i<vectors;i++) {
         		if(bitset.get(i)) {
         			activityVectors[i].addActivity(len);
         		} else {

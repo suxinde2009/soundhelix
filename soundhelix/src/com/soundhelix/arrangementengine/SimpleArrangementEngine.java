@@ -192,7 +192,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 						} else if(avc.stopBeforeSection+1 >= chordSections) {
 							reason = "stopBeforeSection";
 						} else if(avc.stopBeforeSection >= 0 && av.getLastActiveTick() >= chordSectionStartTicks.get(chordSections-1-avc.stopBeforeSection)) {
-							reason = "stopAfterSection";
+							reason = "stopBeforeSection";
 						} else if(avc.startAfterSection >= 0 && firstActiveTick >= 0 && firstActiveTick < chordSectionStartTicks.get(avc.startAfterSection+1)) {
 							// should not happen as this is already checked in createActivityVectors()
 							reason = "startAfterSection";
@@ -231,7 +231,9 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 			break;
 		}
 		
-		logger.debug("Needed "+(tries+1)+" iteration"+(tries > 0 ? "s" : "")+" to satisfy constraints");
+		if (logger.isDebugEnabled()) {
+			logger.debug("Needed "+(tries+1)+" iteration"+(tries > 0 ? "s" : "")+" to satisfy constraints");
+		}
 	}
 
 	private void dumpActivityVectors(HashMap<String,ActivityVectorConfiguration> neededActivityVector) {
@@ -293,7 +295,9 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 	 * if not all bits are set already). From the set of false bits,
 	 * one is chosen at random and that bit is set to true. The method
 	 * avoids setting the bit given by avoidBit, unless there is only
-	 * 1 bit left that can be set to true.
+	 * 1 bit left that can be set to true. It also avoids to set a
+	 * bit if this would violate the startAfterSection or the stopBeforeSection
+	 * constraint.
 	 * 
 	 * @param bitSet the BitSet to modify
 	 * @param size the size of the BitSet
@@ -302,7 +306,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 	 * @return the number of the set bit (or -1 if no clear bit existed)
 	 */
 	
-	private int setRandomBit(BitSet bitSet,int size,int avoidBit,int section,ActivityVectorConfiguration[] activityVectorConfigurations) {
+	private int setRandomBit(BitSet bitSet,int size,int avoidBit,int section,int sections,ActivityVectorConfiguration[] activityVectorConfigurations) {
 		int ones = bitSet.cardinality();
 		
 		if(ones >= size) {
@@ -313,6 +317,10 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
 		int bit;
 		int pos;
+		
+		int stopPos = sections-1-section;
+		
+		ActivityVectorConfiguration avc;
 		
 		do {
 			do {		
@@ -327,8 +335,13 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 			while(bit-- > 0) {
 				pos = bitSet.nextClearBit(pos+1);
 			}
+			
+			avc = activityVectorConfigurations[pos];
+			
 			// retry if we are trying to set a bit which shouldn't be set yet
-		} while(section <= activityVectorConfigurations[pos].startAfterSection);
+			// note that this will handle the startAfterSection constraint completely, the stopBeforeSection
+			// constraint is only handled partially
+		} while(section <= avc.startAfterSection || stopPos <= avc.stopBeforeSection);
 		
 		bitSet.set(pos);
 
@@ -438,12 +451,12 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         	// section
         	
         	if(active < wantedActivityVectors) {
-        		do {lastAddedBit = setRandomBit(bitset,vectors,lastRemovedBit,section,activityVectorConfigurations);} while(bitset.cardinality() < wantedActivityVectors);
+        		do {lastAddedBit = setRandomBit(bitset,vectors,lastRemovedBit,section,sections,activityVectorConfigurations);} while(bitset.cardinality() < wantedActivityVectors);
         	} else if(active > wantedActivityVectors) {
         		do {lastRemovedBit = clearRandomBit(bitset,lastAddedBit);} while(bitset.cardinality() > wantedActivityVectors);
         	} else if(active > 0 && random.nextFloat() < 0.5f) {
         		lastRemovedBit = clearRandomBit(bitset,lastAddedBit);
-        		lastAddedBit = setRandomBit(bitset,vectors,lastRemovedBit,section,activityVectorConfigurations);
+        		lastAddedBit = setRandomBit(bitset,vectors,lastRemovedBit,section,sections,activityVectorConfigurations);
         	}
         	
         	// check the BitSet and add activity or inactivity intervals

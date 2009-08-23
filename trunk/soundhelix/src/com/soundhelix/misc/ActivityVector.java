@@ -211,6 +211,33 @@ public class ActivityVector {
 		}
 	}
 	
+	/**
+	 * Counts the number of activity segments.
+	 * 
+	 * @return the number of activity segments
+	 */
+	
+	public int getSegmentCount() {
+		int segments = 0;
+		int pos = -1;
+		
+		while(true) {
+			pos = bitSet.nextSetBit(pos+1);
+			
+			if (pos == -1) {
+				return segments;
+			}				
+
+			segments++;
+			
+			pos = bitSet.nextClearBit(pos+1);
+
+			if (pos == -1) {
+				return segments;
+			}			
+		}
+	}
+	
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		

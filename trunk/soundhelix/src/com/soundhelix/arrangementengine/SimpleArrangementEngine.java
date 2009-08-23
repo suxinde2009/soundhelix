@@ -174,11 +174,13 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
 				double active = 100.0d*av.getActiveTicks()/ticks;
 				int firstActiveTick = av.getFirstActiveTick();
+				int segmentCount = av.getSegmentCount();
 				
 				if(active < avc.minActive && (!avc.allowInactive || active > 0) || active > avc.maxActive ||
 				   avc.startAfterSection+1 >= chordSections || avc.stopBeforeSection+1 >= chordSections ||
 				   avc.stopBeforeSection >= 0 && av.getLastActiveTick() >= chordSectionStartTicks.get(chordSections-1-avc.stopBeforeSection) ||
-				   avc.startAfterSection >= 0 && firstActiveTick >= 0 && firstActiveTick < chordSectionStartTicks.get(avc.startAfterSection+1)) {
+				   avc.startAfterSection >= 0 && firstActiveTick >= 0 && firstActiveTick < chordSectionStartTicks.get(avc.startAfterSection+1) ||
+				   (avc.minSegmentCount >=0 || avc.maxSegmentCount < Integer.MAX_VALUE) && (segmentCount < avc.minSegmentCount || segmentCount > avc.maxSegmentCount)) {
 				    
 					if(isDebug) {
 						String reason;
@@ -196,6 +198,10 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 						} else if(avc.startAfterSection >= 0 && firstActiveTick >= 0 && firstActiveTick < chordSectionStartTicks.get(avc.startAfterSection+1)) {
 							// should not happen as this is already checked in createActivityVectors()
 							reason = "startAfterSection";
+						} else if(segmentCount < avc.minSegmentCount) {
+							reason = "minSegmentCount";
+						} else if(segmentCount > avc.maxSegmentCount) {
+							reason = "maxSegmentCount";
 						} else {
 							reason = "unknown";
 						}
@@ -631,7 +637,17 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 			    stopBeforeSection = XMLUtils.parseInteger(random,"stopBeforeSection",nodeList.item(i),xpath);
 			} catch(Exception e) {}
 
-			activityVectorConfigurationHashMap.put(name,new ActivityVectorConfiguration(name,minActive,allowInactive,maxActive,startShift,stopShift,startAfterSection,stopBeforeSection));		
+			int minSegmentCount = 0;
+			try {
+			    minSegmentCount = XMLUtils.parseInteger(random,"minSegmentCount",nodeList.item(i),xpath);
+			} catch(Exception e) {}
+
+			int maxSegmentCount = Integer.MAX_VALUE;
+			try {
+			    maxSegmentCount = XMLUtils.parseInteger(random,"maxSegmentCount",nodeList.item(i),xpath);
+			} catch(Exception e) {}
+
+			activityVectorConfigurationHashMap.put(name,new ActivityVectorConfiguration(name,minActive,allowInactive,maxActive,startShift,stopShift,startAfterSection,stopBeforeSection,minSegmentCount,maxSegmentCount));		
 		}
 				
 		setActivityVectorConfiguration(activityVectorConfigurationHashMap);
@@ -749,9 +765,11 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 		private int stopShift;
 		private int startAfterSection;
         private int stopBeforeSection;
+        private int minSegmentCount;
+        private int maxSegmentCount;
 		private ActivityVector activityVector;
 
-		private ActivityVectorConfiguration(String name,double minActive,boolean allowInactive,double maxActive,int startShift,int stopShift,int startAfterSection,int stopBeforeSection) {
+		private ActivityVectorConfiguration(String name,double minActive,boolean allowInactive,double maxActive,int startShift,int stopShift,int startAfterSection,int stopBeforeSection,int minSegmentCount,int maxSegmentCount) {
 			this.name = name;
 			this.minActive = minActive;
 			this.allowInactive = allowInactive;
@@ -760,6 +778,8 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 			this.stopShift = stopShift;
 			this.startAfterSection = startAfterSection;
 			this.stopBeforeSection = stopBeforeSection;
+			this.minSegmentCount = minSegmentCount;
+			this.maxSegmentCount = maxSegmentCount;
 		}	
 	}
 

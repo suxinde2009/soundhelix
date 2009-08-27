@@ -56,16 +56,9 @@ import com.soundhelix.util.XMLUtils;
  * Global constraints can only be checked after all AVs have been generated. No correction to enforce the constraints
  * are possible except for completely recreating all AVs. Currently, none of the constraints are really global.
  * 
- * Note that some constraints are a mixture between local and global. For example, the minActive and maxActive
- * constraints can not really be tracked efficiently during AV generation except by checking if there is no possible
- * way to fulfill the constraint anymore, which is mostly the case near the end of the AV creation. Such constraints
- * should not be checked during creation, because they slow the generation down and will hardly have a positive impact
- * because they can be detected too late. For a minActive constraint of 10%, the constraint cannot fail before 90%
- * of the AV matrix has been generated. Before having generated 90%, the constraint still could be fulfilled.
- * 
  * The easiest (but least efficient) way to check constraints is of course to check them after the whole activity
  * matrix has been generated. However, the time to fulfill all constraints tends to grow exponentially with every 
- * constraint added.
+ * constraint added. Therefore, most of the constraints are checked as early as possible.
  * 
  * The only low-cost constraint is currently the startAfterSection constraint. Using it hardly increases the
  * AV creation time at all. The minActive/maxActive constraints on the other hand are expensive for percentages larger
@@ -109,7 +102,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 		ActivityVectorConfiguration[] vectors = neededActivityVectors.values().toArray(new ActivityVectorConfiguration[neededActivityVectors.size()]);
 		
 		createConstrainedActivityVectors(structure.getTicks(),tracks,vectors);
-		dumpActivityVectors(neededActivityVectors);
+		dumpActivityVectors(vectors);
 		shiftIntervalBoundaries(neededActivityVectors);
 
 		Arrangement arrangement = createArrangement(neededActivityVectors,tracks);
@@ -209,7 +202,36 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 			// note that the constraint startAfterSection is already taken care of in the following method
 			// (unfortunately, it's not simple to do the same for stopBeforeSection)
 
-			ActivityVector[] activityVectors = createActivityVectors(activityVectorConfigurations);
+			ActivityVector[] activityVectors;
+			
+			try {
+				activityVectors = createActivityVectors(activityVectorConfigurations);
+			} catch(ConstraintException e) {
+				if (isDebug) {
+					String key = e.getActivityVectorConfiguration().name+"/"+e.getReason();
+					Integer current = constraintFailure.get(key);
+
+					constraintFailure.put(key,current != null ? current+1 : 1);
+				}
+				
+				tries++;
+
+			    if(tries >= maxIterations) {
+			    	if(logger.isDebugEnabled()) {
+			    		Iterator<String> it2 = constraintFailure.keySet().iterator();
+
+			    		while(it2.hasNext()) {
+			    			String k = it2.next();
+			    			logger.debug("Constraint failures for "+k+": "+constraintFailure.get(k));
+			    		}
+			    	}
+			    					    	
+			        throw(new RuntimeException("Couldn't satisfy activity constraints within "+tries+" iterations"));
+			    } else {
+			        // we haven't reached the iteration limit yet, retry
+			        continue again;
+			    }				        
+			}
 			
 			for(int i=0;i<vectors;i++) {
 				ActivityVector av = activityVectors[i];
@@ -256,7 +278,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 						
 						constraintFailure.put(key,current != null ? current+1 : 1);
 					}
-										
+							
 					tries++;
 
 				    if(tries >= maxIterations) {
@@ -275,8 +297,6 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 				        continue again;
 				    }				        
 				}
-
-				avc.activityVector = av;
 			}
 
 			break;
@@ -287,7 +307,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 		}
 	}
 
-	private void dumpActivityVectors(HashMap<String,ActivityVectorConfiguration> neededActivityVector) {
+	private void dumpActivityVectors(ActivityVectorConfiguration[] vectors) {
 		if(!logger.isDebugEnabled()) {
 			return;
 		}
@@ -297,16 +317,12 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 		int ticks = structure.getTicks();
 		
 		int maxLen = 0;
-		Iterator<ActivityVectorConfiguration> it = neededActivityVector.values().iterator();
 		
-		while(it.hasNext()) {
-			maxLen = Math.max(maxLen,it.next().name.length());
+		for(ActivityVectorConfiguration avc : vectors) {
+			maxLen = Math.max(maxLen,avc.name.length());
 		}
 
-		it = neededActivityVector.values().iterator();
-
-		while(it.hasNext()) {
-			ActivityVectorConfiguration avc = it.next();
+		for(ActivityVectorConfiguration avc : vectors) {
 			sb.append(String.format("%"+maxLen+"s: ",avc.name));
 
 			ActivityVector av = avc.activityVector;
@@ -327,10 +343,8 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 		for(int tick=0;tick<ticks;tick += structure.getHarmonyEngine().getChordSectionTicks(tick)) {
 			int c=0;
 			
-			it = neededActivityVector.values().iterator();
-			
-			while(it.hasNext()) {
-				if(it.next().activityVector.isActive(tick)) {
+			for(ActivityVectorConfiguration avc : vectors) {
+				if(avc.activityVector.isActive(tick)) {
 					c++;
 				}
 			}
@@ -357,7 +371,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 	 * @return the number of the set bit (or -1 if no clear bit existed)
 	 */
 	
-	private int setRandomBit(BitSet bitSet,int size,int avoidBit,int section,int sections,ActivityVectorConfiguration[] activityVectorConfigurations) {
+	private int setRandomBit(BitSet bitSet,int size,int avoidBit,int section,int sections,ActivityVectorConfiguration[] activityVectorConfigurations,int[] activeSegments) {
 		int ones = bitSet.cardinality();
 		
 		if(ones >= size) {
@@ -395,7 +409,14 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 		} while(section <= avc.startAfterSection || stopPos <= avc.stopBeforeSection);
 		
 		bitSet.set(pos);
+		
+		// this is the start of a new segment
+		activeSegments[pos]++;
 
+		if (activeSegments[pos] > activityVectorConfigurations[pos].maxSegmentCount) {
+			throw(new ConstraintException(avc,"earlyMaxSegmentCount"));
+		}
+		
 		return pos;	
 	}
 	
@@ -459,9 +480,16 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 		// create empty ActivityVectors
 		
 		ActivityVector[] activityVectors = new ActivityVector[vectors];
+		int[] activeSections = new int[vectors];
+		int[] minActiveSections = new int[vectors];
+		int[] maxActiveSections = new int[vectors];
+		int[] activeSegments = new int[vectors];
 		
 		for(int i=0;i<vectors;i++) {
 			activityVectors[i] = new ActivityVector();
+			activityVectorConfigurations[i].activityVector = activityVectors[i];
+			minActiveSections[i] = (int)(activityVectorConfigurations[i].minActive/100.0d*sections);
+			maxActiveSections[i] = (int)(activityVectorConfigurations[i].maxActive/100.0d*sections);
 		}
 		
 		// start with an empty BitSet
@@ -502,12 +530,9 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         	// section
         	
         	if(active < wantedActivityVectors) {
-        		do {lastAddedBit = setRandomBit(bitset,vectors,lastRemovedBit,section,sections,activityVectorConfigurations);} while(bitset.cardinality() < wantedActivityVectors);
+        		do {lastAddedBit = setRandomBit(bitset,vectors,lastRemovedBit,section,sections,activityVectorConfigurations,activeSegments);} while(bitset.cardinality() < wantedActivityVectors);
         	} else if(active > wantedActivityVectors) {
         		do {lastRemovedBit = clearRandomBit(bitset,lastAddedBit);} while(bitset.cardinality() > wantedActivityVectors);
-        	} else if(active > 0 && random.nextFloat() < 0.5f) {
-        		lastRemovedBit = clearRandomBit(bitset,lastAddedBit);
-        		lastAddedBit = setRandomBit(bitset,vectors,lastRemovedBit,section,sections,activityVectorConfigurations);
         	}
         	
         	// check the BitSet and add activity or inactivity intervals
@@ -515,10 +540,24 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         	
         	for(int i=0;i<vectors;i++) {
         		if(bitset.get(i)) {
-        			activityVectors[i].addActivity(len);
+        			if (activeSections[i] >= maxActiveSections[i]) {
+        				throw(new ConstraintException(activityVectorConfigurations[i], "earlyMaxActive"));
+        			} else if(sections-1-section <= activityVectorConfigurations[i].stopBeforeSection) {
+    			    	throw(new ConstraintException(activityVectorConfigurations[i], "earlyStopBeforeSection"));
+        			}
+        			
+        			activeSections[i]++;        			 
+           			activityVectors[i].addActivity(len);
         		} else {
-        			activityVectors[i].addInactivity(len);
-        		}
+            		// check if the still missing active sections are more than what is left
+            		// we only need to check this in the inactive case
+        			
+    			    if (! activityVectorConfigurations[i].allowInactive && minActiveSections[i]-activeSections[i] > sections-1-section) {
+    			    	throw(new ConstraintException( activityVectorConfigurations[i], "earlyMinActive"));
+    			    }
+    			    
+    			    activityVectors[i].addInactivity(len);
+        		}        	
         	}
        	
             tick += len;
@@ -842,5 +881,24 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
 	public void setMaxIterations(int maxIterations) {
 		this.maxIterations = maxIterations;
+	}
+	
+	private class ConstraintException extends RuntimeException {
+		private ActivityVectorConfiguration avc;
+		private String reason;
+		
+		public ConstraintException(ActivityVectorConfiguration avc, String reason) {
+			super();
+			this.avc = avc;
+			this.reason = reason;
+		}
+		
+		public String getReason() {
+			return reason;
+		}
+		
+		public ActivityVectorConfiguration getActivityVectorConfiguration() {
+			return avc;
+		}
 	}
 }

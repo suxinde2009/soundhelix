@@ -24,10 +24,55 @@ import com.soundhelix.util.HarmonyEngineUtils;
 import com.soundhelix.util.XMLUtils;
 
 /**
- * Implements a simple ArrangementEngine. The song starts with a configurable
- * "fade-in" of the number of active ActivityVectors and ends with a
- * configurable "fade-out" of the number of active ActivityVectors.
+ * Implements a simple ArrangementEngine. The song starts with a configurable "fade-in" of the number of active
+ * ActivityVectors and ends with a configurable "fade-out" of the number of active ActivityVectors. For each
+ * chord section in between, the number of active AVs is varied in the configured range.
+ *
+ * ActivityVector activity can be constrained individually to enforce certain properties. All AVs are filled at
+ * the same time because there is always the above-mentioned overall song constraint that defines the number of
+ * active AVs for each chord section. For each chord section a choice is made to activate or deactivate AVs or to
+ * leave the number of active AVs the same. The list of generated AVs are called an activity matrix.
+ *
+ * The following constraints are supported for ActivityVectors:
  * 
+ * - minActive(n): the AV must be active for at least n% of the song; granularity is at section level
+ * - maxActive(n): the AV must be active for at most n% of the song; granularity is at section level
+ * - startAfterSection(n): the AV must not be active before section n+1
+ * - stopBeforeSection(n): the AV must not be active after section n+1 counted from the end
+ * - minSegmentCount(n): the AV must be active for at least n section segments
+ * - maxSegmentCount(n): the AV must be active for at most n section segments
+ *
+ * Local (peep-hole) constraints can be checked during AV generation when the activity per chord section is generated.
+ * Such a constraint can be a success constraint, which means that a random choice can be redone on-the-fly until the
+ * constraint is not violated anymore (if that's possible) or it can be a failure constraint, which means the
+ * constraint can be checked locally but can make the whole creation fail. For example, the startAfterSection
+ * constraint is a local success constraint, because if an AV is randomly chosen to become active too early, this
+ * random selection can be repeated until an AV is chosen that does not violate that constraint (unless such an AV
+ * doesn't exist). In contrast, the stopAfterSection constraint cannot be enforced so easily, because an AV can be
+ * active in a chord section either because it becomes active (then the constraint can be made a success by choosing
+ * another AV to become active instead) or because it is already active and stays active (because the number of
+ * active AVs should increase).
+ * 
+ * Global constraints can only be checked after all AVs have been generated. No correction to enforce the constraints
+ * are possible except for completely recreating all AVs. Currently, none of the constraints are really global.
+ * 
+ * Note that some constraints are a mixture between local and global. For example, the minActive and maxActive
+ * constraints can not really be tracked efficiently during AV generation except by checking if there is no possible
+ * way to fulfill the constraint anymore, which is mostly the case near the end of the AV creation. Such constraints
+ * should not be checked during creation, because they slow the generation down and will hardly have a positive impact
+ * because they can be detected too late. For a minActive constraint of 10%, the constraint cannot fail before 90%
+ * of the AV matrix has been generated. Before having generated 90%, the constraint still could be fulfilled.
+ * 
+ * The easiest (but least efficient) way to check constraints is of course to check them after the whole activity
+ * matrix has been generated. However, the time to fulfill all constraints tends to grow exponentially with every 
+ * constraint added.
+ * 
+ * The only low-cost constraint is currently the startAfterSection constraint. Using it hardly increases the
+ * AV creation time at all. The minActive/maxActive constraints on the other hand are expensive for percentages larger
+ * than the expected average percentage for minActive and percentages smaller than the expected average percentage for
+ * maxActive. For example, if you have 20 AVs and 5 of them should active at least 60% of the time, you will need
+ * quite a lot of creation iterations until these constraints are fulfilled.
+ *
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 

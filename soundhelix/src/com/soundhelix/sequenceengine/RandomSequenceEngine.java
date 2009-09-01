@@ -85,7 +85,7 @@ public class RandomSequenceEngine extends AbstractSequenceEngine {
             			// add pause
             			seq.addPause(l);
         			} else {
-        				seq.addNote(entry.getPitch(),l);
+        				seq.addNote(entry.getPitch(),l,entry.getVelocity(),entry.isLegato());
         			}
         		} else {
         			// add pause
@@ -156,9 +156,9 @@ public class RandomSequenceEngine extends AbstractSequenceEngine {
             			int offset = ((value%3)+3)%3;
             			
             	 	    if(chord.isMajor()) {
-            			    list.add(new PatternEntry(octave*12+MAJOR_TABLE[offset]+chord.getPitch(),entry.getVelocity(),t));
+            			    list.add(new PatternEntry(octave*12+MAJOR_TABLE[offset]+chord.getPitch(),entry.getVelocity(),t,entry.isLegato()));
             		    } else {
-            			    list.add(new PatternEntry(octave*12+MINOR_TABLE[offset]+chord.getPitch(),entry.getVelocity(),t));
+            			    list.add(new PatternEntry(octave*12+MINOR_TABLE[offset]+chord.getPitch(),entry.getVelocity(),t,entry.isLegato()));
             		    }
         				
         				lastValue = value;

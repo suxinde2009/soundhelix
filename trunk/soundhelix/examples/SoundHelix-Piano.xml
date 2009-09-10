@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<SoundHelix xmlns:xi="http://www.w3.org/2001/XInclude">
+  <structure>
+     <bars><random min="32" max="64" step="16"/></bars> 
+     <beatsPerBar>4</beatsPerBar>
+     <ticksPerBeat>4</ticksPerBeat>
+  </structure>
+  <xi:include href="../includes/Standard-HarmonyEngine.xml"/>
+  <arrangementEngine class="SimpleArrangementEngine">
+    <maxIterations>200000</maxIterations>
+    <minActivityCount>2</minActivityCount>
+    <maxActivityCount>8</maxActivityCount>
+    <maxActivityChangeCount>2</maxActivityChangeCount>
+    <startActivityCounts><random list="1,2,3"/></startActivityCounts>
+	<stopActivityCounts><random list="1"/></stopActivityCounts>
+    <activityVector name="accomp">
+    </activityVector>
+    <activityVector name="arpeggio">
+    </activityVector>
+    <activityVector name="melody">
+		<startAfterSection>0</startAfterSection>
+    </activityVector>
+ 
+    <track>
+      <instrument>0</instrument>
+	  <transposition>-12</transposition>
+      <sequenceEngine class="PatternSequenceEngine">
+  	    <obeyChordSubtype>true</obeyChordSubtype>
+		<pattern>0,-,2,-,3,-,4,-</pattern>
+      </sequenceEngine>
+      <activityVector>arpeggio</activityVector>
+    </track>
+    <track>
+      <instrument>0</instrument>
+	  <transposition>-24</transposition>
+      <sequenceEngine class="MultiPatternSequenceEngine">
+	    <patterns>
+		  <pattern>-,-,-,-,5,-,-,-,-,-,-,-,5,-,-,-</pattern>
+		  <pattern>-,-,-,-,4,-,-,-,-,-,-,-,4,-,-,-</pattern>
+		  <pattern>-,-,-,-,3,-,-,-,-,-,-,-,3,-,-,-</pattern>
+		  <pattern>0,-,-,0,-,-,0,-,-,-,0,-,-,-,-,-,0,-,-,0,-,-,0,-,-,-,0,-,-,-,-,-,0,-,-,0,-,-,0,-,-,-,0,-,-,-,-,-,0,-,-,0,-,-,0,-,-,-,0,-,-,-,+,-</pattern>
+		</patterns>
+      </sequenceEngine>
+      <activityVector>accomp</activityVector>
+    </track>
+    <track>
+      <instrument>0</instrument>
+      <transposition>0</transposition>
+      <sequenceEngine class="MelodySequenceEngine">
+        <pattern>0,-,-,-,+,-,+,+,0,-,-,-,+,-,+,-,0,-,-,-,+,-,+,+,0,-,-,-,0,+,+,+</pattern>
+		<pattern>0,-,-,-,-,-,-,-,0,-,+,-,0,-,+,-,0,-,-,-,-,-,-,-,0,-,+,-,0,-,+,-,0,-,-,-,-,-,-,-,0,-,+,-,0,-,+,-,0,-,-,-,-,-,-,-,0,-,+,-,0,-,+,+,0,-,-,-,-,-,-,-,0,-,+,-,0,-,+,-,0,-,-,-,-,-,-,-,0,-,+,-,0,-,+,-,0,-,-,-,-,-,-,-,0,-,+,-,0,-,+,-,0,-,-,-,-,-,-,0,-,-,+,-,-,0,-,+</pattern>
+        <pattern>0,-,-,0,-,-,+,-,0,-,-,0,-,-,+,-,0,-,-,0,-,-,+,-,0,-,-,0,-,+,0,+</pattern>
+        <pattern>0,-,-,-,0,-,-,-,0,-,0,-,-,-,-,-,0,-,+,-,+,-,+,-,0,-,-,-,-,-,-,-,0,-,-,-,0,-,-,-,0,-,0,-,-,-,-,-,0,-,+,-,+,-,+,-,0,-,+,-,-,0,-,0</pattern>
+        <pattern>0,-,-,-,0,-,-,-,0,-,-,+,-,-,-,+,0,-,-,-,0,-,-,-,-,+,-,0,-,-,0,-,0,-,-,-,0,-,-,-,0,-,-,+,-,-,-,+,0,-,-,-,0,-,-,-,+,-,-,0,-,0,-,+</pattern>
+        <pattern>0,-,+,-,0,-,+,-,0,+,-,0,-,-,-,+,0,-,+,-,0,-,+,-,0,+,-,0,-,-,-,-</pattern>
+        <pattern>0,-,-,-,0,-,-,0,-,-,+,-,-,0,-,-,0,-,-,+,-,-,-,0,-,-,+,-,-,0,-,+,0,-,-,+,-,-,-,0,-,-,+,-,-,0,-,-,0,-,-,+,-,-,-,0,-,-,+,-,0,-,0,-</pattern>
+		<!-- <pattern>0,-,-,-,-,-,+,-,0,-,-,-,0,-,-,-,0,-,-,-,-,-,+,-,0,-,-,-,0,-,-,-,0,-,-,-,-,-,+,-,0,-,-,-,0,-,-,-,0,-,-,-,-,-,+,-,0,-,-,-,0,-,-,-,0,-,-,-,-,-,+,-,0,-,-,-,0,-,-,-,0,-,-,-,-,-,0,-,0,-,-,-,0,-,-,-,0,-,-,-,+,-,-,-,0,-,-,-,0,-,-,-,0,-,-,-,+,-,-,-,0,-,-,-,+,-,-,-,0,-,-,-,-,-,-,-,-,-,-,-,+,-,+,-,0,-,-,-,+,-,0,-,-,-,-,-,0,-,-,-,0,-,-,-,-,-,-,-,-,-,-,-,+,-,+,-,0,-,-,-,+,-,0,-,-,-,-,-,0,-,-,-,0,-,-,-,-,-,-,-,-,-,-,-,+,-,+,-,0,-,-,-,+,-,0,-,-,-,-,-,0,-,-,-,0,-,-,-,-,-,-,-,-,-,-,-,+,-,+,-,0,-,-,-,+,-,0,-,-,-,-,-,0,-,-,-</pattern> -->
+        <pattern>0,-,-,-,-,-,-,-,0,-,+,-,+,-,+,-,0,+,-,+,0,-,+,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,+,-,+,-,-,0,-,0,-,+,0,-,+,-,0,-,-,-,-,-,0,-</pattern>
+	  </sequenceEngine>
+      <activityVector>melody</activityVector>
+    </track>
+  </arrangementEngine>
+  <player class="MidiPlayer">
+    <bpm><random min="112" max="130" type="normal" variance="6"/></bpm>
+    <transposition><random min="64" max="68"/></transposition>
+    <groove><random list="105,107,95,98,103|102,110,105,111,108"/></groove>
+    <device name="device1" clockSynchronization="true">Out To MIDI Yoke:  1</device>
+	<map instrument="0" device="device1" channel="0"/>
+	<map instrument="1" device="device1" channel="1"/>
+  </player>
+</SoundHelix>

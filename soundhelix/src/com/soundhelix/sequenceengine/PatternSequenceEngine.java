@@ -118,7 +118,7 @@ public class PatternSequenceEngine extends AbstractSequenceEngine {
        					nextChord = null;
        				}
 
-       				int pitch = getTransitionPitch(chord,nextChord);
+       				int pitch = NoteUtils.getTransitionPitch(chord,nextChord);
 
        				boolean useLegato = entry.isLegato() ? pattern.isLegatoLegal(activityVector, tick+len, pos+1) : false;
        				seq.addNote(pitch,len,vel,useLegato);
@@ -163,61 +163,6 @@ public class PatternSequenceEngine extends AbstractSequenceEngine {
         track.add(seq);
         return track;
 	}
-	
-	/**
-	 * Returns a transition pitch between the chord and the next chord,
-	 * which is based on the base pitches of the two chords.
-	 * If the next chord is null, the pitch of the first chord is used.
-	 * If the pitch difference of the two chords is 2, the halftone in
-	 * between is returned. If the pitch difference of the two chords
-	 * is one or zero, the first pitch is returned. Otherwise, a pitch
-	 * between the two pitches which is on the C/Am scale is returned.
-	 * 
-	 * @param chord the current chord
-	 * @param nextChord the next chord (or null)
-	 * 
-	 * @return a transition pitch
-	 */
-	
-    private static int getTransitionPitch(Chord chord,Chord nextChord) {
-    	if(nextChord == null) {
-    		// next chord is undefined, just return the current pitch
-    		return chord.getPitch();
-    	}
-    	
-    	int pitch1 = chord.getPitch();
-    	int pitch2 = nextChord.getPitch();
-    	
-    	int diff = pitch2-pitch1;
-    	int absdiff = Math.abs(diff);
-    	
-    	if(diff == 0) {
-    		// chords are the same
-    		return pitch1;
-    	} else if(absdiff == 2) {
-    		// pitch difference is one tone,
-    		// use the halftone in between
-    		return((pitch1+pitch2)/2);
-       	} else if(absdiff == 1) {
-    		// pitch difference is one halftone
-    		// use the current pitch
-    		return(pitch1);
-    	} else if(diff > 0) {
-    		// we have a pitch difference of at least 3 halftones up
-    		pitch1 += Math.min(0,absdiff/2-1);
-    		do {
-    			pitch1++;
-    		} while(!NoteUtils.isOnScale(pitch1));
-    	   	return pitch1;
-    	} else {
-    		// we have a pitch difference of at least 3 halftones down
-    		pitch1 -= Math.min(0,absdiff/2-1);
-    		do {
-    			pitch1--;
-    		} while(!NoteUtils.isOnScale(pitch1));
-    		return pitch1;
-    	}
-    }
     	
     public void configure(Node node,XPath xpath) throws XPathException {
     	random = new Random(randomSeed);

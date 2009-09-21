@@ -21,15 +21,16 @@ import com.soundhelix.util.XMLUtils;
  * of chord patterns and random table patterns. One of the given
  * chord patterns is chosen at random. A chord pattern consists of comma-separated combinations of chords
  * and lengths in beats (separated by a slash). A chord is either a simple chord name ("C" for C major, "Am" for A minor, etc.),
- * a random table number (starting from 0) or a backreference to an already generated chord at an
- * earlier position ("$0" for first chord, "$1" for second chord, etc.). If a random table number is
- * given, a chord is randomly chosen from that table. Chord random tables a comma-separated lists of
- * chord names (e.g., "Am,G,F,Em,Dm"), they are numbered starting from 0. For example, the chord pattern
- * "Am/4,0/4,1/4,$1/4" means "A minor for 4 beats, a random chord from random table 0 for 4 beats, a random
- * chord from random table 1 for 4 beats and the second chord again for 4 beats" and could result in the
- * chord sequence "Am/4,F/4,G/4,F/4" (given suitable random tables). Normally, each chord pattern is an individual
- * chord section. A pattern can be split into two or more chord sections by using "+" signs directly
- * before a chord/length combination (e.g., "Am/4,F/4,G/4,C/4,+Am/4,F/4,G/4,Em/4").
+ * a random table number (starting from 0), a random table number (starting from 0) with a negative backreference (e.g.,
+ * "0!0") to an already generated chord at an earlier position or it can be a positive backreference to an already
+ * generated chord at an earlier position ("$0" for first chord, "$1" for second chord, etc.). If a random table number
+ * is given, a chord is randomly chosen from that table. Chord random tables a comma-separated lists of chord names
+ * (e.g., "Am,G,F,Em,Dm"), they are numbered starting from 0. For example, the chord pattern "Am/4,0/4,0!1/4,$1/4"
+ * means "A minor for 4 beats, a random chord from random table 0 for 4 beats, a random chord from random table 0 but
+ * not the same as the one from position 1 for 4 beats and the second chord again for 4 beats" and could result in
+ * the chord sequence "Am/4,F/4,G/4,F/4" (given suitable random tables). Normally, each chord pattern is an individual
+ * chord section. A pattern can be split into two or more chord sections by using "+" signs directly before a
+ * chord/length combination (e.g., "Am/4,F/4,G/4,C/4,+Am/4,F/4,G/4,Em/4").
  *
  * <br><br>
  * <b>XML-Configuration</b>
@@ -158,7 +159,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 					pitch -= 12;
 				}
 				
-				ch = new Chord(pitch,ChordType.MAJOR,Chord.ChordSubtype.BASE_0);;
+				ch = new Chord(pitch,ChordType.MAJOR,Chord.ChordSubtype.BASE_0);
 			}
 
 			if(firstChord == null) {
@@ -270,15 +271,32 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 				
 				if(pitch == Integer.MIN_VALUE) {
 					// we have a random chord table number
+
+					int pos = spec[0].indexOf('!');
 					
-					int table = Integer.parseInt(spec[0]);
+					int table;
+					int notrefnum;
+					
+					if (pos > 0) {
+						table = Integer.parseInt(spec[0].substring(0,pos));
+						notrefnum = Integer.parseInt(spec[0].substring(pos+1));
+					} else {
+						table = Integer.parseInt(spec[0]);
+						notrefnum = -1;
+					}
 
 					int num;
-
+					int it = 0;
+					
 					do {
 						num = random.nextInt(chordRandomTables[table].length);
 						chord = chordRandomTables[table][num];
-					} while(chord.equals(prevChord) || i == count-1 && chord.equals(firstChord));
+						it++;
+						if (it > 1000) {
+							// try again
+							return createPattern();
+						}
+					} while(chord.equals(prevChord) || i == count-1 && chord.equals(firstChord) || notrefnum >= 0 && chord.equals(chordList.get(notrefnum)));
 				} else {
 					// we have a note, take the note (include 'm' suffix, if present)
 					chord = spec[0];				

@@ -92,7 +92,7 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
         		
     			pos++;
     			i += l;
-    			tick++;
+    			tick += l;
          	}
         }
         
@@ -208,10 +208,11 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
     	
     	Hashtable<String,Pattern> ht = new Hashtable<String,Pattern>();
     	
+    	int ticks = structure.getTicks();
     	int tick = 0;
     	int pos = 0;
     	
-    	while(tick < structure.getTicks()) {
+    	while(tick < ticks) {
     		String section = HarmonyEngineUtils.getChordSectionString(structure,tick);
             int len = he.getChordSectionTicks(tick);
     		
@@ -230,13 +231,13 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
         				list.add(new PatternEntry(t));
         			} else if(entry.isWildcard() && entry.getWildcardCharacter() == FREE) {
         				pitch = getRandomPitch(pitch == Integer.MIN_VALUE ? 0 : pitch,2,2);
-        				list.add(new PatternEntry(pitch,entry.getVelocity(),t));
+        				list.add(new PatternEntry(pitch,entry.getVelocity(),t,entry.isLegato()));
         			} else if(entry.isWildcard() && entry.getWildcardCharacter() == REPEAT && pitch != Integer.MIN_VALUE && chord.containsPitch(pitch)) {
         				// reuse the previous pitch
-        				list.add(new PatternEntry(pitch,entry.getVelocity(),t));
+        				list.add(new PatternEntry(pitch,entry.getVelocity(),t,entry.isLegato()));
         			} else {
         				pitch = getRandomPitch(chord,pitch == Integer.MIN_VALUE ? 0 : pitch,2,2);
-        				list.add(new PatternEntry(pitch,entry.getVelocity(),t));
+        				list.add(new PatternEntry(pitch,entry.getVelocity(),t,entry.isLegato()));
         			}
         			
         			pos++;

@@ -179,7 +179,85 @@ public class Sequence {
 		}
 	}
 
-	public class SequenceEntry {
+	/**
+	 * Replaces the entry at the given tick by the given entry. The tick can be any tick within the sequence and
+	 * any note can be given. Note that this is an expensive operation, because the runtime grows linearly with
+	 * the number of entries in the sequence.
+	 * 
+	 * @param tick the tick where the replacement should take place
+	 * @param entry the SequenceEntry to insert
+	 */
+	
+	public void replaceEntry(int tick,SequenceEntry entry) {
+		// determine the insertion offset
+		
+		// FIXME: doesn't correctly cover all cases
+		
+		int offset = 0;
+		int offsetTick = 0;
+		
+		while (offsetTick < tick) {
+			offsetTick += sequence.get(offset).ticks;
+			offset++;
+		}
+
+		if (tick < offsetTick) {
+			// shorten the previous note
+			sequence.get(offset-1).ticks = tick - (offsetTick-sequence.get(offset-1).ticks);
+			
+			int diff = tick + entry.ticks - offsetTick;
+			
+			if (diff == 0) {
+				sequence.add(offset, entry);
+				return;
+			} else if (diff < 0) {
+				sequence.add(offset, entry);
+				sequence.add(offset+1, new SequenceEntry(0, (short) -1, -diff, false));
+				return;
+			} else {
+				sequence.add(offset, entry);
+
+				int prevLength = 0;
+				offset++;
+				
+				do {
+					prevLength += sequence.get(offset).ticks;
+					sequence.remove(offset);
+				} while(diff > prevLength);
+
+				if (diff < prevLength) {
+					sequence.add(offset,new SequenceEntry(0, (short) -1, prevLength - diff, false));
+				}
+				return;
+			}
+		} else {
+			int prevLength = sequence.get(offset).ticks;
+
+			int diff = entry.ticks - prevLength;
+			
+			if (diff == 0) {
+				sequence.set(offset, entry);
+			} else if(diff < 0) {
+				sequence.set(offset, entry);
+				sequence.add(offset+1, new SequenceEntry(0, (short) -1, -diff, false));
+			} else {
+				sequence.set(offset, entry);
+
+				offset++;
+
+				do {
+					prevLength += sequence.get(offset).ticks;
+					sequence.remove(offset);
+				} while(entry.ticks > prevLength);
+
+				if (entry.ticks < prevLength) {
+					sequence.add(offset,new SequenceEntry(0, (short) -1, prevLength - entry.ticks, false));
+				}
+			}
+		}
+	}
+
+	public static class SequenceEntry {
 		private int pitch;
 		private short velocity;
 		private int ticks;
@@ -220,4 +298,200 @@ public class Sequence {
 			return pitch + "/" + ticks + "/" + velocity;
 		}
 	}
+	
+	public static void test() {
+		if (tested) {
+			return;
+		}
+		
+		tested = true;
+
+		int number = 1;
+
+		Sequence seq = new Sequence();
+
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+
+		test(number++,seq, 16, 60, 16, "#64{50/16,60/16,50/16,50/16}");
+
+		seq = new Sequence();
+
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+
+		test(number++,seq, 16, 60, 8, "#64{50/16,60/8,-/8,50/16,50/16}");
+		test(number++,seq, 16, Integer.MIN_VALUE, 8, "#64{50/16,-/8,-/8,50/16,50/16}");
+
+		seq = new Sequence();
+
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+
+		test(number++,seq, 16, 60, 24, "#64{50/16,60/24,-/8,50/16}");
+
+		seq = new Sequence();
+
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+
+		test(number++,seq, 16, 60, 32, "#64{50/16,60/32,50/16}");
+
+		seq = new Sequence();
+
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+
+		test(number++,seq, 16, 60, 33, "#64{50/16,60/33,-/15}");
+
+		seq = new Sequence();
+
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+
+		test(number++,seq, 16, 60, 48, "#64{50/16,60/48}");
+
+		seq = new Sequence();
+
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+
+		test(number++,seq, -1, 50, 20, "#64{50/16,50/16,50/16,50/16}");
+		test(number++,seq, 16, 60, 16, "#64{50/16,60/16,50/16,50/16}");
+
+		seq = new Sequence();
+		
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+
+		test(number++,seq, 16, 60, 47, "#64{50/16,60/47,-/1}");
+
+		number = 101;
+		
+		seq = new Sequence();
+		
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+
+		test(number++,seq, 8, 60, 20, "#64{50/8,60/20,-/4,50/16,50/16}");
+
+		seq = new Sequence();
+		
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+
+		test(number++,seq, 8, 60, 8, "#64{50/8,60/8,50/16,50/16,50/16}");
+
+		seq = new Sequence();
+		
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+
+		test(number++,seq, 8, 60, 4, "#64{50/8,60/4,-/4,50/16,50/16,50/16}");
+
+		seq = new Sequence();
+		
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+
+		test(number++,seq, 8, 60, 24, "#64{50/8,60/24,50/16,50/16}");
+
+		seq = new Sequence();
+		
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+
+		test(number++,seq, 8, 60, 30, "#64{50/8,60/30,-/10,50/16}");
+
+		seq = new Sequence();
+		
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+
+		test(number++,seq, 8, 60, 40, "#64{50/8,60/40,50/16}");
+
+		seq = new Sequence();
+		
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+
+		test(number++,seq, 8, 60, 56, "#64{50/8,60/56}");
+
+		seq = new Sequence();
+		
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+		seq.addNote(50, 16);
+
+		test(number++,seq, 8, 60, 55, "#64{50/8,60/55,-/1}");
+
+	}
+	
+	static boolean tested = false;
+	
+	public static void test(int number,Sequence seq, int tick, int pitch, int ticks, String str) {
+		try {
+			if (tick >= 0) seq.replaceEntry(tick, new SequenceEntry(pitch,pitch == Integer.MIN_VALUE ? -1 : (short)32767,ticks,false));
+
+			int size = seq.size();
+			int t=0;
+			
+			for(int i=0;i<size;i++) {
+				t += seq.get(i).ticks;
+			}
+			
+			if (t != seq.totalTicks) {
+				System.out.println("Test "+number+" Expected: "+str);
+				System.out.println("          Found: "+seq.toString());
+				System.out.println("   ** MISMATCH: Expected "+seq.totalTicks+" ticks, got "+t+" ticks");
+				return;
+			}
+		} catch(Exception e) {
+			System.out.println("Test "+number+" Expected: "+str);
+			System.out.println("   Found exception");
+			e.printStackTrace();
+			return;
+		}
+		
+		String s = seq.toString();
+		
+		if (!s.equals(str)) {
+			System.out.println("Test "+number+" Expected: "+str);
+			System.out.println("          Found: "+s+"\n");
+		} else {
+			System.out.println("Test "+number+" succeeded");
+		}
+	}
+	
 }

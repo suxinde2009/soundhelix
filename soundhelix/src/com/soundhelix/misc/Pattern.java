@@ -135,19 +135,11 @@ public class Pattern {
 			this.ticks = ticks;
 		}
 
-		public PatternEntry(int pitch,short velocity,int ticks) {
-			this(pitch,velocity,ticks,false);
-		}
-
 		public PatternEntry(int pitch,short velocity,int ticks,boolean legato) {
 			this.pitch = pitch;
 			this.velocity = velocity;
 			this.ticks = ticks;
 			this.legato = legato;
-		}
-
-		public PatternEntry(char wildcardCharacter,short velocity,int ticks) {
-			this(wildcardCharacter,velocity,ticks,false);
 		}
 
 		public PatternEntry(char wildcardCharacter,short velocity,int ticks,boolean legato) {

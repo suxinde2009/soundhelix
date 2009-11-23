@@ -30,6 +30,9 @@ import com.soundhelix.misc.XMLConfigurable;
  */
 
 public class XMLUtils {
+	/** The read buffer to use for reading files. */
+	private static final int READ_BUFFER = 16384;
+	
 	private static Logger logger = Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
 	
 	private XMLUtils() {}
@@ -80,6 +83,7 @@ public class XMLUtils {
 	 * Searches for the element pointed to by path and tries to parse
 	 * it as an integer.
 	 * 
+	 * @param random the random generator
 	 * @param path the XPath expression
 	 * @param parentNode the parent node to start searching from
 	 * @param xpath an XPath instance
@@ -106,6 +110,7 @@ public class XMLUtils {
 	 * If it is an integer, the integer is returned. Otherwise, the node
 	 * is checked for valid subelements, which are then evaluated.
 	 * 
+	 * @param random the random generator
 	 * @param node the node to parse
 	 * @param xpath an XPath instance
 	 * 
@@ -169,6 +174,7 @@ public class XMLUtils {
 	 * Searches for the element pointed to by path and tries to parse
 	 * it as an integer.
 	 * 
+	 * @param random the random generator
 	 * @param path the XPath expression
 	 * @param parentNode the parent node to start searching from
 	 * @param xpath an XPath instance
@@ -195,6 +201,7 @@ public class XMLUtils {
 	 * If it is an integer, the integer is returned. Otherwise, the node
 	 * is checked for valid subelements, which are then evaluated.
 	 * 
+	 * @param random the random generator
 	 * @param node the node to parse
 	 * @param xpath an XPath instance
 	 * 
@@ -224,6 +231,7 @@ public class XMLUtils {
 	 * If it is a boolean, the boolean. Otherwise, the node
 	 * is checked for valid subelements, which are then evaluated.
 	 * 
+	 * @param random the random generator
 	 * @param node the node to parse
 	 * @param xpath an XPath instance
 	 * 
@@ -245,8 +253,8 @@ public class XMLUtils {
 	
 		if(n.getNodeName().equals("random")) {
 			try {
-				int prob = Integer.parseInt((String)xpath.evaluate("attribute::probability",n,XPathConstants.STRING));
-				return random.nextInt(100) < prob;
+				double prob = Double.parseDouble((String)xpath.evaluate("attribute::probability",n,XPathConstants.STRING));
+				return RandomUtils.getBoolean(random,prob/100.0d);
 			} catch(Exception e) {throw(new RuntimeException("Error parsing random attributes",e));}
 		} else {
 			throw(new RuntimeException("Invalid element "+n.getNodeName()));
@@ -257,6 +265,7 @@ public class XMLUtils {
 	 * Searches for the element pointed to by path and tries to parse
 	 * it as a string.
 	 * 
+	 * @param random the random generator
 	 * @param path the XPath expression
 	 * @param parentNode the parent node to start searching from
 	 * @param xpath an XPath instance
@@ -278,6 +287,16 @@ public class XMLUtils {
 		}
 	}
 	
+	/**
+	 * Tries to parse the given node as a string.
+	 * 
+	 * @param random the random generator
+	 * @param node the node
+	 * @param xpath an XPath instance
+	 * 
+	 * @return the string (or null)
+	 */
+
 	public static String parseString(Random random,Node node,XPath xpath) {
 		if(node == null) {
 			return null;
@@ -407,8 +426,6 @@ public class XMLUtils {
 	    
 	    NodeList nodeList = null;
 		
-		logger.debug("Node: "+node.getNodeName()+"  type: "+node.getNodeType());
-		
 		try {
 		    // recursively search all "include" tags, starting from node
 			nodeList = (NodeList)xpath.evaluate("//include",node,XPathConstants.NODESET);
@@ -498,7 +515,7 @@ public class XMLUtils {
 		BufferedReader reader = new BufferedReader(new FileReader(filename));
 		
 		// the buffer used for reading
-		char[] buf = new char[16384];
+		char[] buf = new char[READ_BUFFER];
 		
 		int numRead;
 		

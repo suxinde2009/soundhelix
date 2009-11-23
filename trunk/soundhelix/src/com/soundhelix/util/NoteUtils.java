@@ -12,9 +12,12 @@ import com.soundhelix.misc.Chord;
 
 public class NoteUtils {
 	// list of notes which are on the C/Am scale, i.e., which
-	// form the white keys on the piano keyboard, starting with C
-	private static final boolean[] SCALE_TABLE = new boolean[] {true,false,true,false,true,true,false,true,false,true,false,true};
+	// form the white keys on the piano keyboard, starting with c
+	// this equals all even indexes < 5 and all odd indexes >= 5
+	private static final boolean[] SCALE_TABLE = new boolean[] {
+		true,false,true,false,true,true,false,true,false,true,false,true};
 
+	/** The list of all note names, starting with c. */
 	private static String[] noteNames = {
 		"c","c#","d","d#","e","f","f#","g","g#","a","a#","b"
 	};
@@ -23,6 +26,7 @@ public class NoteUtils {
 	private static Hashtable<String,Integer> h = new Hashtable<String,Integer>();
 	
 	static {
+		// build a reverse lookup table for noteNames
 		for(int i=0;i<12;i++) {
 			h.put(noteNames[i],i);
 		}

@@ -1,5 +1,6 @@
 package com.soundhelix.sequenceengine;
 
+import java.util.Arrays;
 import java.util.Random;
 
 import javax.xml.xpath.XPath;
@@ -9,10 +10,14 @@ import javax.xml.xpath.XPathException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.soundhelix.harmonyengine.HarmonyEngine;
 import com.soundhelix.misc.ActivityVector;
+import com.soundhelix.misc.Pattern;
 import com.soundhelix.misc.Sequence;
 import com.soundhelix.misc.Track;
+import com.soundhelix.misc.Pattern.PatternEntry;
 import com.soundhelix.misc.Track.TrackType;
+import com.soundhelix.util.RandomUtils;
 import com.soundhelix.util.XMLUtils;
 
 /**
@@ -57,12 +62,16 @@ import com.soundhelix.util.XMLUtils;
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
-// TODO: consider adding velocity support to the patterns (do we need this?)
-
 public class DrumSequenceEngine extends AbstractSequenceEngine {
 
+	private final int CONDITION_INACTIVE_TO_ACTIVE = 0;
+	private final int CONDITION_ACTIVE_TO_INACTIVE = 1;
+
+	private final int MODE_ADD = 0;
+	private final int MODE_REPLACE = 1;
+
 	private DrumEntry[] drumEntries;
-	private int activityVectors;
+	private ConditionalEntry[] conditionalEntries;
 	
 	private Random random;
 	
@@ -70,124 +79,303 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
 		super();
 	}
 	
-	public void setDrumEntries(DrumEntry[] drumEntries) {
-		int activityVectors = -1;
+	static {
+		int ticks = 512;
 		
-		for(int i=0;i<drumEntries.length;i++) {
-			activityVectors = Math.max(activityVectors,drumEntries[i].activityGroup);
+		StringBuilder sb = new StringBuilder();
+		
+		for(int i=0;i<ticks;i++) {
+			if(sb.length()>0) {
+			sb.append(',');
+			}
+			sb.append("0:"+(32000*(i+1)/ticks));
 		}
-
-		activityVectors++;
-
-		this.activityVectors = activityVectors;
 		
-		this.drumEntries = drumEntries;
+		//Logger.getLogger(DrumSequenceEngine.class).debug(sb.toString());
 	}
 	
-	public Track render(ActivityVector[] activityVector) {
-		Track track = new Track(TrackType.RHYTHM);
+	public void setDrumEntries(DrumEntry[] drumEntries) {
+		this.drumEntries = drumEntries;
+	}
 
-		int stretchFactor;
+	public void setConditionalEntries(ConditionalEntry[] conditionalEntries) {
+		this.conditionalEntries = conditionalEntries;
+	}
+
+	public Track render(ActivityVector[] activityVectors) {
+        HarmonyEngine harmonyEngine = structure.getHarmonyEngine();        
+        int ticks = structure.getTicks();
+        int drumEntryCount = drumEntries.length;
+        
+		Sequence[] seqs = new Sequence[drumEntryCount];
 		
-		int ticksPerBeat = structure.getTicksPerBeat();
-		
-		switch(ticksPerBeat) {
-		case 16:
-		case 12:
-		case 8:
-		case 6:
-		case 4:
-		case 3:
-		        stretchFactor = 1;
-		        break;
-
-		case 2: 
-        		stretchFactor = 2;
-        		break;
-
-		case 1: 
-        		stretchFactor = 4;
-        		break;
-        		
-        default:
-        		throw(new RuntimeException("Invalid ticks per beat"));
+		for(int i=0;i<drumEntryCount;i++) {
+			seqs[i] = new Sequence();
 		}
-	
-		for(int i=0;i<drumEntries.length;i++) {
-			DrumEntry drumEntry = drumEntries[i];
-			
-        	Sequence seq = new Sequence();
-      	
-        	for(int tick=0,patternTick=0;tick<structure.getTicks();tick++,patternTick++) {
-        		if(activityVector[drumEntry.activityGroup].isActive(tick) && drumEntry.pattern.charAt((patternTick*stretchFactor)%drumEntry.pattern.length()) == '1') {
-        			seq.addNote(drumEntry.pitch,1);
-        		} else {
-        			seq.addPause(1);
-        		}
-        		
-        		switch(ticksPerBeat) {
-        		case 6:
-        		case 8: seq.addPause(1);
-        				tick++;
-        		        break;
-        		        
-        		case 12: seq.addPause(2);
-        		        tick += 2;
-        		        break;
-        		        
-        		case 16: seq.addPause(3);
-        		         tick += 3;
-        		         break;
-        		}
-        	}
-      
-        	track.add(seq);
-		}    
+
+		Track track = new Track(TrackType.RHYTHM);
 		
+       	for(int i=0;i<drumEntryCount;i++) {
+    		ActivityVector activityVector = activityVectors[i];
+       		Sequence seq = seqs[i];
+    		Pattern pattern = drumEntries[i].pattern;
+
+    		// the pitch is constant
+    		int pitch = drumEntries[i].pitch;
+
+    		int patternLength = pattern.size();
+    		int pos = 0;
+    		int tick = 0;
+
+			while(tick < ticks) {
+				Pattern.PatternEntry entry = pattern.get(pos%patternLength);
+        		int len = entry.getTicks();
+
+        		if(activityVector.isActive(tick)) {
+        			short vel = entry.getVelocity();
+
+        			if(entry.isPause()) {
+        				// add pause
+        				seq.addPause(len);
+        			} else {
+        				boolean useLegato = entry.isLegato() ? pattern.isLegatoLegal(activityVector, tick+len, pos+1) : false;
+        				seq.addNote(pitch,len,vel,useLegato);
+        			}
+        		} else {
+        			// add pause
+        			seq.addPause(len);
+        		}
+
+        		tick += len;
+        		pos++;
+        	}
+    		track.add(seq);
+        }
+        
+       	int conditionalEntryCount = conditionalEntries.length;
+       	
+       	next:
+       	for(int i=0;i<conditionalEntryCount;i++) {
+       		int[] targets = conditionalEntries[i].targets;
+       		java.util.regex.Pattern condition = conditionalEntries[i].condition;
+       		int mode = conditionalEntries[i].mode;
+       		double probability = conditionalEntries[i].probability;
+    		Pattern pattern = conditionalEntries[i].pattern;
+    		int patternTicks = pattern.getTicks();
+
+    		String previousActivity = getActivityString(-1, activityVectors);
+    		
+    		int tick = 0;    		
+    		int lastMatchedTick = Integer.MIN_VALUE;
+    		
+    		while(true) {
+    			while(tick < ticks) {
+					String activity = getActivityString(tick, activityVectors);
+					String totalActivity = previousActivity + activity; 
+
+    				previousActivity = activity;
+
+    				if (tick-patternTicks > lastMatchedTick) {
+    					if (condition.matcher(totalActivity).matches()) {
+    						break;
+    					}
+					} else {
+						System.out.println("Pattern "+i+" would overlap. Current pos: "+tick+"  Last match: "+lastMatchedTick+"  Pattern ticks: "+patternTicks);
+					}
+
+    				tick += harmonyEngine.getChordSectionTicks(tick);
+    			}
+  
+    			if (tick >= ticks) {
+    				continue next;
+    			}
+
+    			tick -= patternTicks;
+
+    			if (tick >= 0) {
+    				if (RandomUtils.getBoolean(random, probability)) {    					
+    					lastMatchedTick = tick;
+    					
+    					logger.debug("Applying conditional pattern "+i+" with length "+patternTicks+" for targets "+Arrays.toString(targets)+" at ticks "+tick+"-"+(tick + patternTicks - 1));
+    					
+    					int len = pattern.size();
+
+    					for(int k=0;k<len;k++) {
+    						PatternEntry entry = pattern.get(k);
+
+        					for(int j=0;j<targets.length;j++) {
+        			       		Sequence seq = seqs[targets[j]];
+        			    		int pitch = drumEntries[targets[j]].pitch;
+
+        						if (entry.isNote()) {
+        							seq.replaceEntry(tick, new Sequence.SequenceEntry(pitch,entry.getVelocity(),entry.getTicks(),entry.isLegato()));
+        						} else if (mode == MODE_REPLACE) {
+        							seq.replaceEntry(tick, new Sequence.SequenceEntry(Integer.MIN_VALUE,(short)-1,entry.getTicks(),entry.isLegato()));
+        						}
+        					}
+    						tick += entry.getTicks();
+    					}
+    				}
+    			}
+    			
+				tick += patternTicks;
+				tick += harmonyEngine.getChordSectionTicks(tick);
+    		}
+        }   	
+       	
         return track;
 	}
 	
+	private String getActivityString(int tick,ActivityVector[] activityVectors) {
+		int len = activityVectors.length;
+		
+		StringBuilder sb = new StringBuilder(len);
+		
+		for(int i=0;i<len;i++) {
+			if(tick >= 0 && activityVectors[i].isActive(tick)) {
+				sb.append('1');
+			} else {
+				sb.append('0');
+			}
+		}
+		
+		return sb.toString();
+	}
+	
 	public int getActivityVectorCount() {
-		return activityVectors;
+		return drumEntries.length;
 	}
 	
     public void configure(Node node,XPath xpath) throws XPathException {
     	random = new Random(randomSeed);
     	
 		NodeList nodeList = (NodeList)xpath.evaluate("pattern",node,XPathConstants.NODESET);
-
 		int patterns = nodeList.getLength();
 		
 		DrumEntry[] drumEntries = new DrumEntry[patterns];
 		
-		if(nodeList.getLength() == 0) {
+		if(patterns == 0) {
 			throw(new RuntimeException("Need at least 1 pattern"));
 		}
 		
 		for(int i=0;i<patterns;i++) {
-			String pattern = XMLUtils.parseString(random,nodeList.item(i),xpath);
+			String patternString = XMLUtils.parseString(random,nodeList.item(i),xpath);
 			int pitch = Integer.parseInt((String)xpath.evaluate("attribute::pitch",nodeList.item(i),XPathConstants.STRING));
-			int activityGroup = Integer.parseInt((String)xpath.evaluate("attribute::activityGroup",nodeList.item(i),XPathConstants.STRING));
 
-			if(activityGroup < 0) {
-				throw(new RuntimeException("activityGroup must not be negative"));
+			Pattern pattern = Pattern.parseString(patternString);
+			
+			drumEntries[i] = new DrumEntry(pattern,pitch);
+		}
+
+		setDrumEntries(drumEntries);
+
+		nodeList = (NodeList)xpath.evaluate("conditionalPattern",node,XPathConstants.NODESET);
+		patterns = nodeList.getLength();
+		
+		ConditionalEntry[] conditionalEntries = new ConditionalEntry[patterns];
+		
+		for(int i=0;i<patterns;i++) {
+			String patternString = XMLUtils.parseString(random,nodeList.item(i),xpath);
+
+			String conditionString = (String)xpath.evaluate("attribute::condition",nodeList.item(i),XPathConstants.STRING);
+
+			conditionString = conditionString.replaceAll(">","").replaceAll(",","|").replaceAll("-",".");
+			java.util.regex.Pattern condition = java.util.regex.Pattern.compile(conditionString);
+			
+			String modeString = (String)xpath.evaluate("attribute::mode",nodeList.item(i),XPathConstants.STRING);
+			int mode;
+			
+			if (modeString.equals("add")) {
+				mode = MODE_ADD;
+			} else if(modeString.equals("replace")) {
+				mode = MODE_REPLACE;
+			} else {
+				throw(new RuntimeException("Unknown mode \""+modeString+"\""));
 			}
 			
-			drumEntries[i] = new DrumEntry(pattern,pitch,activityGroup);
+			String targetString = (String)xpath.evaluate("attribute::target",nodeList.item(i),XPathConstants.STRING);
+			String[] targetStrings = targetString.split(",");
+			int[] targets = new int[targetStrings.length];
+			
+			for(int k=0;k<targetStrings.length;k++) {
+				targets[k] = Integer.parseInt(targetStrings[k]);
+			}
+			
+			double probability = Double.parseDouble((String)xpath.evaluate("attribute::probability",nodeList.item(i),XPathConstants.STRING))/100.0d;
+
+			Pattern pattern = Pattern.parseString(patternString);
+			
+			conditionalEntries[i] = new ConditionalEntry(pattern,condition,mode,targets,probability);
 		}
 		
-		setDrumEntries(drumEntries);
+		setConditionalEntries(conditionalEntries);
     }
     
-    private class DrumEntry {
-    	private final String pattern;
-    	private final int pitch;
-    	private final int activityGroup;
+    /**
+     * Matches a string representing the current activity state with the given pattern.
+     * The activity state string must consist only of the digits 0 and 1, the pattern must consist of
+     * the same digits plus a minus character.
+     * 
+     * @param value the value string
+     * @param pattern the pattern string
+     * 
+     * @return true if the value matches the pattern, false otherwise
+     */
+    
+    private boolean matchesPattern(String value,String pattern) {
+    	if (value == null || pattern == null) {
+    		return false;
+    	}
     	
-    	private DrumEntry(String pattern,int pitch,int activityGroup) {
+    	int len = pattern.length();
+    	
+    	if (len != value.length()) {
+    		throw(new RuntimeException("The activity value \""+value+"\" is not compatible with the pattern \""+pattern+"\""));
+    	}
+    	
+    	for (int i=0;i<len;i++) {
+    		char c = pattern.charAt(i);
+    		switch (c) {
+    		case '0':
+    		case '1':
+    			if(value.charAt(i) != c) {
+    				return false;
+    			}
+    			break;
+    		case '-':
+    			// acts as a wildcard
+    			break;
+    		default:
+    			throw(new RuntimeException("Invalid pattern character \""+c+"\" in pattern \""+pattern+"\""));
+    		}
+    	}
+    	
+    	return true;
+    }
+    
+    private static class DrumEntry {
+    	private final Pattern pattern;
+    	private final int pitch;
+    	
+    	private DrumEntry(Pattern pattern,int pitch) {
     		this.pattern = pattern;
     		this.pitch = pitch;
-    		this.activityGroup = activityGroup;
+    	}
+    }
+    
+    private static class ConditionalEntry {
+    	private final Pattern pattern;
+    	private final java.util.regex.Pattern condition;
+    	private final int mode;
+    	private final int[] targets;
+    	private final double probability;
+    	
+    	private ConditionalEntry(Pattern pattern,java.util.regex.Pattern condition,int mode,int[] targets,double probability) {
+    		this.pattern = pattern;
+       		this.condition = condition;
+       		this.mode = mode;
+    		this.targets= targets;
+    		this.probability = probability;
     	}
     }
 }

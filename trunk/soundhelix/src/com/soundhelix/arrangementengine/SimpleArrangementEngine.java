@@ -208,7 +208,8 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 				activityVectors = createActivityVectors(activityVectorConfigurations);
 			} catch(ConstraintException e) {
 				if (isDebug) {
-					String key = e.getActivityVectorConfiguration().name+"/"+e.getReason();
+					String name = (e.getActivityVectorConfiguration() != null ? e.getActivityVectorConfiguration().name : "unknown");
+					String key = name+"/"+e.getReason();
 					Integer current = constraintFailure.get(key);
 
 					constraintFailure.put(key,current != null ? current+1 : 1);
@@ -387,6 +388,8 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 		
 		ActivityVectorConfiguration avc;
 		
+		int count = 100;
+		
 		do {
 			do {		
 				// choose random bit number
@@ -406,7 +409,11 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 			// retry if we are trying to set a bit which shouldn't be set yet
 			// note that this will handle the startAfterSection constraint completely, the stopBeforeSection
 			// constraint is only handled partially
-		} while(section <= avc.startAfterSection || stopPos <= avc.stopBeforeSection);
+		} while(count-- > 0 && (section <= avc.startAfterSection || stopPos <= avc.stopBeforeSection));
+		
+		if (count < 0) {
+			throw(new ConstraintException(null, "Couldn't set bit"));
+		}
 		
 		bitSet.set(pos);
 		

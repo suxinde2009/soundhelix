@@ -3,7 +3,8 @@ package com.soundhelix.util;
 import java.util.Random;
 
 /**
- * Implements some static methods for random numbers.
+ * Implements some static methods for random numbers. All methods need a random generator as
+ * a parameter.
  * 
  * @author Thomas Schürger (thomas@schuerger.com)
  */
@@ -18,9 +19,10 @@ public class RandomUtils {
 	 * of the form min+k*step (k = 0, 1, ..., upto a suitable
 	 * maximum) can be returned.
 	 * 
+	 * @param random the random generator
 	 * @param min the minimum value (inclusive)
 	 * @param max the maximum value (inclusive)
-	 * @param step the step (normally 1)
+	 * @param step the step (must be >= 0)
      *
 	 * @return a uniformly distributed integer
 	 */
@@ -36,6 +38,7 @@ public class RandomUtils {
 	 * random value being exactly max would be negligible (in the
 	 * order of 2^-53).
 	 * 
+	 * @param random the random generator
 	 * @param min the minimum value (inclusive)
 	 * @param max the maximum value (exclusive)
      *
@@ -53,9 +56,10 @@ public class RandomUtils {
 	 * of the form min+k*step (k = 0, 1, ..., upto a suitable
 	 * maximum) can be returned.
 	 * 
+	 * @param random the random generator
 	 * @param min the minimum value (inclusive)
 	 * @param max the maximum value (exclusive)
-	 * @param step the step (must not be 0)
+	 * @param step the step (must be >= 0)
      *
 	 * @return a uniformly distributed double
 	 */
@@ -71,6 +75,7 @@ public class RandomUtils {
 	 * fall into the specified interval between min and max,
 	 * the process is repeated until it does.
 	 * 
+	 * @param random the random generator
 	 * @param min the minimum value (inclusive)
 	 * @param max the maximum value (inclusive)
 	 * @param mean the mean value
@@ -96,6 +101,7 @@ public class RandomUtils {
 	 * fall into the specified interval between min and max,
 	 * the process is repeated until it does.
 	 * 
+	 * @param random the random generator
 	 * @param min the minimum value (inclusive)
 	 * @param max the maximum value (inclusive)
 	 * @param mean the mean value
@@ -112,5 +118,26 @@ public class RandomUtils {
 		} while(value < min || value > max);
 
 		return value;
+	}
+	
+	/**
+	 * Returns a boolean being true with the given probability.
+	 * 
+	 * @param random the random generator
+	 * @param probability the probability (between 0 and 1)
+	 * 
+	 * @return a boolean being true with the given probability
+	 */
+	
+	public static boolean getBoolean(Random random,double probability) {
+	    if(probability == 0.5d) {
+	    	return random.nextBoolean();
+	    } else if(probability >= 1.0d) {
+			return true;
+		} else if(probability <= 0.0d) {
+			return false;
+		} else {
+			return random.nextDouble() < probability;
+		}
 	}
 }

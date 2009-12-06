@@ -110,7 +110,7 @@
 	<activityVector name="chord3">
 	  <minActive>20</minActive>
 	  <maxActive>40</maxActive>
-      <startAfterSection>0</startAfterSection></img>
+      <startAfterSection>0</startAfterSection>
 	</activityVector>
 
     <track>

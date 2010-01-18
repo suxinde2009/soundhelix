@@ -69,7 +69,7 @@ public class RandomUtils {
 	}
 
 	/**
-	 * Returns a normally distributed integer within min and max
+	 * Returns a normally distributed random integer within min and max
 	 * (both inclusive), having the specified mean and the
 	 * specified variance. If the calculated random Gaussian does not
 	 * fall into the specified interval between min and max,
@@ -95,7 +95,7 @@ public class RandomUtils {
 	}
 	
 	/**
-	 * Returns a normally distributed double within min and max
+	 * Returns a normally distributed random double within min and max
 	 * (both inclusive), having the specified mean and the
 	 * specified variance. If the calculated random Gaussian does not
 	 * fall into the specified interval between min and max,
@@ -120,6 +120,37 @@ public class RandomUtils {
 		return value;
 	}
 	
+	/**
+	 * Returns a random double with a power distribution of the given order between min (inclusive) and max (exclusive).
+	 * 
+	 * @param random the random generator
+	 * @param min the minimum value (inclusive)
+	 * @param max the maximum value (exclusive)
+	 * @param order the order (1 = linear, 2 = quadratic, 3 = cubic, etc.)
+	 * 
+	 * @return the random double
+	 */
+	
+	public static double getPowerDouble(Random random, double min, double max, double order) {
+		return min+(max-min)*Math.pow(random.nextDouble(), order);
+	}
+
+	/**
+	 * Converts the given random value (between 0 and 1) into a double with a power distribution
+	 * of the given order between min (inclusive) and max (exclusive).
+	 * 
+	 * @param value the random value (between 0 and 1)
+	 * @param min the minimum value (inclusive)
+	 * @param max the maximum value (exclusive)
+	 * @param order the order (1 = linear, 2 = quadratic, 3 = cubic, etc.)
+	 * 
+	 * @return the random double
+	 */
+	
+	public static double getPowerDouble(double value, double min, double max, double order) {
+		return min+(max-min)*Math.pow(value, order);
+	}
+
 	/**
 	 * Returns a boolean being true with the given probability.
 	 * 

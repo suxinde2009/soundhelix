@@ -82,19 +82,25 @@ public class AcidSequenceEngine extends AbstractMultiPatternSequenceEngine {
     	final double noteRatio = 0.8;
     	final double slideRatio = 0.25;
     	
-    	double minVolume = 1d;
-    	double maxVolume = 20000d;
+    	final double minVolume = 1d;
+    	final double maxVolume = 20000d;
+    	
+    	final int[] offsets = {0,1,2,3,4,5,6};
+    	final int[] lengths = {1,2,3};
     	
     	// 1 = only pitch dependent, 0 = not pitch dependent
-    	double pitchFactor = 0.7;
-    	int maxPitch = 6;
-    	double order = 3.0d;
+    	final double pitchFactor = 0.7;
+    	final double order = 3.0d;
+
+    	final int minPitch = findMinimum(offsets);
+    	final int maxPitch = findMaximum(offsets);
+    	final int pitchDiff = maxPitch - minPitch;
 
     	boolean currentIsNote;
     	boolean nextIsNote = random.nextDouble() < noteRatio;
 
     	for(int i=0;i<ticks;) {
-    		int length = random.nextInt(2) + 1;
+    		int length = lengths[random.nextInt(lengths.length)];
 
     		if (i + length > ticks) {
     			length = ticks - i;
@@ -104,9 +110,9 @@ public class AcidSequenceEngine extends AbstractMultiPatternSequenceEngine {
         	nextIsNote = random.nextDouble() < noteRatio;
 
         	if (currentIsNote) {    		
-    			int pitch = random.nextInt(maxPitch + 1);
+    			int pitch = offsets[random.nextInt(offsets.length)];
     			
-    			double v = ((1.0d - pitchFactor) * random.nextDouble() + pitchFactor * pitch / maxPitch);
+    			double v = ((1.0d - pitchFactor) * random.nextDouble() + pitchFactor * (pitch - minPitch) / pitchDiff);
     			int volume = (int) RandomUtils.getPowerDouble(v, minVolume, maxVolume, order);
     			
     			boolean isSlide = nextIsNote && (i + length < ticks) && random.nextDouble() < slideRatio;
@@ -159,4 +165,27 @@ public class AcidSequenceEngine extends AbstractMultiPatternSequenceEngine {
     	
     	return sb.toString();
     }
+    
+    public int findMaximum(int[] list) {
+    	int maximum = Integer.MIN_VALUE;
+    	int num = list.length;
+    	
+    	for(int i=0;i<num;i++) {
+    		maximum = Math.max(list[i], maximum);
+    	}
+    	
+    	return maximum;
+    }
+    
+    public int findMinimum(int[] list) {
+    	int minimum = Integer.MAX_VALUE;
+    	int num = list.length;
+    	
+    	for(int i=0;i<num;i++) {
+    		minimum = Math.min(list[i], minimum);
+    	}
+    	
+    	return minimum;
+    }
+
 }

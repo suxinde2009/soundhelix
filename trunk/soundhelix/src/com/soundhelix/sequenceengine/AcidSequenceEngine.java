@@ -29,12 +29,19 @@ public class AcidSequenceEngine extends AbstractMultiPatternSequenceEngine {
 			setObeyChordSubtype(XMLUtils.parseBoolean(random,"obeyChordSubtype",node,xpath));
 		} catch(Exception e) {}
 		
-		setPatterns(new String[] {generatePattern()});
+		setPatterns(new String[] {generatePattern("ABAC")});
     }
     
-    private String generatePattern() {
-    	final String pattern = "ABAC";
-
+    /**
+     * Generates a pattern that is based on the given pattern of patterns. Each character
+     * in the pattern string corresponds to one generated pattern.
+     * 
+     * @param patternPattern the string of pattern characters 
+     * 
+     * @return the generated pattern
+     */
+    
+    private String generatePattern(String patternPattern) {
     	// maps pattern characters to patterns
     	Map <Character,String> patternMap = new HashMap<Character,String>();
     	Set <String> patternSet = new HashSet<String>();
@@ -44,8 +51,8 @@ public class AcidSequenceEngine extends AbstractMultiPatternSequenceEngine {
     	String basePattern = null;    	
     	StringBuilder totalPattern = new StringBuilder();
     	
-    	for(int i=0;i<pattern.length();i++) {
-    		char c = pattern.charAt(i);
+    	for(int i=0;i<patternPattern.length();i++) {
+    		char c = patternPattern.charAt(i);
     		String p = patternMap.get(c);
     		
     		if (p == null) {
@@ -59,8 +66,10 @@ public class AcidSequenceEngine extends AbstractMultiPatternSequenceEngine {
     				} while(patternSet.contains(p));
     			}
 
-    			logger.debug("Pattern " + c + ": "+p);    			
-
+    			if (logger.isDebugEnabled()) {
+    				logger.debug("Pattern " + c + ": "+p);    			
+    			}
+    				
 				patternMap.put(c,p);
 				patternSet.add(p);
     		}
@@ -74,6 +83,12 @@ public class AcidSequenceEngine extends AbstractMultiPatternSequenceEngine {
     	
     	return totalPattern.toString();    
     }
+    
+    /**
+     * Creates and returns a random pattern.
+     * 
+     * @return the random pattern
+     */
     
     private String generateBasePattern() {
     	StringBuilder sb = new StringBuilder();
@@ -136,6 +151,17 @@ public class AcidSequenceEngine extends AbstractMultiPatternSequenceEngine {
     	return sb.toString();
     }
     
+    /**
+     * Takes the given pattern and returns a modified version of it by
+     * doing the given number of random swaps. It is possible for the
+     * pattern to be identical to the original pattern.
+     * 
+     * @param pattern the original pattern
+     * @param modifications the number of modifications
+     * 
+     * @return the modified pattern
+     */
+
     private String modifyPattern(String pattern, int modifications) {
     	String[] values = pattern.split(",");
     	int length = values.length;
@@ -166,7 +192,16 @@ public class AcidSequenceEngine extends AbstractMultiPatternSequenceEngine {
     	return sb.toString();
     }
     
-    public int findMaximum(int[] list) {
+    /**
+     * Finds the maximum integer from the given list of ints.
+     * If the list is empty, Integer.MIN_VALUE is returned.
+     *
+     * @param list the list of ints
+     * 
+     * @return the maximum integer from the list
+     */
+    
+    private int findMaximum(int[] list) {
     	int maximum = Integer.MIN_VALUE;
     	int num = list.length;
     	
@@ -176,8 +211,17 @@ public class AcidSequenceEngine extends AbstractMultiPatternSequenceEngine {
     	
     	return maximum;
     }
-    
-    public int findMinimum(int[] list) {
+
+    /**
+     * Finds the minimum integer from the given list of ints.
+     * If the list is empty, Integer.MAX_VALUE is returned.
+     *
+     * @param list the list of ints
+     * 
+     * @return the minimum integer from the list
+     */
+
+    private int findMinimum(int[] list) {
     	int minimum = Integer.MAX_VALUE;
     	int num = list.length;
     	
@@ -187,5 +231,4 @@ public class AcidSequenceEngine extends AbstractMultiPatternSequenceEngine {
     	
     	return minimum;
     }
-
 }

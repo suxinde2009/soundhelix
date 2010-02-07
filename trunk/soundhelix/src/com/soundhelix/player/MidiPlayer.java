@@ -94,12 +94,6 @@ import com.soundhelix.util.XMLUtils;
 // TODO: make number of ticks to wait before and after playing configurable
 
 public class MidiPlayer extends AbstractPlayer {
-	/** The number of ticks to wait before starting playing. */
-	private static final int WAIT_TICKS_BEFORE_SONG = 32;
-	
-	/** The number of ticks to wait after stopping playing. */
-	private static final int WAIT_TICKS_AFTER_SONG = 64;
-
 	/**
 	 * The number of MIDI clock synchronization ticks per beat.
 	 * 24 is the standard MIDI synchronization, 480 is the
@@ -115,6 +109,9 @@ public class MidiPlayer extends AbstractPlayer {
 	private int transposition;
 	private int[] groove;
 	
+	private int beforePlayWaitTicks;
+	private int afterPlayWaitTicks;
+	
 	private Map<Integer,DeviceChannel> channelMap;
 	private Map<String,Device> deviceMap;
 	
@@ -122,7 +119,7 @@ public class MidiPlayer extends AbstractPlayer {
 	
 	// has open() been called?
 	boolean opened = false;
-	
+
 	// true if at least one MIDI device requires clock synchronization
 	boolean useClockSynchronization = false;
 		
@@ -358,7 +355,7 @@ public class MidiPlayer extends AbstractPlayer {
             }
 
     		long referenceTime = System.nanoTime();            
-            referenceTime = waitTicks(referenceTime,WAIT_TICKS_BEFORE_SONG,clockTimingsPerTick,structure.getTicksPerBeat());
+            referenceTime = waitTicks(referenceTime,beforePlayWaitTicks,clockTimingsPerTick,structure.getTicksPerBeat());
             
     		ShortMessage sm = new ShortMessage();
 
@@ -403,7 +400,7 @@ public class MidiPlayer extends AbstractPlayer {
     		
     		muteActiveChannels(arrangement, posList);
     	
-            referenceTime = waitTicks(referenceTime,WAIT_TICKS_AFTER_SONG,clockTimingsPerTick,structure.getTicksPerBeat());
+            referenceTime = waitTicks(referenceTime,afterPlayWaitTicks,clockTimingsPerTick,structure.getTicksPerBeat());
 
     		if(useClockSynchronization) {
     		    sendShortMessageToClockSynchronized(ShortMessage.STOP);
@@ -869,6 +866,9 @@ public class MidiPlayer extends AbstractPlayer {
     	setTransposition(XMLUtils.parseInteger(random,(Node)xpath.evaluate("transposition",node,XPathConstants.NODE),xpath));
     	setGroove(XMLUtils.parseString(random,(Node)xpath.evaluate("groove",node,XPathConstants.NODE),xpath));
     	
+    	setBeforePlayWaitTicks(XMLUtils.parseInteger(random,(Node)xpath.evaluate("beforePlayWaitTicks",node,XPathConstants.NODE),xpath));
+    	setAfterPlayWaitTicks(XMLUtils.parseInteger(random,(Node)xpath.evaluate("afterPlayWaitTicks",node,XPathConstants.NODE),xpath));
+    	
 		nodeList = (NodeList)xpath.evaluate("map",node,XPathConstants.NODESET);
 		entries = nodeList.getLength();
 		
@@ -1043,4 +1043,12 @@ public class MidiPlayer extends AbstractPlayer {
     		this.phase = phase;
     	}
     }
+
+	public void setBeforePlayWaitTicks(int beforePlayWaitTicks) {
+		this.beforePlayWaitTicks = beforePlayWaitTicks;
+	}
+
+	public void setAfterPlayWaitTicks(int afterPlayWaitTicks) {
+		this.afterPlayWaitTicks = afterPlayWaitTicks;
+	}
 }

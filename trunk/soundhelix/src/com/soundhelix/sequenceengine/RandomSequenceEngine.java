@@ -80,7 +80,7 @@ public class RandomSequenceEngine extends AbstractSequenceEngine {
     			PatternEntry entry = p.get(pos);
     			int l = entry.getTicks();
 
-    			if(activityVector.isActive(tick)) {	
+    			if(activityVector.isActive(tick + i)) {	
         			if(entry.isPause()) {
             			// add pause
             			seq.addPause(l);

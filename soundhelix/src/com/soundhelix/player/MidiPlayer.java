@@ -91,7 +91,6 @@ import com.soundhelix.util.XMLUtils;
 // TODO: mute all MIDI channels when player is aborted by ctrl+c (how?)
 // TODO: allow setting BPM in a fine-grained fashion (with at least milli-BPM resolution)
 // TODO: on each tick, send all note-offs before sending note-ons (this is currently done per track, but should be done globally)
-// TODO: make number of ticks to wait before and after playing configurable
 
 public class MidiPlayer extends AbstractPlayer {
 	/**
@@ -119,10 +118,12 @@ public class MidiPlayer extends AbstractPlayer {
 	
 	// has open() been called?
 	boolean opened = false;
-
+	
 	// true if at least one MIDI device requires clock synchronization
 	boolean useClockSynchronization = false;
-		
+
+    private boolean isAborted;    
+
     public MidiPlayer() {
     	super();
     }
@@ -133,7 +134,7 @@ public class MidiPlayer extends AbstractPlayer {
     
     public void open() {
     	if(opened) {
-    		throw(new RuntimeException("open() already called"));
+    		throw(new IllegalStateException("open() already called"));
     	}
     	
     	try {
@@ -145,6 +146,7 @@ public class MidiPlayer extends AbstractPlayer {
     	}
     	
     	opened = true;
+    	isAborted = false;
     }
     
     /**
@@ -231,7 +233,7 @@ public class MidiPlayer extends AbstractPlayer {
      * @param bpm the number of beats per minute
      */
     
-    private void setBPM(int bpm) {
+    public void setBPM(int bpm) {
     	if(bpm <= 0) {
     		throw(new IllegalArgumentException("BPM must be > 0"));
     	}
@@ -335,6 +337,7 @@ public class MidiPlayer extends AbstractPlayer {
 
        		Structure structure = arrangement.getStructure();
        		int ticksPerBeat = structure.getTicksPerBeat();
+       		int ticks = structure.getTicks();
        		
     		// when clock synchronization is used, we must make sure that
     		// the ticks per beat divide CLOCK_SYNCHRONIZATION_TICKS_PER_BEAT
@@ -348,51 +351,61 @@ public class MidiPlayer extends AbstractPlayer {
     		List<int[]> tickList = new ArrayList<int[]>();
     		List<int[]> posList = new ArrayList<int[]>();
 
-    		System.out.println("Song length: "+(structure.getTicks()*60/(structure.getTicksPerBeat()*bpm))+" seconds");
-
+    		if(logger.isDebugEnabled()) {
+    			logger.debug("Song length: "+ticks+" ticks ("+(ticks*60/(structure.getTicksPerBeat()*bpm))+" seconds)");
+    		}
+    		
             if(useClockSynchronization) {
                 sendShortMessageToClockSynchronized(ShortMessage.START);
             }
 
-    		long referenceTime = System.nanoTime();            
+    		long referenceTime = System.nanoTime();
+    		
+    		// wait specified number of ticks before starting playing, sending timing ticks if configured
             referenceTime = waitTicks(referenceTime,beforePlayWaitTicks,clockTimingsPerTick,structure.getTicksPerBeat());
             
-    		ShortMessage sm = new ShortMessage();
-
     		Iterator<ArrangementEntry> i = arrangement.iterator();
 
     		// initialize internal sequence pointers
     		
     		while(i.hasNext()) {
-    			ArrangementEntry ae = i.next();
-    			int size = ae.getTrack().size();
+    			int size = i.next().getTrack().size();
     			tickList.add(new int[size]);
     			posList.add(new int[size]);
     		}
 
     		List<Integer> legatoList = new ArrayList<Integer>();
 
-    		int tick = 0;
+    		int currentTick = 0;
     		
     		long tickReferenceTime = referenceTime;
     		long timingTickReferenceTime = useClockSynchronization ? referenceTime : Long.MAX_VALUE;
     		
-    		while(tick < structure.getTicks()) {
+    		// note that we use <= here; this is to make sure that the very last tick is completely processed
+    		// (including timing ticks); otherwise (with <) the loop would end as soon as the last tick has been
+    		// played, but the remaining timing ticks for the last tick still need to be processed
+    		
+    		while(currentTick <= ticks && !isAborted) {
+    			int tick = currentTick;
+    			
+    			// wait until the next event
+    			referenceTime = waitNanos(tickReferenceTime,timingTickReferenceTime);
+
     			// in each iteration, at least one of the following two conditions should be true
     			
     			if(referenceTime >= timingTickReferenceTime) {
-       				sendShortMessageToClockSynchronized(ShortMessage.TIMING_CLOCK);
+       				if(useClockSynchronization) sendShortMessageToClockSynchronized(ShortMessage.TIMING_CLOCK);
     				timingTickReferenceTime += getTimingTickNanos(clockTimingsPerTick, ticksPerBeat);
     			}
 
     			if(referenceTime >= tickReferenceTime) {
+    				if (tick == ticks) {
+    					break;
+    				}
     				playTick(arrangement, tick, tickList, posList, legatoList);
     				tickReferenceTime += getTickNanos(tick, ticksPerBeat);
-    				tick++;
+    				currentTick++;
     			}
-
-    			// wait until the next event
-    			referenceTime = waitNanos(tickReferenceTime,timingTickReferenceTime);
     		}
     		
     		// playing finished	
@@ -400,7 +413,7 @@ public class MidiPlayer extends AbstractPlayer {
     		
     		muteActiveChannels(arrangement, posList);
     	
-            referenceTime = waitTicks(referenceTime,afterPlayWaitTicks,clockTimingsPerTick,structure.getTicksPerBeat());
+            waitTicks(referenceTime,afterPlayWaitTicks,clockTimingsPerTick,structure.getTicksPerBeat());
 
     		if(useClockSynchronization) {
     		    sendShortMessageToClockSynchronized(ShortMessage.STOP);
@@ -451,7 +464,7 @@ public class MidiPlayer extends AbstractPlayer {
 		Iterator<ArrangementEntry> i;
 		i = arrangement.iterator();
 
-		if((tick % (2*ticksPerBar)) == 0) {
+		if((tick % (4*ticksPerBar)) == 0) {
 			System.out.printf("Tick: %4d   Seconds: %3d  %5.1f %%\n",tick,tick*60/(structure.getTicksPerBeat()*bpm),(double)tick*100d/(double)structure.getTicks());
 		}
 
@@ -626,22 +639,21 @@ public class MidiPlayer extends AbstractPlayer {
     private long waitTicks(long referenceTime,int ticks,int clockTimingsPerTick,int ticksPerBeat) throws InvalidMidiDataException,InterruptedException {
     	long lastWantedNanos = referenceTime;
     	
-    	for(int t=0;t<ticks;t++) {
+    	for(int t=0;t<ticks && !isAborted;t++) {
     	    for(int s=0;s<clockTimingsPerTick;s++) {    				
     		
-    	    	if(useClockSynchronization) {
-    				sendShortMessageToClockSynchronized(ShortMessage.TIMING_CLOCK);
-        	    }
-
     	    	long length = getTimingTickNanos(clockTimingsPerTick, ticksPerBeat);
     	    	
 				long wantedNanos = lastWantedNanos + length;
 				long wait = Math.max(0,wantedNanos - System.nanoTime());
 
-
 				if(wait > 0) {
 				    Thread.sleep((int)(wait/1000000l),(int)(wait%1000000l));
 				}
+
+    	    	if(useClockSynchronization) {
+    				sendShortMessageToClockSynchronized(ShortMessage.TIMING_CLOCK);
+        	    }
 
 				lastWantedNanos = wantedNanos;
 			}
@@ -865,7 +877,6 @@ public class MidiPlayer extends AbstractPlayer {
     	setBPM(XMLUtils.parseInteger(random,(Node)xpath.evaluate("bpm",node,XPathConstants.NODE),xpath));
     	setTransposition(XMLUtils.parseInteger(random,(Node)xpath.evaluate("transposition",node,XPathConstants.NODE),xpath));
     	setGroove(XMLUtils.parseString(random,(Node)xpath.evaluate("groove",node,XPathConstants.NODE),xpath));
-    	
     	setBeforePlayWaitTicks(XMLUtils.parseInteger(random,(Node)xpath.evaluate("beforePlayWaitTicks",node,XPathConstants.NODE),xpath));
     	setAfterPlayWaitTicks(XMLUtils.parseInteger(random,(Node)xpath.evaluate("afterPlayWaitTicks",node,XPathConstants.NODE),xpath));
     	
@@ -970,7 +981,7 @@ public class MidiPlayer extends AbstractPlayer {
     	
     	public void open() {
            	try {
-           		midiDevice = MidiPlayer.findMidiDevice(midiName);
+           		midiDevice = findMidiDevice(midiName);
 
         		if(midiDevice == null) {
            			throw(new RuntimeException("Could not find MIDI device \""+midiName+"\". Available devices with MIDI IN:\n"+getMidiDevices()));
@@ -1043,12 +1054,16 @@ public class MidiPlayer extends AbstractPlayer {
     		this.phase = phase;
     	}
     }
-
-	public void setBeforePlayWaitTicks(int beforePlayWaitTicks) {
-		this.beforePlayWaitTicks = beforePlayWaitTicks;
+	
+	public void abortPlay() {
+		this.isAborted = true;
 	}
 
-	public void setAfterPlayWaitTicks(int afterPlayWaitTicks) {
-		this.afterPlayWaitTicks = afterPlayWaitTicks;
+	public void setBeforePlayWaitTicks(int preWaitTicks) {
+		this.beforePlayWaitTicks = preWaitTicks;
+	}
+
+	public void setAfterPlayWaitTicks(int postWaitTicks) {
+		this.afterPlayWaitTicks = postWaitTicks;
 	}
 }

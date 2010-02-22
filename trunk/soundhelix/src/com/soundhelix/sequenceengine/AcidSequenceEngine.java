@@ -101,10 +101,10 @@ public class AcidSequenceEngine extends AbstractMultiPatternSequenceEngine {
     	final double maxVolume = 20000d;
     	
     	final int[] offsets = {0,1,2,3,4,5,6};
-    	final int[] lengths = {1,2,3};
+    	final int[] lengths = {1,2,3,2,1,1};
     	
     	// 1 = only pitch dependent, 0 = not pitch dependent
-    	final double pitchFactor = 0.7;
+    	final double pitchFactor = 0.75;
     	final double order = 3.0d;
 
     	final int minPitch = findMinimum(offsets);

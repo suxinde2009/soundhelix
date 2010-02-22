@@ -39,4 +39,9 @@ public interface Player extends XMLConfigurable,RandomSeedable {
  	 */
 
     public abstract void close();
+    
+    public void setBPM(int bpm);
+    
+    public void abortPlay();
+    
 }

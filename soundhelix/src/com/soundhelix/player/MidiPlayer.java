@@ -596,21 +596,38 @@ public class MidiPlayer extends AbstractPlayer {
 		ShortMessage sm = new ShortMessage();
 		
 		for(ControllerLFO clfo : controllerLFOs) {
-			Device device = deviceMap.get(clfo.deviceName);
-			
 			int value = clfo.lfo.getTickValue(tick);
 			
 			if(tick == 0 || value != clfo.lastSentValue) {
 				// value has changed or is the first value, send message
 				
-				if(clfo.controller.equals("pitchBend")) {
+				String controller = clfo.controller;				
+				
+				if(controller.equals("pitchBend")) {
 					sm.setMessage(ShortMessage.PITCH_BEND,clfo.channel,value%128,value/128);
-				} else if(clfo.controller.equals("modulationWheel")) {
+				} else if(controller.equals("modulationWheel")) {
 					sm.setMessage(ShortMessage.CONTROL_CHANGE,clfo.channel,1,value);
+				} else if(controller.equals("breath")) {
+					sm.setMessage(ShortMessage.CONTROL_CHANGE,clfo.channel,2,value);
+				} else if(controller.equals("footPedal")) {
+					sm.setMessage(ShortMessage.CONTROL_CHANGE,clfo.channel,4,value);
+				} else if(controller.equals("volume")) {
+					sm.setMessage(ShortMessage.CONTROL_CHANGE,clfo.channel,7,value);
+				} else if(controller.equals("balance")) {
+					sm.setMessage(ShortMessage.CONTROL_CHANGE,clfo.channel,8,value);
+				} else if(controller.equals("pan")) {
+					sm.setMessage(ShortMessage.CONTROL_CHANGE,clfo.channel,10,value);
+				} else if(controller.equals("expression")) {
+					sm.setMessage(ShortMessage.CONTROL_CHANGE,clfo.channel,11,value);
+				} else if(controller.equals("effect1")) {
+					sm.setMessage(ShortMessage.CONTROL_CHANGE,clfo.channel,12,value);
+				} else if(controller.equals("effect2")) {
+					sm.setMessage(ShortMessage.CONTROL_CHANGE,clfo.channel,13,value);
 				} else {
-					throw(new RuntimeException("Invalid LFO controller \""+clfo.controller+"\""));
+					throw(new RuntimeException("Invalid LFO controller \""+controller+"\""));
 				}
 
+				Device device = deviceMap.get(clfo.deviceName);
 				device.receiver.send(sm,-1);
 				
 				clfo.lastSentValue = value;
@@ -756,7 +773,7 @@ public class MidiPlayer extends AbstractPlayer {
 	/**
 	 * Mutes all channels of all devices. This is done by sending an ALL
 	 * SOUND OFF message to all channels. In addition to that (because this
-	 * is not supported by all devices) a NOTE_OFF is sent for each of the
+	 * does not include sending NOTE OFF) a NOTE_OFF is sent for each of the
 	 * 128 possible pitches to each channel.
 	 * 
 	 * @throws InvalidMidiDataException
@@ -772,6 +789,10 @@ public class MidiPlayer extends AbstractPlayer {
 			// send ALL SOUND OFF message
 			sm.setMessage(ShortMessage.CONTROL_CHANGE,dc.channel,120,0);
 			dc.device.receiver.send(sm,-1);
+
+			// send ALL NOTES OFF message (doesn't work on all MIDI devices)
+			//sm.setMessage(ShortMessage.CONTROL_CHANGE,dc.channel,123,0);
+			//dc.device.receiver.send(sm,-1);
 
 			for(int i=0;i<128;i++) {
 				sm.setMessage(ShortMessage.NOTE_OFF,dc.channel,i,0);
@@ -804,13 +825,13 @@ public class MidiPlayer extends AbstractPlayer {
     /**
      * Checks if the given instrument is part of the arrangement and if so, determines the
      * tick of the first note and the tick of the end of the last note plus 1. The start and
-     * end ticks are returned as a two-dimensional array. If the instrument is not found or
+     * end ticks are returned as a two-dimensional int array. If the instrument is not found or
      * the instrument's track contains no note, null is returned.
      * 
      * @param arrangement the arrangement
      * @param instrument the number of the instrument
      * 
-     * @return a two-dimensional array containing start and end tick (or null)
+     * @return a two-dimensional int array containing start and end tick (or null)
      */
     
     private static int[] getInstrumentActivity(Arrangement arrangement,int instrument) {
@@ -820,6 +841,8 @@ public class MidiPlayer extends AbstractPlayer {
     		ArrangementEntry entry = i.next();
     		
     		if(entry.getInstrument() == instrument) {
+    			// instrument found, check for first and last tick
+    		
     			Track track = entry.getTrack();
     			
     			int startTick = Integer.MAX_VALUE;
@@ -849,13 +872,16 @@ public class MidiPlayer extends AbstractPlayer {
     			}
     			
     			if(startTick == Integer.MAX_VALUE) {
+    				// instrument was present but completely silent
     				return null;
     			} else {
+    				// both startTick and endTick contain a proper value
     				return new int[] {startTick,endTick};
     			}
     		}
     	}
     	
+    	// instrument was not found
     	return null;
     }
     

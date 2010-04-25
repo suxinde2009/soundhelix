@@ -26,10 +26,8 @@ public class Sequence {
 	/**
 	 * Calls addNote(pitch,Short.MAX_VALUE,ticks).
 	 * 
-	 * @param pitch
-	 *            the pitch
-	 * @param ticks
-	 *            the ticks
+	 * @param pitch the pitch
+	 * @param ticks the ticks
 	 */
 
 	public void addNote(int pitch, int ticks) {
@@ -46,12 +44,10 @@ public class Sequence {
 	 * note-up afterwards. This method does nothing if ticks is 0. If velocity
 	 * is 0, an equivalently sized pause is added.
 	 * 
-	 * @param pitch
-	 *            the pitch
-	 * @param velocity
-	 *            the velocity (between 0 and 32767)
-	 * @param ticks
-	 *            the ticks
+	 * @param pitch the pitch
+	 * @param velocity the velocity (between 0 and 32767)
+	 * @param ticks the ticks
+	 * @param legato the legato flag
 	 */
 
 	public void addNote(int pitch, int ticks, short velocity, boolean legato) {
@@ -71,8 +67,7 @@ public class Sequence {
 	 * entry already was a pause, that pause is extended by the number of ticks
 	 * instead of adding another pause. The method does nothing if ticks is 0.
 	 * 
-	 * @param ticks
-	 *            the ticks
+	 * @param ticks the ticks
 	 */
 
 	public void addPause(int ticks) {
@@ -163,17 +158,17 @@ public class Sequence {
 	 */
 	
 	public void transpose(int halftones) {
-		if(halftones == 0) {
+		if (halftones == 0) {
 			// nothing to do
 			return;
 		}
 		
 		Iterator<SequenceEntry> iter = sequence.iterator();
 		
-		while(iter.hasNext()) {
+		while (iter.hasNext()) {
 			SequenceEntry entry = iter.next();
 			
-			if(entry.isNote()) {
+			if (entry.isNote()) {
 				entry.pitch += halftones;
 			}
 		}
@@ -203,7 +198,7 @@ public class Sequence {
 
 		if (tick < offsetTick) {
 			// shorten the previous note
-			sequence.get(offset-1).ticks = tick - (offsetTick-sequence.get(offset-1).ticks);
+			sequence.get(offset - 1).ticks = tick - (offsetTick - sequence.get(offset - 1).ticks);
 			
 			int diff = tick + entry.ticks - offsetTick;
 			
@@ -212,7 +207,7 @@ public class Sequence {
 				return;
 			} else if (diff < 0) {
 				sequence.add(offset, entry);
-				sequence.add(offset+1, new SequenceEntry(0, (short) -1, -diff, false));
+				sequence.add(offset + 1, new SequenceEntry(0, (short) -1, -diff, false));
 				return;
 			} else {
 				sequence.add(offset, entry);
@@ -237,9 +232,9 @@ public class Sequence {
 			
 			if (diff == 0) {
 				sequence.set(offset, entry);
-			} else if(diff < 0) {
+			} else if (diff < 0) {
 				sequence.set(offset, entry);
-				sequence.add(offset+1, new SequenceEntry(0, (short) -1, -diff, false));
+				sequence.add(offset + 1, new SequenceEntry(0, (short) -1, -diff, false));
 			} else {
 				sequence.set(offset, entry);
 
@@ -458,29 +453,30 @@ public class Sequence {
 
 	}
 	
-	static boolean tested = false;
+	private static boolean tested = false;
 	
 	public static void test(int number,Sequence seq, int tick, int pitch, int ticks, String str) {
 		try {
 			if (tick >= 0) {
-				seq.replaceEntry(tick, new SequenceEntry(pitch,pitch == Integer.MIN_VALUE ? -1 : (short)32767,ticks,false));
+				seq.replaceEntry(tick,
+						new SequenceEntry(pitch,pitch == Integer.MIN_VALUE ? -1 : (short)32767,ticks,false));
 			}
 			
 			int size = seq.size();
-			int t=0;
+			int t = 0;
 			
-			for(int i=0;i<size;i++) {
+			for (int i = 0; i < size; i++) {
 				t += seq.get(i).ticks;
 			}
 			
 			if (t != seq.totalTicks) {
-				System.out.println("Test "+number+" Expected: "+str);
-				System.out.println("          Found: "+seq.toString());
-				System.out.println("   ** MISMATCH: Expected "+seq.totalTicks+" ticks, got "+t+" ticks");
+				System.out.println("Test " + number + " Expected: " + str);
+				System.out.println("          Found: " + seq.toString());
+				System.out.println("   ** MISMATCH: Expected " + seq.totalTicks + " ticks, got " + t + " ticks");
 				return;
 			}
-		} catch(Exception e) {
-			System.out.println("Test "+number+" Expected: "+str);
+		} catch (Exception e) {
+			System.out.println("Test " + number + " Expected: " + str);
 			System.out.println("   Found exception");
 			e.printStackTrace();
 			return;
@@ -489,11 +485,10 @@ public class Sequence {
 		String s = seq.toString();
 		
 		if (!s.equals(str)) {
-			System.out.println("Test "+number+" Expected: "+str);
-			System.out.println("          Found: "+s+"\n");
+			System.out.println("Test " + number + " Expected: " + str);
+			System.out.println("          Found: " + s + "\n");
 		} else {
-			System.out.println("Test "+number+" succeeded");
+			System.out.println("Test " + number + " succeeded");
 		}
-	}
-	
+	}	
 }

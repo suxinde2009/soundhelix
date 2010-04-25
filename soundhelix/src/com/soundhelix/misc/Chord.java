@@ -328,15 +328,11 @@ public class Chord {
      */
     
     public boolean containsPitch(int pitch) {
-    	pitch = (((pitch%12)+12)%12);
+    	pitch = (((pitch % 12) + 12) % 12);
     	
-    	if(pitch == (((getLowPitch()%12)+12)%12) || 
-    	   pitch == (((getMiddlePitch()%12)+12)%12) ||
-    	   pitch == (((getHighPitch()%12)+12)%12)) {
-    		return true;
-    	} else {
-    		return false;
-    	}
+    	return pitch == (((getLowPitch() % 12) + 12) % 12) ||
+    	   pitch == (((getMiddlePitch() % 12) + 12) % 12) ||
+    	   pitch == (((getHighPitch() % 12) + 12) % 12);
     }
     
     public int hashCode() {

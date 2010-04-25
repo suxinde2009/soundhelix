@@ -105,7 +105,9 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
      * Returns a random pitch which is near the given pitch and on the
      * C/Am scale.
      * 
-     * @param the starting pitch
+     * @param pitch the starting pitch
+     * @param maxDistanceDown the maximum distance below the pitch
+     * @param maxDistanceUp the maximum distance above the pitch
      * 
      * @return the random pitch
      */
@@ -152,7 +154,10 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
      * Returns a random pitch which is near the given pitch and
      * is one of the given chords notes.
      * 
-     * @param the starting pitch
+     * @param chord the chord
+     * @param pitch the starting pitch
+     * @param maxDistanceDown the maximum distance below the pitch
+     * @param maxDistanceUp the maximum distance above the pitch
      * 
      * @return the random pitch
      */

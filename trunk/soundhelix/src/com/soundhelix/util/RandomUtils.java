@@ -9,7 +9,7 @@ import java.util.Random;
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
-public class RandomUtils {
+public final class RandomUtils {
 	private RandomUtils() {}
 	
 	/**

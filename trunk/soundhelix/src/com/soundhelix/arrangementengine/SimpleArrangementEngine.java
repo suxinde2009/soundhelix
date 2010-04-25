@@ -833,7 +833,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 		return activityCounts;
 	}
 	
-	private static class ArrangementEntry {
+	private static final class ArrangementEntry {
 		private int instrument;
 		private SequenceEngine sequenceEngine;
 		private int transposition;
@@ -847,7 +847,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 		}
 	}
 	
-	private static class ActivityVectorConfiguration {
+	private static final class ActivityVectorConfiguration {
 		private String name;
 		private double minActive;
 		private boolean allowInactive;

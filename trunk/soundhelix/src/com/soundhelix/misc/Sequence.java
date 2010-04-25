@@ -462,8 +462,10 @@ public class Sequence {
 	
 	public static void test(int number,Sequence seq, int tick, int pitch, int ticks, String str) {
 		try {
-			if (tick >= 0) seq.replaceEntry(tick, new SequenceEntry(pitch,pitch == Integer.MIN_VALUE ? -1 : (short)32767,ticks,false));
-
+			if (tick >= 0) {
+				seq.replaceEntry(tick, new SequenceEntry(pitch,pitch == Integer.MIN_VALUE ? -1 : (short)32767,ticks,false));
+			}
+			
 			int size = seq.size();
 			int t=0;
 			

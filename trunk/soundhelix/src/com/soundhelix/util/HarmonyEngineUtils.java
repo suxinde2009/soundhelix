@@ -14,7 +14,7 @@ import com.soundhelix.misc.Structure;
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
-public class HarmonyEngineUtils {
+public final class HarmonyEngineUtils {
 	private HarmonyEngineUtils() {}
 	
 	/**

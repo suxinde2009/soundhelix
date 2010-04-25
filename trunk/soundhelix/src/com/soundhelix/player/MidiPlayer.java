@@ -706,7 +706,13 @@ public class MidiPlayer extends AbstractPlayer {
     }
      
     /**
-     * Returns the number of nanos of the given tick.
+     * Returns the number of nanos of the given tick, taking the current groove
+     * into account.
+     * 
+     * @param tick the tick
+     * @param ticksPerBeat the number of ticks per beat
+     * 
+     * @return the number of nanos
      */
     
 	private long getTickNanos(int tick,int ticksPerBeat) {
@@ -714,7 +720,12 @@ public class MidiPlayer extends AbstractPlayer {
 	}
 
 	/**
-	 * Returns the number of nanos of the given timing tick.
+	 * Returns the number of nanos for a timing tick.
+	 * 
+	 * @param ticksPerBeat the ticks per beat
+	 * @param clockTimingsPerTick the clock timings per tick
+	 * 
+	 * @return the number of nanos for a timing tick
 	 */
 	
 	private long getTimingTickNanos(int ticksPerBeat,int clockTimingsPerTick) {

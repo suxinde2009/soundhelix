@@ -342,13 +342,15 @@ public final class XMLUtils {
 	 * @param node the node to use for configuration
 	 * @param xpath an XPath instance
 	 * @param randomSeed the random seed to use
+	 * @param <T> the class to get an instance of
 	 * 
 	 * @return the instance
 	 * 
-	 * @throws Exception
+	 * @throws ClassNotFoundException if the class cannot be found
+	 * @throws IllegalAccessException if the class cannot be instantiated
 	 */
 	
-	public static <T> T getInstance(Class<T> superclass,Node node,XPath xpath,long randomSeed) throws InstantiationException,XPathException,XPathExpressionException,ClassNotFoundException,IllegalAccessException {
+	public static <T> T getInstance(Class<T> superclass,Node node,XPath xpath,long randomSeed) throws InstantiationException,XPathException,XPathExpressionException,IllegalAccessException,ClassNotFoundException {
 		String className = (String)xpath.evaluate("attribute::class",node,XPathConstants.STRING);
 
 		if(className.indexOf('.') < 0) {

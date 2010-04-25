@@ -17,7 +17,7 @@ public class Pattern {
 
 		int ticks = 0;
 		
-		for(int i=0;i<pattern.length;i++) {
+		for (int i = 0; i<pattern.length; i++) {
 			ticks += pattern[i].getTicks();
 		}
 		
@@ -29,7 +29,7 @@ public class Pattern {
 	}
 
 	public static Pattern parseString(String patternString,String wildcardString) {
-		if(wildcardString == null) {
+		if (wildcardString == null) {
 			wildcardString = "";
 		}
 		
@@ -42,7 +42,7 @@ public class Pattern {
 		
 		// format: offset/ticks:velocity or offset~/ticks:velocity
 		
-		for(int i=0;i<len;i++) {
+		for (int i = 0; i < len; i++) {
 			String[] a = p[i].split(":");
 			short v = (a.length > 1 ? Short.parseShort(a[1]) : Short.MAX_VALUE);
 			String[] b = a[0].split("/");
@@ -50,14 +50,14 @@ public class Pattern {
 			
 			boolean legato = b[0].endsWith("~");
 			
-			if(legato) {
+			if (legato) {
 				// cut off legato character
-				b[0] = b[0].substring(0,b[0].length()-1);
+				b[0] = b[0].substring(0,b[0].length() - 1);
 			}
 
-			if(b[0].equals("-")) {
+			if (b[0].equals("-")) {
 				pattern[i] = new Pattern.PatternEntry(t);
-			} else if(b[0].length() == 1 && wildcardString.indexOf(b[0]) >= 0) {
+			} else if (b[0].length() == 1 && wildcardString.indexOf(b[0]) >= 0) {
 				pattern[i] = new PatternEntry(b[0].charAt(0),v,t,legato);
 			} else {
 				pattern[i] = new PatternEntry(Integer.parseInt(b[0]),v,t,legato);
@@ -122,7 +122,7 @@ public class Pattern {
 		return sb.append('}').toString();
 	}
 	
-	public static class PatternEntry {
+	public static final class PatternEntry {
 		private int pitch;
 		private short velocity;
 		private int ticks;
@@ -197,10 +197,16 @@ public class Pattern {
 	 * the pattern offset. Legato is legal for the tick if there is a subsequent note on the pattern
 	 * that lies in the activity range of the activity vector. I.e., it is illegal to use legato on a
 	 * note which ends outside of an activity interval.
+	 * 
+	 * @param activityVector the activity vector
+	 * @param tick the tick
+	 * @param patternOffset the pattern offset
+	 * 
+	 * @return true if legato is legal, false otherwise
 	 */
 	
 	public boolean isLegatoLegal(ActivityVector activityVector,int tick,int patternOffset) {	
-		if(!activityVector.isActive(tick)) {
+		if (!activityVector.isActive(tick)) {
 			return false;
 		}
 		
@@ -209,10 +215,10 @@ public class Pattern {
 
 		int patternLength = size();
 		
-		for(int i=0;i<activityLength;i++) {
-			PatternEntry entry = get(patternOffset%patternLength);
+		for (int i = 0; i< activityLength; i++) {
+			PatternEntry entry = get(patternOffset % patternLength);
 		
-			if(entry.isNote() || entry.isWildcard() && entry.getVelocity() > 0) {
+			if (entry.isNote() || entry.isWildcard() && entry.getVelocity() > 0) {
 				return true;
 			}
 			

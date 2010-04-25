@@ -394,7 +394,9 @@ public class MidiPlayer extends AbstractPlayer {
     			// in each iteration, at least one of the following two conditions should be true
     			
     			if(referenceTime >= timingTickReferenceTime) {
-       				if(useClockSynchronization) sendShortMessageToClockSynchronized(ShortMessage.TIMING_CLOCK);
+       				if(useClockSynchronization) {
+       					sendShortMessageToClockSynchronized(ShortMessage.TIMING_CLOCK);
+       				}
     				timingTickReferenceTime += getTimingTickNanos(clockTimingsPerTick, ticksPerBeat);
     			}
 

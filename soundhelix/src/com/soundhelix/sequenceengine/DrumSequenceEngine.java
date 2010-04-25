@@ -64,11 +64,11 @@ import com.soundhelix.util.XMLUtils;
 
 public class DrumSequenceEngine extends AbstractSequenceEngine {
 
-	private final int CONDITION_INACTIVE_TO_ACTIVE = 0;
-	private final int CONDITION_ACTIVE_TO_INACTIVE = 1;
+	private static final int CONDITION_INACTIVE_TO_ACTIVE = 0;
+	private static final int CONDITION_ACTIVE_TO_INACTIVE = 1;
 
-	private final int MODE_ADD = 0;
-	private final int MODE_REPLACE = 1;
+	private static final int MODE_ADD = 0;
+	private static final int MODE_REPLACE = 1;
 
 	private DrumEntry[] drumEntries;
 	private ConditionalEntry[] conditionalEntries;
@@ -353,7 +353,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
     	return true;
     }
     
-    private static class DrumEntry {
+    private static final class DrumEntry {
     	private final Pattern pattern;
     	private final int pitch;
     	
@@ -363,7 +363,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
     	}
     }
     
-    private static class ConditionalEntry {
+    private static final class ConditionalEntry {
     	private final Pattern pattern;
     	private final java.util.regex.Pattern condition;
     	private final int mode;

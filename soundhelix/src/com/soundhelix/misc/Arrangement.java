@@ -71,7 +71,7 @@ public class Arrangement {
 		fos.close();
     }
     
-    public class ArrangementEntry {
+    public static final class ArrangementEntry {
     	private final Track track;
     	private final int instrument;
     	

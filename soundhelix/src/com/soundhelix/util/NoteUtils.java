@@ -10,7 +10,7 @@ import com.soundhelix.misc.Chord;
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
-public class NoteUtils {
+public final class NoteUtils {
 	// list of notes which are on the C/Am scale, i.e., which
 	// form the white keys on the piano keyboard, starting with c
 	// this equals all even indexes < 5 and all odd indexes >= 5

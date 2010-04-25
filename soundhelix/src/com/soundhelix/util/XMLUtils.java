@@ -29,7 +29,7 @@ import com.soundhelix.misc.XMLConfigurable;
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
-public class XMLUtils {
+public final class XMLUtils {
 	/** The read buffer to use for reading files. */
 	private static final int READ_BUFFER = 16384;
 	

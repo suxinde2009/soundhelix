@@ -35,7 +35,7 @@ public abstract class AbstractSequenceEngine implements SequenceEngine {
     }
     
 	/**
-	 * Renders one or more sequences (i.e., voices). The
+	 * Renders one or more sequences (i.e., voices) as a track. The
 	 * method should check the given ActivityVectors to decide when to insert
 	 * notes and when to insert pauses. The method should also take care that
 	 * played notes are not sustained beyond inactive intervals of the
@@ -43,6 +43,10 @@ public abstract class AbstractSequenceEngine implements SequenceEngine {
 	 * returned list must contain at least one sequence. The length of each
 	 * sequence must match the length of the song. The method must take the
 	 * song's HarmonyEngine into consideration.
+	 * 
+	 * @param activityVectors the activityVectors
+	 * 
+	 * @return the track
 	 */
 
      public abstract Track render(ActivityVector[] activityVectors);

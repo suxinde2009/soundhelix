@@ -103,7 +103,7 @@ public interface LFO {
 	public void setAmplitudeMinimum(int minimum);
 
 	/**
-	 * Sets the maximum value of the amplitude
+	 * Sets the maximum value of the amplitude.
 	 *
 	 * @param maximum the amplitude maximum
 	 */

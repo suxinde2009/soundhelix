@@ -368,6 +368,10 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 	 * @param bitSet the BitSet to modify
 	 * @param size the size of the BitSet
 	 * @param avoidBit the bit number to avoid (or -1 to skip this step)
+	 * @param section the section
+	 * @param sections the sections
+	 * @param activityVectorConfigurations the activity vector configurations
+	 * @param activeSegments the active segments
 	 * 
 	 * @return the number of the set bit (or -1 if no clear bit existed)
 	 */
@@ -474,7 +478,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 	 * ActivityVectors should be active. The BitSet is changed on each new
 	 * chord section by removing or adding bits randomly.
 	 * 
-	 * @param num the number of ActivityVectors to create
+	 * @param activityVectorConfigurations the activity vector configurations
 	 *
 	 * @return the array of ActivityVectors
 	 */
@@ -585,6 +589,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 	 * @param section the section number (between 0 and sections-1)
 	 * @param sections the total number of sections
 	 * @param maxActivityVectors the maximum number of tracks to use
+	 * @param lastCount the last count
 
 	 * @return the number of tracks
 	 */
@@ -593,24 +598,24 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 		// important: all of this must work properly when only few sections
         // and few ActivityVectors (or even 1) are available
 		
-		int increaseTill = Math.min(maxActivityVectors,Math.min(sections/2,startActivityCounts.length))-1;
-		int decreaseFrom = sections-Math.min(maxActivityVectors,Math.min(sections/2,stopActivityCounts.length+1));
+		int increaseTill = Math.min(maxActivityVectors,Math.min(sections / 2,startActivityCounts.length)) - 1;
+		int decreaseFrom = sections - Math.min(maxActivityVectors,Math.min(sections / 2,stopActivityCounts.length + 1));
 		
-		if(section <= increaseTill) {
+		if (section <= increaseTill) {
 			// in fade-in phase
 			return startActivityCounts[section];
-		} else if(section == decreaseFrom) {
-			int firstStop = stopActivityCounts[section-decreaseFrom];
-			int count = (lastCount+firstStop)/2;
+		} else if (section == decreaseFrom) {
+			int firstStop = stopActivityCounts[section - decreaseFrom];
+			int count = (lastCount + firstStop) / 2;
 			
-			while((count == lastCount || count == firstStop) && count < maxActivityVectors) {
+			while ((count == lastCount || count == firstStop) && count < maxActivityVectors) {
 				count++;
 			}
 
 			return count;
-		} else if(section >= decreaseFrom+1) {
+		} else if (section >= decreaseFrom+1) {
 			// in fade-out phase
-			return stopActivityCounts[section-decreaseFrom-1];
+			return stopActivityCounts[section - decreaseFrom - 1];
 		} else {
 			// in between
 			int min = Math.min(maxActivityVectors,minActivityCount);

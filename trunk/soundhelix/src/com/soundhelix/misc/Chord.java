@@ -5,15 +5,14 @@ import com.soundhelix.util.NoteUtils;
 
 /**
  * Defines a chord. A chord is immutable, consists of a pitch (with 0 being c', 1 being c#' and so on),
- * a type (major, minor) and a subtype (base 0, base 4 [first inversion] and base 6 [second inversion]).
+ * a type (major, minor) and a subtype (base 0, base 4 a.k.a. first inversion and base 6 a.k.a. second inversion).
  * The pitch always identifies the base/root/main note of the chord, which need not be the
  * lowest note of the chord. Currently, only standard major and minor chords (triads), including
  * two inversions of each, are supported. More complex types (seventh chords, etc.) may be
  * added in the future. 
  * 
- * Note that even though the pitch of the base note also defines the
- * octave, it is up to the caller to make use of or ignore the pitch's
- * implicit octave.
+ * Note that even though the pitch of the base note also defines the octave, it is up to the caller to make use of
+ * or ignore the pitch's implicit octave.
  * 
  * Callers are encouraged to interpret the second inversion as a downwards shift
  * (ceg becomes Gce) and the first inversion as an upwards shift (ceg becomes egc').
@@ -25,16 +24,23 @@ import com.soundhelix.util.NoteUtils;
 
 public class Chord {
 	
+	/** The possible chord types. */
 	public enum ChordType {
 		MAJOR,MINOR
 	};
 
+	/** The possible chord subtypes. */
 	public enum ChordSubtype {
 		BASE_0,BASE_4,BASE_6
 	};
 
+	/** The base pitch of the chord. */
     private final int pitch;
+
+    /** The type of the chord. */
     private final ChordType type;
+    
+    /** The subtype of the chord. */
     private final ChordSubtype subtype;
 
 	public Chord(int pitch,ChordType type,ChordSubtype subtype) {
@@ -97,8 +103,15 @@ public class Chord {
 		return type == ChordType.MINOR;
 	}
 	
+	/**
+	 * Implements an equality check. Two chords are equivalent iff they are based on the same pitch and have the
+	 * same chord type and subchord type.
+	 * 
+	 * @param other the other chord to compare this chord to
+	 */
+	
 	public boolean equals(Object other) {
-		if(other == null || !(other instanceof Chord)) {
+		if (other == null || !(other instanceof Chord)) {
 			return false;
 		}
 		
@@ -118,7 +131,7 @@ public class Chord {
 	 */
 	
 	public String getShortName() {
-		return NoteUtils.getNoteName(pitch).toUpperCase()+(isMinor() ? "m" : "");
+		return NoteUtils.getNoteName(pitch).toUpperCase() + (isMinor() ? "m" : "");
 	}
 	
 	/**
@@ -134,7 +147,7 @@ public class Chord {
 	 */
 	
 	public Chord findClosestChord(Chord otherChord) {
-		if(pitch == otherChord.getPitch() && type == otherChord.getType()) {
+		if (pitch == otherChord.getPitch() && type == otherChord.getType()) {
 			// our chord clearly is the best choice in this case, regardless
 			// of the subtype of the other chord
 			return this;
@@ -143,39 +156,39 @@ public class Chord {
 		int pitch1 = getMiddlePitch();
 		int pitch2 = otherChord.getMiddlePitch();
 
-		if(pitch1 == pitch2) {
+		if (pitch1 == pitch2) {
 			// middle pitches are equal; any modification of otherChord
 			// could only make things worse
 			return otherChord;
-		} else if(pitch2 < pitch1) {
+		} else if (pitch2 < pitch1) {
 			Chord lastChord = otherChord;
 			
-			while(true) {				
+			while (true) {				
 				Chord chord = lastChord.getHigherChord();				
 				pitch2 = chord.getMiddlePitch();
 				
-				if(pitch2 >= pitch1) {
+				if (pitch2 >= pitch1) {
 					// the new chord's low pitch has now reached at least pitch1
 					// the last chord's low pitch was lower than pitch1
 					
 					// check if chord or lastChord is better
 					
-					int diff1 = pitch2-pitch1;
-					int diff2 = pitch1-lastChord.getMiddlePitch();
+					int diff1 = pitch2 - pitch1;
+					int diff2 = pitch1 - lastChord.getMiddlePitch();
 					
-					if(diff1 < diff2) {
+					if (diff1 < diff2) {
 						return chord;
-					} else if(diff1 > diff2 ){
+					} else if (diff1 > diff2 ){
 						return lastChord;
 					} else {						
 						// we have a tie, choose on of the chords
 						// randomly, but consistently
 
-						if(random == null) {
+						if (random == null) {
 							random = new ConsistentRandom(577385l);
 						}
 						
-						if(random.getBoolean(lastChord.toString()+"#"+chord.toString())) {
+						if (random.getBoolean(lastChord.toString() + "#" + chord.toString())) {
 							return chord;
 						} else {
 							return lastChord;
@@ -188,32 +201,32 @@ public class Chord {
 		} else {   // pitch2 > pitch1
 			Chord lastChord = otherChord;
 			
-			while(true) {
+			while (true) {
 				Chord chord = lastChord.getLowerChord();
 				pitch2 = chord.getMiddlePitch();
 				
-				if(pitch2 <= pitch1) {
+				if (pitch2 <= pitch1) {
 					// the new chord's low pitch has now reached at most pitch1
 					// the last chord's low pitch was higher than pitch1
 					
 					// check if chord or lastChord is better
 					
-					int diff1 = pitch1-pitch2;
-					int diff2 = lastChord.getMiddlePitch()-pitch1;
+					int diff1 = pitch1 - pitch2;
+					int diff2 = lastChord.getMiddlePitch() - pitch1;
 
-					if(diff1 < diff2) {
+					if (diff1 < diff2) {
 						return chord;
-					} else if(diff1 > diff2) {
+					} else if (diff1 > diff2) {
 						return lastChord;
 					} else {
 						// we have a tie, choose on of the chords
 						// randomly, but consistently
 						
-						if(random == null) {
+						if (random == null) {
 							random = new ConsistentRandom(577385577385l);
 						}
 						
-						if(random.getBoolean(lastChord.toString()+"#"+chord.toString())) {
+						if (random.getBoolean(lastChord.toString() + "#" + chord.toString())) {
 							return chord;
 						} else {
 							return lastChord;
@@ -234,12 +247,12 @@ public class Chord {
 	 */
 	
 	public int getLowPitch() {
-		if(subtype == ChordSubtype.BASE_0) {
+		if (subtype == ChordSubtype.BASE_0) {
 			return pitch;
-		} else if(subtype == ChordSubtype.BASE_4) {
-			return isMajor() ? pitch+4 : pitch+3;
+		} else if (subtype == ChordSubtype.BASE_4) {
+			return isMajor() ? pitch + 4 : pitch + 3;
 		} else {
-			return pitch-5;
+			return pitch - 5;
 		}		
 	}
 
@@ -251,12 +264,12 @@ public class Chord {
 	 */
 	
 	public int getMiddlePitch() {
-		if(subtype == ChordSubtype.BASE_6) {
+		if (subtype == ChordSubtype.BASE_6) {
 			return pitch;
-		} else if(subtype == ChordSubtype.BASE_0) {
-			return isMajor() ? pitch+4 : pitch+3;
+		} else if (subtype == ChordSubtype.BASE_0) {
+			return isMajor() ? pitch + 4 : pitch + 3;
 		} else {
-			return pitch+7;
+			return pitch + 7;
 		}		
 	}
 
@@ -268,30 +281,29 @@ public class Chord {
 	 */
 
 	public int getHighPitch() {
-		if(subtype == ChordSubtype.BASE_4) {
-			return pitch+12;
-		} else if(subtype == ChordSubtype.BASE_6) {
-			return isMajor() ? pitch+4 : pitch+3;
+		if (subtype == ChordSubtype.BASE_4) {
+			return pitch + 12;
+		} else if (subtype == ChordSubtype.BASE_6) {
+			return isMajor() ? pitch + 4 : pitch + 3;
 		} else {
-			return pitch+7;
+			return pitch + 7;
 		}		
 	}
 	
 	/**
 	 * Returns a new version of the chord that is one step
-	 * higher than the chord. Effectively, this method replaces
+	 * higher than the given chord. Effectively, this method replaces
 	 * the low note of the chord with that note transposed one
-	 * octave up. This always involves changing the subtype
-	 * of the chord.
+	 * octave up. This always involves changing the subtype of the chord.
 	 * 
 	 * @return the higher chord
 	 */
 	
     public Chord getHigherChord() {
-        if(subtype == ChordSubtype.BASE_0) {
+        if (subtype == ChordSubtype.BASE_0) {
         	return new Chord(getPitch(),getType(),ChordSubtype.BASE_4);
-        } else if(subtype == ChordSubtype.BASE_4) {
-        	return new Chord(getPitch()+12,getType(),ChordSubtype.BASE_6);
+        } else if (subtype == ChordSubtype.BASE_4) {
+        	return new Chord(getPitch() + 12,getType(),ChordSubtype.BASE_6);
         } else {
         	return new Chord(getPitch(),getType(),ChordSubtype.BASE_0);
         }
@@ -308,12 +320,12 @@ public class Chord {
 	 */
     
     public Chord getLowerChord() {
-        if(subtype == ChordSubtype.BASE_0) {
+        if (subtype == ChordSubtype.BASE_0) {
         	return new Chord(getPitch(),getType(),ChordSubtype.BASE_6);
-        } else if(subtype == ChordSubtype.BASE_4) {
+        } else if (subtype == ChordSubtype.BASE_4) {
         	return new Chord(getPitch(),getType(),ChordSubtype.BASE_0);
         } else {
-        	return new Chord(getPitch()-12,getType(),ChordSubtype.BASE_4);
+        	return new Chord(getPitch() - 12,getType(),ChordSubtype.BASE_4);
         }    	
     }
     

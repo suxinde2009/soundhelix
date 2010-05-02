@@ -22,7 +22,10 @@ import java.util.zip.GZIPOutputStream;
  */
 
 public class Arrangement {
+	/** The structure. */
 	private final Structure structure;
+	
+	/** The list of arrangement entries. */
     private final List<ArrangementEntry> entryList = new ArrayList<ArrangementEntry>();
     
     public Arrangement(Structure structure) {
@@ -49,6 +52,12 @@ public class Arrangement {
     	return structure;
     }
 
+    /**
+     * Loads a gzip-serialized arrangement from the given file and returns it.
+     * 
+     * @param filename the filename of the arrangement to load
+     */
+
     public static Arrangement loadArrangement(String filename) throws IOException,ClassNotFoundException {
 		FileInputStream fis = new FileInputStream(filename);
 		GZIPInputStream gis = new GZIPInputStream(fis);
@@ -61,9 +70,16 @@ public class Arrangement {
 		return arrangement;
     }
 
+    /**
+     * Serializes this arrangement and writes it in gziped format to the given file.
+     * 
+     * @param arrangement the arrangement to save
+     * @param filename the filename to save the arrangement to
+     */
+    
     public static void saveArrangement(Arrangement arrangement,String filename) throws IOException {
     	FileOutputStream fos = new FileOutputStream(filename);
-    	GZIPOutputStream gos = new GZIPOutputStream(fos,1<<18);
+    	GZIPOutputStream gos = new GZIPOutputStream(fos, 1 << 18);
 		ObjectOutputStream oos = new ObjectOutputStream(gos);
 		oos.writeObject(arrangement);
 		oos.close();
@@ -72,7 +88,10 @@ public class Arrangement {
     }
     
     public static final class ArrangementEntry {
+    	/** The track. */
     	private final Track track;
+    	
+    	/** The instrument. */
     	private final int instrument;
     	
     	private ArrangementEntry(Track track,int instrument) {

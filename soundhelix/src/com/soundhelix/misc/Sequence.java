@@ -18,13 +18,17 @@ import java.util.List;
  */
 
 public class Sequence {
+	/** The list of sequence entries. */
 	private List<Sequence.SequenceEntry> sequence = new ArrayList<Sequence.SequenceEntry>();
+
+	/** The total number of ticks in this sequence. */
 	private int totalTicks;
 	
+	/** Flag indicating whether the last note added was a pause. */
 	private boolean lastWasPause = false;
 
 	/**
-	 * Calls addNote(pitch,Short.MAX_VALUE,ticks).
+	 * Calls addNote(pitch,ticks,Short.MAX_VALUE).
 	 * 
 	 * @param pitch the pitch
 	 * @param ticks the ticks
@@ -33,6 +37,14 @@ public class Sequence {
 	public void addNote(int pitch, int ticks) {
 		addNote(pitch,ticks,Short.MAX_VALUE);
 	}
+
+	/**
+	 * Calls addNote(pitch,Short.MAX_VALUE,ticks,false).
+	 * 
+	 * @param pitch the pitch
+	 * @param ticks the ticks
+	 * @param velocity the velocity
+	 */
 
 	public void addNote(int pitch, int ticks, short velocity) {
 		addNote(pitch, ticks, velocity, false);
@@ -101,8 +113,7 @@ public class Sequence {
 	/**
 	 * Returns the sequence entry with the given index.
 	 * 
-	 * @param index
-	 *            the index
+	 * @param index the index
 	 * 
 	 * @return the sequence entry at that index
 	 */

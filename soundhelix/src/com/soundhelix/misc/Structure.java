@@ -60,7 +60,7 @@ public class Structure {
 	}
 	
 	public void setHarmonyEngine(HarmonyEngine harmonyEngine) {
-		if(harmonyEngine == null) {
+		if (harmonyEngine == null) {
 			throw(new RuntimeException("HarmonyEngine already set"));
 		}
 		
@@ -73,7 +73,7 @@ public class Structure {
 		this.beatsPerBar = beatsPerBar;
 		this.ticksPerBeat = ticksPerBeat;		
 
-		this.ticksPerBar = beatsPerBar*ticksPerBeat;
-		this.ticks = bars*ticksPerBar;		
+		this.ticksPerBar = beatsPerBar * ticksPerBeat;
+		this.ticks = bars * ticksPerBar;		
 	}
 }

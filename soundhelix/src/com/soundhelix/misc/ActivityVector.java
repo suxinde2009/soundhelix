@@ -18,7 +18,10 @@ import java.util.BitSet;
  */
 
 public class ActivityVector {
+	/** The bit set used (each bit represents a tick activity). */
     private BitSet bitSet = new BitSet();
+
+    /** The length of the vector in ticks. */
     private int totalTicks;
     
     /**
@@ -29,7 +32,7 @@ public class ActivityVector {
      */
     
     public void addActivity(int ticks) {
-    	bitSet.set(totalTicks,totalTicks+ticks);
+    	bitSet.set(totalTicks,totalTicks + ticks);
     	totalTicks += ticks;
     }
 
@@ -41,7 +44,7 @@ public class ActivityVector {
      */
     
     public void addInactivity(int ticks) {
-    	bitSet.clear(totalTicks,totalTicks+ticks);
+    	bitSet.clear(totalTicks,totalTicks + ticks);
     	totalTicks += ticks;
     }
     
@@ -55,7 +58,7 @@ public class ActivityVector {
      */
     
     public boolean isActive(int tick) {
-    	if(tick >= totalTicks) {
+    	if (tick >= totalTicks) {
     		return false;
     	}
     	
@@ -73,10 +76,10 @@ public class ActivityVector {
      */
     
     public int getIntervalLength(int tick) {
-    	if(bitSet.get(tick)) {
+    	if (bitSet.get(tick)) {
     		// bit is active; search for the next clear bit
     		// this bit must exist, because we use a BitSet
-    		return bitSet.nextClearBit(tick)-tick;
+    		return bitSet.nextClearBit(tick) - tick;
     	} else {
     		// bit is inactive; search for the next set bit
     		// if there is no set bit, return the remaining
@@ -85,10 +88,10 @@ public class ActivityVector {
     		
     		int num = bitSet.nextSetBit(tick);
     		
-    		if(num == -1) {
-    			return totalTicks-tick;
+    		if (num == -1) {
+    			return totalTicks - tick;
     		} else {
-    			return num-tick;
+    			return num - tick;
     		}
     	}
     }
@@ -134,7 +137,7 @@ public class ActivityVector {
      */
     
     public int getLastActiveTick() {
-        return bitSet.length()-1;
+        return bitSet.length() - 1;
     }
 
     /**
@@ -148,7 +151,7 @@ public class ActivityVector {
     public int getFirstInactiveTick() {
     	int tick = bitSet.nextClearBit(0);
     	
-    	if(tick >= totalTicks) {
+    	if (tick >= totalTicks) {
     		return -1;
     	} else {
     		return tick;
@@ -166,7 +169,7 @@ public class ActivityVector {
      */
     
     public void setActivityState(int from,int till,boolean state) {
-    	if(till > totalTicks) {
+    	if (till > totalTicks) {
     		totalTicks = till;
     	}
     	
@@ -186,33 +189,34 @@ public class ActivityVector {
 	 */
 	
 	public void shiftIntervalBoundaries(int startTicks,int stopTicks) {
-		if(startTicks == 0 && stopTicks == 0) {
+		if (startTicks == 0 && stopTicks == 0) {
 			return;
 		}
 
 		int tick = 0;
 		
-		while(tick < totalTicks) {
+		while (tick < totalTicks) {
 			tick += getIntervalLength(tick);
 			
 			boolean active = isActive(tick);
 			
-			if(stopTicks < 0 && !active) {
-				setActivityState(tick+stopTicks,tick,false);
-			} else if(stopTicks > 0 && tick < totalTicks && !active) {
-				setActivityState(tick,tick+stopTicks,true);
+			if (stopTicks < 0 && !active) {
+				setActivityState(tick + stopTicks,tick,false);
+			} else if (stopTicks > 0 && tick < totalTicks && !active) {
+				setActivityState(tick,tick + stopTicks,true);
 				tick  += stopTicks;
-			} else if(startTicks < 0 && active) {				
-				setActivityState(tick+startTicks,tick,true);
-			} else if(startTicks > 0 && active) {
-				setActivityState(tick,tick+startTicks,false);
+			} else if (startTicks < 0 && active) {				
+				setActivityState(tick + startTicks,tick,true);
+			} else if (startTicks > 0 && active) {
+				setActivityState(tick,tick + startTicks,false);
 				tick  += startTicks;
 			}
 		}
 	}
 	
 	/**
-	 * Counts the number of activity segments.
+	 * Counts the number of activity segments, which is the number of consecutive blocks of activity in the
+	 * vector.
 	 * 
 	 * @return the number of activity segments
 	 */
@@ -221,8 +225,8 @@ public class ActivityVector {
 		int segments = 0;
 		int pos = -1;
 		
-		while(true) {
-			pos = bitSet.nextSetBit(pos+1);
+		while (true) {
+			pos = bitSet.nextSetBit(pos + 1);
 			
 			if (pos == -1) {
 				return segments;
@@ -230,7 +234,7 @@ public class ActivityVector {
 
 			segments++;
 			
-			pos = bitSet.nextClearBit(pos+1);
+			pos = bitSet.nextClearBit(pos + 1);
 
 			if (pos == -1) {
 				return segments;
@@ -241,17 +245,17 @@ public class ActivityVector {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		
-		int tick=0;
+		int tick = 0;
 		
-		while(tick < totalTicks) {
+		while (tick < totalTicks) {
 			
 			int len = getIntervalLength(tick);
 			
-			if(sb.length() > 0) {
+			if (sb.length() > 0) {
 				sb.append(',');
 			}
 			
-			sb.append(isActive(tick) ? "1/"+len : "0/"+len);
+			sb.append(isActive(tick) ? "1/" + len : "0/" + len);
 			
 			tick += len;
 		}

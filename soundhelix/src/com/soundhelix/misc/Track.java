@@ -1,7 +1,6 @@
 package com.soundhelix.misc;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -27,6 +26,7 @@ public class Track {
 	// the sequence list
 	List<Sequence> seqList = new ArrayList<Sequence>();
 	
+	/** The possible track types. */
 	public static enum TrackType {
 		// the track contains melodic sequences, subject to transposition
 		MELODY,
@@ -34,7 +34,7 @@ public class Track {
 		RHYTHM
 	}
 	
-	// the type
+	/** The track type. */
 	private final TrackType type;
 	
 	public Track(TrackType type) {
@@ -92,20 +92,20 @@ public class Track {
 	 */
 	
 	public void transpose(int halftones) {
-		if(halftones == 0) {
+		if (halftones == 0) {
 			// nothing to do
 			return;
 		}
 		
-		if(type == TrackType.RHYTHM) {
+		if (type == TrackType.RHYTHM) {
 			// transposing is forbidden
 			throw(new RuntimeException("Tracks of type RHYTHM must not be transposed"));
 		}
 		
-		Iterator<Sequence> iter = seqList.iterator();
+		// transpose all the sequences of this track
 		
-		while(iter.hasNext()) {
-			iter.next().transpose(halftones);
+		for (Sequence seq : seqList) {
+			seq.transpose(halftones);
 		}
 	}
 }

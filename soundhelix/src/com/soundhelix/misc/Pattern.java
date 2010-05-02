@@ -17,7 +17,7 @@ public class Pattern {
 
 		int ticks = 0;
 		
-		for (int i = 0; i<pattern.length; i++) {
+		for (int i = 0; i < pattern.length; i++) {
 			ticks += pattern[i].getTicks();
 		}
 		
@@ -112,12 +112,12 @@ public class Pattern {
 		sb.append(totalTicks);
 		sb.append('{');
 
-		for(int i=0;i<pattern.length;i++) {
+		for (int i = 0; i < pattern.length; i++) {
 			sb.append(pattern[i].toString());
 			sb.append(',');
 		}
 
-		sb.setLength(sb.length()-1);
+		sb.setLength(sb.length() - 1);
 
 		return sb.append('}').toString();
 	}
@@ -183,10 +183,11 @@ public class Pattern {
 		}
 		
 		public String toString() {
-			if(isPause()) {
-				return "-"+(ticks > 1 ? "/"+ticks : "");
+			if (isPause()) {
+				return "-" + (ticks > 1 ? "/" + ticks : "");
 			} else {
-				return (isWildcard ? ""+wildcardCharacter : ""+pitch) + (ticks > 1 ? "/" + ticks : "") + (velocity == Short.MAX_VALUE ? "" : ":" + velocity);
+				return (isWildcard ? "" + wildcardCharacter : "" + pitch) + (ticks > 1 ? "/" + ticks : "") +
+						(velocity == Short.MAX_VALUE ? "" : ":" + velocity);
 			}
 		}
 	}
@@ -215,7 +216,7 @@ public class Pattern {
 
 		int patternLength = size();
 		
-		for (int i = 0; i< activityLength; i++) {
+		for (int i = 0; i < activityLength; i++) {
 			PatternEntry entry = get(patternOffset % patternLength);
 		
 			if (entry.isNote() || entry.isWildcard() && entry.getVelocity() > 0) {

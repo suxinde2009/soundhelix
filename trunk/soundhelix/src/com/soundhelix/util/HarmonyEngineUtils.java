@@ -15,7 +15,8 @@ import com.soundhelix.misc.Structure;
  */
 
 public final class HarmonyEngineUtils {
-	private HarmonyEngineUtils() {}
+	private HarmonyEngineUtils() {
+	}
 	
 	/**
 	 * Returns the total number of chord sections.
@@ -34,7 +35,7 @@ public final class HarmonyEngineUtils {
 
 		int sections = 0;
 
-	    for(int tick=0;tick<ticks;tick += harmonyEngine.getChordSectionTicks(tick)) {
+	    for (int tick = 0; tick < ticks; tick += harmonyEngine.getChordSectionTicks(tick)) {
 			sections++;
 		}
 
@@ -55,7 +56,7 @@ public final class HarmonyEngineUtils {
 	 */
 	
 	public static String getChordSectionString(Structure structure,int tick) {
-		if(tick < 0 || tick >= structure.getTicks()) {
+		if (tick < 0 || tick >= structure.getTicks()) {
 			return null;
 		}
 		
@@ -64,11 +65,11 @@ public final class HarmonyEngineUtils {
 		
 		int tickEnd = tick + harmonyEngine.getChordSectionTicks(tick);
 
-		while(tick < tickEnd) {
+		while (tick < tickEnd) {
 			Chord chord = harmonyEngine.getChord(tick);
 			int len = harmonyEngine.getChordTicks(tick);
 			
-			if(sb.length() > 0) {
+			if (sb.length() > 0) {
 				sb.append(',');
 			}
 			
@@ -77,7 +78,7 @@ public final class HarmonyEngineUtils {
 			
 			// the chord section might end before a chord change occurs
 			// therefore we need to use Math.min()
-			sb.append(Math.min(tickEnd-tick,len));
+			sb.append(Math.min(tickEnd - tick,len));
 
 			tick += len;
 		}
@@ -99,7 +100,7 @@ public final class HarmonyEngineUtils {
 		
 		Hashtable<String,Boolean> ht = new Hashtable<String,Boolean>();
 
-	    for(int tick=0;tick<ticks;tick += harmonyEngine.getChordSectionTicks(tick)) {
+	    for (int tick = 0; tick < ticks; tick += harmonyEngine.getChordSectionTicks(tick)) {
 			ht.put(getChordSectionString(structure,tick),true);
 		}
 
@@ -122,7 +123,7 @@ public final class HarmonyEngineUtils {
 
 	    int ticks = structure.getTicks();
 	    
-	    for(int tick=0;tick<ticks;tick += harmonyEngine.getChordSectionTicks(tick)) {
+	    for (int tick = 0; tick < ticks; tick += harmonyEngine.getChordSectionTicks(tick)) {
 	        list.add(tick);
 	    }
 	    

@@ -33,6 +33,7 @@ public final class XMLUtils {
 	/** The read buffer to use for reading files. */
 	private static final int READ_BUFFER = 16384;
 	
+	/** The logger. */
 	private static Logger logger = Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
 	
 	private XMLUtils() {}
@@ -49,8 +50,8 @@ public final class XMLUtils {
 	public static Node getFirstElementChild(Node node) {
 		node = node.getFirstChild();
 		
-		while(node != null) {
-			if(node.getNodeType() == Node.ELEMENT_NODE) {
+		while (node != null) {
+			if (node.getNodeType() == Node.ELEMENT_NODE) {
 				return node;
 			}			
 			node = node.getNextSibling();
@@ -69,9 +70,9 @@ public final class XMLUtils {
 	 */
 	
 	public static Node getNextElementSibling(Node node) {
-		while(node != null) {
+		while (node != null) {
 			node = node.getNextSibling();
-			if(node.getNodeType() == Node.ELEMENT_NODE) {
+			if (node.getNodeType() == Node.ELEMENT_NODE) {
 				return node;
 			}
 		}
@@ -95,12 +96,12 @@ public final class XMLUtils {
 		try {
 			Node node = (Node)xpath.evaluate(path,parentNode,XPathConstants.NODE);
 
-			if(node == null) {
+			if (node == null) {
 				throw(new RuntimeException("Path \""+path+"\" not found within node "+parentNode.getNodeName()));
 			}
 
 			return XMLUtils.parseInteger(random,node,xpath);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw(new RuntimeException("Error parsing integer",e));
 		}
 	}
@@ -120,15 +121,16 @@ public final class XMLUtils {
 	public static int parseInteger(Random random,Node node,XPath xpath) {
 		try {
 		  return Integer.parseInt(node.getTextContent());
-		} catch(RuntimeException e) {}
+		} catch (RuntimeException e) {
+		}
 
 		Node n = getFirstElementChild(node);
 	
-		if(n.getNodeName().equals("random")) {
+		if (n.getNodeName().equals("random")) {
 			try {
 				String s = (String)xpath.evaluate("attribute::list",n,XPathConstants.STRING);
 
-				if(s != null && !s.equals("")) {
+				if (s != null && !s.equals("")) {
 					String[] str = s.split("\\|");
 
 					return Integer.parseInt(str[random.nextInt(str.length)]);
@@ -138,35 +140,39 @@ public final class XMLUtils {
 
 					String type = (String)xpath.evaluate("attribute::type",n,XPathConstants.STRING);
 
-					if(type == null || type.equals("") || type.equals("uniform")) {
+					if (type == null || type.equals("") || type.equals("uniform")) {
 						int step = 1;
 
 						try {
-							step = Integer.parseInt((String)xpath.evaluate("attribute::step",n,XPathConstants.STRING));						
-						} catch(Exception e) {}
+							step = Integer.parseInt((String)xpath.evaluate("attribute::step",n,XPathConstants.STRING));
+						} catch (Exception e) {
+						}
 
 						return RandomUtils.getUniformInteger(random,min,max,step);
-					} else if(type.equals("normal")) {
+					} else if (type.equals("normal")) {
 						double mean;
 				    	String meanstr = (String)xpath.evaluate("attribute::mean",n,XPathConstants.STRING);
 						
-						if(meanstr != null && !meanstr.equals("")) {
+						if (meanstr != null && !meanstr.equals("")) {
 							mean = Double.parseDouble(meanstr);
 						} else {
 						    // use arithmetic mean
-							mean = (min+max)/2.0f;
+							mean = (min + max) / 2.0f;
 						}
 						
-						double variance = Double.parseDouble((String)xpath.evaluate("attribute::variance",n,XPathConstants.STRING));
+						double variance = Double.parseDouble(
+								(String)xpath.evaluate("attribute::variance",n,XPathConstants.STRING));
 
 						return RandomUtils.getNormalInteger(random,min,max,mean,variance);
 					} else {
-						throw(new RuntimeException("Unknown random distribution \""+type+"\""));
+						throw(new RuntimeException("Unknown random distribution \"" + type + "\""));
 					}
 				}
-			} catch(Exception e) {throw(new RuntimeException("Error parsing random attributes",e));}
+			} catch (Exception e) {
+				throw new RuntimeException("Error parsing random attributes",e);
+			}
 		} else {
-			throw(new RuntimeException("Invalid element "+n.getNodeName()));
+			throw(new RuntimeException("Invalid element " + n.getNodeName()));
 		}
 	}
 
@@ -186,12 +192,12 @@ public final class XMLUtils {
 		try {
 			Node node = (Node)xpath.evaluate(path,parentNode,XPathConstants.NODE);
 
-			if(node == null) {
-				throw(new RuntimeException("Path \""+path+"\" not found within node "+parentNode.getNodeName()));
+			if (node == null) {
+				throw(new RuntimeException("Path \"" + path + "\" not found within node " + parentNode.getNodeName()));
 			}
 
 			return XMLUtils.parseDouble(random,node,xpath);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw(new RuntimeException("Error parsing double",e));
 		}
 	}
@@ -216,12 +222,12 @@ public final class XMLUtils {
 		try {
 			Node node = (Node)xpath.evaluate(path,parentNode,XPathConstants.NODE);
 
-			if(node == null) {
-				throw(new RuntimeException("Path \""+path+"\" not found within node "+parentNode.getNodeName()));
+			if (node == null) {
+				throw(new RuntimeException("Path \"" + path + "\" not found within node " + parentNode.getNodeName()));
 			}
 
 			return XMLUtils.parseBoolean(random,node,xpath);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw(new RuntimeException("Error parsing boolean",e));
 		}
 	}
@@ -241,23 +247,27 @@ public final class XMLUtils {
 	public static boolean parseBoolean(Random random,Node node,XPath xpath) {
 		String content = node.getTextContent();
 		
-		if(content != null && !content.equals("")) {
-			if(content.equals("1") || content.equals("yes") || content.equals("true") || content.equals("on")) {
+		if (content != null && !content.equals("")) {
+			if (content.equals("1") || content.equals("yes") || content.equals("true") || content.equals("on")) {
 				return true;
-			} else if(content.equals("0") || content.equals("no") || content.equals("false") || content.equals("off")) {
+			} else if (content.equals("0") || content.equals("no") ||
+					content.equals("false") || content.equals("off")) {
 				return false;
 			}
 		}
 	
 		Node n = getFirstElementChild(node);
 	
-		if(n.getNodeName().equals("random")) {
+		if (n.getNodeName().equals("random")) {
 			try {
-				double prob = Double.parseDouble((String)xpath.evaluate("attribute::probability",n,XPathConstants.STRING));
-				return RandomUtils.getBoolean(random,prob/100.0d);
-			} catch(Exception e) {throw(new RuntimeException("Error parsing random attributes",e));}
+				double prob = Double.parseDouble(
+						(String)xpath.evaluate("attribute::probability",n,XPathConstants.STRING));
+				return RandomUtils.getBoolean(random,prob / 100.0d);
+			} catch (Exception e) {
+				throw new RuntimeException("Error parsing random attributes",e);
+			}
 		} else {
-			throw(new RuntimeException("Invalid element "+n.getNodeName()));
+			throw(new RuntimeException("Invalid element " + n.getNodeName()));
 		}
 	}
 
@@ -277,12 +287,12 @@ public final class XMLUtils {
 		try {
 			Node node = (Node)xpath.evaluate(path,parentNode,XPathConstants.NODE);
 
-			if(node == null) {
+			if (node == null) {
 				return null;
 			}
 
 			return XMLUtils.parseString(random,node,xpath);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw(new RuntimeException("Error parsing string",e));
 		}
 	}
@@ -298,32 +308,32 @@ public final class XMLUtils {
 	 */
 
 	public static String parseString(Random random,Node node,XPath xpath) {
-		if(node == null) {
+		if (node == null) {
 			return null;
 		}
 		
 		Node n = getFirstElementChild(node);
 
-		if(n == null) {
+		if (n == null) {
 			return node.getTextContent();
 		}
 
-		if(n.getNodeName().equals("random")) {
+		if (n.getNodeName().equals("random")) {
 			try {
 				String s = (String)xpath.evaluate("attribute::list",n,XPathConstants.STRING);
 
-				if(s == null || s.equals("")) {
+				if (s == null || s.equals("")) {
 					throw(new RuntimeException("Attribute \"list\" is empty"));
 				}
 
 				String[] str = s.split("\\|");
 
 				return str[random.nextInt(str.length)];
-			} catch(Exception e) {
+			} catch (Exception e) {
 				throw(new RuntimeException("Error parsing random attributes",e));
 			}
 		} else {
-			throw(new RuntimeException("Invalid element "+n.getNodeName()));
+			throw(new RuntimeException("Invalid element " + n.getNodeName()));
 		}
 	}
 	
@@ -350,43 +360,46 @@ public final class XMLUtils {
 	 * @throws IllegalAccessException if the class cannot be instantiated
 	 */
 	
-	public static <T> T getInstance(Class<T> superclass,Node node,XPath xpath,long randomSeed) throws InstantiationException,XPathException,XPathExpressionException,IllegalAccessException,ClassNotFoundException {
+	public static <T> T getInstance(Class<T> superclass,Node node,XPath xpath,long randomSeed)
+			throws InstantiationException,XPathException,XPathExpressionException,
+					IllegalAccessException,ClassNotFoundException {
 		String className = (String)xpath.evaluate("attribute::class",node,XPathConstants.STRING);
 
-		if(className.indexOf('.') < 0) {
+		if (className.indexOf('.') < 0) {
 			// prefix the class name with the package name of the superclass
 			className = superclass.getName().substring(0,superclass.getName().lastIndexOf('.')+1)+className;
 		}
 		
-		if(logger.isTraceEnabled()) {
-			logger.trace("Instantiating class "+className);
+		if (logger.isTraceEnabled()) {
+			logger.trace("Instantiating class " + className);
 		}
 
 		Class<?> cl = Class.forName(className);
 		
-		if(superclass.isAssignableFrom(cl)) {
+		if (superclass.isAssignableFrom(cl)) {
 			// TODO: any chance of getting rid of the warning here?
 			T inst = (T)cl.newInstance();
 
 			// random-seed instance if it is random-seedable
 			// (it's important to seed before configuring)
 
-			if(inst instanceof RandomSeedable) {
-				if(logger.isTraceEnabled()) {
-					logger.trace("Base random seed: "+randomSeed+", using "+(randomSeed^className.hashCode()-1478923845823984391l*randomSeed));
+			if (inst instanceof RandomSeedable) {
+				if (logger.isTraceEnabled()) {
+					logger.trace("Base random seed: " + randomSeed + ", using " +
+							(randomSeed ^ className.hashCode() - 1478923845823984391l * randomSeed));
 				}
-				((RandomSeedable)inst).setRandomSeed(randomSeed^className.hashCode());
+				((RandomSeedable)inst).setRandomSeed(randomSeed ^ className.hashCode());
 			}
 
 			// configure instance if it is XML-configurable
 
-			if(inst instanceof XMLConfigurable) {
+			if (inst instanceof XMLConfigurable) {
 				((XMLConfigurable)inst).configure(node,xpath);
 			}
 
 			return inst;
 		} else {
-			throw(new RuntimeException("Class "+className+" is not a subclass of "+superclass));
+			throw(new RuntimeException("Class " + className + " is not a subclass of " + superclass));
 		}
 	}
 
@@ -394,7 +407,7 @@ public final class XMLUtils {
 	    Node node = doc.getFirstChild();
 	    int includedFiles = 0;
 	    
-	    while(node != null) {
+	    while (node != null) {
 	        includedFiles += expandIncludeTags(random,doc,node,xpath,includedFiles);
 	        node = node.getNextSibling();
 	    }
@@ -413,6 +426,7 @@ public final class XMLUtils {
 	 * prevent inclusion cycles (file including itself directly or indirectly via
 	 * other included files).
 	 *
+	 * @param random the random generator
 	 * @param doc the document
 	 * @param node the node to start searching from (must be part of doc)
 	 * @param xpath an XPath instance
@@ -422,7 +436,7 @@ public final class XMLUtils {
 	 */
 	
 	private static int expandIncludeTags(Random random,Document doc,Node node,XPath xpath,int includedFiles) {
-	    if(node == null || node.getNodeType() == Node.DOCUMENT_TYPE_NODE) {
+	    if (node == null || node.getNodeType() == Node.DOCUMENT_TYPE_NODE) {
 	        return 0;
 	    }
 	    
@@ -431,16 +445,18 @@ public final class XMLUtils {
 		try {
 		    // recursively search all "include" tags, starting from node
 			nodeList = (NodeList)xpath.evaluate("//include",node,XPathConstants.NODESET);
-		} catch(Exception e) {logger.warn("Exception: ",e);}
+		} catch (Exception e) {
+			logger.warn("Exception: ",e);
+		}
 		
-		System.out.println("Nodelist: "+nodeList);
+		System.out.println("Nodelist: " + nodeList);
 		
 		int nodes = nodeList.getLength();
 	
-		for(int i=0;i<nodes;i++) {
+		for (int i = 0; i < nodes; i++) {
 	        includedFiles++;
 
-	        if(includedFiles > 100) {
+	        if (includedFiles > 100) {
 	        	throw(new RuntimeException("More than 100 files included (inclusion cycle?)"));
 	        }
 	            
@@ -449,12 +465,12 @@ public final class XMLUtils {
 			String filename = XMLUtils.parseString(random,includeNode,xpath);
 			String fileData;
 
-			logger.debug("Including XML fragment \""+filename+"\"");			
+			logger.debug("Including XML fragment \"" + filename + "\"");
 
 			try {
 				fileData = readTextFile(filename);
-			} catch(Exception e) {
-				throw(new RuntimeException("Could not read included file \""+filename+"\"",e));
+			} catch (Exception e) {
+				throw(new RuntimeException("Could not read included file \"" + filename + "\"",e));
 			}
 
 			DocumentBuilder builder;
@@ -466,9 +482,9 @@ public final class XMLUtils {
 				// we wrap the file data into an artificial XML tag "fragment", so that
 				// we have a valid XML document having one root element
 				
-				includeDoc = builder.parse(new InputSource(new StringReader("<fragment>"+fileData+"</fragment>")));
-			} catch(Exception e) {
-				throw(new RuntimeException("Error parsing XML document \""+filename+"\"",e));
+				includeDoc = builder.parse(new InputSource(new StringReader("<fragment>" + fileData+"</fragment>")));
+			} catch (Exception e) {
+				throw(new RuntimeException("Error parsing XML document \"" + filename + "\"",e));
 			}
 			
 			// recursively expand the include tags of the included file (if any)
@@ -487,7 +503,7 @@ public final class XMLUtils {
     
             // move the children of the "fragment" tag into the fragment
             
-            while(newNode.hasChildNodes()) {
+            while (newNode.hasChildNodes()) {
                 docFragment.appendChild(newNode.removeChild(newNode.getFirstChild()));
             }
 
@@ -521,7 +537,7 @@ public final class XMLUtils {
 		
 		int numRead;
 		
-		while((numRead = reader.read(buf)) != -1){
+		while ((numRead = reader.read(buf)) != -1) {
 			sb.append(buf, 0, numRead);
 		}
 		

@@ -242,6 +242,12 @@ public class ActivityVector {
 		}
 	}
 	
+	/**
+	 * Returns a string representation of the ActivityVector.
+	 *
+	 * @return a string representation
+	 */
+	
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		

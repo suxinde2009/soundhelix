@@ -21,7 +21,7 @@ import java.util.zip.GZIPOutputStream;
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
-public class Arrangement {
+public class Arrangement implements Iterable<Arrangement.ArrangementEntry> {
 	/** The structure. */
 	private final Structure structure;
 	

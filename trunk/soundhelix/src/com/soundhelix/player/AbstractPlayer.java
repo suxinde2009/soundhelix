@@ -18,6 +18,7 @@ import com.soundhelix.misc.Arrangement;
 public abstract class AbstractPlayer implements Player {
 	protected final Logger logger;
 
+	/** The random seed. */
 	protected long randomSeed;
 	
     public AbstractPlayer() {

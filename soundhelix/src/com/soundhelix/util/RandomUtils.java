@@ -28,7 +28,7 @@ public final class RandomUtils {
 	 */
 	
 	public static int getUniformInteger(Random random,int min,int max,int step) {
-		return min+step*random.nextInt((max-min)/step+1);
+		return min + step * random.nextInt((max - min) / step + 1);
 	}
 
 	/**
@@ -46,7 +46,7 @@ public final class RandomUtils {
 	 */
 	
 	public static double getUniformDouble(Random random,double min,double max) {
-		return min+(max-min)*random.nextDouble();
+		return min + (max - min) * random.nextDouble();
 	}
 
 	/**
@@ -65,7 +65,7 @@ public final class RandomUtils {
 	 */
 	
 	public static double getUniformDouble(Random random,double min,double max,double step) {
-		return min+step*Math.floor((max-min)*random.nextDouble()/step);
+		return min + step * Math.floor((max - min) * random.nextDouble() / step);
 	}
 
 	/**
@@ -88,8 +88,8 @@ public final class RandomUtils {
 		int value;
 		
 		do {
-			value = (int)(mean+variance*random.nextGaussian());
-		} while(value < min || value > max);
+			value = (int)(mean + variance * random.nextGaussian());
+		} while (value < min || value > max);
 
 		return value;
 	}
@@ -114,8 +114,8 @@ public final class RandomUtils {
 		double value;
 		
 		do {
-			value = mean+variance*random.nextGaussian();
-		} while(value < min || value > max);
+			value = mean + variance * random.nextGaussian();
+		} while (value < min || value > max);
 
 		return value;
 	}
@@ -132,7 +132,7 @@ public final class RandomUtils {
 	 */
 	
 	public static double getPowerDouble(Random random, double min, double max, double order) {
-		return min+(max-min)*Math.pow(random.nextDouble(), order);
+		return min + (max - min) * Math.pow(random.nextDouble(), order);
 	}
 
 	/**
@@ -148,7 +148,7 @@ public final class RandomUtils {
 	 */
 	
 	public static double getPowerDouble(double value, double min, double max, double order) {
-		return min+(max-min)*Math.pow(value, order);
+		return min + (max - min) * Math.pow(value, order);
 	}
 
 	/**
@@ -161,11 +161,11 @@ public final class RandomUtils {
 	 */
 	
 	public static boolean getBoolean(Random random,double probability) {
-	    if(probability == 0.5d) {
+	    if (probability == 0.5d) {
 	    	return random.nextBoolean();
-	    } else if(probability >= 1.0d) {
+	    } else if (probability >= 1.0d) {
 			return true;
-		} else if(probability <= 0.0d) {
+		} else if (probability <= 0.0d) {
 			return false;
 		} else {
 			return random.nextDouble() < probability;

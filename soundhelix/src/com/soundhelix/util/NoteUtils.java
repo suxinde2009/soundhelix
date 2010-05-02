@@ -22,17 +22,18 @@ public final class NoteUtils {
 		"c","c#","d","d#","e","f","f#","g","g#","a","a#","b"
 	};
 	
-	// maps note names to normalized pitches
+	/** Maps note names to normalized pitches. */
 	private static Hashtable<String,Integer> h = new Hashtable<String,Integer>();
 	
 	static {
 		// build a reverse lookup table for noteNames
-		for(int i=0;i<12;i++) {
+		for (int i = 0; i < 12;i++) {
 			h.put(noteNames[i],i);
 		}
 	}
 	
-	private NoteUtils() {}
+	private NoteUtils() {
+	}
 
 	/**
 	 * Returns the note name of the given pitch in lower-case. The pitch
@@ -44,7 +45,7 @@ public final class NoteUtils {
 	 */
 	
 	public static String getNoteName(int pitch) {
-		return noteNames[((pitch%12)+12)%12];
+		return noteNames[((pitch % 12) + 12) % 12];
 	}
 	
 	/**
@@ -58,13 +59,13 @@ public final class NoteUtils {
 	 */
 	
 	public static int getNotePitch(String name) {
-		if(name == null) {
+		if (name == null) {
 			return Integer.MIN_VALUE;
 		}
 	
 		Integer pitch = h.get(name.toLowerCase());
 		
-		if(pitch == null) {
+		if (pitch == null) {
 			return Integer.MIN_VALUE;
 		} else {
 			return pitch;
@@ -81,7 +82,7 @@ public final class NoteUtils {
      */
     
     public static boolean isOnScale(int pitch) {
-    	return SCALE_TABLE[((pitch%12)+12)%12];
+    	return SCALE_TABLE[((pitch % 12) + 12) % 12];
     }
 
 	/**
@@ -100,7 +101,7 @@ public final class NoteUtils {
 	 */
 	
 	public static int getTransitionPitch(Chord chord,Chord nextChord) {
-		if(nextChord == null) {
+		if (nextChord == null) {
 			// next chord is undefined, just return the current pitch
 			return chord.getPitch();
 		}
@@ -108,30 +109,30 @@ public final class NoteUtils {
 		int pitch1 = chord.getPitch();
 		int pitch2 = nextChord.getPitch();
 		
-		int diff = pitch2-pitch1;
+		int diff = pitch2 - pitch1;
 		int absdiff = Math.abs(diff);
 		
-		if(diff == 0) {
+		if (diff == 0) {
 			// chords are the same
 			return pitch1;
-		} else if(absdiff == 2) {
+		} else if (absdiff == 2) {
 			// pitch difference is one tone,
 			// use the halftone in between
-			return((pitch1+pitch2)/2);
-	   	} else if(absdiff == 1) {
+			return (pitch1 + pitch2) / 2;
+	   	} else if (absdiff == 1) {
 			// pitch difference is one halftone
 			// use the current pitch
-			return(pitch1);
-		} else if(diff > 0) {
+			return pitch1;
+		} else if (diff > 0) {
 			// we have a pitch difference of at least 3 halftones up
-			pitch1 += Math.min(0,absdiff/2-1);
+			pitch1 += Math.min(0,absdiff / 2 - 1);
 			do {
 				pitch1++;
 			} while(!isOnScale(pitch1));
 		   	return pitch1;
 		} else {
 			// we have a pitch difference of at least 3 halftones down
-			pitch1 -= Math.min(0,absdiff/2-1);
+			pitch1 -= Math.min(0,absdiff / 2 - 1);
 			do {
 				pitch1--;
 			} while(!isOnScale(pitch1));

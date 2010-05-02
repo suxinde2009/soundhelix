@@ -135,9 +135,6 @@ public abstract class AbstractHarmonyEngine implements HarmonyEngine {
         System.out.println();
 	}
 	
-
-	
-
 	/**
 	 * Checks if the 3 abstract methods return consistent and correct
 	 * results. In case of a detected problem, a RuntimeException will

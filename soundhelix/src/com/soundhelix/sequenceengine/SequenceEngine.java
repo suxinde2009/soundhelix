@@ -21,10 +21,16 @@ import com.soundhelix.misc.Track;
 import com.soundhelix.misc.XMLConfigurable;
 
 public interface SequenceEngine extends XMLConfigurable,RandomSeedable {
-    public void setStructure(Structure structure);
+	/**
+	 * Sets the structure.
+	 * 
+	 * @param structure the structure
+	 */
+	
+    void setStructure(Structure structure);
 
 	/**
-	 * Renders one or more sequences (i.e., voices). The
+	 * Renders one or more sequences (i.e., voices) as a track. The
 	 * method should check the given ActivityVectors to decide when to insert
 	 * notes and when to insert pauses. The method should also take care that
 	 * played notes are not sustained beyond inactive intervals of the
@@ -32,9 +38,13 @@ public interface SequenceEngine extends XMLConfigurable,RandomSeedable {
 	 * returned list must contain at least one sequence. The length of each
 	 * sequence must match the length of the song. The method must take the
 	 * song's HarmonyEngine into consideration.
+	 * 
+	 * @param activityVectors the activity vectors
+	 *
+	 * @return the track
 	 */
 
-     public Track render(ActivityVector[] activityVectors);
+     Track render(ActivityVector[] activityVectors);
 
      /**
       * Returns the required number of ActivityVectors. For most implementations,
@@ -45,5 +55,5 @@ public interface SequenceEngine extends XMLConfigurable,RandomSeedable {
       * @return the number of ActivityVectors
       */
      
-     public int getActivityVectorCount();     
+     int getActivityVectorCount();     
 }

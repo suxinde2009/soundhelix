@@ -56,6 +56,11 @@ public class Arrangement implements Iterable<Arrangement.ArrangementEntry> {
      * Loads a gzip-serialized arrangement from the given file and returns it.
      * 
      * @param filename the filename of the arrangement to load
+     * 
+     * @throws IOException in case of an I/O problem
+     * @throws ClassNotFoundException in case of a deserialization problem
+     * 
+     * @return the read arrangement
      */
 
     public static Arrangement loadArrangement(String filename) throws IOException,ClassNotFoundException {
@@ -75,6 +80,8 @@ public class Arrangement implements Iterable<Arrangement.ArrangementEntry> {
      * 
      * @param arrangement the arrangement to save
      * @param filename the filename to save the arrangement to
+     * 
+     * @throws IOException in case of an I/O problem
      */
     
     public static void saveArrangement(Arrangement arrangement,String filename) throws IOException {

@@ -23,14 +23,14 @@ import java.util.List;
 // this way, different types of sequences could be put into a track, which is currently not possible
 
 public class Track {
-	// the sequence list
-	List<Sequence> seqList = new ArrayList<Sequence>();
+	/** The list of sequences. */
+	private List<Sequence> sequences = new ArrayList<Sequence>();
 	
 	/** The possible track types. */
 	public static enum TrackType {
-		// the track contains melodic sequences, subject to transposition
+		/** The track contains melodic sequences, subject to transposition. */
 		MELODY,
-		// the track contains fixed-pitch sequences, which must not be transposed
+		/** The track contains fixed-pitch sequences, which must not be transposed. */
 		RHYTHM
 	}
 	
@@ -48,7 +48,7 @@ public class Track {
 	 */
 	
 	public void add(Sequence sequence) {
-		seqList.add(sequence);
+		sequences.add(sequence);
 	}
 	
 	/**
@@ -58,7 +58,7 @@ public class Track {
 	 */
 	
 	public int size() {
-		return seqList.size();
+		return sequences.size();
 	}
 	
 	/**
@@ -80,7 +80,7 @@ public class Track {
 	 */
 	
 	public Sequence get(int index) {
-		return seqList.get(index);
+		return sequences.get(index);
 	}
 	
 	/**
@@ -104,7 +104,7 @@ public class Track {
 		
 		// transpose all the sequences of this track
 		
-		for (Sequence seq : seqList) {
+		for (Sequence seq : sequences) {
 			seq.transpose(halftones);
 		}
 	}

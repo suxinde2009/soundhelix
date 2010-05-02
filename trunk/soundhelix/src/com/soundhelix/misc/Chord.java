@@ -26,12 +26,20 @@ public class Chord {
 	
 	/** The possible chord types. */
 	public enum ChordType {
-		MAJOR,MINOR
+		/** Major chord. */
+		MAJOR,
+		/** Minor chord. */
+		MINOR
 	};
 
 	/** The possible chord subtypes. */
 	public enum ChordSubtype {
-		BASE_0,BASE_4,BASE_6
+		/** Normal chord (no inversion). */
+		BASE_0,
+		/** First inversion chord. */
+		BASE_4,
+		/** Second inversion chord. */
+		BASE_6
 	};
 
 	/** The base pitch of the chord. */
@@ -49,6 +57,7 @@ public class Chord {
 		this.subtype = subtype;
 	}
 	
+	/** The consistent random generator. */
 	private static ConsistentRandom random;
 
 	/**
@@ -108,6 +117,8 @@ public class Chord {
 	 * same chord type and subchord type.
 	 * 
 	 * @param other the other chord to compare this chord to
+	 * 
+	 * @return true if the two objects are equal, false otherwise
 	 */
 	
 	public boolean equals(Object other) {
@@ -116,11 +127,20 @@ public class Chord {
 		}
 		
 		Chord otherChord = (Chord)other;
-		return this == otherChord || this.pitch == otherChord.pitch && this.type == otherChord.type && this.subtype == otherChord.subtype;
+		return this == otherChord ||
+				this.pitch == otherChord.pitch && this.type == otherChord.type && this.subtype == otherChord.subtype;
 	}
 	
+	/**
+	 * Returns a string representation of this chord.
+	 * 
+	 * @return the string represenation
+	 */
+	
 	public String toString() {
-		return NoteUtils.getNoteName(pitch).toUpperCase()+(isMinor() ? "m" : "")+(subtype == ChordSubtype.BASE_4 ? "4" : subtype == ChordSubtype.BASE_6 ? "6" : "")+"+"+getLowPitch()+"/"+getMiddlePitch()+"/"+getHighPitch();
+		return NoteUtils.getNoteName(pitch).toUpperCase() + (isMinor() ? "m" : "") +
+				(subtype == ChordSubtype.BASE_4 ? "4" : subtype == ChordSubtype.BASE_6 ? "6" : "") +
+				"+" + getLowPitch() + "/" + getMiddlePitch() + "/" + getHighPitch();
 	}
 
 	/**
@@ -178,7 +198,7 @@ public class Chord {
 					
 					if (diff1 < diff2) {
 						return chord;
-					} else if (diff1 > diff2 ){
+					} else if (diff1 > diff2) {
 						return lastChord;
 					} else {						
 						// we have a tie, choose on of the chords

@@ -9,6 +9,6 @@ package com.soundhelix.lfo;
 
 public class SineLFO extends AbstractLFO {
 	public double getValue(double angle) {
-	    return 0.5d+Math.sin(angle)*0.5d;
+	    return 0.5d + Math.sin(angle) * 0.5d;
 	}
 }

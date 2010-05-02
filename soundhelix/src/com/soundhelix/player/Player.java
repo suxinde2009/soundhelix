@@ -5,7 +5,8 @@ import com.soundhelix.misc.RandomSeedable;
 import com.soundhelix.misc.XMLConfigurable;
 
 /**
- * Represents an interface for playing Arrangements.
+ * Represents an interface for playing Arrangements. A player's task usually is to play the
+ * arrangement in real-time.
  * 
  * @see Arrangement
  * 
@@ -39,8 +40,28 @@ public interface Player extends XMLConfigurable,RandomSeedable {
  	 */
 
     public abstract void close();
+
+    /**
+     * Gets the playback speed in milli-BPM.
+     * 
+     * @return the speed in milli-BPM
+     */
     
-    public void setBPM(int bpm);
+    public int getMilliBPM();
+
+    /**
+     * Sets the playback speed in milli-BPM. Setting the BPM speed should be possible while
+     * the player is playing an arrangement.
+     *
+     * @param milliBPM the speed in milli-BPM
+     */
+    
+    public void setMilliBPM(int milliBPM);
+    
+    /**
+     * Aborts playback. Calling this method should stop the player if it is currently
+     * playing an arrangement.
+     */
     
     public void abortPlay();
     

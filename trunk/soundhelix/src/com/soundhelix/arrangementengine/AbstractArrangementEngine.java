@@ -13,9 +13,13 @@ import com.soundhelix.misc.Structure;
  */
 
 public abstract class AbstractArrangementEngine implements ArrangementEngine {
+	/** The logger. */
 	protected final Logger logger;
 	
+	/** The structure. */
 	protected Structure structure;
+	
+	/** The random seed. */
 	protected long randomSeed;
 	
 	public AbstractArrangementEngine() {
@@ -23,7 +27,7 @@ public abstract class AbstractArrangementEngine implements ArrangementEngine {
 	}	
 
 	public void setStructure(Structure structure) {
-		if(this.structure != null) {
+		if (this.structure != null) {
 			throw(new RuntimeException("Structure already set"));
 		}
 		

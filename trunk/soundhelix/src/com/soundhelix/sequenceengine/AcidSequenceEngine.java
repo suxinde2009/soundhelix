@@ -22,14 +22,31 @@ import com.soundhelix.util.XMLUtils;
 
 public class AcidSequenceEngine extends AbstractMultiPatternSequenceEngine {
 
+	private final int ticks = 16;
+	private final double noteRatio = 0.8;
+	private final double slideRatio = 0.25;
+	
+	private final double minVolume = 1d;
+	private final double maxVolume = 20000d;
+	
+	private final int[] offsets = {0,1,2,3,4,5,6};
+	private final int[] lengths = {1,2,3,2,1,1};
+	
+	// 1 = only pitch dependent, 0 = not pitch dependent
+	private final double pitchFactor = 0.75;
+	private final double order = 3.0d;
+
+	private final String patternString = "ABACABAD";
+	
     public void configure(Node node,XPath xpath) throws XPathException {
     	random = new Random(randomSeed);
     	
 		try {
 			setObeyChordSubtype(XMLUtils.parseBoolean(random,"obeyChordSubtype",node,xpath));
-		} catch(Exception e) {}
+		} catch (Exception e) {
+		}
 		
-		setPatterns(new String[] {generatePattern("ABAC")});
+		setPatterns(new String[] {generatePattern(patternString)});
     }
     
     /**
@@ -51,7 +68,7 @@ public class AcidSequenceEngine extends AbstractMultiPatternSequenceEngine {
     	String basePattern = null;    	
     	StringBuilder totalPattern = new StringBuilder();
     	
-    	for(int i=0;i<patternPattern.length();i++) {
+    	for (int i = 0; i < patternPattern.length(); i++) {
     		char c = patternPattern.charAt(i);
     		String p = patternMap.get(c);
     		
@@ -67,7 +84,7 @@ public class AcidSequenceEngine extends AbstractMultiPatternSequenceEngine {
     			}
 
     			if (logger.isDebugEnabled()) {
-    				logger.debug("Pattern " + c + ": "+p);    			
+    				logger.debug("Pattern " + c + ": " + p);    			
     			}
     				
 				patternMap.put(c,p);
@@ -93,20 +110,6 @@ public class AcidSequenceEngine extends AbstractMultiPatternSequenceEngine {
     private String generateBasePattern() {
     	StringBuilder sb = new StringBuilder();
 
-    	final int ticks = 16;
-    	final double noteRatio = 0.8;
-    	final double slideRatio = 0.25;
-    	
-    	final double minVolume = 1d;
-    	final double maxVolume = 20000d;
-    	
-    	final int[] offsets = {0,1,2,3,4,5,6};
-    	final int[] lengths = {1,2,3,2,1,1};
-    	
-    	// 1 = only pitch dependent, 0 = not pitch dependent
-    	final double pitchFactor = 0.75;
-    	final double order = 3.0d;
-
     	final int minPitch = findMinimum(offsets);
     	final int maxPitch = findMaximum(offsets);
     	final int pitchDiff = maxPitch - minPitch;
@@ -114,7 +117,7 @@ public class AcidSequenceEngine extends AbstractMultiPatternSequenceEngine {
     	boolean currentIsNote;
     	boolean nextIsNote = random.nextDouble() < noteRatio;
 
-    	for(int i=0;i<ticks;) {
+    	for (int i = 0; i < ticks;) {
     		int length = lengths[random.nextInt(lengths.length)];
 
     		if (i + length > ticks) {
@@ -133,9 +136,9 @@ public class AcidSequenceEngine extends AbstractMultiPatternSequenceEngine {
     			boolean isSlide = nextIsNote && (i + length < ticks) && random.nextDouble() < slideRatio;
     			
     			if (isSlide) {
-    				sb.append(pitch).append("~/").append(length).append(":").append(volume);
+    				sb.append(pitch).append("~/").append(length).append(':').append(volume);
     			} else {
-       				sb.append(pitch).append("/").append(length).append(":").append(volume);   			
+       				sb.append(pitch).append("/").append(length).append(':').append(volume);   			
     			}
     		} else {
     			sb.append("-/").append(length);
@@ -166,7 +169,7 @@ public class AcidSequenceEngine extends AbstractMultiPatternSequenceEngine {
     	String[] values = pattern.split(",");
     	int length = values.length;
     	
-    	for(int i=0;i<modifications;i++) {
+    	for (int i = 0; i < modifications; i++) {
     		int x,y;
     		
     		do {
@@ -181,10 +184,10 @@ public class AcidSequenceEngine extends AbstractMultiPatternSequenceEngine {
     	
     	StringBuilder sb = new StringBuilder();
     	
-    	for(int i=0;i<length;i++) {
+    	for (int i = 0; i < length;i++) {
     		sb.append(values[i]);
     		
-    		if(i < length-1) {
+    		if (i < length - 1) {
     			sb.append(',');
     		}
     	}
@@ -205,7 +208,7 @@ public class AcidSequenceEngine extends AbstractMultiPatternSequenceEngine {
     	int maximum = Integer.MIN_VALUE;
     	int num = list.length;
     	
-    	for(int i=0;i<num;i++) {
+    	for (int i = 0; i < num; i++) {
     		maximum = Math.max(list[i], maximum);
     	}
     	
@@ -225,7 +228,7 @@ public class AcidSequenceEngine extends AbstractMultiPatternSequenceEngine {
     	int minimum = Integer.MAX_VALUE;
     	int num = list.length;
     	
-    	for(int i=0;i<num;i++) {
+    	for (int i = 0; i < num; i++) {
     		minimum = Math.min(list[i], minimum);
     	}
     	

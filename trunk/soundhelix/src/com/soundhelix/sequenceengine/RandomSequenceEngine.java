@@ -15,30 +15,58 @@ import com.soundhelix.util.RandomUtils;
 import com.soundhelix.util.XMLUtils;
 
 /**
- * Implements a sequence engine that generates a random pattern, with random
- * legato and random velocity.
+ * Implements a generic sequence engine that generates a random pattern, with random
+ * pitches, random note and pause lengths, random legato and random velocity, as well as the ability to repeat
+ * subpatterns.
  * 
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
 public class RandomSequenceEngine extends AbstractMultiPatternSequenceEngine {
 
-	private int patternTicks = 16;
-	private double noteProbability = 0.8;
-	private double legatoProbability = 0.25;
 	
+	/**
+	 * The length of the base pattern. The total length of the pattern is this value times the length of the pattern
+	 * string.
+	 */
+	private int patternTicks = 16;
+
+	/**
+	 * The pattern used to generate the final pattern. Equal characters refer to equal patterns, different characters
+	 * to different patterns. For example, the string "ABAC" will generate the 3 different patterns A, B and C with the
+	 * same length and will generate a final pattern consisting of patterns A, B, A and C concatenated.
+	 */
+	private String patternString = "ABACABAD";
+
+	/** The probability to use a note rather than a pause. */
+	private double noteProbability = 0.8;
+	/** The probability to use legato if a note is generated and the next pattern component is also a note. */
+	private double legatoProbability = 0.25;
+
+	/** The minimum velocity to use. */
 	private double minVelocity = 1d;
+	/** The maximum velocity to use. */
 	private double maxVelocity = 20000d;
 	
+	/** The list of offsets to choose from. The list may contain values more than once for extra weight. */
 	private int[] offsets = {0,1,2,3,4,5,6};
+	/** The list of note lengths to choose from. The list may contain values more than once for extra weight. */
 	private int[] noteLengths = {1,2,3,2,1,1};
+	/** The list of pause lengths to choose from. The list may contain values more than once for extra weight. */
 	private int[] pauseLengths = {1,2,3,2,1,1};
 	
-	// 1 = only pitch dependent, 0 = not pitch dependent
+	/**
+	 * The correlation between pitch and velocity. If 1, the velocity depends only on the pitch and not on the random
+	 * value; if 0, the velocity only depends on the random value.
+	 */
 	private double pitchVelocityCorrelation = 0.75;
+	
+	/**
+	 * The exponent for the power distribution used for velocity. 1 distributes linearly between minimum and maximum
+	 * velocity, 2 quadratically, 0.5 like a square-root, etc. The same happens for a negative exponent, but reverses
+	 * the meaning of minimum and maximum velocity.
+	 */
 	private double velocityExponent = 3.0d;
-
-	private String patternString = "ABACABAD";
 	
     public void configure(Node node,XPath xpath) throws XPathException {
     	random = new Random(randomSeed);
@@ -147,7 +175,9 @@ public class RandomSequenceEngine extends AbstractMultiPatternSequenceEngine {
 
         	if (currentIsNote) {    		
     			int pitch = offsets[random.nextInt(offsets.length)];
-    			double v = (pitchDiff == 0 ? 0.5 : ((1.0d - pitchVelocityCorrelation) * random.nextDouble() + pitchVelocityCorrelation * (pitch - minPitch) / pitchDiff));
+    			
+    			double v = (pitchDiff == 0 ? 0.5 : ((1.0d - pitchVelocityCorrelation) * random.nextDouble() +
+    													pitchVelocityCorrelation * (pitch - minPitch) / pitchDiff));
 
     			int volume;
     			

@@ -299,7 +299,7 @@ public class RandomSequenceEngine extends AbstractMultiPatternSequenceEngine {
 		this.pitchVelocityCorrelation = pitchVelocityCorrelation;
 	}
 
-	public void setVelocityExponent(double exponent) {
+	public void setVelocityExponent(double velocityExponent) {
 		this.velocityExponent = velocityExponent;
 	}
 }

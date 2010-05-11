@@ -337,6 +337,26 @@ public final class XMLUtils {
 		}
 	}
 	
+	public static int[] parseIntegerListString(Random random,String path,Node parentNode,XPath xpath) {
+		String string = XMLUtils.parseString(random,path,parentNode,xpath);
+    	
+    	if (string == null || string.equals("")) {
+    		return null;
+    	}
+
+    	String[] stringArray = string.split(",");
+    	int length = stringArray.length;
+    	
+    	
+		int[] intArray = new int[length];
+    	
+    	for (int i = 0; i < length; i++) {
+    		intArray[i] = Integer.parseInt(stringArray[i]);
+    	}
+    	
+    	return intArray;
+	}
+	
 	/**
 	 * Tries to instantiate an object from the class defined by the
 	 * node's attribute "class". If the given class name is not

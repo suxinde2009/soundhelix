@@ -928,8 +928,8 @@ public class MidiPlayer extends AbstractPlayer {
 		}
 		
     	setDevices(devices);	
-    	setMilliBPM((int)(1000d *
-    			XMLUtils.parseDouble(random,(Node)xpath.evaluate("bpm",node,XPathConstants.NODE),xpath)));
+    	setMilliBPM((int)(1000 *
+    			XMLUtils.parseInteger(random,(Node)xpath.evaluate("bpm",node,XPathConstants.NODE),xpath)));
     	setTransposition(XMLUtils.parseInteger(random,
     			(Node)xpath.evaluate("transposition",node,XPathConstants.NODE),xpath));
     	setGroove(XMLUtils.parseString(random,

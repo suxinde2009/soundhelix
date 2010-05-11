@@ -44,7 +44,7 @@ import com.soundhelix.util.XMLUtils;
  */
 
 public class PatternHarmonyEngine extends AbstractHarmonyEngine {
-	private Chord[] chord;
+	private Chord[] chords;
 	private int[] ticks;
 	private int[] sectionTicks;
 	
@@ -58,23 +58,23 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 	}
 	
 	public Chord getChord(int tick) {
-		if(chord == null) {
+		if (chords == null) {
 			parsePattern();
 		}
 		
-		if(tick >= 0 && tick < structure.getTicks()) {
-			return chord[tick];
+		if (tick >= 0 && tick < structure.getTicks()) {
+			return chords[tick];
 		} else {
 			return null;
 		}
 	}
 
 	public int getChordTicks(int tick) {
-		if(chord == null) {
+		if (chords == null) {
 			parsePattern();
 		}
 
-		if(tick >= 0 && tick < structure.getTicks()) {
+		if (tick >= 0 && tick < structure.getTicks()) {
 			return ticks[tick];
 		} else {
 			return 0;
@@ -82,11 +82,11 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 	}
 
 	public int getChordSectionTicks(int tick) {
-		if(chord == null) {
+		if (chords == null) {
 			parsePattern();
 		}
 
-		if(tick >= 0 && tick < structure.getTicks()) {
+		if (tick >= 0 && tick < structure.getTicks()) {
 			return sectionTicks[tick];
 		} else {
 			return 0;
@@ -94,7 +94,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 	}
 	
 	private void parsePattern() {
-		chord = new Chord[structure.getTicks()];
+		chords = new Chord[structure.getTicks()];
 		ticks = new int[structure.getTicks()];
 		sectionTicks = new int[structure.getTicks()];
 		
@@ -102,11 +102,11 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 		
 		// prepend a '+' sign, if not already present
 		
-		if(!pat.startsWith("+")) {
-			pat = "+"+pat;
+		if (!pat.startsWith("+")) {
+			pat = "+" + pat;
 		}
 		
-		logger.debug("Using harmony pattern "+pat);
+		logger.debug("Using harmony pattern " + pat);
 
 		String[] c = pat.split(",");
 		
@@ -119,18 +119,18 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 		Chord firstChord = null;
 		Chord previousChord = null;
 		
-		while(tick < structure.getTicks()) {
+		while (tick < structure.getTicks()) {
 			String[] p = c[pos % c.length].split("/");
 
 			boolean newSection = false;
 			
-			int len = (int)(Integer.parseInt(p[1])*structure.getTicksPerBeat());
+			int len = (int)(Integer.parseInt(p[1]) * structure.getTicksPerBeat());
 			
 			String cho = p[0];
 			
-			if(cho.startsWith("+")) {
+			if (cho.startsWith("+")) {
 				newSection = true;
-				if(sTicks > 0) {
+				if (sTicks > 0) {
 					sectionVector.add(sTicks);
 				}
 				cho = cho.substring(1);
@@ -144,10 +144,10 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 
 			// check whether we have a major or minor chord
 			
-			if(cho.endsWith("m")) {
-				pitch = NoteUtils.getNotePitch(cho.substring(0,cho.length()-1));
+			if (cho.endsWith("m")) {
+				pitch = NoteUtils.getNotePitch(cho.substring(0,cho.length() - 1));
 				
-				if(pitch > 0) {
+				if (pitch > 0) {
 					pitch -= 12;
 				}
 				
@@ -155,18 +155,18 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 			} else {
 				pitch = NoteUtils.getNotePitch(cho);
 				
-				if(pitch > 0) {
+				if (pitch > 0) {
 					pitch -= 12;
 				}
 				
 				ch = new Chord(pitch,ChordType.MAJOR,Chord.ChordSubtype.BASE_0);
 			}
 
-			if(firstChord == null) {
+			if (firstChord == null) {
 				firstChord = ch;
 			}
 			
-			if(newSection) {
+			if (newSection) {
 				ch = firstChord.findClosestChord(ch);
 			} else {
 				// previousChord is always non-null here
@@ -175,9 +175,9 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 			
 			int songTicks = structure.getTicks();
 			
-			for(int j=0;j<len && tick < songTicks;j++) {
-				ticks[tick] = (tick + len-j >= songTicks ? songTicks - tick : len-j);
-				chord[tick] = ch;
+			for (int j = 0; j < len && tick < songTicks; j++) {
+				ticks[tick] = (tick + len - j >= songTicks ? songTicks - tick : len - j);
+				chords[tick] = ch;
 				tick++;
 				sTicks++;
 			}
@@ -189,14 +189,14 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 		
 		sectionVector.add(sTicks);
 		
-		logger.debug("Chord sections: "+sectionVector.size());
+		logger.debug("Chord sections: " + sectionVector.size());
 		
 		tick = 0;
-		for(int section=0;section<sectionVector.size();section++) {
+		for (int section = 0; section < sectionVector.size(); section++) {
 			int len = sectionVector.get(section);
 			
-			for(int i=0;i<len;i++) {
-				sectionTicks[tick] = len-i;
+			for (int i = 0; i < len; i++) {
+				sectionTicks[tick] = len - i;
 				tick++;
 			}
 		}
@@ -205,7 +205,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 	}
 
 	public void setChordPatterns(String[] chordPatterns) {
-		if(chordPatterns == null || chordPatterns.length == 0) {
+		if (chordPatterns == null || chordPatterns.length == 0) {
 			throw(new IllegalArgumentException("Need at least 1 chord pattern"));
 		}
 		
@@ -213,7 +213,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 	}
 	
 	public void setChordRandomTables(String[][] chordRandomTables) {
-		if(chordRandomTables == null) {
+		if (chordRandomTables == null) {
 			throw(new IllegalArgumentException("chordRandomTables must not be null"));
 		}
 
@@ -239,14 +239,16 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 
 		ArrayList<String> chordList = new ArrayList<String>();
 		
-		for(int i=0;i<count;i++) {
-			if(sb.length() > 0) {sb.append(',');}
+		for (int i = 0; i < count; i++) {
+			if (sb.length() > 0) {
+				sb.append(',');
+			}
 			
 			String[] spec = chords[i].split("/");
 			
 			boolean nextSection;
 			
-			if(spec[0].startsWith("+")) {
+			if (spec[0].startsWith("+")) {
 				nextSection = true;
 				spec[0] = spec[0].substring(1);
 			} else {
@@ -256,20 +258,21 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 			String chord;
 			int length = Integer.parseInt(spec[1]);
 			
-			if(spec[0].startsWith("$")) {
+			if (spec[0].startsWith("$")) {
 				int refnum = Integer.parseInt(spec[0].substring(1));
 				
-				if(refnum < 0 || refnum >= chordList.size()) {
-					throw(new RuntimeException("Invalid back reference $"+refnum));
+				if (refnum < 0 || refnum >= chordList.size()) {
+					throw(new RuntimeException("Invalid back reference $" + refnum));
 				}
 				
 				chord = chordList.get(refnum);
 			} else {
 				// check if we have a note or a random table number
 				
-				int pitch = NoteUtils.getNotePitch(spec[0].endsWith("m") ? spec[0].substring(0,spec[0].length()-1) : spec[0]);
+				int pitch = NoteUtils.getNotePitch(spec[0].endsWith("m") ?
+								spec[0].substring(0,spec[0].length() - 1) : spec[0]);
 				
-				if(pitch == Integer.MIN_VALUE) {
+				if (pitch == Integer.MIN_VALUE) {
 					// we have a random chord table number
 
 					int pos = spec[0].indexOf('!');
@@ -279,7 +282,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 					
 					if (pos > 0) {
 						table = Integer.parseInt(spec[0].substring(0,pos));
-						notrefnum = Integer.parseInt(spec[0].substring(pos+1));
+						notrefnum = Integer.parseInt(spec[0].substring(pos + 1));
 					} else {
 						table = Integer.parseInt(spec[0]);
 						notrefnum = -1;
@@ -296,17 +299,18 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 							// try again
 							return createPattern();
 						}
-					} while(chord.equals(prevChord) || i == count-1 && chord.equals(firstChord) || notrefnum >= 0 && chord.equals(chordList.get(notrefnum)));
+					} while(chord.equals(prevChord) || i == count - 1 && chord.equals(firstChord) ||
+							notrefnum >= 0 && chord.equals(chordList.get(notrefnum)));
 				} else {
 					// we have a note, take the note (include 'm' suffix, if present)
 					chord = spec[0];				
 				}
 			}
 				
-			sb.append((nextSection ? "+" : "")+chord+"/"+length);
+			sb.append(nextSection ? "+" : "").append(chord).append('/').append(length);
 			prevChord = chord;
 
-			if(i == 0) {
+			if (i == 0) {
 				firstChord = chord;
 			}
 
@@ -322,7 +326,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 		NodeList nodeList = (NodeList)xpath.evaluate("chordPattern",node,XPathConstants.NODESET);
 		String[] chordPatterns = new String[nodeList.getLength()];
 		
-		for(int i=0;i<nodeList.getLength();i++) {
+		for (int i = 0; i < nodeList.getLength(); i++) {
 			chordPatterns[i] = XMLUtils.parseString(random,nodeList.item(i),xpath);
 		}
 
@@ -331,7 +335,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 		nodeList = (NodeList)xpath.evaluate("chordRandomTable",node,XPathConstants.NODESET);
 		String[][] chordRandomTables = new String[nodeList.getLength()][];
 		
-		for(int i=0;i<nodeList.getLength();i++) {
+		for (int i = 0; i < nodeList.getLength(); i++) {
 			String table = XMLUtils.parseString(random,nodeList.item(i),xpath);
 			chordRandomTables[i] = table.split(",");
 		}

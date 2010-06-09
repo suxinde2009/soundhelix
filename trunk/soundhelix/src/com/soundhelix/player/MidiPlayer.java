@@ -54,8 +54,8 @@ import com.soundhelix.util.XMLUtils;
  * 
  * This player supports LFOs, whose frequency can be based on a second, a beat, the whole song or on the activity (first
  * activity until last activity) of an instrument. The granularity of an LFO is always a tick. With every tick, each
- * LFO will send out a MIDI message with the new value for the target controller, but only if the LFO value has
- * changed.
+ * LFO will send out a MIDI message with the new value for the target controller, but only if the LFO value is the
+ * first one sent or if it has changed since the last value sent.
  * 
  * Instances of this class are not thread-safe. They must not be used in multiple threads without external
  * synchronization.
@@ -116,8 +116,8 @@ public class MidiPlayer extends AbstractPlayer {
 	
 	private ControllerLFO[] controllerLFOs;
 	
-	// has open() been called?
-	boolean opened = false;
+	/** True if open() has been called, false otherwise. */
+	private boolean opened = false;
 	
 	// true if at least one MIDI device requires clock synchronization
 	boolean useClockSynchronization = false;
@@ -253,7 +253,7 @@ public class MidiPlayer extends AbstractPlayer {
     	this.milliBPM = milliBPM;
     }
 
-    private void setTransposition(int transposition) {
+    public void setTransposition(int transposition) {
     	if (transposition <= 0) {
     		throw(new IllegalArgumentException("transposition must be >= 0"));
     	}
@@ -363,9 +363,6 @@ public class MidiPlayer extends AbstractPlayer {
         	int clockTimingsPerTick = (useClockSynchronization ?
         			CLOCK_SYNCHRONIZATION_TICKS_PER_BEAT / structure.getTicksPerBeat() : 1);
 
-    		List<int[]> tickList = new ArrayList<int[]>();
-    		List<int[]> posList = new ArrayList<int[]>();
-
     		if (logger.isDebugEnabled()) {
     			logger.debug("Song length: "+ticks+" ticks ("+(ticks*60*1000/(structure.getTicksPerBeat()*milliBPM))+" seconds)");
     		}
@@ -380,13 +377,23 @@ public class MidiPlayer extends AbstractPlayer {
             referenceTime = waitTicks(referenceTime,beforePlayWaitTicks,
             				clockTimingsPerTick,structure.getTicksPerBeat());
  
+        	/** Contains the remaining ticks of each note/pause currently played by a voice of an arrangement entry. */
+    		List<int[]> tickList = new ArrayList<int[]>();
+        	/** Contains the pattern position currently played by a voice of an arrangement entry. */
+    		List<int[]> posList = new ArrayList<int[]>();
+        	/**
+        	 * Contains the transposition used when the last note was played by a voice of an arrangement entry.
+        	 * This is used to be able to change the transposition while playing and still being able to send the
+        	 * correct NOTE_OFF pitches.
+        	 */ 
+    		List<int[]> transpositionList = new ArrayList<int[]>();
+
             for (ArrangementEntry entry : arrangement) {
     			int size = entry.getTrack().size();
     			tickList.add(new int[size]);
     			posList.add(new int[size]);
+    			transpositionList.add(new int[size]);
             }
-
-    		List<Integer> legatoList = new ArrayList<Integer>();
 
     		int currentTick = 0;
     		
@@ -416,16 +423,15 @@ public class MidiPlayer extends AbstractPlayer {
     				if (tick == ticks) {
     					break;
     				}
-    				playTick(arrangement, tick, tickList, posList, legatoList);
+    				playTick(arrangement, tick, tickList, posList, transpositionList);
     				tickReferenceTime += getTickNanos(tick, ticksPerBeat);
     				currentTick++;
     			}
     		}
     		
-    		// playing finished	
-    		// send a NOTE_OFF for all current notes
+    		// playing finished, send a NOTE_OFF for all current notes
     		
-    		muteActiveChannels(arrangement, posList);
+    		muteActiveChannels(arrangement, posList, transpositionList);
     	
             waitTicks(referenceTime,afterPlayWaitTicks,clockTimingsPerTick,structure.getTicksPerBeat());
 
@@ -437,7 +443,11 @@ public class MidiPlayer extends AbstractPlayer {
     	}
     }
 
-	private void muteActiveChannels(Arrangement arrangement, List<int[]> posList) throws InvalidMidiDataException {
+    /**
+     * Mutes all active channels.
+     */
+    
+	private void muteActiveChannels(Arrangement arrangement, List<int[]> posList, List<int[]> transpositionList) throws InvalidMidiDataException {
 		ShortMessage sm = new ShortMessage();
 
 		int k = 0;
@@ -454,6 +464,7 @@ public class MidiPlayer extends AbstractPlayer {
 			}
 
 			int[] p = posList.get(k);
+			int[] trans = transpositionList.get(k);
 
 			for (int j = 0; j < p.length; j++) {
 				Sequence s = track.get(j);					
@@ -461,7 +472,7 @@ public class MidiPlayer extends AbstractPlayer {
 
 				if (prevse.isNote()) {
 					sm.setMessage(ShortMessage.NOTE_OFF,channel.channel,
-							(track.getType() == TrackType.MELODY ? transposition : 0) + prevse.getPitch(),0);
+							(track.getType() == TrackType.MELODY ? trans[j] : 0) + prevse.getPitch(),0);
 					channel.device.receiver.send(sm,-1);
 				}
 			}
@@ -470,8 +481,13 @@ public class MidiPlayer extends AbstractPlayer {
 		}
 	}
 
+	/**
+	 * Plays a tick, sending NOTE_OFF messages for notes that should be muted and NOTE_ON messages for notes that
+	 * should be started.
+	 */
+	
 	private void playTick(Arrangement arrangement, int tick, List<int[]> tickList, List<int[]> posList,
-			List<Integer> legatoList)
+			List<int[]> transpositionList)
 			throws InvalidMidiDataException {
 		final ShortMessage sm = new ShortMessage();
 		
@@ -486,7 +502,12 @@ public class MidiPlayer extends AbstractPlayer {
 
 		sendControllerLFOMessages(tick);
 
+		// contains a list of all current pitches where a NOTE_OFF must be sent after the next NOTE_ON (usually tiny)
+		List<Integer> legatoList = new ArrayList<Integer>();
+		
 		int k = 0;
+		
+		int transposition = this.transposition;
 		
 		for (ArrangementEntry entry : arrangement) {
 			Track track = entry.getTrack();
@@ -501,7 +522,8 @@ public class MidiPlayer extends AbstractPlayer {
 
 			int[] t = tickList.get(k);
 			int[] p = posList.get(k);
-
+			int[] trans = transpositionList.get(k);
+			
 			legatoList.clear();
 			
 			for (int j = 0; j < t.length; j++) {
@@ -512,7 +534,7 @@ public class MidiPlayer extends AbstractPlayer {
 					if (p[j] > 0) {
 						SequenceEntry prevse = s.get(p[j] - 1);
 						if (prevse.isNote()) {
-							int pitch = (track.getType() == TrackType.MELODY ? transposition : 0)+prevse.getPitch();
+							int pitch = (track.getType() == TrackType.MELODY ? trans[j] : 0) + prevse.getPitch();
 							
 							if (!prevse.isLegato()) {
 								sm.setMessage(ShortMessage.NOTE_OFF,channel.channel,pitch,0);
@@ -533,19 +555,22 @@ public class MidiPlayer extends AbstractPlayer {
 						SequenceEntry se = s.get(p[j]);
 
 						if (se.isNote()) {
-							int pitch = ((track.getType() == TrackType.MELODY ? transposition : 0)+se.getPitch());
+							int pitch = ((track.getType() == TrackType.MELODY ? transposition : 0) + se.getPitch());
 							sm.setMessage(ShortMessage.NOTE_ON,channel.channel,pitch,getMidiVelocity(se.getVelocity()));
 							channel.device.receiver.send(sm,-1);
-							
-							// remove pitch if it is on the legato list
+
+							// remove pitch if it is on the legato list (rare case)
+							// (Integer) must be used to call the remove(Object), and not remove(int) method
 							legatoList.remove((Integer)pitch);
+
+							trans[j] = transposition;
 						}
 
 						p[j]++;
 						t[j] = se.getTicks();
 					} catch (Exception x) {
 						throw new RuntimeException("Error at k=" + k + "  j=" + j + "  p[j]=" + p[j],x);
-						}
+					}
 				}
 			}
 
@@ -560,6 +585,12 @@ public class MidiPlayer extends AbstractPlayer {
 		}
 	}
 
+	/**
+	 * Initializes all controller LFOs of the arrangement.
+	 * 
+	 * @param arrangement the arrangement
+	 */
+	
 	private void initializeControllerLFOs(Arrangement arrangement) {
 		Structure structure = arrangement.getStructure();
 		
@@ -609,7 +640,7 @@ public class MidiPlayer extends AbstractPlayer {
      *
      * @param tick the tick
      * 
-     * @throws InvalidMidiDataException
+     * @throws InvalidMidiDataException in case of invalid MIDI data
      */
     
 	private void sendControllerLFOMessages(int tick) throws InvalidMidiDataException {
@@ -756,7 +787,7 @@ public class MidiPlayer extends AbstractPlayer {
      * once. Channels whose program is set to -1 are ignored, so that
      * the currently selected program remains active.
      * 
-     * @throws InvalidMidiDataException
+     * @throws InvalidMidiDataException in case of invalid MIDI data
      */
     
 	private void setChannelPrograms() throws InvalidMidiDataException {
@@ -784,7 +815,7 @@ public class MidiPlayer extends AbstractPlayer {
      * 
      * @param message the message
      * 
-     * @throws InvalidMidiDataException
+     * @throws InvalidMidiDataException in case of invalid MIDI data
      */
     
     private void sendShortMessageToClockSynchronized(int message) throws InvalidMidiDataException {
@@ -807,7 +838,7 @@ public class MidiPlayer extends AbstractPlayer {
 	 * does not include sending NOTE OFF) a NOTE_OFF is sent for each of the
 	 * 128 possible pitches to each channel.
 	 * 
-	 * @throws InvalidMidiDataException
+	 * @throws InvalidMidiDataException in case of invalid MIDI data
 	 */
 	
 	public final void muteAllChannels() throws InvalidMidiDataException {
@@ -846,7 +877,7 @@ public class MidiPlayer extends AbstractPlayer {
     		return 0;
     	}
 
-    	return(1 + (velocity - 1) * 126 / (Short.MAX_VALUE - 126));  	
+    	return (1 + (velocity - 1) * 126 / (Short.MAX_VALUE - 126));  	
     }
     
     public final void setControllerLFOs(ControllerLFO[] controllerLFOs) {

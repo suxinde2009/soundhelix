@@ -371,6 +371,7 @@ public class SoundHelix implements Runnable {
 			Console console = System.console();
 			
 			if (console == null) {
+				logger.debug("Exiting console thread, because no console is available");
 				return;
 			}
 			
@@ -386,11 +387,25 @@ public class SoundHelix implements Runnable {
 
 							player.setMilliBPM((int)(1000 * Double.parseDouble(line.substring(4))));
 						}
+					} else if (line.startsWith("transposition ")) {
+							if (player != null && player instanceof MidiPlayer) {
+								System.out.println("Setting transposition");
+
+								((MidiPlayer)player).setTransposition(Integer.parseInt(line.substring(14)));
+							}
+					} else if (line.startsWith("groove ")) {
+						if (player != null && player instanceof MidiPlayer) {
+							System.out.println("Setting groove");
+
+							((MidiPlayer)player).setGroove(line.substring(7));
+						}
 					} else if (line.equals("next")) {
 						if (player != null) {
 							System.out.println("Next Song");
 							player.abortPlay();
 						}
+					} else {
+						System.out.println("Invalid command");
 					}
 				} catch (Exception e) {
 					logger.error("Exception in console thread",e);

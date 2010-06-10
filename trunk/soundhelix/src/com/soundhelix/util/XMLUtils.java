@@ -362,17 +362,17 @@ public final class XMLUtils {
 	 * node's attribute "class". If the given class name is not
 	 * fully qualified (i.e., contains no dot), the package of the
 	 * given superclass is prefixed to the class name. The class must
-	 * be a subclass of the given superclass to succeed. If the class
+	 * be a subclass of the given class to succeed. If the class
 	 * defines the interface XMLConfigurable, it is configured by calling
 	 * configure() with the node as the configuration root. If the class
 	 * defines the interface RandomSeedable, it is random-seeded by using
 	 * the specified random seed and the class name.
 	 * 
-	 * @param superclass the superclass
+	 * @param clazz the class
 	 * @param node the node to use for configuration
 	 * @param xpath an XPath instance
 	 * @param randomSeed the random seed to use
-	 * @param <T> the class to get an instance of
+	 * @param <T> the type
 	 * 
 	 * @return the instance
 	 * 
@@ -380,47 +380,46 @@ public final class XMLUtils {
 	 * @throws IllegalAccessException if the class cannot be instantiated
 	 */
 	
-	public static <T> T getInstance(Class<T> superclass,Node node,XPath xpath,long randomSeed)
+	public static <T> T getInstance(Class<T> clazz,Node node,XPath xpath,long randomSeed)
 			throws InstantiationException,XPathException,XPathExpressionException,
 					IllegalAccessException,ClassNotFoundException {
 		String className = (String)xpath.evaluate("attribute::class",node,XPathConstants.STRING);
 
 		if (className.indexOf('.') < 0) {
 			// prefix the class name with the package name of the superclass
-			className = superclass.getName().substring(0,superclass.getName().lastIndexOf('.')+1)+className;
+			className = clazz.getName().substring(0,clazz.getName().lastIndexOf('.')+1)+className;
 		}
 		
 		if (logger.isTraceEnabled()) {
 			logger.trace("Instantiating class " + className);
 		}
 
-		Class<?> cl = Class.forName(className);
+		T instance;
 		
-		if (superclass.isAssignableFrom(cl)) {
-			// TODO: any chance of getting rid of the warning here?
-			T inst = (T)cl.newInstance();
-
-			// random-seed instance if it is random-seedable
-			// (it's important to seed before configuring)
-
-			if (inst instanceof RandomSeedable) {
-				if (logger.isTraceEnabled()) {
-					logger.trace("Base random seed: " + randomSeed + ", using " +
-							(randomSeed ^ className.hashCode() - 1478923845823984391l * randomSeed));
-				}
-				((RandomSeedable)inst).setRandomSeed(randomSeed ^ className.hashCode());
-			}
-
-			// configure instance if it is XML-configurable
-
-			if (inst instanceof XMLConfigurable) {
-				((XMLConfigurable)inst).configure(node,xpath);
-			}
-
-			return inst;
-		} else {
-			throw(new RuntimeException("Class " + className + " is not a subclass of " + superclass));
+		try {
+			instance = ClassUtils.newInstance(className, clazz);
+		} catch (ClassCastException e) {
+			throw new RuntimeException("Class " + className + " is not a subclass of " + clazz, e);
 		}
+		
+		// random-seed instance if it is random-seedable
+		// (it's important to seed before configuring)
+
+		if (instance instanceof RandomSeedable) {
+			if (logger.isTraceEnabled()) {
+				logger.trace("Base random seed: " + randomSeed + ", using " +
+						(randomSeed ^ className.hashCode() - 1478923845823984391l * randomSeed));
+			}
+			((RandomSeedable)instance).setRandomSeed(randomSeed ^ className.hashCode());
+		}
+
+		// configure instance if it is XML-configurable
+
+		if (instance instanceof XMLConfigurable) {
+			((XMLConfigurable)instance).configure(node,xpath);
+		}
+
+		return instance;
 	}
 
 	public static int expandIncludeTags(Random random,Document doc,XPath xpath) {

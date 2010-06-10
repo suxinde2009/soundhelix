@@ -27,6 +27,7 @@ import com.soundhelix.misc.Track;
 import com.soundhelix.misc.Arrangement.ArrangementEntry;
 import com.soundhelix.misc.Sequence.SequenceEntry;
 import com.soundhelix.misc.Track.TrackType;
+import com.soundhelix.util.ClassUtils;
 import com.soundhelix.util.XMLUtils;
 
 /**
@@ -1048,9 +1049,8 @@ public class MidiPlayer extends AbstractPlayer {
 			}
 			
 			try {
-				Class<LFO> cl = (Class<LFO>)Class.forName(className);
-				LFO lfo = cl.newInstance();
-
+				LFO lfo = ClassUtils.newInstance(className, LFO.class);
+			
 				lfo.setAmplitudeMinimum(minimum);
 				lfo.setAmplitudeMaximum(maximum);
 

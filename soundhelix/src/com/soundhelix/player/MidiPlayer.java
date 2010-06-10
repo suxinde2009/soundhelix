@@ -383,17 +383,17 @@ public class MidiPlayer extends AbstractPlayer {
         	/** Contains the pattern position currently played by a voice of an arrangement entry. */
     		List<int[]> posList = new ArrayList<int[]>();
         	/**
-        	 * Contains the transposition used when the last note was played by a voice of an arrangement entry.
+        	 * Contains the pitch used when the last note was played by a voice of an arrangement entry.
         	 * This is used to be able to change the transposition while playing and still being able to send the
         	 * correct NOTE_OFF pitches.
         	 */ 
-    		List<int[]> transpositionList = new ArrayList<int[]>();
+    		List<int[]> pitchList = new ArrayList<int[]>();
 
             for (ArrangementEntry entry : arrangement) {
     			int size = entry.getTrack().size();
     			tickList.add(new int[size]);
     			posList.add(new int[size]);
-    			transpositionList.add(new int[size]);
+    			pitchList.add(new int[size]);
             }
 
     		int currentTick = 0;
@@ -424,7 +424,7 @@ public class MidiPlayer extends AbstractPlayer {
     				if (tick == ticks) {
     					break;
     				}
-    				playTick(arrangement, tick, tickList, posList, transpositionList);
+    				playTick(arrangement, tick, tickList, posList, pitchList);
     				tickReferenceTime += getTickNanos(tick, ticksPerBeat);
     				currentTick++;
     			}
@@ -432,7 +432,7 @@ public class MidiPlayer extends AbstractPlayer {
     		
     		// playing finished, send a NOTE_OFF for all current notes
     		
-    		muteActiveChannels(arrangement, posList, transpositionList);
+    		muteActiveChannels(arrangement, posList, pitchList);
     	
             waitTicks(referenceTime,afterPlayWaitTicks,clockTimingsPerTick,structure.getTicksPerBeat());
 
@@ -448,7 +448,7 @@ public class MidiPlayer extends AbstractPlayer {
      * Mutes all active channels.
      */
     
-	private void muteActiveChannels(Arrangement arrangement, List<int[]> posList, List<int[]> transpositionList) throws InvalidMidiDataException {
+	private void muteActiveChannels(Arrangement arrangement, List<int[]> posList, List<int[]> pitchList) throws InvalidMidiDataException {
 		ShortMessage sm = new ShortMessage();
 
 		int k = 0;
@@ -465,7 +465,7 @@ public class MidiPlayer extends AbstractPlayer {
 			}
 
 			int[] p = posList.get(k);
-			int[] trans = transpositionList.get(k);
+			int[] pitch = pitchList.get(k);
 
 			for (int j = 0; j < p.length; j++) {
 				Sequence s = track.get(j);					
@@ -473,7 +473,7 @@ public class MidiPlayer extends AbstractPlayer {
 
 				if (prevse.isNote()) {
 					sm.setMessage(ShortMessage.NOTE_OFF,channel.channel,
-							(track.getType() == TrackType.MELODY ? trans[j] : 0) + prevse.getPitch(),0);
+							pitch[j],0);
 					channel.device.receiver.send(sm,-1);
 				}
 			}
@@ -488,7 +488,7 @@ public class MidiPlayer extends AbstractPlayer {
 	 */
 	
 	private void playTick(Arrangement arrangement, int tick, List<int[]> tickList, List<int[]> posList,
-			List<int[]> transpositionList)
+			List<int[]> pitchList)
 			throws InvalidMidiDataException {
 		final ShortMessage sm = new ShortMessage();
 		
@@ -523,7 +523,7 @@ public class MidiPlayer extends AbstractPlayer {
 
 			int[] t = tickList.get(k);
 			int[] p = posList.get(k);
-			int[] trans = transpositionList.get(k);
+			int[] pitches = pitchList.get(k);
 			
 			legatoList.clear();
 			
@@ -535,7 +535,7 @@ public class MidiPlayer extends AbstractPlayer {
 					if (p[j] > 0) {
 						SequenceEntry prevse = s.get(p[j] - 1);
 						if (prevse.isNote()) {
-							int pitch = (track.getType() == TrackType.MELODY ? trans[j] : 0) + prevse.getPitch();
+							int pitch = pitches[j];
 							
 							if (!prevse.isLegato()) {
 								sm.setMessage(ShortMessage.NOTE_OFF,channel.channel,pitch,0);
@@ -564,7 +564,7 @@ public class MidiPlayer extends AbstractPlayer {
 							// (Integer) must be used to call the remove(Object), and not remove(int) method
 							legatoList.remove((Integer)pitch);
 
-							trans[j] = transposition;
+							pitches[j] = pitch;
 						}
 
 						p[j]++;

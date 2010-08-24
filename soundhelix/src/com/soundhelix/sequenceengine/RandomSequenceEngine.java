@@ -22,9 +22,10 @@ import com.soundhelix.util.XMLUtils;
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
+// FIXME: endless loops are possible in certain cases
+
 public class RandomSequenceEngine extends AbstractMultiPatternSequenceEngine {
 
-	
 	/**
 	 * The length of the base pattern. The total length of the pattern is this value times the length of the pattern
 	 * string.
@@ -54,6 +55,11 @@ public class RandomSequenceEngine extends AbstractMultiPatternSequenceEngine {
 	private int[] noteLengths = {1,2,3,2,1,1};
 	/** The list of pause lengths to choose from. The list may contain values more than once for extra weight. */
 	private int[] pauseLengths = {1,2,3,2,1,1};
+	/** The minimum number of active ticks. */
+	private int minActiveTicks = 1;
+	/** The maximum number of active ticks. */
+	private int maxActiveTicks = 16;
+
 	
 	/**
 	 * The correlation between pitch and velocity. If 1, the velocity depends only on the pitch and not on the random
@@ -81,6 +87,8 @@ public class RandomSequenceEngine extends AbstractMultiPatternSequenceEngine {
 		setLegatoProbability(XMLUtils.parseDouble(random,"legatoProbability",node,xpath) / 100.0);
 		setMinVelocity(XMLUtils.parseInteger(random,"minVelocity",node,xpath));
 		setMaxVelocity(XMLUtils.parseInteger(random,"maxVelocity",node,xpath));
+		setMinActiveTicks(XMLUtils.parseInteger(random,"minActiveTicks",node,xpath));
+		setMaxActiveTicks(XMLUtils.parseInteger(random,"maxActiveTicks",node,xpath));
     	setOffsets(XMLUtils.parseIntegerListString(random,"offsets",node,xpath));
     	setNoteLengths(XMLUtils.parseIntegerListString(random,"noteLengths",node,xpath));
     	setPauseLengths(XMLUtils.parseIntegerListString(random,"pauseLengths",node,xpath));
@@ -149,62 +157,73 @@ public class RandomSequenceEngine extends AbstractMultiPatternSequenceEngine {
      */
     
     private String generateBasePattern() {
-    	StringBuilder sb = new StringBuilder();
-
-    	final int minPitch = findMinimum(offsets);
-    	final int maxPitch = findMaximum(offsets);
-    	final int pitchDiff = maxPitch - minPitch;
-
-    	boolean currentIsNote;
-    	boolean nextIsNote = random.nextDouble() < noteProbability;
-
-    	for (int i = 0; i < patternTicks;) {
-    		currentIsNote = nextIsNote;
-        	nextIsNote = random.nextDouble() < noteProbability;
-
-        	int length;
-        	
-        	if (currentIsNote) {
-        		length = noteLengths[random.nextInt(noteLengths.length)];
-        	} else {
-        		length = pauseLengths[random.nextInt(pauseLengths.length)];
-        	}
-    		if (i + length > patternTicks) {
-    			length = patternTicks - i;
-    		}
-
-        	if (currentIsNote) {    		
-    			int pitch = offsets[random.nextInt(offsets.length)];
-    			
-    			double v = (pitchDiff == 0 ? 0.5 : ((1.0d - pitchVelocityCorrelation) * random.nextDouble() +
-    													pitchVelocityCorrelation * (pitch - minPitch) / pitchDiff));
-
-    			int volume;
-    			
-    			if (velocityExponent >= 0.0d) {
-    				volume = (int) RandomUtils.getPowerDouble(v, minVelocity, maxVelocity, velocityExponent);
-    			} else {
-    				volume = (int) RandomUtils.getPowerDouble(v, maxVelocity, minVelocity, -velocityExponent);
-    			}
-
-    			boolean isLegato = nextIsNote && (i + length < patternTicks) && random.nextDouble() < legatoProbability;
-    			
-    			if (isLegato) {
-    				sb.append(pitch).append("~/").append(length).append(':').append(volume);
-    			} else {
-       				sb.append(pitch).append("/").append(length).append(':').append(volume);   			
-    			}
-    		} else {
-    			sb.append("-/").append(length);
-    		}
-    		
-    		i += length;
-    		
-    		if (i < patternTicks) {
-    			sb.append(',');
-    		}
-    	}
+    	StringBuilder sb;
+    	int activeTicks = 0;
     	
+    	do {
+    		sb = new StringBuilder();
+    		activeTicks = 0;
+    		
+    		final int minPitch = findMinimum(offsets);
+    		final int maxPitch = findMaximum(offsets);
+    		final int pitchDiff = maxPitch - minPitch;
+
+    		boolean currentIsNote;
+    		boolean nextIsNote = random.nextDouble() < noteProbability;
+
+    		
+    		for (int i = 0; i < patternTicks;) {
+    			currentIsNote = nextIsNote;
+    			nextIsNote = random.nextDouble() < noteProbability;
+
+    			int length;
+
+    			if (currentIsNote) {
+    				length = noteLengths[random.nextInt(noteLengths.length)];
+    			} else {
+    				length = pauseLengths[random.nextInt(pauseLengths.length)];
+    			}
+    			
+    			if (i + length > patternTicks) {
+    				length = patternTicks - i;
+    			}
+
+    			if (currentIsNote) {    		
+    				int pitch = offsets[random.nextInt(offsets.length)];
+
+    				double v = (pitchDiff == 0 ? 0.5 : ((1.0d - pitchVelocityCorrelation) * random.nextDouble() +
+    						pitchVelocityCorrelation * (pitch - minPitch) / pitchDiff));
+
+    				int volume;
+
+    				if (velocityExponent >= 0.0d) {
+    					volume = (int) RandomUtils.getPowerDouble(v, minVelocity, maxVelocity, velocityExponent);
+    				} else {
+    					volume = (int) RandomUtils.getPowerDouble(v, maxVelocity, minVelocity, -velocityExponent);
+    				}
+
+    				boolean isLegato = nextIsNote && (i + length < patternTicks) && random.nextDouble() < legatoProbability;
+
+    				if (isLegato) {
+    					sb.append(pitch).append("~/").append(length).append(':').append(volume);
+    				} else {
+    					sb.append(pitch).append("/").append(length).append(':').append(volume);   			
+    				}
+    				
+    				activeTicks += length;
+    				
+    			} else {
+    				sb.append("-/").append(length);
+    			}
+
+    			i += length;
+
+    			if (i < patternTicks) {
+    				sb.append(',');
+    			}
+    		}
+    	} while(activeTicks < minActiveTicks || activeTicks > maxActiveTicks);
+
     	return sb.toString();
     }
     
@@ -331,5 +350,13 @@ public class RandomSequenceEngine extends AbstractMultiPatternSequenceEngine {
 
 	public void setVelocityExponent(double velocityExponent) {
 		this.velocityExponent = velocityExponent;
+	}
+
+	public void setMinActiveTicks(int minActiveTicks) {
+		this.minActiveTicks = minActiveTicks;
+	}
+
+	public void setMaxActiveTicks(int maxActiveTicks) {
+		this.maxActiveTicks = maxActiveTicks;
 	}
 }

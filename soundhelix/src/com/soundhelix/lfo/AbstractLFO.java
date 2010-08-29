@@ -63,7 +63,7 @@ public abstract class AbstractLFO implements LFO {
         
         double angle = (TWO_PI / 1000000d) * ((double) tick * microRotationsPerTick + microRotationShift);
         
-        int value = amplitudeMinimum + (int)(0.5d + amplitudeMaximum * getValue(angle));
+        int value = amplitudeMinimum + (int)(0.5d + (amplitudeMaximum - amplitudeMinimum) * getValue(angle));
         
         if (value > returnMaximum) {
         	return returnMaximum;

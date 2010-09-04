@@ -33,11 +33,12 @@ public class RandomSequenceEngine extends AbstractMultiPatternSequenceEngine {
 	private int patternTicks = 16;
 
 	/**
-	 * The pattern used to generate the final pattern. Equal characters refer to equal patterns, different characters
-	 * to different patterns. For example, the string "ABAC" will generate the 3 different patterns A, B and C with the
-	 * same length and will generate a final pattern consisting of patterns A, B, A and C concatenated.
+	 * The comma-separated pattern used to generate the final pattern. Equal character pairs refer to equal patterns,
+	 * different character pairs to different patterns. The first character defines the base pattern, the second
+	 * character the variation of the base pattern. For example, the string "A1,A2,A1,B1" will will generate 2 base
+	 * patterns (one each for A and B, called "A1" and "B1") and a variation of base pattern A called "A2".
 	 */
-	private String patternString = "ABACABAD";
+	private String patternString = "A1,A2,A1,B1";
 
 	/** The probability to use a note rather than a pause. */
 	private double noteProbability = 0.8;
@@ -99,44 +100,69 @@ public class RandomSequenceEngine extends AbstractMultiPatternSequenceEngine {
     }
     
     /**
-     * Generates a pattern that is based on the given pattern of patterns. Each character
-     * in the pattern string corresponds to one generated pattern.
+     * Generates a pattern that is based on the given pattern of patterns. Each element of the pattern pattern
+     * represents a variation of the base pattern specified by the first character each.
      * 
-     * @param patternPattern the string of pattern characters 
+     * @param patternPattern the string of pattern characters (comma-separated)
      * 
      * @return the generated pattern
      */
     
     private String generatePattern(String patternPattern) {
-    	// maps pattern characters to patterns
-    	Map <Character,String> patternMap = new HashMap<Character,String>();
+    	// maps base pattern characters (e.g., 'A') to patterns
+    	Map <Character,String> basePatternMap = new HashMap<Character,String>();
+    	
+    	// maps pattern strings (e.g., 'A1') to patterns 
+    	Map <String,String> patternMap = new HashMap<String,String>();
+
+    	// contains all patterns generated so far
     	Set <String> patternSet = new HashSet<String>();
     	
-    	// generate patterns from the pattern list and add them to total pattern
-
-    	String basePattern = null;    	
     	StringBuilder totalPattern = new StringBuilder();
-    	
-    	for (int i = 0; i < patternPattern.length(); i++) {
-    		char c = patternPattern.charAt(i);
-    		String p = patternMap.get(c);
+
+    	String[] patterns = patternPattern.split(",");
+
+    	for (String patternString : patterns) {
+    		if (patternString.length() != 2) {
+    			throw(new RuntimeException("Pattern part \"" + patternString +
+    					"\" is invalid (2 characters required)"));
+    		}
+    		
+    		String p = patternMap.get(patternString);
     		
     		if (p == null) {
+    			// the pattern string is unknown, check if there already is a base pattern
+    			
+        		char basePatternCharacter = patternString.charAt(0);    		
+    			String basePattern = basePatternMap.get(basePatternCharacter);
+    			
     			if (basePattern == null) {
+    				// no base pattern is found, create one and use it
     				p = generateBasePattern();
-    				basePattern = p;
+    				basePatternMap.put(basePatternCharacter, p);
     			} else {
+    				// we have a base pattern
     				// generate a modified pattern until we find one that we haven't used so far
+    				
+    				int tries = 0;
+    				
     				do {
+    					tries++;
+
+    					if (tries > 10000) {
+    						throw(new RuntimeException("Could not create non-used variation of pattern"));
+    					}
+
     					p = modifyPattern(basePattern,2);
+    					
     				} while(patternSet.contains(p));
     			}
 
     			if (logger.isDebugEnabled()) {
-    				logger.debug("Pattern " + c + ": " + p);    			
+    				logger.debug("Pattern " + patternString + ": " + p);    			
     			}
-    				
-				patternMap.put(c,p);
+    			
+				patternMap.put(patternString,p);
 				patternSet.add(p);
     		}
 
@@ -202,7 +228,8 @@ public class RandomSequenceEngine extends AbstractMultiPatternSequenceEngine {
     					volume = (int) RandomUtils.getPowerDouble(v, maxVelocity, minVelocity, -velocityExponent);
     				}
 
-    				boolean isLegato = nextIsNote && (i + length < patternTicks) && random.nextDouble() < legatoProbability;
+    				boolean isLegato = nextIsNote && (i + length < patternTicks) &&
+    								   random.nextDouble() < legatoProbability;
 
     				if (isLegato) {
     					sb.append(pitch).append("~/").append(length).append(':').append(volume);

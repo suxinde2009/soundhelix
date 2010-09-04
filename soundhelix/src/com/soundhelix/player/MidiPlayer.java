@@ -374,10 +374,16 @@ public class MidiPlayer extends AbstractPlayer {
 
     		long referenceTime = System.nanoTime();
     		
-    		// wait specified number of ticks before starting playing, sending timing ticks if configured
-            referenceTime = waitTicks(referenceTime,beforePlayWaitTicks,
+    		if (beforePlayWaitTicks > 0) {
+    			if (logger.isDebugEnabled()) {
+    				logger.debug("Waiting " + beforePlayWaitTicks + " ticks before playing");
+    			}
+    			
+    			// wait specified number of ticks before starting playing, sending timing ticks if configured
+    			referenceTime = waitTicks(referenceTime,beforePlayWaitTicks,
             				clockTimingsPerTick,structure.getTicksPerBeat());
- 
+    		}
+    	
         	/** Contains the remaining ticks of each note/pause currently played by a voice of an arrangement entry. */
     		List<int[]> tickList = new ArrayList<int[]>();
         	/** Contains the pattern position currently played by a voice of an arrangement entry. */
@@ -434,8 +440,14 @@ public class MidiPlayer extends AbstractPlayer {
     		
     		muteActiveChannels(arrangement, posList, pitchList);
     	
-            waitTicks(referenceTime,afterPlayWaitTicks,clockTimingsPerTick,structure.getTicksPerBeat());
+    		if (afterPlayWaitTicks > 0) {
+       			if (logger.isDebugEnabled()) {
+    				logger.debug("Waiting " + afterPlayWaitTicks + " ticks after playing");
+    			}
 
+       			waitTicks(referenceTime,afterPlayWaitTicks,clockTimingsPerTick,structure.getTicksPerBeat());
+    		}
+    		
     		if (useClockSynchronization) {
     		    sendShortMessageToClockSynchronized(ShortMessage.STOP);
     		}
@@ -496,7 +508,7 @@ public class MidiPlayer extends AbstractPlayer {
 		int ticksPerBar = structure.getTicksPerBar();
 
 		if ((tick % (4 * ticksPerBar)) == 0) {
-			System.out.printf("Tick: %4d   Seconds: %3d  %5.1f %%\n",tick,
+			System.out.printf("Tick: %5d   Seconds: %4d  %5.1f %%\n",tick,
 					tick * 60 * 1000 / (structure.getTicksPerBeat() * milliBPM),
 					(double)tick * 100 / structure.getTicks());
 		}

@@ -154,9 +154,13 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
     		// start with the second chord section
     		int tick = harmonyEngine.getChordSectionTicks(0);
     		
+    		// the tick where the pattern was applied last (last tick of the pattern + 1)
     		int lastMatchedTick = Integer.MIN_VALUE;
     		
     		while (true) {
+    			// jump to the next position where the condition is true and the pattern does not overlap
+    			// with the pattern's previous application
+    			
     			while (tick < ticks) {
 					String activity = getActivityString(tick, activityVectors);
 					String totalActivity = previousActivity + activity; 
@@ -167,9 +171,6 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
     					if (condition.matcher(totalActivity).matches()) {
     						break;
     					}
-					} else {
-						logger.debug("Conditional pattern " + i + " would overlap. Current tick: " + tick +
-								     "  Last matched tick: " + lastMatchedTick + "  Pattern ticks: " + patternTicks);
 					}
 
     				tick += harmonyEngine.getChordSectionTicks(tick);
@@ -179,12 +180,11 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
     				continue next;
     			}
 
-    			tick -= patternTicks;
-
-    			if (tick >= 0) {
+    			if (tick - patternTicks >= 0) {
     				if (RandomUtils.getBoolean(random, probability)) {    					
-    					lastMatchedTick = tick + patternTicks;
-    					
+    	    			// jump back to where the pattern will start
+    					tick -= patternTicks;
+
     					logger.debug("Applying conditional pattern " + i + " with length " + patternTicks +
     								 " for targets " + Arrays.toString(targets) + " at ticks " + tick + "-" +
     								 (tick + patternTicks - 1));
@@ -208,11 +208,9 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
         					}
     						tick += entry.getTicks();
     					}
-    				} else {
-    					tick += patternTicks;
+    					
+    					lastMatchedTick = tick;
     				}
-    			} else {
-    				tick += patternTicks;
     			}
     			
 				tick += harmonyEngine.getChordSectionTicks(tick);

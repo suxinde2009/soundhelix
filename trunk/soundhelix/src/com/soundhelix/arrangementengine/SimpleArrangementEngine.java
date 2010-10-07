@@ -771,7 +771,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 		ArrangementEntry[] arrangementEntries = new ArrangementEntry[tracks];
 		
 		for (int i = 0; i < tracks; i++) {
-			int instrument = XMLUtils.parseInteger(random,"instrument",nodeList.item(i),xpath);
+			String instrument = XMLUtils.parseString(random,"instrument",nodeList.item(i),xpath);
 
 			int transposition = 0;
 			
@@ -852,12 +852,12 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 	}
 	
 	private static final class ArrangementEntry {
-		private int instrument;
+		private String instrument;
 		private SequenceEngine sequenceEngine;
 		private int transposition;
 		private String[] activityVectorNames;
 		
-		private ArrangementEntry(int instrument,SequenceEngine sequenceEngine,int transposition,String[] activityVectorNames) {
+		private ArrangementEntry(String instrument,SequenceEngine sequenceEngine,int transposition,String[] activityVectorNames) {
 			this.instrument = instrument;
 			this.sequenceEngine = sequenceEngine;
 			this.transposition = transposition;

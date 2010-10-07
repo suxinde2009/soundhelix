@@ -9,6 +9,8 @@ import javax.xml.xpath.XPathException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.soundhelix.misc.Pattern;
+import com.soundhelix.patternengine.PatternEngine;
 import com.soundhelix.util.XMLUtils;
 
 /**
@@ -38,15 +40,28 @@ public class PatternSequenceEngine extends AbstractMultiPatternSequenceEngine {
     	
 		NodeList nodeList = (NodeList)xpath.evaluate("pattern",node,XPathConstants.NODESET);
 
-		if(nodeList.getLength() == 0) {
+		if (nodeList.getLength() == 0) {
 			throw(new RuntimeException("Need at least 1 pattern"));
 		}
 		
 		try {
 			setObeyChordSubtype(XMLUtils.parseBoolean(random,"obeyChordSubtype",node,xpath));
 		} catch(Exception e) {}
+
+		int i = random.nextInt(nodeList.getLength());
+		Node patternEngineNode = (Node)xpath.evaluate("patternEngine",nodeList.item(i),XPathConstants.NODE);
 		
-		setPatterns(new String[] {
-				XMLUtils.parseString(random,nodeList.item(random.nextInt(nodeList.getLength())),xpath)});
+		PatternEngine patternEngine;
+		
+		try {
+			patternEngine = XMLUtils.getInstance(PatternEngine.class,patternEngineNode,
+					xpath,randomSeed ^ 47351842858l);
+		} catch (Exception e) {
+			throw(new RuntimeException("Error instantiating PatternEngine",e));
+		}
+		
+		Pattern pattern = patternEngine.render("" + TRANSITION);
+		
+		setPatterns(new Pattern[] {pattern});
     }
 }

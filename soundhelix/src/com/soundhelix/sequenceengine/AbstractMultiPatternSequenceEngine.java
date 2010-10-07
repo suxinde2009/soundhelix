@@ -27,7 +27,7 @@ import com.soundhelix.util.NoteUtils;
 
 public abstract class AbstractMultiPatternSequenceEngine extends AbstractSequenceEngine {
 	
-	private static final char TRANSITION = '+';
+	protected static final char TRANSITION = '+';
 	
 	protected static final int[] MAJOR_TABLE = new int[] {0,4,7};
 	protected static final int[] MINOR_TABLE = new int[] {0,3,7};
@@ -42,12 +42,8 @@ public abstract class AbstractMultiPatternSequenceEngine extends AbstractSequenc
 		super();
 	}
 
-	public void setPatterns(String[] patternStrings) {
-		patterns = new Pattern[patternStrings.length];
-		
-		for(int i=0;i<patternStrings.length;i++) {
-			patterns[i] = Pattern.parseString(patternStrings[i],""+TRANSITION);
-		}
+	public void setPatterns(Pattern[] patterns) {
+		this.patterns = patterns;
 	}
 	
 	public void setObeyChordSubtype(boolean obeyChordSubtype) {

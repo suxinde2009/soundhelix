@@ -17,6 +17,7 @@ import com.soundhelix.misc.Sequence;
 import com.soundhelix.misc.Track;
 import com.soundhelix.misc.Pattern.PatternEntry;
 import com.soundhelix.misc.Track.TrackType;
+import com.soundhelix.patternengine.PatternEngine;
 import com.soundhelix.util.RandomUtils;
 import com.soundhelix.util.XMLUtils;
 
@@ -253,12 +254,20 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
 		}
 		
 		for (int i = 0; i < patterns; i++) {
-			String patternString = XMLUtils.parseString(random,nodeList.item(i),xpath);
-			int pitch = Integer.parseInt((String)xpath.evaluate("attribute::pitch",
-										  nodeList.item(i),XPathConstants.STRING));
-
-			Pattern pattern = Pattern.parseString(patternString);
+			int pitch = XMLUtils.parseInteger(random, "pitch", nodeList.item(i), xpath);
+				
+			Node patternEngineNode = (Node)xpath.evaluate("patternEngine",nodeList.item(i),XPathConstants.NODE);
+		
+			PatternEngine patternEngine;
 			
+			try {
+				patternEngine = XMLUtils.getInstance(PatternEngine.class,patternEngineNode,
+						xpath,randomSeed ^ 47351842858l);
+			} catch (Exception e) {
+				throw(new RuntimeException("Error instantiating PatternEngine",e));
+			}
+			
+			Pattern pattern = patternEngine.render("");
 			drumEntries[i] = new DrumEntry(pattern,pitch);
 		}
 
@@ -270,15 +279,19 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
 		ConditionalEntry[] conditionalEntries = new ConditionalEntry[patterns];
 		
 		for (int i = 0; i < patterns; i++) {
-			String patternString = XMLUtils.parseString(random,nodeList.item(i),xpath);
+			String targetString = XMLUtils.parseString(random, "target", nodeList.item(i), xpath);
+			String[] targetStrings = targetString.split(",");
+			int[] targets = new int[targetStrings.length];
+			
+			for (int k = 0; k < targetStrings.length; k++) {
+				targets[k] = Integer.parseInt(targetStrings[k]);
+			}
 
-			String conditionString = (String)xpath.evaluate("attribute::condition",
-															nodeList.item(i),XPathConstants.STRING);
-
+			String conditionString = XMLUtils.parseString(random, "condition", nodeList.item(i), xpath);
 			conditionString = conditionString.replaceAll(">","").replaceAll(",","|").replaceAll("-",".");
 			java.util.regex.Pattern condition = java.util.regex.Pattern.compile(conditionString);
 			
-			String modeString = (String)xpath.evaluate("attribute::mode",nodeList.item(i),XPathConstants.STRING);
+			String modeString = XMLUtils.parseString(random, "mode", nodeList.item(i), xpath);
 			int mode;
 			
 			if (modeString.equals("add")) {
@@ -289,18 +302,20 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
 				throw(new RuntimeException("Unknown mode \"" + modeString + "\""));
 			}
 			
-			String targetString = (String)xpath.evaluate("attribute::target",nodeList.item(i),XPathConstants.STRING);
-			String[] targetStrings = targetString.split(",");
-			int[] targets = new int[targetStrings.length];
-			
-			for (int k = 0; k < targetStrings.length; k++) {
-				targets[k] = Integer.parseInt(targetStrings[k]);
-			}
-			
-			double probability = Double.parseDouble((String)xpath.evaluate("attribute::probability",
-					                                               nodeList.item(i),XPathConstants.STRING)) / 100.0d;
+			double probability = XMLUtils.parseDouble(random, "probability", nodeList.item(i), xpath) / 100.0d;
 
-			Pattern pattern = Pattern.parseString(patternString);
+			Node patternEngineNode = (Node)xpath.evaluate("patternEngine",nodeList.item(i),XPathConstants.NODE);
+		
+			PatternEngine patternEngine;
+			
+			try {
+				patternEngine = XMLUtils.getInstance(PatternEngine.class,patternEngineNode,
+						xpath,randomSeed ^ 47351842858l);
+			} catch (Exception e) {
+				throw(new RuntimeException("Error instantiating PatternEngine",e));
+			}
+
+			Pattern pattern = patternEngine.render("");
 			
 			conditionalEntries[i] = new ConditionalEntry(pattern,condition,mode,targets,probability);
 		}

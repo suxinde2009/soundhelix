@@ -11,6 +11,7 @@ import javax.xml.xpath.XPathException;
 
 import org.w3c.dom.Node;
 
+import com.soundhelix.misc.Pattern;
 import com.soundhelix.util.RandomUtils;
 import com.soundhelix.util.XMLUtils;
 
@@ -96,7 +97,7 @@ public class RandomSequenceEngine extends AbstractMultiPatternSequenceEngine {
 		setPitchVelocityCorrelation(XMLUtils.parseDouble(random,"pitchVelocityCorrelation",node,xpath) / 100.0d);
 		setVelocityExponent(XMLUtils.parseDouble(random,"velocityExponent",node,xpath));
 		setPatternString(XMLUtils.parseString(random,"patternString",node,xpath));
-		setPatterns(new String[] {generatePattern(patternString)});
+		setPatterns(new Pattern[] {Pattern.parseString(generatePattern(patternString))});
     }
     
     /**

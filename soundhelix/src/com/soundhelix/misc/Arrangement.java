@@ -32,7 +32,7 @@ public class Arrangement implements Iterable<Arrangement.ArrangementEntry> {
     	this.structure = structure;
     }
     
-    public void add(Track track,int instrument) {
+    public void add(Track track,String instrument) {
     	entryList.add(new ArrangementEntry(track,instrument));
     }
     
@@ -99,9 +99,9 @@ public class Arrangement implements Iterable<Arrangement.ArrangementEntry> {
     	private final Track track;
     	
     	/** The instrument. */
-    	private final int instrument;
+    	private final String instrument;
     	
-    	private ArrangementEntry(Track track,int instrument) {
+    	private ArrangementEntry(Track track,String instrument) {
     		this.track = track;
     		this.instrument = instrument;
     	}
@@ -110,7 +110,7 @@ public class Arrangement implements Iterable<Arrangement.ArrangementEntry> {
     		return track;
     	}
     	
-    	public int getInstrument() {
+    	public String getInstrument() {
     		return instrument;
     	}
     }

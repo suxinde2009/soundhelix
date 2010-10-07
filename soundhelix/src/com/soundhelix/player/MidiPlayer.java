@@ -112,7 +112,7 @@ public class MidiPlayer extends AbstractPlayer {
 	private int beforePlayWaitTicks;
 	private int afterPlayWaitTicks;
 	
-	private Map<Integer,DeviceChannel> channelMap;
+	private Map<String,DeviceChannel> channelMap;
 	private Map<String,Device> deviceMap;
 	
 	private ControllerLFO[] controllerLFOs;
@@ -318,7 +318,7 @@ public class MidiPlayer extends AbstractPlayer {
      * @param channelMap the channel map
      */
     
-    public void setChannelMap(Map<Integer,DeviceChannel> channelMap) {
+    public void setChannelMap(Map<String,DeviceChannel> channelMap) {
     	this.channelMap = channelMap;
     }
     
@@ -467,7 +467,7 @@ public class MidiPlayer extends AbstractPlayer {
 		
 		for (ArrangementEntry entry : arrangement) {
 			Track track = entry.getTrack();
-			int instrument = entry.getInstrument();
+			String instrument = entry.getInstrument();
 
 			DeviceChannel channel = channelMap.get(instrument);
 			
@@ -524,7 +524,7 @@ public class MidiPlayer extends AbstractPlayer {
 		
 		for (ArrangementEntry entry : arrangement) {
 			Track track = entry.getTrack();
-			int instrument = entry.getInstrument();
+			String instrument = entry.getInstrument();
 
 			DeviceChannel channel = channelMap.get(instrument);
 			
@@ -909,9 +909,9 @@ public class MidiPlayer extends AbstractPlayer {
      * @return a two-dimensional int array containing start and end tick (or null)
      */
     
-    private static int[] getInstrumentActivity(Arrangement arrangement,int instrument) {
+    private static int[] getInstrumentActivity(Arrangement arrangement,String instrument) {
     	for (ArrangementEntry entry : arrangement) {
-    		if (entry.getInstrument() == instrument) {
+    		if (entry.getInstrument().equals(instrument)) {
     			// instrument found, check for first and last tick
     		
     			Track track = entry.getTrack();
@@ -986,11 +986,11 @@ public class MidiPlayer extends AbstractPlayer {
 		nodeList = (NodeList)xpath.evaluate("map",node,XPathConstants.NODESET);
 		entries = nodeList.getLength();
 		
-		Map<Integer,DeviceChannel> channelMap = new HashMap<Integer,DeviceChannel>();
+		Map<String,DeviceChannel> channelMap = new HashMap<String,DeviceChannel>();
 		
 		for (int i = 0; i < entries; i++) {
-			int instrument = Integer.parseInt((String)xpath.evaluate("attribute::instrument",
-					nodeList.item(i),XPathConstants.STRING));
+			String instrument = (String)xpath.evaluate("attribute::instrument",
+					nodeList.item(i),XPathConstants.STRING);
 			String device = ((String)xpath.evaluate("attribute::device",nodeList.item(i),XPathConstants.STRING));
 			int channel = Integer.parseInt((String)xpath.evaluate("attribute::channel",
 					nodeList.item(i),XPathConstants.STRING));
@@ -1039,7 +1039,7 @@ public class MidiPlayer extends AbstractPlayer {
 					(Node)xpath.evaluate("rotationUnit",nodeList.item(i),XPathConstants.NODE),xpath);
 			
 			double phase = 0.0d;
-			int instrument = -1;
+			String instrument = null;
 			
 			try {
 				phase = XMLUtils.parseDouble(random,
@@ -1048,7 +1048,7 @@ public class MidiPlayer extends AbstractPlayer {
 			}
 			
 			try {
-				instrument = XMLUtils.parseInteger(random,
+				instrument = XMLUtils.parseString(random,
 						(Node)xpath.evaluate("instrument",nodeList.item(i),XPathConstants.NODE),xpath);
 			} catch (Exception e) {
 			}
@@ -1157,13 +1157,13 @@ public class MidiPlayer extends AbstractPlayer {
     	private final String deviceName;
     	private int channel;
     	private String controller;
-    	private int instrument;
+    	private String instrument;
     	private double speed;
     	private String rotationUnit;
     	private double phase;
     	private int lastSentValue;
     	
-    	public ControllerLFO(LFO lfo,String deviceName,int channel,String controller,int instrument,double speed,String rotationUnit,double phase) {
+    	public ControllerLFO(LFO lfo,String deviceName,int channel,String controller,String instrument,double speed,String rotationUnit,double phase) {
     		this.lfo = lfo;
     		this.deviceName = deviceName;
     		this.channel = channel;

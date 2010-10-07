@@ -38,7 +38,7 @@ public class FreePatternSequenceEngine extends AbstractFreeMultiPatternSequenceE
     	
 		NodeList nodeList = (NodeList)xpath.evaluate("pattern",node,XPathConstants.NODESET);
 
-		if(nodeList.getLength() == 0) {
+		if (nodeList.getLength() == 0) {
 			throw(new RuntimeException("Need at least 1 pattern"));
 		}
 		

@@ -9,6 +9,7 @@ import javax.xml.xpath.XPathException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.soundhelix.misc.Pattern;
 import com.soundhelix.util.XMLUtils;
 
 /**
@@ -47,10 +48,10 @@ public class MultiPatternSequenceEngine extends AbstractMultiPatternSequenceEngi
 			throw(new RuntimeException("Need at least 1 pattern"));
 		}
 
-		String[] patterns = new String[patternList.getLength()];
+		Pattern[] patterns = new Pattern[patternList.getLength()];
 		
 		for(int i=0;i<patternList.getLength();i++) {
-			patterns[i] = XMLUtils.parseString(random,patternList.item(i),xpath);
+			patterns[i] = Pattern.parseString(XMLUtils.parseString(random,patternList.item(i),xpath));
 		}
 		
 		setPatterns(patterns);

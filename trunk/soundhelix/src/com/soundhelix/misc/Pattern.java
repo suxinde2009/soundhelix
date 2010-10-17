@@ -9,7 +9,10 @@ package com.soundhelix.misc;
  */
 
 public class Pattern {
+	/** The PatternEntry array. */
 	private PatternEntry[] pattern;
+	
+	/** The total number of ticks. */
 	private int totalTicks;
 
 	public Pattern(PatternEntry[] pattern) {
@@ -65,6 +68,38 @@ public class Pattern {
 		}
 
 		return new Pattern(pattern);
+	}
+	
+	/**
+	 * Transposes the pattern up by the given pitch (which may be negative) and returns it as a new pattern (or the
+	 * original pattern if pitch is 0). Only the notes will be affected by this operation (wildcards and pauses are
+	 * not affected).
+	 * 
+	 * @param pitch the number of halftones to transpose up (may be negative)
+	 * 
+	 * @return a new pattern that is a transposed version of this pattern
+	 */
+	
+	public Pattern transpose(int pitch) {
+		if (pitch == 0) {
+			// nothing to do; as instances are immutable, we can just return this pattern
+			return this;
+		}
+		
+		PatternEntry[] p = new PatternEntry[pattern.length];
+		
+		for (int i = 0; i < pattern.length; i++) {
+			PatternEntry entry = pattern[i];
+			if (entry.isNote()) {
+				// make a modified copy of the PatternEntry
+				p[i] = new PatternEntry(entry.pitch + pitch,entry.velocity,entry.ticks,entry.legato);
+			} else {
+				// just use the original PatternEntry
+				p[i] = entry;
+			}
+		}
+		
+		return new Pattern(p);
 	}
 
 	/**

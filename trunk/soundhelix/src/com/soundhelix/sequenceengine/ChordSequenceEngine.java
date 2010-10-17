@@ -9,13 +9,8 @@ import javax.xml.xpath.XPathException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.soundhelix.harmonyengine.HarmonyEngine;
-import com.soundhelix.misc.ActivityVector;
-import com.soundhelix.misc.Chord;
-import com.soundhelix.misc.Sequence;
-import com.soundhelix.misc.Track;
-import com.soundhelix.misc.Chord.ChordSubtype;
-import com.soundhelix.misc.Track.TrackType;
+import com.soundhelix.misc.Pattern;
+import com.soundhelix.patternengine.PatternEngine;
 import com.soundhelix.util.XMLUtils;
 
 /**
@@ -41,143 +36,32 @@ import com.soundhelix.util.XMLUtils;
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
-// TODO: allow specifying velocities in patterns (like in the PatternSequenceEngine)
-
-public class ChordSequenceEngine extends AbstractSequenceEngine {
+public class ChordSequenceEngine extends MultiPatternSequenceEngine {
 	
-	private static final int[] MAJOR_TABLE = new int[] {0,4,7};
-	private static final int[] MINOR_TABLE = new int[] {0,3,7};
-
-	private Random random;
-	
-	private boolean obeyChordSubtype = true;
-	private int[] pattern;
-	private int patternLength;
-	
-	private int voiceCount = 3;
 	private int[] offsets;
 
 	public ChordSequenceEngine() {
 		super();
 	}
 
-	public void setPattern(String patternString) {
-		this.pattern = parsePatternString(patternString);
-		this.patternLength = pattern.length;
-	}
-
 	public void setOffsets(int[] offsets) {
-		if(offsets.length == 0) {
+		if (offsets.length == 0) {
 			throw(new RuntimeException("Array of offsets must not be empty"));
 		}
 		
 		this.offsets = offsets;
-    	this.voiceCount = offsets.length;
 	}
 	
 	public void setObeyChordSubtype(boolean obeyChordSubtype) {
 		this.obeyChordSubtype = obeyChordSubtype;
 	}
 
-	public Track render(ActivityVector[] activityVectors) {
-		ActivityVector activityVector = activityVectors[0];
-		
-        Sequence[] seq = new Sequence[voiceCount];
-        HarmonyEngine ce = structure.getHarmonyEngine();
-        
-        int tick = 0;
-        
-        for(int i=0;i<voiceCount;i++) {
-        	seq[i] = new Sequence();
-        }
-        
-        while(tick < structure.getTicks()) {
-        	Chord chord = ce.getChord(tick);
-        	int len = ce.getChordTicks(tick);
-        
-        	for(int i=0;i<len;i++) {
-        		if(activityVector.isActive(tick)) {
-        			// add next note for major/minor chord
-
-        			for(int k=0;k<voiceCount;k++) {
-        				int value = pattern[(tick+i)%patternLength];
-
-        				if(value == Integer.MIN_VALUE) {
-        					seq[k].addPause(1);        						
-        					continue;
-        				}
-
-        				value += offsets[k];
-
-        				if(obeyChordSubtype) {
-        					if(chord.getSubtype() == ChordSubtype.BASE_4) {
-        						value++;
-        					} else if(chord.getSubtype() == ChordSubtype.BASE_6) {
-        						value--;
-        					}
-        				}
-        			
-        				// split value into octave and offset
-
-        				int octave = (value >= 0 ? value/3 : (value-2)/3);
-        				int offset = ((value%3)+3)%3;
-
-        				if(chord.isMajor()) {
-        					seq[k].addNote(octave*12+MAJOR_TABLE[offset]+chord.getPitch(),1);
-        				} else {
-        					seq[k].addNote(octave*12+MINOR_TABLE[offset]+chord.getPitch(),1);
-        				}
-        			}
-        		} else {
-        			for(int k=0;k<voiceCount;k++) {
-        				seq[k].addPause(1);
-        			}
-        		}
-        	}
-        	
-        	tick += len;
-        }
-        
-		Track track = new Track(TrackType.MELODY);
-
-		for(int i=0;i<voiceCount;i++) {
-			track.add(seq[i]);		
-		}
-
-		return track;
-	}
-	
-	private static int[] parsePatternString(String s) {
-		String[] p = s.split(",");
-		int len = p.length;
-		
-		int[] array = new int[len];
-		
-		for(int i=0;i<len;i++) {
-			if(p[i].equals("-")) {
-				array[i] = Integer.MIN_VALUE;
-			} else {
-				array[i] = Integer.parseInt(p[i]);
-			}
-		}
-		
-		return array;
-	}
-	
     public void configure(Node node,XPath xpath) throws XPathException {
     	random = new Random(randomSeed);
-    	
-		NodeList nodeList = (NodeList)xpath.evaluate("pattern",node,XPathConstants.NODESET);
-
-		if(nodeList.getLength() == 0) {
-			throw(new RuntimeException("Need at least 1 pattern"));
-		}
-		
-		setPattern(XMLUtils.parseString(random,nodeList.item(random.nextInt(nodeList.getLength())),xpath));
 
     	String offsetString = XMLUtils.parseString(random,"offsets",node,xpath);
     	
-    	if(offsetString == null || offsetString.equals("")) {
+    	if (offsetString == null || offsetString.equals("")) {
     		offsetString = "0,1,2";
     	}
     	
@@ -185,7 +69,7 @@ public class ChordSequenceEngine extends AbstractSequenceEngine {
     	
     	int[] offsets = new int[offsetList.length];
     	
-    	for(int i=0;i<offsetList.length;i++) {
+    	for (int i = 0; i < offsetList.length; i++) {
     		offsets[i] = Integer.parseInt(offsetList[i]);
     	}
     	
@@ -193,6 +77,35 @@ public class ChordSequenceEngine extends AbstractSequenceEngine {
     	
 		try {
 			setObeyChordSubtype(XMLUtils.parseBoolean(random,"obeyChordSubtype",node,xpath));
-		} catch(Exception e) {}
+		} catch (Exception e) {}
+
+		NodeList nodeList = (NodeList)xpath.evaluate("patternEngine",node,XPathConstants.NODESET);
+
+		if (nodeList.getLength() == 0) {
+			throw(new RuntimeException("Need at least 1 pattern"));
+		}
+		
+		PatternEngine patternEngine;
+		
+		try {
+			int i = random.nextInt(nodeList.getLength());
+			patternEngine = XMLUtils.getInstance(PatternEngine.class,nodeList.item(i),
+					xpath,randomSeed ^ 47351842858l);
+		} catch (Exception e) {
+			throw(new RuntimeException("Error instantiating PatternEngine",e));
+		}
+		
+		// render base pattern
+		Pattern pattern = patternEngine.render("");
+
+		// transpose base pattern once for each offset
+		
+		Pattern[] patterns = new Pattern[offsets.length];
+		
+		for (int i = 0; i < offsets.length;i++) {
+			patterns[i] = pattern.transpose(offsets[i]);
+		}
+		
+		setPatterns(patterns);
     }
 }

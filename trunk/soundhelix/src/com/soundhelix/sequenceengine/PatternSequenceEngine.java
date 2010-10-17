@@ -38,23 +38,22 @@ public class PatternSequenceEngine extends AbstractMultiPatternSequenceEngine {
     public void configure(Node node,XPath xpath) throws XPathException {
     	random = new Random(randomSeed);
     	
-		NodeList nodeList = (NodeList)xpath.evaluate("pattern",node,XPathConstants.NODESET);
+		NodeList nodeList = (NodeList)xpath.evaluate("patternEngine",node,XPathConstants.NODESET);
 
 		if (nodeList.getLength() == 0) {
-			throw(new RuntimeException("Need at least 1 pattern"));
+			throw(new RuntimeException("Need at least 1 patternEngine"));
 		}
 		
 		try {
 			setObeyChordSubtype(XMLUtils.parseBoolean(random,"obeyChordSubtype",node,xpath));
 		} catch(Exception e) {}
 
-		int i = random.nextInt(nodeList.getLength());
-		Node patternEngineNode = (Node)xpath.evaluate("patternEngine",nodeList.item(i),XPathConstants.NODE);
 		
 		PatternEngine patternEngine;
 		
 		try {
-			patternEngine = XMLUtils.getInstance(PatternEngine.class,patternEngineNode,
+			int i = random.nextInt(nodeList.getLength());
+			patternEngine = XMLUtils.getInstance(PatternEngine.class,nodeList.item(i),
 					xpath,randomSeed ^ 47351842858l);
 		} catch (Exception e) {
 			throw(new RuntimeException("Error instantiating PatternEngine",e));

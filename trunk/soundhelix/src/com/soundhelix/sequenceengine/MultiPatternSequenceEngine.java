@@ -10,6 +10,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.soundhelix.misc.Pattern;
+import com.soundhelix.patternengine.PatternEngine;
 import com.soundhelix.util.XMLUtils;
 
 /**
@@ -32,32 +33,41 @@ public class MultiPatternSequenceEngine extends AbstractMultiPatternSequenceEngi
 	}
 
 	public void configure(Node node,XPath xpath) throws XPathException {
-    	random = new Random(randomSeed);
+		random = new Random(randomSeed);
 
-		NodeList patternsList = (NodeList)xpath.evaluate("patterns",node,XPathConstants.NODESET);
+		NodeList patternsList = (NodeList)xpath.evaluate("patternEngines",node,XPathConstants.NODESET);
 
-		if(patternsList.getLength() == 0) {
-			throw(new RuntimeException("Need at least 1 list of patterns"));
+		if (patternsList.getLength() == 0) {
+			throw(new RuntimeException("Need at least 1 list of patternEngines"));
 		}
 
 		Node patternsNode = patternsList.item(random.nextInt(patternsList.getLength()));
-		
-		NodeList patternList = (NodeList) xpath.evaluate("pattern", patternsNode,XPathConstants.NODESET);
 
-		if(patternList.getLength() == 0) {
+		NodeList patternList = (NodeList) xpath.evaluate("patternEngine", patternsNode,XPathConstants.NODESET);
+
+		if (patternList.getLength() == 0) {
 			throw(new RuntimeException("Need at least 1 pattern"));
 		}
 
 		Pattern[] patterns = new Pattern[patternList.getLength()];
+
+		for (int i = 0; i < patternList.getLength(); i++) {
+			PatternEngine patternEngine;
+			
+			try {
+				patternEngine = XMLUtils.getInstance(PatternEngine.class,patternList.item(i),
+						xpath,randomSeed ^ 47351842858l);
+			} catch (Exception e) {
+				throw(new RuntimeException("Error instantiating PatternEngine",e));
+			}
 		
-		for(int i=0;i<patternList.getLength();i++) {
-			patterns[i] = Pattern.parseString(XMLUtils.parseString(random,patternList.item(i),xpath));
+			patterns[i] = patternEngine.render("" + TRANSITION);
 		}
-		
+
 		setPatterns(patterns);
 
 		try {
 			setObeyChordSubtype(XMLUtils.parseBoolean(random,"obeyChordSubtype",node,xpath));
-		} catch(Exception e) {}
-    }
+		} catch (Exception e) {}
+	}
 }

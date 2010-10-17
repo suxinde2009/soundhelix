@@ -71,17 +71,17 @@ public class RandomPatternSequenceEngine extends AbstractSequenceEngine {
         
         Hashtable<String,Pattern> melodyHashtable = createMelodies();
         
-		while(tick < ticks) {
+		while (tick < ticks) {
         	int len = harmonyEngine.getChordSectionTicks(tick);
         	Pattern p = melodyHashtable.get(HarmonyEngineUtils.getChordSectionString(structure,tick));
         	int pos = 0;
         	
-        	for(int i=0;i<len;) {
+        	for (int i = 0; i < len;) {
     			PatternEntry entry = p.get(pos);
     			int l = entry.getTicks();
 
-    			if(activityVector.isActive(tick + i)) {	
-        			if(entry.isPause()) {
+    			if (activityVector.isActive(tick + i)) {	
+        			if (entry.isPause()) {
             			// add pause
             			seq.addPause(l);
         			} else {
@@ -119,23 +119,23 @@ public class RandomPatternSequenceEngine extends AbstractSequenceEngine {
     	
     	int tick = 0;
     	
-    	while(tick < structure.getTicks()) {
+    	while (tick < structure.getTicks()) {
     		String section = HarmonyEngineUtils.getChordSectionString(structure,tick);
             int len = he.getChordSectionTicks(tick);
     		
-    		if(!ht.containsKey(section)) {
+    		if (!ht.containsKey(section)) {
     			// no pattern created yet; create one
     			List<PatternEntry> list = new ArrayList<PatternEntry>();    			
     			
     			int lastValue = Integer.MIN_VALUE;
     			int pos = 0;
     			
-    			for(int i=0;i<len;) {
-    				PatternEntry entry = pattern.get(pos%patternLength);
-        			Chord chord = he.getChord(tick+i);
+    			for (int i = 0; i < len;) {
+    				PatternEntry entry = pattern.get(pos % patternLength);
+        			Chord chord = he.getChord(tick + i);
         			int t = entry.getTicks();
         			
-        			if(entry.isPause()) {
+        			if (entry.isPause()) {
         				list.add(new PatternEntry(t));
         			} else {
         				int value;
@@ -144,21 +144,23 @@ public class RandomPatternSequenceEngine extends AbstractSequenceEngine {
         					value = offsets[random.nextInt(offsets.length)];
         				} while(value == lastValue);
 
-        				if(true) {
-            				if(chord.getSubtype() == ChordSubtype.BASE_4) {
+        				if (true) {
+            				if (chord.getSubtype() == ChordSubtype.BASE_4) {
             					value++;
-            				} else if(chord.getSubtype() == ChordSubtype.BASE_6) {
+            				} else if (chord.getSubtype() == ChordSubtype.BASE_6) {
             					value--;
             				}
             			}
         				
-            			int octave = (value >= 0 ? value/3 : (value-2)/3);
-            			int offset = ((value%3)+3)%3;
+            			int octave = (value >= 0 ? value / 3 : (value - 2) / 3);
+            			int offset = ((value % 3) + 3) % 3;
             			
-            	 	    if(chord.isMajor()) {
-            			    list.add(new PatternEntry(octave*12+MAJOR_TABLE[offset]+chord.getPitch(),entry.getVelocity(),t,entry.isLegato()));
+            	 	    if (chord.isMajor()) {
+            			    list.add(new PatternEntry(octave * 12 + MAJOR_TABLE[offset] + chord.getPitch(),
+            			    		                  entry.getVelocity(),t,entry.isLegato()));
             		    } else {
-            			    list.add(new PatternEntry(octave*12+MINOR_TABLE[offset]+chord.getPitch(),entry.getVelocity(),t,entry.isLegato()));
+            			    list.add(new PatternEntry(octave * 12 + MINOR_TABLE[offset] + chord.getPitch(),
+            			    		                  entry.getVelocity(),t,entry.isLegato()));
             		    }
         				
         				lastValue = value;
@@ -187,7 +189,7 @@ public class RandomPatternSequenceEngine extends AbstractSequenceEngine {
 		
 		String offsetString = XMLUtils.parseString(random,"offsets",node,xpath);
     	
-    	if(offsetString == null || offsetString.equals("")) {
+    	if (offsetString == null || offsetString.equals("")) {
     		offsetString = "0,1,2";
     	}
     	
@@ -195,7 +197,7 @@ public class RandomPatternSequenceEngine extends AbstractSequenceEngine {
     	
     	int[] offsets = new int[offsetList.length];
     	
-    	for(int i=0;i<offsetList.length;i++) {
+    	for (int i = 0; i < offsetList.length;i++) {
     		offsets[i] = Integer.parseInt(offsetList[i]);
     	}
     	

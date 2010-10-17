@@ -35,6 +35,10 @@ import com.soundhelix.util.XMLUtils;
 
 public class PatternSequenceEngine extends AbstractMultiPatternSequenceEngine {
 
+	public PatternSequenceEngine() {
+		super();
+	}
+
     public void configure(Node node,XPath xpath) throws XPathException {
     	random = new Random(randomSeed);
     	

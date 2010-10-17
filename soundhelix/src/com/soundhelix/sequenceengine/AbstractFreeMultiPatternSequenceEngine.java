@@ -27,12 +27,8 @@ public abstract class AbstractFreeMultiPatternSequenceEngine extends AbstractSeq
 		super();
 	}
 
-	public void setPatterns(String[] patternStrings) {
-		patterns = new Pattern[patternStrings.length];
-		
-		for(int i=0;i<patternStrings.length;i++) {
-			patterns[i] = Pattern.parseString(patternStrings[i]);
-		}
+	public void setPatterns(Pattern[] patterns) {
+		this.patterns = patterns;
 	}
 	
 	public Track render(ActivityVector[] activityVectors) {
@@ -43,34 +39,36 @@ public abstract class AbstractFreeMultiPatternSequenceEngine extends AbstractSeq
         
 		Sequence[] seqs = new Sequence[patternCount];
 		
-		for(int i=0;i<patternCount;i++) {
+		for (int i = 0; i < patternCount; i++) {
 			seqs[i] = new Sequence();
 		}
 
 		Track track = new Track(TrackType.MELODY);
 		
-       	for(int i=0;i<patterns.length;i++) {
+       	for (int i = 0; i < patterns.length; i++) {
     		Sequence seq = seqs[i];
     		Pattern pattern = patterns[i];
     		int patternLength = pattern.size();
     		int pos = 0;
     		int tick = 0;
 
-			while(tick < ticks) {
-				Pattern.PatternEntry entry = pattern.get(pos%patternLength);
+			while (tick < ticks) {
+				Pattern.PatternEntry entry = pattern.get(pos % patternLength);
         		int len = entry.getTicks();
 
-        		if(activityVector.isActive(tick)) {
+        		if (activityVector.isActive(tick)) {
         			short vel = entry.getVelocity();
 
-        			if(entry.isPause()) {
+        			if (entry.isPause()) {
         				// add pause
         				seq.addPause(len);
         			} else {
         				// normal note
         				int pitch = entry.getPitch();
 
-        				boolean useLegato = entry.isLegato() ? pattern.isLegatoLegal(activityVector, tick+len, pos+1) : false;
+        				boolean useLegato = entry.isLegato() 
+        				                          ? pattern.isLegatoLegal(activityVector, tick + len, pos + 1)
+        										  : false;
 
        					seq.addNote(pitch,len,vel,useLegato);
         			}

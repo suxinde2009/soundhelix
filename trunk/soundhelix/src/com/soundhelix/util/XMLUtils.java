@@ -383,6 +383,10 @@ public final class XMLUtils {
 	public static <T> T getInstance(Class<T> clazz,Node node,XPath xpath,long randomSeed)
 			throws InstantiationException,XPathException,XPathExpressionException,
 					IllegalAccessException,ClassNotFoundException {
+		if (node == null) {
+			throw new IllegalArgumentException("Node is null");
+		}
+		
 		String className = (String)xpath.evaluate("attribute::class",node,XPathConstants.STRING);
 
 		if (className.indexOf('.') < 0) {
@@ -410,6 +414,7 @@ public final class XMLUtils {
 				logger.trace("Base random seed: " + randomSeed + ", using " +
 						(randomSeed ^ className.hashCode() - 1478923845823984391l * randomSeed));
 			}
+			
 			((RandomSeedable)instance).setRandomSeed(randomSeed ^ className.hashCode());
 		}
 

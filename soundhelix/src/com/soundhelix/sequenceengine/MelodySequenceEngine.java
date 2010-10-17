@@ -69,17 +69,17 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
         
         Hashtable<String,Pattern> melodyHashtable = createMelodies();
         
-		while(tick < ticks) {
+		while (tick < ticks) {
         	int len = harmonyEngine.getChordSectionTicks(tick);
         	Pattern p = melodyHashtable.get(HarmonyEngineUtils.getChordSectionString(structure,tick));
         	int pos = 0;
         	
-        	for(int i=0;i<len;) {
+        	for (int i = 0; i < len; i++) {
     			PatternEntry entry = p.get(pos);
     			int l = entry.getTicks();
 
-    			if(activityVector.isActive(tick)) {	
-        			if(entry.isPause()) {
+    			if (activityVector.isActive(tick)) {	
+        			if (entry.isPause()) {
             			// add pause
             			seq.addPause(l);
         			} else {
@@ -91,7 +91,6 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
         		}
         		
     			pos++;
-    			i += l;
     			tick += l;
          	}
         }
@@ -120,32 +119,32 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
     		again = false;
     		int r = random.nextInt(3);
     		
-    		if(r == 2 && random.nextFloat() > 0.4f) {
+    		if (r == 2 && random.nextFloat() > 0.4f) {
     			r = random.nextInt(2);
     		}
     		
-    		if(r == 0 || p < -12) {
+    		if (r == 0 || p < -12) {
     			// move up
     			p += random.nextInt(maxDistanceUp);
     			do {
     				p++;
-    			} while(!NoteUtils.isOnScale(p));    		
-    		} else if(r==1 || p > 12) {
+    			} while (!NoteUtils.isOnScale(p));    		
+    		} else if (r == 1 || p > 12) {
     			// move down
     			p -= random.nextInt(maxDistanceDown);
     			do {
     				p--;
-    			} while(!NoteUtils.isOnScale(p));    		
+    			} while (!NoteUtils.isOnScale(p));    		
     		} else {
     			// don't move, but check
-    			if(!NoteUtils.isOnScale(p)) {
+    			if (!NoteUtils.isOnScale(p)) {
     				// pitch has to be changed, because it is invalid
     				// we must go up or down, so we'll retry    			
     				again = true;
     				continue;
     			}
     		}
-    	} while(again || p < -12 || p > 12);
+    	} while (again || p < -12 || p > 12);
 
     	return p;
     }
@@ -171,31 +170,31 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
     		p = pitch;
     		int r = random.nextInt(3);
 
-    		if(r == 2 && random.nextFloat() > 0.4f) {
+    		if (r == 2 && random.nextFloat() > 0.4f) {
     			r = random.nextInt(2);
     		}
 
-    		if(r == 0 || p < -12) {
+    		if (r == 0 || p < -12) {
     			// move up
     			p += random.nextInt(maxDistanceUp);
     			do {
     				p++;
-    			} while(!chord.containsPitch(p));    		
-    		} else if(r==1 || p > 12) {
+    			} while (!chord.containsPitch(p));    		
+    		} else if (r == 1 || p > 12) {
     			// move down
     			p -= random.nextInt(maxDistanceDown);
     			do {
     				p--;
-    			} while(!chord.containsPitch(p));    		
+    			} while (!chord.containsPitch(p));    		
     		} else {
     			// don't move, but check
-    			if(!chord.containsPitch(p)) {
+    			if (!chord.containsPitch(p)) {
     				// pitch has to be changed, because it is invalid
     				// we must go up or down, so we'll retry    			
     				again = true;
     			}
     		}
-    	} while(again || p < -12 || p > 12);
+    	} while (again || p < -12 || p > 12);
 
     	return p;
     }
@@ -217,27 +216,28 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
     	int tick = 0;
     	int pos = 0;
     	
-    	while(tick < ticks) {
+    	while (tick < ticks) {
     		String section = HarmonyEngineUtils.getChordSectionString(structure,tick);
             int len = he.getChordSectionTicks(tick);
     		
-    		if(!ht.containsKey(section)) {
+    		if (!ht.containsKey(section)) {
     			// no melody created yet; create one
     			List<PatternEntry> list = new ArrayList<PatternEntry>();    			
     			
     			int pitch = Integer.MIN_VALUE;
     			 			
-    			for(int i=0;i<len;) {
-    				PatternEntry entry = pattern.get(pos%patternLength);
-        			Chord chord = he.getChord(tick+i);
+    			for (int i = 0; i < len;) {
+    				PatternEntry entry = pattern.get(pos % patternLength);
+        			Chord chord = he.getChord(tick + i);
         			int t = entry.getTicks();
         			
-        			if(entry.isPause()) {
+        			if (entry.isPause()) {
         				list.add(new PatternEntry(t));
-        			} else if(entry.isWildcard() && entry.getWildcardCharacter() == FREE) {
+        			} else if (entry.isWildcard() && entry.getWildcardCharacter() == FREE) {
         				pitch = getRandomPitch(pitch == Integer.MIN_VALUE ? 0 : pitch,2,2);
         				list.add(new PatternEntry(pitch,entry.getVelocity(),t,entry.isLegato()));
-        			} else if(entry.isWildcard() && entry.getWildcardCharacter() == REPEAT && pitch != Integer.MIN_VALUE && chord.containsPitch(pitch)) {
+        			} else if (entry.isWildcard() && entry.getWildcardCharacter() == REPEAT &&
+        					   pitch != Integer.MIN_VALUE && chord.containsPitch(pitch)) {
         				// reuse the previous pitch
         				list.add(new PatternEntry(pitch,entry.getVelocity(),t,entry.isLegato()));
         			} else {
@@ -265,7 +265,7 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
     	
 		NodeList nodeList = (NodeList)xpath.evaluate("pattern",node,XPathConstants.NODESET);
 
-		if(nodeList.getLength() == 0) {
+		if (nodeList.getLength() == 0) {
 			return; // Use default pattern
 		}
 		

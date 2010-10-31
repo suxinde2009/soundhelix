@@ -301,19 +301,19 @@ public class SoundHelix implements Runnable {
 	}
 	
 	private SongQueueEntry generateSong(Random random) throws Exception {
-		System.out.println("Rendering new song");
+		logger.debug("Rendering new song");
 
 		File file = new File(filename);
 
 		logger.debug("Reading and parsing XML file");
 		
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
+      dbf.setNamespaceAware(true);
         dbf.setXIncludeAware(true);
         dbf.setValidating(false);
         DocumentBuilder builder = dbf.newDocumentBuilder();
         Document doc = builder.parse(file);
-
+        
         if (ENABLE_SCHEMA_VALIDATION) {
             // create a SchemaFactory capable of understanding WXS schemas
             SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
@@ -339,8 +339,8 @@ public class SoundHelix implements Runnable {
 		Node arrangementEngineNode = (Node)xpath.evaluate("arrangementEngine",mainNode,XPathConstants.NODE);
 		Node playerNode = (Node)xpath.evaluate("player",mainNode,XPathConstants.NODE);
 
-		System.out.println("Randomseed: " + randomSeed);
-		
+		logger.debug("Using song random seed " + randomSeed);
+
 		Structure structure = parseStructure(random,structureNode,xpath);
 	
 		HarmonyEngine harmonyEngine = XMLUtils.getInstance(HarmonyEngine.class,

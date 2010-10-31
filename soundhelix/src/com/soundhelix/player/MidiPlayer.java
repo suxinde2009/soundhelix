@@ -249,7 +249,7 @@ public class MidiPlayer extends AbstractPlayer {
     		throw(new IllegalArgumentException("BPM must be > 0"));
     	}
     	
-    	System.out.println("Setting BPM to " + (milliBPM / 1000f));
+    	logger.debug("Setting BPM to " + (milliBPM / 1000f));
     	
     	this.milliBPM = milliBPM;
     }

@@ -1,7 +1,7 @@
 package com.soundhelix.sequenceengine;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -20,6 +20,7 @@ import com.soundhelix.misc.Sequence;
 import com.soundhelix.misc.Track;
 import com.soundhelix.misc.Pattern.PatternEntry;
 import com.soundhelix.misc.Track.TrackType;
+import com.soundhelix.patternengine.PatternEngine;
 import com.soundhelix.util.HarmonyEngineUtils;
 import com.soundhelix.util.NoteUtils;
 import com.soundhelix.util.XMLUtils;
@@ -43,19 +44,13 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
 	private static final char FREE = '+';
 	private static final char REPEAT = '*';
 	
-	private static String defaultPatternString = "0,-,-,+,-,-,+,-,0,-,-,+,-,-,+,-,0,-,-,+,-,-,+,-,0,-,+,-,+,-,-,-,0,-,-,+,-,-,+,-,0,-,-,+,-,-,+,-,0,-,-,+,-,-,+,-,0,-,+,-,+,-,+,+";
 	private Pattern pattern;
 	private int patternLength;
 	
 	private Random random;
 	
 	public MelodySequenceEngine() {
-		this(defaultPatternString);
-	}
-
-	public MelodySequenceEngine(String patternString) {
 		super();
-		setPattern(patternString);
 	}
 
 	public Track render(ActivityVector[] activityVectors) {
@@ -67,11 +62,11 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
         int tick = 0;
         int ticks = structure.getTicks();
         
-        Hashtable<String,Pattern> melodyHashtable = createMelodies();
+        HashMap<String,Pattern> melodyHashMap = createMelodies();
         
 		while (tick < ticks) {
         	int len = harmonyEngine.getChordSectionTicks(tick);
-        	Pattern p = melodyHashtable.get(HarmonyEngineUtils.getChordSectionString(structure,tick));
+        	Pattern p = melodyHashMap.get(HarmonyEngineUtils.getChordSectionString(structure,tick));
         	int pos = 0;
         	
         	for (int i = 0; i < len; i++) {
@@ -207,10 +202,10 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
      * @return a hashtable mapping chord section strings to melody arrays
      */
     
-    private Hashtable<String,Pattern> createMelodies() {
+    private HashMap<String,Pattern> createMelodies() {
     	HarmonyEngine he = structure.getHarmonyEngine();
     	
-    	Hashtable<String,Pattern> ht = new Hashtable<String,Pattern>();
+    	HashMap<String,Pattern> ht = new HashMap<String,Pattern>();
     	
     	int ticks = structure.getTicks();
     	int tick = 0;
@@ -263,17 +258,28 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
     public void configure(Node node,XPath xpath) throws XPathException {
     	random = new Random(randomSeed);
     	
-		NodeList nodeList = (NodeList)xpath.evaluate("pattern",node,XPathConstants.NODESET);
+		NodeList nodeList = (NodeList)xpath.evaluate("patternEngine",node,XPathConstants.NODESET);
 
 		if (nodeList.getLength() == 0) {
 			return; // Use default pattern
 		}
 		
-		setPattern(XMLUtils.parseString(random,nodeList.item(random.nextInt(nodeList.getLength())),xpath));
+		PatternEngine patternEngine;
+		
+		try {
+			int i = random.nextInt(nodeList.getLength());
+			patternEngine = XMLUtils.getInstance(PatternEngine.class,nodeList.item(i),
+					xpath,randomSeed ^ 47351842858l);
+		} catch (Exception e) {
+			throw(new RuntimeException("Error instantiating PatternEngine",e));
+		}
+		
+		Pattern pattern = patternEngine.render("" + FREE + REPEAT);
+		setPattern(pattern);
     }
     
-	public void setPattern(String patternString) {
-		this.pattern = Pattern.parseString(patternString,""+FREE+REPEAT);
+	public void setPattern(Pattern pattern) {
+		this.pattern = pattern;
 		this.patternLength = pattern.size();
 	}
 }

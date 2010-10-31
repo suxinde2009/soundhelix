@@ -47,6 +47,7 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
 	
 	private int voiceCount = -1;
 	private int[] offsets;
+	private short velocity = Short.MAX_VALUE;
 	
 	public PadSequenceEngine() {
 		super();
@@ -60,7 +61,11 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
 		this.offsets = offsets;
     	this.voiceCount = offsets.length;
 	}
-	
+
+	public void setVelocity(short velocity) {
+		this.velocity = velocity;
+	}
+
 	public void setObeyChordSubtype(boolean obeyChordSubtype) {
 		this.obeyChordSubtype = obeyChordSubtype;
 	}
@@ -84,16 +89,16 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
         	Chord chord = firstChord.findClosestChord(ce.getChord(tick));
            	int len = ce.getChordTicks(tick);
            	
-        	if(activityVector.isActive(tick)) {
+        	if (activityVector.isActive(tick)) {
         	
         	int activityLen = activityVector.getIntervalLength(tick);
         	
         	int shift = 0;
 
-        	if(obeyChordSubtype) {
-        		if(chord.getSubtype() == ChordSubtype.BASE_4) {
+        	if (obeyChordSubtype) {
+        		if (chord.getSubtype() == ChordSubtype.BASE_4) {
         			shift = 1;
-        		} else if(chord.getSubtype() == ChordSubtype.BASE_6) {
+        		} else if (chord.getSubtype() == ChordSubtype.BASE_6) {
         			shift = -1;
         		}
         	}
@@ -101,16 +106,16 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
         	for(int i=0;i<voiceCount;i++) {
         		Sequence seq = track.get(i);
 
-        		int pos = offsets[i]+shift;
+        		int pos = offsets[i] + shift;
         		
-        		int octave = (pos >= 0 ? pos/3 : (pos-2)/3);
-        		int offset = ((pos%3)+3)%3;
+        		int octave = (pos >= 0 ? pos / 3 : (pos - 2) / 3);
+        		int offset = ((pos % 3) + 3) % 3;
         		
-        		if(chord.isMajor()) {
-        			seq.addNote(octave*12+MAJOR_TABLE[offset]+chord.getPitch(),Math.min(activityLen,len)-postPauseTicks);
+        		if (chord.isMajor()) {
+        			seq.addNote(octave*12+MAJOR_TABLE[offset]+chord.getPitch(),Math.min(activityLen,len)-postPauseTicks, velocity);
         			seq.addPause(len-Math.min(activityLen,len));
         		} else {
-        			seq.addNote(octave*12+MINOR_TABLE[offset]+chord.getPitch(),Math.min(activityLen,len)-postPauseTicks);        			
+        			seq.addNote(octave*12+MINOR_TABLE[offset]+chord.getPitch(),Math.min(activityLen,len)-postPauseTicks, velocity);        			
         			seq.addPause(len-Math.min(activityLen,len));
         		}
         		
@@ -121,7 +126,7 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
         		pos++;
         	}
         	} else {
-        		for(int i=0;i<voiceCount;i++) {
+        		for (int i=0;i<voiceCount;i++) {
         		  track.get(i).addPause(len);
         		}
         	}
@@ -153,5 +158,9 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
 		try {
 			setObeyChordSubtype(XMLUtils.parseBoolean(random,"obeyChordSubtype",node,xpath));
 		} catch(Exception e) {}
-    }
+
+		try {
+			setVelocity((short) XMLUtils.parseInteger(random,"velocity",node,xpath));
+		} catch(Exception e) {}
+	}
 }

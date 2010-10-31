@@ -993,7 +993,7 @@ public class MidiPlayer extends AbstractPlayer {
 					nodeList.item(i),XPathConstants.STRING);
 			String device = ((String)xpath.evaluate("attribute::device",nodeList.item(i),XPathConstants.STRING));
 			int channel = Integer.parseInt((String)xpath.evaluate("attribute::channel",
-					nodeList.item(i),XPathConstants.STRING));
+					nodeList.item(i),XPathConstants.STRING)) - 1;
 
 			if (channelMap.containsKey(instrument)) {
 				throw(new RuntimeException("Instrument " + instrument + " must not be re-mapped"));
@@ -1007,7 +1007,7 @@ public class MidiPlayer extends AbstractPlayer {
 			
 			try {
 				program = Integer.parseInt((String)xpath.evaluate("attribute::program",
-						nodeList.item(i),XPathConstants.STRING));
+						nodeList.item(i),XPathConstants.STRING)) - 1;
 			} catch (Exception e) {
 			}
 			

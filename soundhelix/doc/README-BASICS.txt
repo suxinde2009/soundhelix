@@ -9,7 +9,8 @@ Ticks
 
 The basic time unit in SoundHelix is a tick. A tick subdivides a beat into an integer number of parts. Songs usually
 use 4 ticks per beat, but other numbers (3, 8, 12, 16 or 24) are also common. For the MIDI player, the number of
-ticks per beat must divide 24, so 16 would not be a valid number, but the others would.
+ticks per beat must divide 24 (at least if MIDI time synchronization is used), so 16 would not be a valid number in
+this case, but the others would.
 
 
 Harmony
@@ -28,8 +29,8 @@ Sequence
 --------
 
 A sequence (class Sequence) is a sequence of notes and pauses for one voice. A note has a pitch, a length in ticks,
-a velocity (volume) and a legato flag. The legato flag will make sure that the note-on for the following note will
-be sent before the note-off for the current note. This makes it possible to change the pitch of a note without
+a velocity (volume) and a legato flag. The legato flag if set will make sure that the note-on for the following note
+will be sent before the note-off for the current note. This makes it possible to change the pitch of a note without
 restarting the ADSR (attack, decay, sustain, release) cycle. Together with portamento, this makes nice slides possible.
 Note however, that legato and portamento must be supported by the MIDI playback device if it is to be used.
 
@@ -43,11 +44,11 @@ All sequences usually span the whole song.
 Patterns
 --------
 
-Like sequences, patterns are sequence of notes and pauses for one voice. However, patterns are often used repetitively
+Like sequences, patterns are sequences of notes and pauses for one voice. However, patterns are often used repetitively
 to create a sequence. While applying a pattern to create a sequence, often the pattern's notes are transposed according
 to the current chord. Therefore, patterns usually don't use pitches directly, but offsets in a chord table, which are
 then converted to pitches when a sequence is created. Additionally, patterns may contain wildcard characters, which may
-have a special meaning.
+have a special meaning. Patterns are created by PatternEngines.
 
 
 Track
@@ -59,8 +60,14 @@ One or more sequences form a track. A whole track is assigned to a playback devi
 Arrangement
 -----------
 
-An arrangement is a list of generated tracks and forms the song. The arrangement, together with an
-instrument mapping table, will be used by the player to play the song.
+An arrangement is a list of generated tracks and forms the song.
+
+
+Player
+------
+
+A player is responsible for playing an arrangement. Currently, only a MIDI player is available in SoundHelix. 
+The MIDI player uses an instrument mapping table in order to map instruments to MIDI channels.
 
 
 ActivityVector

@@ -14,6 +14,7 @@
     <startActivityCounts><random list="1,2,3"/></startActivityCounts>
 	<stopActivityCounts><random list="1"/></stopActivityCounts>
     <activityVector name="accomp">
+        <stopShift>-2</stopShift>
     </activityVector>
     <activityVector name="arpeggio">
     </activityVector>
@@ -75,7 +76,7 @@
 	
     <track>
       <instrument>melody</instrument>
-      <transposition>0</transposition>
+      <transposition>12</transposition>
       <sequenceEngine class="MelodySequenceEngine">
  	    <patternEngine class="StringPatternEngine">
         <string>0,-,-,-,+,-,+,+,0,-,-,-,+,-,+,-,0,-,-,-,+,-,+,+,0,-,-,-,0,+,+,+</string>
@@ -188,10 +189,11 @@
 	<beforePlayWaitTicks>16</beforePlayWaitTicks>
     <afterPlayWaitTicks>16</afterPlayWaitTicks>
     <groove><random list="100|110,90"/></groove>
+    <!-- device name="device1" clockSynchronization="true">Java Sound Synthesizer</device> -->
     <device name="device1" clockSynchronization="true">Microsoft GS Wavetable SW Synth</device>
 	<map instrument="arpeggio" device="device1" channel="1" program="1"/>
 	<map instrument="accomp" device="device1" channel="2" program="1"/>
-	<map instrument="melody" device="device1" channel="3" program="25"/>
+	<map instrument="melody" device="device1" channel="3" program="2"/>
 	<map instrument="pad" device="device1" channel="4" program="92"/>
 	<map instrument="bass" device="device1" channel="5" program="40"/>
 	<map instrument="percussion" device="device1" channel="10"/>

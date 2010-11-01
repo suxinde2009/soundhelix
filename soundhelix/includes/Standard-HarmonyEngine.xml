@@ -1,30 +1,37 @@
 <harmonyEngine class="PatternHarmonyEngine">
-  <chordPattern>0/4,1/4,1/4,2/4</chordPattern>
-  <chordPattern>0/4,1/4,1/4,1/2,2/2</chordPattern>
+  
+  <chordPattern>0/4,1/4,1/4,2!1/4</chordPattern>
+  <chordPattern>0/4,1/4,1/4,1/2,2!3/2</chordPattern>
   <chordPattern>0/4,1/4,1/4,1/2,1/2,0/4,1/4,1/4,1/2,2/2</chordPattern>
   <chordPattern>0/8,1/4,2/4</chordPattern>
-  <chordPattern>0/8,1/8,1/8,1/8</chordPattern>
+  <chordPattern>0/8,1/8,1/8,1!1/8</chordPattern>
   <chordPattern>0/8,1/4,1/2,2/2,$0/8,1/4,$2/2,$3/2</chordPattern> 
   <chordPattern>0/4,1/4,1/2,1/2,1/2,2/2</chordPattern>
   <chordPattern>0/4,1/4,1/4,1/4,0/4,1/4,1/4,2/4</chordPattern>
   <chordPattern>0/4,1/4,1/4,1/4,0/4,1/4,1/4,1/2,2/2</chordPattern>
   <chordPattern>0/4,1/4,1/2,1/2,2/4</chordPattern>
   <chordPattern>0/2,1/2,1/2,2/2,$0/2,$1/2,$2/2,2/2,$0/2,$1/2,$2/2,$3/2,$0/2,$1/2,1/2,2/2</chordPattern>
-  <chordPattern>0/4,1/4,$0/4,1/2,$1/2</chordPattern> 
+  <chordPattern>0/4,1/4,$0/4,1/2,$1/2</chordPattern>
   <chordPattern>0/2,1/2,1/2,2/2,$0/2,$1/2,$2/2,2/2</chordPattern>
   <chordPattern>0/2,1/2,$0/2,$1/2,$0/2,$1/2,1/2,1/2</chordPattern>
   <chordPattern>0/16,1/8,1/8</chordPattern>
   <chordPattern>0/32,+1/16,1/8,1/4,1/4</chordPattern>
-  <chordPattern>0/16,1/8,1/8,+$0/16,1/8,1/4,1/4</chordPattern>
-  <chordPattern>C/4,Dm/4,C/4,Am/2,Dm/2</chordPattern>
-  <chordPattern>0/7,1/1,0/6,1/2,$0/7,$1/1,$2/6,1/2</chordPattern>
-  <chordPattern>0/12,1/4,$0/12,1/4</chordPattern>
-  <chordPattern>0/12,1/4,$0/8,1/8</chordPattern>
-  <!-- <chordPattern>C/4,G/8,C/8,F/4,C/2,G/2,C/4,+C/4,G/4,Am/4,Em/4,F/4,C/4,F/4,G/4</chordPattern> -->
   <chordPattern>0/8,1/8,$0/8,1/8</chordPattern>
   <chordPattern>0/8,1/8,$0/8,$1/8</chordPattern>
-  <chordPattern>0/16,1/16</chordPattern>
-  <chordRandomTable>C,Am</chordRandomTable>
+  <chordPattern>0/16,1/8,1/8,+$0/16,1/8,1/4,1/4</chordPattern>
+  <chordPattern>0/7,1/1,0/6,1/2,$0/7,$1/1,$2/6,1/2</chordPattern>  
+  <chordPattern>0/7,1/1,0/7,1/1,$0/7,$1/1,$2/6,1/2</chordPattern>  
+  <chordPattern>0/12,1/4,$0/12,1/4</chordPattern>
+  <chordPattern>0/12,1/4,$0/8,1/8</chordPattern>
+  <chordPattern>0/6,1/2,1/8,1!0/8,1!1/8</chordPattern>
+  <chordPattern>0/6,1/2,1/8,1!0/6,1!1/2,1!2/8</chordPattern>
+  <chordPattern>0/8,1/8,1/8,1/8,+$0/8,1/8,1/8,1/8</chordPattern>
+  <chordPattern>0/8,1/8,0!0/8,1!1/8</chordPattern>
+
+  <chordPattern>Am/4,C/4,Am/4,F/2,C/2,Am/4,C/4,Am/4,Dm/2,F/2</chordPattern>
+  <chordPattern>C/4,G/8,C/8,F/4,C/2,G/2,C/4,+C/4,G/4,Am/4,Em/4,F/4,C/4,F/4,G/4</chordPattern>
+  
+  <chordRandomTable>Am,Am,Am,Am</chordRandomTable>
   <chordRandomTable>C,Am,G,F,Em,Dm</chordRandomTable>
   <chordRandomTable>C,Am,G,F,Em,Dm</chordRandomTable>
 </harmonyEngine>

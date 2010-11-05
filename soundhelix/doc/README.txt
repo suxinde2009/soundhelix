@@ -9,37 +9,38 @@ Introduction
 
 SoundHelix is a framework for algorithmic music creation and playback.
 
-In 1995, I started working on a similar software on the Amiga platform,
-called AlgoMusic, which was published on Aminet and was improved over
-a couple of releases until 1998. Then I stopped development due
-to lack of time. Due to the focus on and limitations of the standard Amiga
-audio hardware, AlgoMusic itself was very limited and inflexible.
+In 1995, I started working on a similar software on the Amiga platform, called
+AlgoMusic, which was published on Aminet and was improved over a couple of
+releases until 1998. Then I stopped development due to lack of time. Due to the
+focus on and limitations of the standard Amiga audio hardware, AlgoMusic itself
+was very limited and inflexible.
 
-SoundHelix has a similar goal, but strives to remove most (if not all)
-of the limitations of AlgoMusic. Due to its nature as a framework, it
-is possible to plug-in own implementations of most components.
+SoundHelix has a similar goal, but strives to remove most (if not all) of the
+limitations of AlgoMusic. Due to its nature as a framework, it is possible to
+plug-in own implementations of most components.
 
 SoundHelix is a Java rewrite from scratch which offers a whole lot of
-flexibility and customization capabilities. It is also a framework
-which allows other developers to easily write their own music creation
-components and use them within SoundHelix.
+flexibility and customization capabilities. It is also a framework which allows
+other developers to easily write their own music creation components and use
+them within SoundHelix.
 
-SoundHelix features some basic music creation abilities and a MIDI
-player, which can access any MIDI resource accessible to Java. Currently,
-some external MIDI software is required for playback. This can be any
-MIDI software or hardware which can be accessed using a MIDI driver on
-your platform. You can even use the standard Java Software Synthesizer or
-the Windows Wavetable Software Synth. It is possible to use any number of
-MIDI devices in parallel for playback. Please check the included configuration
-files.
+SoundHelix features some basic music creation abilities and a MIDI player,
+which can access any MIDI resource accessible to Java. Currently, some external
+MIDI software is required for playback. This can be any MIDI software or
+hardware which can be accessed using a MIDI driver on your platform. You can
+even use the standard Java Software Synthesizer or the Windows Wavetable
+Software Synth. It is possible to use any number of MIDI devices in parallel
+for playback. Please check the included configuration files.
 
 Note that SoundHelix might require some configuration time to produce good
-results on your MIDI setup. You shouldn't expect excellent results out-of-the-box.
+results on your MIDI setup. You shouldn't expect excellent results
+out-of-the-box.
 
-The current implementation of SoundHelix is very likely to change in different areas.
-Especially the XML format is going to be reworked in order to make it more consistent and to
-make it validatable using standard XML validation techniques. Don't expect your XML files to work
-across different versions of SoundHelix without any adaptions.
+The current implementation of SoundHelix is very likely to change in different
+areas.  Especially the XML format is going to be reworked in order to make it
+more consistent and to make it validatable using standard XML validation
+techniques. Don't expect your XML files to work across different versions of
+SoundHelix without any adaptions.
 
 
 Requirements
@@ -63,8 +64,8 @@ Developers:
 Running SoundHelix
 ------------------
 
-Download a binary package of SoundHelix and extract it somewhere. Then, open a console and go to that
-directory. Then simply run SoundHelix by typing
+Download a binary package of SoundHelix and extract it somewhere. Then, open a
+console and go to that directory. Then simply run SoundHelix by typing
 
 run.bat examples/SoundHelix-Piano.xml
 
@@ -72,30 +73,42 @@ or on Linux
 
 run.sh examples/SoundHelix-Piano.xml
 
-During playback, SoundHelix provides a very simple command console. Type "help" to view the possible
-commands.
+During playback, SoundHelix provides a very simple command console. Type "help"
+to view the possible commands.
 
 
 Example XML files
 -----------------
 
-A few examples are provided with SoundHelix. From these, the example SoundHelix-Piano.xml can be used
-out-of-the-box on a Windows system. It uses the MIDI device "Microsoft GS Wavetable SW Synth". The other examples
-can be used as snippets if you want to create your own files.
+A few examples are provided with SoundHelix. From these, the example
+SoundHelix-Piano.xml can be used out-of-the-box on a Windows system. It uses
+the MIDI device "Microsoft GS Wavetable SW Synth". The other examples can be
+used as snippets if you want to create your own files.
 
-It is also possible to use the MIDI device "Java Sound Synthesizer", which is part of the Java API. However, this
-might require the installation of a MIDI sound bank. See http://java.sun.com/products/java-media/sound/soundbanks.html
-for more details.
+It is also possible to use the MIDI device "Java Sound Synthesizer", which is
+part of the Java API. This MIDI device is platform-independent. However, this
+might require the installation of a MIDI sound bank (and at least on Windows,
+no MIDI soundbank is included in the JRE installation), but this is easy to
+install. See http://java.sun.com/products/java-media/sound/soundbanks.html for
+more details.
 
-If you have created new example files or have improved the existing ones, I would be glad to include them in the
-next SoundHelix release.
+If you have created new example files or have improved the existing ones, I
+would be glad to include them in the next SoundHelix release.
+
+
+Troubleshooting
+---------------
+
+SoundHelix has not been tested on many platforms yet. If you encounter problems
+on your platform that you cannot resolve yourself, please drop me an e-mail.
+
 
 
 Example Songs
 -------------
 
-You can find some example songs generated by SoundHelix on the SoundHelix channel
-on YouTube (sorry for the low sound quality):
+You can find some example songs generated by SoundHelix on the SoundHelix
+channel on YouTube (sorry for the low sound quality):
 
 http://www.youtube.com/user/SoundHelix/
 
@@ -103,12 +116,12 @@ http://www.youtube.com/user/SoundHelix/
 Building SoundHelix
 -------------------
 
-Download the source code (or get it using a Subversion client) and store
-it in any location on your harddrive. See below for how to check out the source code.
+Download the source code (or get it using a Subversion client) and store it in
+any location on your harddrive. See below for how to check out the source code.
 
-Then just run "ant jar" in SoundHelix' main directory, which is the directory containing the ant
-build script (build.xml). After building, a JAR file (SoundHelix.jar) will have been created
-in that directory.
+Then just run "ant jar" in SoundHelix' main directory, which is the directory
+containing the ant build script (build.xml). After building, a JAR file
+(SoundHelix.jar) will have been created in that directory.
 
 Then simply follow the same steps as mentioned in "Running SoundHelix".
 
@@ -116,26 +129,24 @@ Then simply follow the same steps as mentioned in "Running SoundHelix".
 Installing a MIDI Hub
 ---------------------
 
-Some MIDI software (like Propellerhead Reason) does not offer a
-MIDI device itself, but can connect to a present MIDI device to receive
-MIDI messages. SoundHelix also does not make itself visible as a MIDI device,
-so neither can SoundHelix connect to the MIDI software nor can the MIDI
-software connect to SoundHelix. In this case, you must install some MIDI hub
-software as a man-in-the-middle, for example MIDI Yoke (available for
-Windows, other platforms offer similar MIDI hub software).
+Some MIDI software (like Propellerhead Reason) does not offer a MIDI device
+itself, but can connect to a present MIDI device to receive MIDI messages.
+SoundHelix also does not make itself visible as a MIDI device, so neither can
+SoundHelix connect to the MIDI software nor can the MIDI software connect to
+SoundHelix. In this case, you must install some MIDI hub software as a
+man-in-the-middle, for example MIDI Yoke (available for Windows, other
+platforms offer similar MIDI hub software).
 
-This software simply sets up a MIDI device that is visible from both Java
-and from any other MIDI software and relays MIDI messages between
-SoundHelix and the MIDI software. SoundHelix must be configured
-to use MIDI Yoke as the MIDI output device and the MIDI software
-must use MIDI Yoke as the MIDI input device. MIDI Yoke provides
-up to 8 MIDI ports. It is sufficient to use one of the ports
-for SoundHelix (provided that you don't want use more than 16 MIDI
-channels), otherwise you can use more than one port. The name of the
-MIDI Yoke MIDI output port is "Out To MIDI Yoke:  n" (with n from
-1 to 8) - note the extra space after the colon. This must be used
-in SoundHelix for output. The MIDI software can then use "In From
-MIDI Yoke:  n" for input.
+This software simply sets up a MIDI device that is visible from both Java and
+from any other MIDI software and relays MIDI messages between SoundHelix and
+the MIDI software. SoundHelix must be configured to use MIDI Yoke as the MIDI
+output device and the MIDI software must use MIDI Yoke as the MIDI input
+device. MIDI Yoke provides up to 8 MIDI ports. It is sufficient to use one of
+the ports for SoundHelix (provided that you don't want use more than 16 MIDI
+channels), otherwise you can use more than one port. The name of the MIDI Yoke
+MIDI output port is "Out To MIDI Yoke:  n" (with n from 1 to 8) - note the
+extra space after the colon. This must be used in SoundHelix for output. The
+MIDI software can then use "In From MIDI Yoke:  n" for input.
 
 MIDI Yoke can be found here: http://www.midiox.com/myoke.htm
 
@@ -143,16 +154,15 @@ MIDI Yoke can be found here: http://www.midiox.com/myoke.htm
 Configuration
 -------------
 
-Configuration is done using an XML file. If no filename is
-provided at startup, the file "SoundHelix.xml" is read from the current
-directory, otherwise the first parameter given is used as the XML filename
-and that file is read. A couple of example configuration files are included
-in the "examples" directory.
+Configuration is done using an XML file. If no filename is provided at startup,
+the file "SoundHelix.xml" is read from the current directory, otherwise the
+first parameter given is used as the XML filename and that file is read. A
+couple of example configuration files are included in the "examples" directory.
 
 Details about configuration are still to be written.
 
-Within each XML tag that requires an integer you can use the following
-syntax instead of a plain integer:
+Within each XML tag that requires an integer you can use the following syntax
+instead of a plain integer:
 
 - <random min="minimum" max="maximum"/>
 
@@ -177,15 +187,15 @@ of a plain string:
 
   to randomly select one of the specified strings with uniform distribution
 
-Note that all of these special tags can only be used in text nodes in the XML file,
-i.e., not for attribute values.
+Note that all of these special tags can only be used in text nodes in the XML
+file, i.e., not for attribute values.
 
 
 Results wanted
 --------------
 
-I'm going to collect SoundHelix results from users throughout the world
-for publishing them as example results on the SoundHelix webpage.
+I'm going to collect SoundHelix results from users throughout the world for
+publishing them as example results on the SoundHelix webpage.
 
 These are the requirements:
 
@@ -195,9 +205,9 @@ These are the requirements:
 - song lengths must be between 3 and 8 minutes
 - songs must be in MP3 format with a bitrate between 128 and 320 KBit/s
 
-Songs will be published with your real name or pseudonym, optionally with
-your mail address, and a short description of your setup (operating system,
-MIDI software used, etc.).
+Songs will be published with your real name or pseudonym, optionally with your
+mail address, and a short description of your setup (operating system, MIDI
+software used, etc.).
 
 You can send your results to me by e-mail.
 
@@ -222,9 +232,9 @@ svn co https://soundhelix.svn.sourceforge.net/svnroot/soundhelix/trunk/soundheli
 More Developers welcome
 -----------------------
 
-I'm looking for more developers to join this project. If you have Java and
-some music skills, documentation skills or think you can contribute to the
-project in any other way, then please don't hesitate to contact me.
+I'm looking for more developers to join this project. If you have Java and some
+music skills, documentation skills or think you can contribute to the project
+in any other way, then please don't hesitate to contact me.
 
 
 Developer Resources

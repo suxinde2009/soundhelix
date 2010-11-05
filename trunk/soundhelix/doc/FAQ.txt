@@ -1,0 +1,46 @@
+﻿SoundHelix
+----------
+
+Author: Thomas Schürger (thomas@schuerger.com)
+
+
+Frequently Asked Questions
+--------------------------
+
+1. SoundHelix complains about the MIDI device. What can I do?
+
+Depending on your platform, the names of the available MIDI devices can change.
+This is true even between different Windows platform. For example, the included
+MIDI device is called "Microsoft GS Wavetable SW Synth" on Windows XP, but is
+called "Microsoft GS Wavetable Synth" on Windows 7.
+
+You can change the MIDI device to use in the XML file (look for the <device>
+tag). If an invalid MIDI device is specified, SoundHelix will list the
+available MIDI devices.
+
+The standard MIDI device that is available in Java on all platforms is the
+"Java Sound Synthesizer" device. This device provides a software synthesizer
+that is compatible with the General MIDI standard. Please read the FAQ entry
+about that device.
+
+
+2. I'm using the MIDI device "Java Sound Synthesizer", but I can't hear anything. Why?
+
+If you are using the standard MIDI device "Java Sound Synthesizer", please make
+sure that a MIDI soundbank file is available. Otherwise the device will pretend
+it's playing something but it will just remain silent. Please read the
+following document about instructions how to download and install such a file:
+http://java.sun.com/products/java-media/sound/soundbanks.html
+
+
+3. What is the "groove" tag for?
+
+The MidiPlayer device supports a "groove" tag. This tag defines how the ticks
+are played. If it includes a single positive number, the ticks are played with
+uniform length. If you provide more than one value (comma-separated), the tick
+lengths are played using these numbers as ratios, repeating this pattern in a
+round-robin manner. For example, if you use "2,1", then every even tick (ticks
+are counted from 0) is played using 133% of its standard length and every odd
+tick is played using 66% of the standard length, giving a ratio of 2:1. This
+will make playing more groovy (try it out!). Of course, larger numbers and more
+numbers are possible as well (e.g., "120,80", or "120,80,110,90").

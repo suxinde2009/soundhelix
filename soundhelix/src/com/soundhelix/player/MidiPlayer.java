@@ -322,19 +322,43 @@ public class MidiPlayer extends AbstractPlayer {
     	this.channelMap = channelMap;
     }
     
-	private static MidiDevice findMidiDevice(String name) {
+    /**
+     * Takes a comma-separated list of MIDI devices and instantiates the first one that is available in the system.
+     * 
+     * @param namesString comma-separated list of MIDI device names
+     * 
+     * @return a first instantiated MIDI device or null if none of the devices are available
+     */
+    
+	private MidiDevice findMidiDevice(String namesString) {
     	MidiDevice.Info[] infos = MidiSystem.getMidiDeviceInfo();
-
+    	Map<String,MidiDevice.Info> map = new HashMap<String,MidiDevice.Info>();
+    	
     	for (MidiDevice.Info info : infos) {
-    		if (info.getName().equals(name)) {
+    	    map.put(info.getName(), info);
+    	} 
+    	    
+    	String[] names = namesString.split(",");
+ 
+    	for (String name : names) {
+    	    MidiDevice.Info info = map.get(name);
+    	    
+    	    if (info != null) {
+    	        // device was found, try to create an instance
+    	        
     			try {
-    				return MidiSystem.getMidiDevice(info);
+    			    MidiDevice midiDevice = MidiSystem.getMidiDevice(info);
+    			    logger.debug("Successfully opened MIDI device \"" + name + "\"");
+    			    return midiDevice;
     			} catch (Exception e) {
-    				return null;
+                    logger.debug("MIDI device \"" + name + "\" could not be instantiated", e);
     			}
+    		} else {
+    		    logger.debug("MIDI device \"" + name + "\" was not found");
     		}
     	}
     	
+    	// none of the devices were found or were instantiable
     	return null;
     }
       

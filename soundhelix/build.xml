@@ -1,19 +1,35 @@
 <project name="SoundHelix" default="jar" basedir=".">
+    <property name="version" value="0.0.2"/>
     <property name="src" location="src"/>
+    <property name="zip" location="SoundHelix.zip"/>
     <property name="build" location="bin"/>
     <property name="javadoc" location="javadoc"/>
     <property name="classpath" location="lib/log4j.jar"/>
 
     <target name="init">
-        <mkdir dir="${build}"/>
+        <tstamp/>
     </target>
 
     <target name="compile" depends="init" description="compile the source">
+        <mkdir dir="${build}"/>
         <javac encoding="UTF-8" classpath="${classpath}" srcdir="${src}" destdir="${build}" debug="yes" target="1.5"/>
     </target>
 
     <target name="jar" depends="compile" description="generate the JAR">
-        <jar jarfile="SoundHelix.jar" basedir="${build}"/>
+        <jar jarfile="SoundHelix.jar" basedir="${build}" includes="**/*.class">
+        	<manifest>
+        	    <attribute name="Main-Class" value="com.soundhelix.SoundHelix"/>
+                <attribute name="Class-Path" value="lib/log4j.jar"/>
+                <section name="common">
+        	        <attribute name="Specification-Title" value="SoundHelix"/>
+        	        <attribute name="Specification-Version" value="${version}"/>
+        	        <attribute name="Specification-Vendor" value="soundhelix.com"/>
+        	        <attribute name="Implementation-Title" value="SoundHelix"/>
+        	        <attribute name="Implementation-Version" value="${version} ${TODAY}"/> 
+        	        <attribute name="Implementation-Vendor" value="soundhelix.com"/>
+        	    </section>
+            </manifest>
+        </jar>
     </target>
 
     <target name="javadoc" depends="init" description="generate javadoc">
@@ -33,8 +49,21 @@
         </javadoc>
     </target>
 
+	<target name="packagebin" depends="init,jar">
+		<zip destfile="SoundHelix-bin.zip"
+		     basedir=".."
+		     includes="soundhelix/SoundHelix.jar,soundhelix/run.bat,soundhelix/run.sh,soundhelix/examples/*,soundhelix/includes/*,soundhelix/doc/*,soundhelix/lib/*,soundhelix/log4j.*"/>		     
+	</target>
+
+    <target name="packagesrc" depends="init,jar,javadoc">
+	    <zip destfile="SoundHelix-src.zip"
+             basedir=".."
+             includes="soundhelix/src/*,soundhelix/javadoc/*,soundhelix/build.xml,soundhelix/SoundHelix.jar,soundhelix/run.bat,soundhelix/run.sh,soundhelix/examples/*,soundhelix/includes/*,soundhelix/doc/*,soundhelix/lib/*,,soundhelix/log4j.*"/>
+	</target>
+  
     <target name="clean" description="clean up">
         <delete dir="${build}"/>
         <delete dir="${javadoc}"/>
+    	<delete dir="${zip}"/>
     </target>
 </project>

@@ -73,6 +73,15 @@ or on Linux
 
 run.sh examples/SoundHelix-Piano.xml
 
+Parameter syntax (substitute run.bat with run.sh on Linux):
+
+run.bat                           - starts SoundHelix with the file "SoundHelix.xml" in the current directory
+run.bat <filename>                - starts SoundHelix with the given XML file
+run.bat <filename> "<songname>"   - starts SoundHelix with the given XML file and uses the song name for the random
+                                    seed by computing a hash value
+run.bat <filename> seed:<seed>    - starts SoundHelix with the given XML file and uses the given seed value for the
+                                    random seed
+
 During playback, SoundHelix provides a very simple command console. Type "help"
 to view the possible commands.
 

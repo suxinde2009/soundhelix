@@ -126,15 +126,15 @@ public class SoundHelix implements Runnable {
 			SoundHelix soundHelix = new SoundHelix(filename,randomSeed);
 			
 			// launch song generation thread with low priority
-			Thread t = new Thread(soundHelix);
+			Thread t = new Thread(soundHelix,"Generator");
 			t.setPriority(Thread.MIN_PRIORITY);
 			t.start();
 
-			Thread consoleThread = new Thread(new ConsoleRunnable());
+			Thread consoleThread = new Thread(new ConsoleRunnable(),"Console");
 			consoleThread.setPriority(Thread.MIN_PRIORITY);
 			consoleThread.start();
 
-            // increase priority of the current thread
+            // increase priority of the current thread for playback
 			Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 
 			generateNew = true;
@@ -404,8 +404,16 @@ public class SoundHelix implements Runnable {
 							System.out.println("Next Song");
 							player.abortPlay();
 						}
+					} else if (line.equals("help")) {
+						System.out.println("\nAvailable commands");
+						System.out.println("------------------\n");
+						System.out.println("bpm <value>             Sets the BPM. Example: \"bpm 140\"");
+						System.out.println("transposition <value>   Sets the transposition. Example: \"transposition 70\"");
+						System.out.println("groove <value>          Sets the groove. Example: \"groove 130,70\"");
+						System.out.println("next                    Aborts playing and starts the next song. Example: \"next\"");
+						System.out.println();
 					} else {
-						System.out.println("Invalid command");
+						System.out.println("Invalid command. Type \"help\" for help.");
 					}
 				} catch (Exception e) {
 					logger.error("Exception in console thread",e);

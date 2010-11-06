@@ -190,7 +190,7 @@
     <afterPlayWaitTicks>16</afterPlayWaitTicks>
     <groove><random list="100|110,90"/></groove>
     <!-- device name="device1" clockSynchronization="true">Java Sound Synthesizer</device> -->
-    <device name="device1" clockSynchronization="true">Microsoft GS Wavetable SW Synth</device>
+    <device name="device1" clockSynchronization="true">Microsoft GS Wavetable Synth,Microsoft GS Wavetable SW Synth,Java Sound Synthesizer</device>
 	<map instrument="arpeggio" device="device1" channel="1" program="1"/>
 	<map instrument="accomp" device="device1" channel="2" program="1"/>
 	<map instrument="melody" device="device1" channel="3" program="2"/>

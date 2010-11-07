@@ -1,7 +1,9 @@
 <project name="SoundHelix" default="jar" basedir=".">
     <property name="version" value="0.0.2"/>
     <property name="src" location="src"/>
-    <property name="zip" location="SoundHelix.zip"/>
+    <property name="jar" location="SoundHelix.jar"/>
+    <property name="binzip" location="SoundHelix-bin.zip"/>
+    <property name="srczip" location="SoundHelix-src.zip"/>
     <property name="build" location="bin"/>
     <property name="javadoc" location="javadoc"/>
     <property name="classpath" location="lib/log4j.jar"/>
@@ -16,7 +18,7 @@
     </target>
 
     <target name="jar" depends="compile" description="generate the JAR">
-        <jar jarfile="SoundHelix.jar" basedir="${build}" includes="**/*.class">
+        <jar jarfile="${jar}" basedir="${build}" includes="**/*.class">
         	<manifest>
         	    <attribute name="Main-Class" value="com.soundhelix.SoundHelix"/>
                 <attribute name="Class-Path" value="lib/log4j.jar"/>
@@ -50,20 +52,22 @@
     </target>
 
 	<target name="packagebin" depends="init,jar">
-		<zip destfile="SoundHelix-bin.zip"
+		<zip destfile="${binzip}"
 		     basedir=".."
 		     includes="soundhelix/SoundHelix.jar,soundhelix/run.bat,soundhelix/run.sh,soundhelix/examples/*,soundhelix/includes/*,soundhelix/doc/*,soundhelix/lib/*,soundhelix/log4j.*"/>		     
 	</target>
 
     <target name="packagesrc" depends="init,jar,javadoc">
-	    <zip destfile="SoundHelix-src.zip"
+	    <zip destfile="${srczip}"
              basedir=".."
              includes="soundhelix/src/*,soundhelix/javadoc/*,soundhelix/build.xml,soundhelix/SoundHelix.jar,soundhelix/run.bat,soundhelix/run.sh,soundhelix/examples/*,soundhelix/includes/*,soundhelix/doc/*,soundhelix/lib/*,,soundhelix/log4j.*"/>
 	</target>
   
     <target name="clean" description="clean up">
         <delete dir="${build}"/>
+        <delete file="${jar}"/>
         <delete dir="${javadoc}"/>
-    	<delete dir="${zip}"/>
+    	<delete file="${binzip}"/>
+        <delete file="${srczip}"/>
     </target>
 </project>

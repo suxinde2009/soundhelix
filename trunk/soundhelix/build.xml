@@ -1,6 +1,6 @@
 <project name="SoundHelix" default="jar" basedir=".">
-    <property name="version" value="0.0.2"/>
     <property name="src" location="src"/>
+    <property name="constants" location="${src}/com/soundhelix/util/BuildConstants.java"/>
     <property name="jar" location="SoundHelix.jar"/>
     <property name="binzip" location="SoundHelix-bin.zip"/>
     <property name="srczip" location="SoundHelix-src.zip"/>
@@ -8,8 +8,45 @@
     <property name="javadoc" location="javadoc"/>
     <property name="classpath" location="lib/log4j.jar"/>
 
+    <property file="VERSION.txt"/>
+	
     <target name="init">
-        <tstamp/>
+        <tstamp>
+            <format property="TODAY" pattern="yyyy-MM-dd"/>
+            <format property="NOW" pattern="HH:mm:ss"/>
+        </tstamp>
+    	
+        <exec executable="svn" outputproperty="revision">
+        	 <env key="LANG" value="en_US"/>
+             <arg line="info"/>
+             <redirector>
+                 <outputfilterchain>
+                     <linecontainsregexp>
+                         <regexp pattern='^Revision' />
+                     </linecontainsregexp>
+                     <tokenfilter>
+                         <replaceregex pattern='[\D]+([\d]+)' replace="\1" />
+                     </tokenfilter>
+                  </outputfilterchain>
+              </redirector>
+           </exec>
+
+    	<replaceregexp file="${constants}"
+    	               match="(\sVERSION\s*=\s*&quot;)[^&quot;]+?(&quot;)"
+                       replace="\1${version}\2"/>
+
+        <replaceregexp file="${constants}"
+                       match="(\sREVISION\s*=\s*&quot;)[^&quot;]+?(&quot;)"
+                       replace="\1${revision}\2"/>
+ 
+        <replaceregexp file="${constants}"
+                       match="(\sBUILD_DATE\s*=\s*&quot;)[^&quot;]+?(&quot;)"
+                       replace="\1${TODAY}\2"/>
+
+    	<echo> Version: ${version}</echo>
+        <echo>    Date: ${TODAY}</echo>
+        <echo>Revision: ${revision}</echo> 	
+
     </target>
 
     <target name="compile" depends="init" description="compile the source">
@@ -27,7 +64,7 @@
         	        <attribute name="Specification-Version" value="${version}"/>
         	        <attribute name="Specification-Vendor" value="soundhelix.com"/>
         	        <attribute name="Implementation-Title" value="SoundHelix"/>
-        	        <attribute name="Implementation-Version" value="${version} ${TODAY}"/> 
+        	        <attribute name="Implementation-Version" value="${version} r${revision} ${TODAY}"/> 
         	        <attribute name="Implementation-Vendor" value="soundhelix.com"/>
         	    </section>
             </manifest>

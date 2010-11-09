@@ -30,6 +30,7 @@ import com.soundhelix.misc.Arrangement;
 import com.soundhelix.misc.Structure;
 import com.soundhelix.player.MidiPlayer;
 import com.soundhelix.player.Player;
+import com.soundhelix.util.BuildConstants;
 import com.soundhelix.util.XMLUtils;
 
 /**
@@ -72,7 +73,10 @@ public class SoundHelix implements Runnable {
 		this.randomSeed = randomSeed;
 	}
 	
-	public static void main(String[] args) throws Exception {		
+	public static void main(String[] args) throws Exception {
+		System.out.println("SoundHelix " + BuildConstants.VERSION + " (r" + BuildConstants.REVISION + "), built on "
+						   + BuildConstants.BUILD_DATE);
+		
 		if (args.length == 1 && args[0].equals("-h") || args.length > 2) {
 			System.out.println("java SoundHelix [XML-File [Songtitle]] ");
 			System.exit(0);

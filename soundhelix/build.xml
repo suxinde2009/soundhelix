@@ -1,10 +1,13 @@
 <project name="SoundHelix" default="jar" basedir=".">
     <property name="src" location="src"/>
+    <property name="tmpsrc" location="tmpsrc"/>
+    <property name="build" location="bin"/>
     <property name="constants" location="${src}/com/soundhelix/constants/BuildConstants.java"/>
+    <property name="tmpconstants" location="${tmpsrc}/com/soundhelix/constants/BuildConstants.java"/>
+    <property name="constantsclass" location="${build}/com/soundhelix/constants/BuildConstants.class"/>
     <property name="jar" location="SoundHelix.jar"/>
     <property name="binzip" location="SoundHelix-bin.zip"/>
     <property name="srczip" location="SoundHelix-src.zip"/>
-    <property name="build" location="bin"/>
     <property name="javadoc" location="javadoc"/>
     <property name="classpath" location="lib/log4j.jar"/>
 
@@ -15,7 +18,9 @@
             <format property="TODAY" pattern="yyyy-MM-dd"/>
             <format property="NOW" pattern="HH:mm:ss"/>
         </tstamp>
-    	
+    </target>
+    
+    <target name="-createBuildConstants">
         <exec executable="svn" outputproperty="revision">
         	 <env key="LANG" value="en_US"/>
              <arg line="info"/>
@@ -31,27 +36,37 @@
               </redirector>
            </exec>
 
-    	<replaceregexp file="${constants}"
+        <copy file="${constants}" tofile="${tmpconstants}" overwrite="true"/>    	
+    	
+    	<replaceregexp file="${tmpconstants}"
     	               match="(\sVERSION\s*=\s*&quot;)[^&quot;]+?(&quot;)"
                        replace="\1${version}\2"/>
 
-        <replaceregexp file="${constants}"
+        <replaceregexp file="${tmpconstants}"
                        match="(\sREVISION\s*=\s*&quot;)[^&quot;]+?(&quot;)"
                        replace="\1${revision}\2"/>
  
-        <replaceregexp file="${constants}"
+        <replaceregexp file="${tmpconstants}"
                        match="(\sBUILD_DATE\s*=\s*&quot;)[^&quot;]+?(&quot;)"
                        replace="\1${TODAY}\2"/>
+
+        <replaceregexp file="${tmpconstants}"
+                       match="(\sBUILD_TIME\s*=\s*&quot;)[^&quot;]+?(&quot;)"
+                       replace="\1${NOW}\2"/>
 
     	<echo> Version: ${version}</echo>
         <echo>    Date: ${TODAY}</echo>
         <echo>Revision: ${revision}</echo> 	
-
-    </target>
-
-    <target name="compile" depends="init" description="compile the source">
+    </target> 
+	
+    <target name="compile" depends="init,-createBuildConstants" description="compile the source">
         <mkdir dir="${build}"/>
-        <javac encoding="UTF-8" classpath="${classpath}" srcdir="${src}" destdir="${build}" debug="yes" target="1.5"/>
+        <javac encoding="UTF-8" classpath="${classpath}" destdir="${build}" debug="yes" target="1.5">
+            <src path="${tmpsrc}"/>
+            <src path="${src}"/>
+            <include name="**/*.java"/>
+            <exclude name="com/soundhelix/constants/BuildConstants.java"/>
+        </javac>
     </target>
 
     <target name="jar" depends="compile" description="generate the JAR">
@@ -72,7 +87,7 @@
     </target>
 
     <target name="javadoc" depends="init" description="generate javadoc">
-        <javadoc sourcepath="src"
+        <javadoc sourcepath="${src}"
                  classpath="${classpath}"
                  defaultexcludes="yes"
                  destdir="${javadoc}"
@@ -101,6 +116,7 @@
 	</target>
   
     <target name="clean" description="clean up">
+        <delete dir="${tmpsrc}"/>
         <delete dir="${build}"/>
         <delete file="${jar}"/>
         <delete dir="${javadoc}"/>

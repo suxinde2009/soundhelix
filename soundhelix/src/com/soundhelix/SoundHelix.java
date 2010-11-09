@@ -25,12 +25,12 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import com.soundhelix.arrangementengine.ArrangementEngine;
+import com.soundhelix.constants.BuildConstants;
 import com.soundhelix.harmonyengine.HarmonyEngine;
 import com.soundhelix.misc.Arrangement;
 import com.soundhelix.misc.Structure;
 import com.soundhelix.player.MidiPlayer;
 import com.soundhelix.player.Player;
-import com.soundhelix.util.BuildConstants;
 import com.soundhelix.util.XMLUtils;
 
 /**

@@ -1,19 +1,21 @@
 package com.soundhelix.constants;
 
 /**
- * Provides constants regarding the application build. These constants are modified automatically by the build
- * process.
+ * Provides constants regarding the application build. These constants are filled automatically by the build process.
  * 
- * @author: Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas Schürger (thomas@schuerger.com)
  */
 
 public class BuildConstants {
 	/** The application version of the build. */
-	public static final String VERSION = "0.0.3";
+	public static final String VERSION = "???";
 	
 	/** The Subversion revision of the build. */
-	public static final String REVISION = "331";
+	public static final String REVISION = "???";
 	
-	/** The date of the build. */
-	public static final String BUILD_DATE = "2010-11-09";
+	/** The date of the build (yyyy-mm-dd). */
+	public static final String BUILD_DATE = "???";
+	
+	/** The time of the build (hh:mm:ss). */
+	public static final String BUILD_TIME = "???";
 }

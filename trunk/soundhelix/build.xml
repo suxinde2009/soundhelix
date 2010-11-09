@@ -1,6 +1,6 @@
 <project name="SoundHelix" default="jar" basedir=".">
     <property name="src" location="src"/>
-    <property name="constants" location="${src}/com/soundhelix/util/BuildConstants.java"/>
+    <property name="constants" location="${src}/com/soundhelix/constants/BuildConstants.java"/>
     <property name="jar" location="SoundHelix.jar"/>
     <property name="binzip" location="SoundHelix-bin.zip"/>
     <property name="srczip" location="SoundHelix-src.zip"/>

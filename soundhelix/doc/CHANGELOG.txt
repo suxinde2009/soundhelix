@@ -1,0 +1,19 @@
+﻿SoundHelix
+----------
+
+Author: Thomas Schürger (thomas@schuerger.com)
+
+
+Change log
+----------
+
+0.0.2: 2010-11-07
+
+    - Added possibility to specify more than one MIDI device name for the MIDI player; SoundHelix will take the first
+      one available on your system.
+      
+    - Updated example.
+     
+0.0.1: 2010-11-02
+
+    - Initial release

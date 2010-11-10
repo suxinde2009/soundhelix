@@ -230,9 +230,15 @@ public class RandomPatternEngine extends StringPatternEngine {
     								   random.nextDouble() < legatoProbability;
 
     				if (isLegato) {
-    					sb.append(pitch).append("~/").append(length).append(':').append(volume);
+    					sb.append(pitch).append("~/");
     				} else {
-    					sb.append(pitch).append("/").append(length).append(':').append(volume);   			
+    					sb.append(pitch).append('/');   			
+    				}
+    				
+    				if (volume != Short.MAX_VALUE) {
+    				    sb.append(length).append(':').append(volume); 
+    				} else {
+    				    sb.append(length);
     				}
     				
     				activeTicks += length;

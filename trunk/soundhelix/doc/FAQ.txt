@@ -47,3 +47,29 @@ its standard length and every odd tick is played using 66% of the standard
 length, giving a ratio of 2:1. This will make playing more groovy (try it
 out!). Of course, larger numbers and more numbers are possible as well (e.g.,
 "120,80", or "120,80,110,90").
+
+
+4. I like a specific song. Can I generate the exact same song again later?
+
+Yes, at least if you are using the same XML file later and are using the same
+version of SoundHelix. Simply record the random seed logged as "song random
+seed" and start SoundHelix with the XML file as the first parameter and
+"seed:your_random_seed" as the second parameter. For example, run "run.bat
+examples/SoundHelix-Piano.xml seed:4823948293" if the logged seed was
+4823948293. It is also possible to create a reproducible song by using a song
+name as the second parameter. Internally, the given song title will be hashed
+and the hash value will be used as the random seed. For example, run "run.bat
+examples/SoundHelix-Piano.xml Notorious". Remember to put the song title in
+quotes if it contains spaces. The song title is case insensitive and must not
+start with "seed:".
+
+
+5. Playing seems to hang a bit every now and then. Why?
+
+SoundHelix uses a custom real-time MIDI player for playing songs. The created
+thread for MIDI playback is given high priority. Still, it is possible that
+your system sometimes is too busy for playing the notes with exactly the correct
+timing. If that happens, SoundHelix will notice this and will try to "catch up"
+to the correct timing again as soon as it can. So if a note was played with a
+delay, SoundHelix tries to reduce the delay of the next note by the same amount
+to correct that timing glitch.

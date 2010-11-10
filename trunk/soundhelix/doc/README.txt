@@ -17,7 +17,9 @@ was very limited and inflexible.
 
 SoundHelix has a similar goal, but strives to remove most (if not all) of the
 limitations of AlgoMusic. Due to its nature as a framework, it is possible to
-plug-in own implementations of most components.
+plug-in own implementations of most components. In the future, it should be
+possible to include SoundHelix in third-party applications, for example as
+in-game music.
 
 SoundHelix is a Java rewrite from scratch which offers a whole lot of
 flexibility and customization capabilities. It is also a framework which allows
@@ -25,22 +27,23 @@ other developers to easily write their own music creation components and use
 them within SoundHelix.
 
 SoundHelix features some basic music creation abilities and a MIDI player,
-which can access any MIDI resource accessible to Java. Currently, some external
-MIDI software is required for playback. This can be any MIDI software or
-hardware which can be accessed using a MIDI driver on your platform. You can
-even use the standard Java Software Synthesizer or the Windows Wavetable
-Software Synth. It is possible to use any number of MIDI devices in parallel
-for playback. Please check the included configuration files.
+which can access any MIDI resource accessible to Java. Currently, one or more
+MIDI devices are required for playback. These can be provided by any MIDI
+software or hardware which can be accessed using a MIDI driver on your
+platform. You can even use the standard Java Software Synthesizer that comes
+along with Java or the Windows Wavetable Software Synth. It is possible to use
+any number of MIDI devices in parallel for playback. Please check the included
+configuration files.
 
 Note that SoundHelix might require some configuration time to produce good
 results on your MIDI setup. You shouldn't expect excellent results
 out-of-the-box.
 
 The current implementation of SoundHelix is very likely to change in different
-areas.  Especially the XML format is going to be reworked in order to make it
+areas. Especially the XML format is going to be reworked in order to make it
 more consistent and to make it validatable using standard XML validation
 techniques. Don't expect your XML files to work across different versions of
-SoundHelix without any adaptions.
+SoundHelix without any adaptions. You have been warned.
 
 
 Requirements
@@ -65,22 +68,30 @@ Running SoundHelix
 ------------------
 
 Download a binary package of SoundHelix and extract it somewhere. Then, open a
-console and go to that directory. Then simply run SoundHelix by typing
+console and go to that directory. Then on Windows simply run SoundHelix by typing
 
-run.bat examples/SoundHelix-Piano.xml
+run.bat
 
-or on Linux
+or on Linux type
 
-run.sh examples/SoundHelix-Piano.xml
+./run.sh
+
+Without parameters (like above), this will start SoundHelix with the XML file
+examples/SoundHelix-Piano.xml.
+
 
 Parameter syntax (substitute run.bat with run.sh on Linux):
 
-run.bat                           - starts SoundHelix with the file "SoundHelix.xml" in the current directory
+run.bat                           - starts SoundHelix with the example XML file
 run.bat <filename>                - starts SoundHelix with the given XML file
 run.bat <filename> "<songname>"   - starts SoundHelix with the given XML file and uses the song name for the random
                                     seed by computing a hash value
 run.bat <filename> seed:<seed>    - starts SoundHelix with the given XML file and uses the given seed value for the
                                     random seed
+
+The "raw" way to start SoundHelix (without a batch or shell script) is to run
+
+java -jar SoundHelix.jar <Parameters...>
 
 During playback, SoundHelix provides a very simple command console. Type "help"
 to view the possible commands.
@@ -126,7 +137,7 @@ Building SoundHelix
 Download the source code (or get it using a Subversion client) and store it in
 any location on your harddrive. See below for how to check out the source code.
 
-Then just run "ant jar" in SoundHelix' main directory, which is the directory
+Then just run "ant clean jar" in SoundHelix' main directory, which is the directory
 containing the ant build script (build.xml). After building, a JAR file
 (SoundHelix.jar) will have been created in that directory.
 

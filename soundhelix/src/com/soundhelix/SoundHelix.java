@@ -98,33 +98,18 @@ public class SoundHelix implements Runnable {
 
 		long randomSeed;
 		
-		if (songtitle != null) {
+		if (songtitle != null && !songtitle.equals("")) {
 			if (songtitle.startsWith("seed:")) {
 				randomSeed = Long.parseLong(songtitle.substring(5));
 			} else {
 				randomSeed = songtitle.trim().toLowerCase().hashCode();
 			}
 		} else {
-			randomSeed = System.nanoTime();
+			randomSeed = new Random().nextLong();
 		}
 		
 		logger.debug("Main random seed: " + randomSeed);
 
-		if (false) {
-			SoundHelix soundHelix = new SoundHelix(filename,randomSeed);
-			Random random = new Random(randomSeed);
-
-			while (true) {
-				try {
-					soundHelix.generateSong(random);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				
-				soundHelix.randomSeed ^= random.nextLong();
-			}
-		}
-		
 		try {
 			// instantiate this class so we can launch a thread
 			SoundHelix soundHelix = new SoundHelix(filename,randomSeed);
@@ -183,21 +168,20 @@ public class SoundHelix implements Runnable {
 	 */
 	
 	public void run() {
-		while (true) {
-			Random random = new Random(randomSeed);
-			
+        long randomSeed = this.randomSeed;
+        Random random = new Random(randomSeed);
+        
+        while (true) {
 			try {
 				if (songQueue.size() < 1 && generateNew) {
 					// the queue is empty; render a new song
-					songQueue.add(generateSong(random));
-					//generateNew = false;
+					songQueue.add(generateSong(randomSeed));
+					randomSeed = random.nextLong();
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			
-			randomSeed ^= random.nextLong();
-
 			try {
 				Thread.sleep(1000);
 			} catch (Exception e) {
@@ -304,15 +288,15 @@ public class SoundHelix implements Runnable {
 		}
 	}
 	
-	private SongQueueEntry generateSong(Random random) throws Exception {
+	private SongQueueEntry generateSong(long randomSeed) throws Exception {
 		logger.debug("Rendering new song");
 
 		File file = new File(filename);
 
-		logger.debug("Reading and parsing XML file");
+		logger.debug("Reading and parsing XML file \"" + filename + "\"");
 		
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-      dbf.setNamespaceAware(true);
+        dbf.setNamespaceAware(true);
         dbf.setXIncludeAware(true);
         dbf.setValidating(false);
         DocumentBuilder builder = dbf.newDocumentBuilder();
@@ -343,7 +327,8 @@ public class SoundHelix implements Runnable {
 		Node arrangementEngineNode = (Node)xpath.evaluate("arrangementEngine",mainNode,XPathConstants.NODE);
 		Node playerNode = (Node)xpath.evaluate("player",mainNode,XPathConstants.NODE);
 
-		logger.debug("Using song random seed " + randomSeed);
+        logger.debug("Using song random seed " + randomSeed);
+        Random random = new Random(randomSeed);
 
 		Structure structure = parseStructure(random,structureNode,xpath);
 	

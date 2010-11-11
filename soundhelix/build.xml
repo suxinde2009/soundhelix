@@ -6,12 +6,12 @@
     <property name="tmpconstants" location="${tmpsrc}/com/soundhelix/constants/BuildConstants.java"/>
     <property name="constantsclass" location="${build}/com/soundhelix/constants/BuildConstants.class"/>
     <property name="jar" location="SoundHelix.jar"/>
-    <property name="binzip" location="SoundHelix-bin.zip"/>
-    <property name="srczip" location="SoundHelix-src.zip"/>
     <property name="javadoc" location="javadoc"/>
     <property name="classpath" location="lib/log4j.jar"/>
 
     <property file="VERSION.txt"/>
+    <property name="binzip" location="SoundHelix-${version}-bin.zip"/>
+    <property name="srczip" location="SoundHelix-${version}-src.zip"/>
 	
     <target name="init">
         <tstamp>

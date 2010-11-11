@@ -38,7 +38,7 @@ http://java.sun.com/products/java-media/sound/soundbanks.html
 3. What is the "groove" tag for?
 
 The MidiPlayer device supports a "groove" tag. This tag defines the timing of
-how the ticks are played.  are played. If it includes a single positive number,
+how the ticks are played. If it includes a single positive number,
 the ticks are played with uniform, equal length. If you provide more than one
 value (comma-separated), the tick lengths are played using these numbers as
 ratios, repeating this pattern in a round-robin manner. For example, if you use
@@ -72,4 +72,6 @@ your system sometimes is too busy for playing the notes with exactly the correct
 timing. If that happens, SoundHelix will notice this and will try to "catch up"
 to the correct timing again as soon as it can. So if a note was played with a
 delay, SoundHelix tries to reduce the delay of the next note by the same amount
-to correct that timing glitch.
+to correct that timing glitch. This way, SoundHelix keeps the overall timing
+accurate.
+

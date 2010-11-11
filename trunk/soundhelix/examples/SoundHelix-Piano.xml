@@ -11,7 +11,7 @@
     <minActivityCount>3</minActivityCount>
     <maxActivityCount>8</maxActivityCount>
     <maxActivityChangeCount>2</maxActivityChangeCount>
-    <startActivityCounts><random list="1,2,3|1,2,3,4"/></startActivityCounts>
+    <startActivityCounts><random list="1,2,3,4|1,2,3,4,5"/></startActivityCounts>
 	<stopActivityCounts><random list="2,1|3,2"/></stopActivityCounts>
     <activityVector name="accomp">
         <stopShift>-2</stopShift>
@@ -19,8 +19,8 @@
     <activityVector name="arpeggio">
     </activityVector>
     <activityVector name="melody">
- 	  <startAfterSection>0</startAfterSection>
-	  <stopBeforeSection>0</stopBeforeSection>
+ 	  <startAfterSection>3</startAfterSection>
+	  <stopBeforeSection>1</stopBeforeSection>
     </activityVector>
     <activityVector name="base_and_snare">
       <minActive>50</minActive>
@@ -103,7 +103,7 @@
         <pattern>
           <pitch>36</pitch>
           <patternEngine class="StringPatternEngine">
-            <string><random list="0,-,-,0,-,-,-,0,-,-,0,-,-,-,-,-"/></string>
+            <string><random list="0,-,-,0,-,-,-,0,-,-,0,-,-,-,-,-|0,-,-,-,-,-,-,0,-,-,0,-,-,-,-,-,0,-,-,-,-,-,-,0,-,-,0,-,-,0,-,-,0,-,-,-,-,-,-,0,-,-,0,-,-,-,-,-,0,-,-,-,-,-,-,0,-,-,0,-,-,0,-,0"/></string>
           </patternEngine>
         </pattern>
         <pattern>

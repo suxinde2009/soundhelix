@@ -37,7 +37,8 @@ configuration files.
 
 Note that SoundHelix might require some configuration time to produce good
 results on your MIDI setup. You shouldn't expect excellent results
-out-of-the-box.
+out-of-the-box. SoundHelix generates music (i.e., notes), not sound. How the
+music sounds is totally up to the MIDI playback device used.
 
 The current implementation of SoundHelix is very likely to change in different
 areas. Especially the XML format is going to be reworked in order to make it
@@ -72,7 +73,10 @@ console and go to that directory. Then on Windows simply run SoundHelix by typin
 
 run.bat
 
-or on Linux type
+You can also double-click on "run.bat" (or "run", depending on how it's
+displayed) using the Explorer.
+
+On Linux type
 
 ./run.sh
 

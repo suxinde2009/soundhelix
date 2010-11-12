@@ -13,9 +13,9 @@ import org.w3c.dom.NodeList;
 import com.soundhelix.harmonyengine.HarmonyEngine;
 import com.soundhelix.misc.ActivityVector;
 import com.soundhelix.misc.Pattern;
+import com.soundhelix.misc.Pattern.PatternEntry;
 import com.soundhelix.misc.Sequence;
 import com.soundhelix.misc.Track;
-import com.soundhelix.misc.Pattern.PatternEntry;
 import com.soundhelix.misc.Track.TrackType;
 import com.soundhelix.patternengine.PatternEngine;
 import com.soundhelix.util.RandomUtils;
@@ -150,10 +150,10 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
     		Pattern pattern = conditionalEntries[i].pattern;
     		int patternTicks = pattern.getTicks();
 
-    		String previousActivity = getActivityString(-1, activityVectors);
-    		
     		// start with the second chord section
     		int tick = harmonyEngine.getChordSectionTicks(0);
+
+    		String previousActivity = getActivityString(tick-1, activityVectors);
     		
     		// the tick where the pattern was applied last (last tick of the pattern + 1)
     		int lastMatchedTick = Integer.MIN_VALUE;
@@ -221,13 +221,22 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
         return track;
 	}
 	
+	/**
+	 * Returns the activity string of the given tick. The activity string is a concatenation of '0' and '1'
+	 * characters specifying whether the ActivityVectors from the list are active or not. If the tick is negative,
+	 * the returned string consists of only '0' characters.
+	 * 
+	 * @param tick the tick to check
+	 * @param activityVectors the array of ActivityVectors
+	 * 
+	 * @return the activity string
+	 */
+	
 	private String getActivityString(int tick,ActivityVector[] activityVectors) {
-		int len = activityVectors.length;
+		StringBuilder sb = new StringBuilder(activityVectors.length);
 		
-		StringBuilder sb = new StringBuilder(len);
-		
-		for (int i = 0; i < len; i++) {
-			if (tick >= 0 && activityVectors[i].isActive(tick)) {
+		for (ActivityVector av : activityVectors) {
+			if (tick >= 0 && av.isActive(tick)) {
 				sb.append('1');
 			} else {
 				sb.append('0');

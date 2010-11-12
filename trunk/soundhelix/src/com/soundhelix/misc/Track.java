@@ -1,6 +1,7 @@
 package com.soundhelix.misc;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -14,13 +15,14 @@ import java.util.List;
  * 
  * Only a whole track can be assigned to an instrument, so all contained sequences use the
  * same instrument for playback. If different instruments are needed, the sequences must each
- * be put into a track individually.
+ * be put into a track individually. The assignment of a whole track to an instrument is
+ * also the reason why it doesn't make sense to individually assign the types to sequences.
+ * If you have an instrument where part of the keys should use RHYTHM, the others should use
+ * MELODY, you should split these off into two different tracks and assign them to the same
+ * MIDI channel for playback.
  *
  * @author Thomas Schürger (thomas@schuerger.com)
  */
-
-// TODO: consider moving the TrackType to the Sequence class (as SequenceType)
-// this way, different types of sequences could be put into a track, which is currently not possible
 
 public class Track {
 	/** The list of sequences. */
@@ -84,9 +86,18 @@ public class Track {
 	}
 	
 	/**
-	 * Transposes all sequences of this track up by the given
-	 * number of halftones. If the number of halftones is not zero,
-     * the track type must not be RHYTHM.
+	 * Returns an iterator that iterates over this track's sequences.
+	 * 
+	 * @return the iterator
+	 */
+	
+	public Iterator<Sequence> iterator() {
+		return sequences.iterator();
+	}
+	
+	/**
+	 * Transposes all sequences of this track up by the given number of halftones. If the number of halftones is
+	 * not zero, the track type must not be RHYTHM.
 	 * 
 	 * @param halftones the number of halftones (positive or negative)
 	 */
@@ -98,11 +109,11 @@ public class Track {
 		}
 		
 		if (type == TrackType.RHYTHM) {
-			// transposing is forbidden
-			throw(new RuntimeException("Tracks of type RHYTHM must not be transposed"));
+			// non-zero transposition is forbidden for this type
+			throw(new IllegalArgumentException("Tracks of type RHYTHM must not be transposed"));
 		}
 		
-		// transpose all the sequences of this track
+		// transpose all the sequences of this track up by the number of halftones
 		
 		for (Sequence seq : sequences) {
 			seq.transpose(halftones);

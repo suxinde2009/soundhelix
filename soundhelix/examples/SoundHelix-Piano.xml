@@ -5,7 +5,7 @@
      <beatsPerBar>4</beatsPerBar>
      <ticksPerBeat>4</ticksPerBeat>
   </structure>
-  <xi:include href="../includes/Standard-HarmonyEngine.xml"/>
+  <xi:include href="includes/Standard-HarmonyEngine.xml"/>
   <arrangementEngine class="SimpleArrangementEngine">
     <maxIterations>200000</maxIterations>
     <minActivityCount>3</minActivityCount>

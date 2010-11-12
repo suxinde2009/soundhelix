@@ -21,11 +21,11 @@ import org.w3c.dom.NodeList;
 
 import com.soundhelix.lfo.LFO;
 import com.soundhelix.misc.Arrangement;
+import com.soundhelix.misc.Arrangement.ArrangementEntry;
 import com.soundhelix.misc.Sequence;
+import com.soundhelix.misc.Sequence.SequenceEntry;
 import com.soundhelix.misc.Structure;
 import com.soundhelix.misc.Track;
-import com.soundhelix.misc.Arrangement.ArrangementEntry;
-import com.soundhelix.misc.Sequence.SequenceEntry;
 import com.soundhelix.misc.Track.TrackType;
 import com.soundhelix.util.ClassUtils;
 import com.soundhelix.util.XMLUtils;
@@ -362,7 +362,9 @@ public class MidiPlayer extends AbstractPlayer {
     	return null;
     }
       
-    public void play(Arrangement arrangement) {
+    public void play() {
+    	Arrangement arrangement = this.arrangement;
+    	
     	if (!opened) {
     		throw(new RuntimeException("Must call open() first"));
     	}
@@ -1186,7 +1188,7 @@ public class MidiPlayer extends AbstractPlayer {
     	private String rotationUnit;
     	private double phase;
     	private int lastSentValue;
-    	
+
     	public ControllerLFO(LFO lfo,String deviceName,int channel,String controller,String instrument,double speed,String rotationUnit,double phase) {
     		this.lfo = lfo;
     		this.deviceName = deviceName;

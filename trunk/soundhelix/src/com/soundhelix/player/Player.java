@@ -5,8 +5,7 @@ import com.soundhelix.misc.RandomSeedable;
 import com.soundhelix.misc.XMLConfigurable;
 
 /**
- * Represents an interface for playing Arrangements. A player's task usually is to play the
- * arrangement in real-time.
+ * Represents an interface for playing Arrangements. A player's task usually is to play the arrangement in real-time.
  * 
  * @see Arrangement
  * 
@@ -23,15 +22,26 @@ public interface Player extends XMLConfigurable,RandomSeedable {
 
     public void open();
     
+    /**
+     * Gets the arrangement to play.
+     * 
+     * @return the arrangement
+     */
+    
+    Arrangement getArrangement();
+
+    /**
+     * Sets the arrangement to play.
+     */
+    
+    void setArrangement(Arrangement arrangement);
+
 	/**
-	 * Plays the given arrangement. The method will play the arrangement
-	 * and will return as soon as playing has finished. The method
-	 * open() must have been called once prior to calling this method.
-	 * 
-	 * @param arrangement the Arrangement to play
+	 * Plays the arrangement last set by setArrangement(). The method will return as soon as playing has finished.
+	 * The method open() must have been called once prior to calling this method.
 	 */
 
-    public void play(Arrangement arrangement);
+    void play();
 
  	/**
  	 * Closes all required resources. The method play() must
@@ -39,7 +49,7 @@ public interface Player extends XMLConfigurable,RandomSeedable {
  	 * open() has been called after that.
  	 */
 
-    public abstract void close();
+    abstract void close();
 
     /**
      * Gets the playback speed in milli-BPM.
@@ -47,7 +57,7 @@ public interface Player extends XMLConfigurable,RandomSeedable {
      * @return the speed in milli-BPM
      */
     
-    public int getMilliBPM();
+    int getMilliBPM();
 
     /**
      * Sets the playback speed in milli-BPM. Setting the BPM speed should be possible while
@@ -56,13 +66,12 @@ public interface Player extends XMLConfigurable,RandomSeedable {
      * @param milliBPM the speed in milli-BPM
      */
     
-    public void setMilliBPM(int milliBPM);
+    void setMilliBPM(int milliBPM);
     
     /**
      * Aborts playback. Calling this method should stop the player if it is currently
      * playing an arrangement.
      */
     
-    public void abortPlay();
-    
+    void abortPlay();
 }

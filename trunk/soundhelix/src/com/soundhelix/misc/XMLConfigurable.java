@@ -6,8 +6,7 @@ import javax.xml.xpath.XPathException;
 import org.w3c.dom.Node;
 
 /**
- * Simple interface that adds XML-configurability to a class. XML
- * configuration is based on DOM and XPath.
+ * Simple interface that adds XML-configurability to a class. XML configuration is based on DOM and XPath.
  *
  * @author Thomas Schürger (thomas@schuerger.com)
  */

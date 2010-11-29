@@ -1,9 +1,11 @@
 package com.soundhelix.misc;
 
 /**
- * Simple interface that adds random-seedability to a class. A class that
- * implements this interface, but does not want to use it needs to supply at least
- * a dummy implementation that adheres to the contract described in getRandomSeed().
+ * Simple interface that adds random-seedability to a class. A class that implements this interface, but does not
+ * want to use it needs to supply at least a dummy implementation that adheres to the contract described in
+ * getRandomSeed(). How the random seed is used is up to the classes that implement this interface. The seed is often
+ * used to instantiate a random generator. Note that the class java.util.Random only uses the lower 48 bits of the
+ * random seed, but other random generators might make use of the full 64 bits of the seed.
  *
  * @author Thomas Schürger (thomas@schuerger.com)
  */

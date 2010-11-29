@@ -1,9 +1,8 @@
 package com.soundhelix.misc;
 
 /**
- * Represents a pattern, which is like a repeatable Sequence, but is immutable
- * and allows particular notes as well as wildcards used for special purposes.
- * Patterns can be created from pattern strings.
+ * Represents a pattern, which is like a repeatable Sequence, but is immutable and allows particular notes (or offsets)
+ * as well as wildcards used for special purposes. Patterns can be created from pattern strings.
  * 
  * @author Thomas Schürger (thomas@schuerger.com)
  */

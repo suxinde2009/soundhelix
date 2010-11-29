@@ -1,13 +1,7 @@
 package com.soundhelix.sequenceengine;
 
 /**
- * Represents an abstract generator for note sequences. This class provides
- * a dummy implementation of RandomSeedable, which is a no-op (it stores the
- * random seed and can return the stored seed, but doesn't use the seed). Subclasses
- * that want to make use of random-seedability must override setRandomSeed() and
- * getRandomSeed() accordingly. This is to make sure that a subclass is able to
- * react to calls to setRandomSeed() to re-seed the internal random generators, if
- * needed.
+ * Represents a generator for sequences. Generated sequences are combined into a track.
  * 
  * @see Sequence
  * 

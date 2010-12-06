@@ -391,7 +391,7 @@ public class MidiPlayer extends AbstractPlayer {
         			CLOCK_SYNCHRONIZATION_TICKS_PER_BEAT / structure.getTicksPerBeat() : 1);
 
     		if (logger.isDebugEnabled()) {
-    			logger.debug("Song length: "+ticks+" ticks ("+(ticks*60*1000/(structure.getTicksPerBeat()*milliBPM))+" seconds)");
+    			logger.debug("Song length: "+ticks+" ticks ("+(ticks*60*1000/(structure.getTicksPerBeat()*milliBPM))+" seconds @ " + ((double) milliBPM/1000) + " BPM)");
     		}
     		
             if (useClockSynchronization) {
@@ -534,9 +534,9 @@ public class MidiPlayer extends AbstractPlayer {
 		int ticksPerBar = structure.getTicksPerBar();
 
 		if ((tick % (4 * ticksPerBar)) == 0) {
-			System.out.printf("Tick: %5d   Seconds: %4d  %5.1f %%\n",tick,
+			logger.debug(String.format("Tick: %5d   Seconds: %4d  %5.1f %%",tick,
 					tick * 60 * 1000 / (structure.getTicksPerBeat() * milliBPM),
-					(double)tick * 100 / structure.getTicks());
+					(double)tick * 100 / structure.getTicks()));
 		}
 
 		sendControllerLFOMessages(tick);

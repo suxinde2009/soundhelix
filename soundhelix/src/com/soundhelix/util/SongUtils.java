@@ -2,6 +2,8 @@ package com.soundhelix.util;
 
 import java.io.File;
 import java.io.InputStream;
+import java.io.FileInputStream;
+import java.net.URL;
 import java.util.Random;
 
 import javax.xml.XMLConstants;
@@ -28,24 +30,57 @@ import com.soundhelix.misc.Structure;
 import com.soundhelix.player.Player;
 
 public class SongUtils {
-	/** The logger. */
-	private static Logger logger = Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
+    /** The logger. */
+    private static Logger logger = Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
 
     private static final boolean ENABLE_SCHEMA_VALIDATION = false;
-	private static final String VALIDATION_SCHEMA_FILENAME = "SoundHelix.xsd";
+    private static final String VALIDATION_SCHEMA_FILENAME = "SoundHelix.xsd";
 
-	/**
-	 * Parses the XML file provided by the given input stream, creates an arrangement and a player and configures
-	 * the player to use this arrangement.
-	 * 
-	 * @param inputStream the input stream
-	 * @param randomSeed the random seed
-	 */
-	
-	public static Player generateSong(InputStream inputStream,long randomSeed) throws Exception {
-		
-		logger.debug("Rendering new song");
-		
+    /**
+     * Opens the given URL as an InputStream and tries to generate a song by calling
+     * generateSong(inputStream,randomSeed).
+     * 
+     * @param url the URL of an XML file
+     * @param randomSeed the random seed
+     * 
+     * @return a Player
+     */
+    
+    public static Player generateSongFromUrl(String URL,long randomSeed) throws Exception {
+        logger.debug("Loading XML data from URL \"" + URL + "\"");
+        InputStream inputStream = new URL(URL).openConnection().getInputStream();
+        return generateSong(inputStream,randomSeed);
+    }
+
+    /**
+     * Opens the given file as an InputStream and tries to generate a song by calling
+     * generateSong(inputStream,randomSeed).
+     * 
+     * @param filename the filename of an XML file
+     * @param randomSeed the random seed
+     * 
+     * @return a Player
+     */
+
+    public static Player generateSongFromFile(String filename,long randomSeed) throws Exception {
+        File file = new File(filename);
+        logger.debug("Loading XML data from file \"" + file.getAbsolutePath()+"\"");
+        InputStream inputStream = new FileInputStream(file);
+        return generateSong(inputStream,randomSeed);
+    }
+
+    /**
+     * Parses the XML file provided by the given input stream, creates an arrangement and a player and configures
+     * the player to use this arrangement.
+     * 
+     * @param inputStream the input stream
+     * @param randomSeed the random seed
+     */
+    
+    public static Player generateSong(InputStream inputStream,long randomSeed) throws Exception {
+        
+        logger.debug("Rendering new song");
+        
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         dbf.setXIncludeAware(true);
@@ -68,73 +103,73 @@ public class SongUtils {
             }
         }
         
-		XPath xpath = XPathFactory.newInstance().newXPath();
+        XPath xpath = XPathFactory.newInstance().newXPath();
 
-		// get the root element of the file (we don't care what it's called)
-		Node mainNode = (Node)xpath.evaluate("/*",doc,XPathConstants.NODE);
+        // get the root element of the file (we don't care what it's called)
+        Node mainNode = (Node)xpath.evaluate("/*",doc,XPathConstants.NODE);
 
-		Node structureNode = (Node)xpath.evaluate("structure",mainNode,XPathConstants.NODE);
-		Node harmonyEngineNode = (Node)xpath.evaluate("harmonyEngine",mainNode,XPathConstants.NODE);
-		Node arrangementEngineNode = (Node)xpath.evaluate("arrangementEngine",mainNode,XPathConstants.NODE);
-		Node playerNode = (Node)xpath.evaluate("player",mainNode,XPathConstants.NODE);
+        Node structureNode = (Node)xpath.evaluate("structure",mainNode,XPathConstants.NODE);
+        Node harmonyEngineNode = (Node)xpath.evaluate("harmonyEngine",mainNode,XPathConstants.NODE);
+        Node arrangementEngineNode = (Node)xpath.evaluate("arrangementEngine",mainNode,XPathConstants.NODE);
+        Node playerNode = (Node)xpath.evaluate("player",mainNode,XPathConstants.NODE);
 
         logger.debug("Using song random seed " + randomSeed);
         Random random = new Random(randomSeed);
 
-		Structure structure = parseStructure(random,structureNode,xpath);
-	
-		HarmonyEngine harmonyEngine = XMLUtils.getInstance(HarmonyEngine.class,
-					harmonyEngineNode,xpath,randomSeed ^ 47357892832l);
-		structure.setHarmonyEngine(harmonyEngine);	
+        Structure structure = parseStructure(random,structureNode,xpath);
+    
+        HarmonyEngine harmonyEngine = XMLUtils.getInstance(HarmonyEngine.class,
+                    harmonyEngineNode,xpath,randomSeed ^ 47357892832l);
+        structure.setHarmonyEngine(harmonyEngine);    
 
-		ArrangementEngine arrangementEngine = XMLUtils.getInstance(ArrangementEngine.class,
-					arrangementEngineNode,xpath,randomSeed ^ 123454893l);
-		arrangementEngine.setStructure(structure);
+        ArrangementEngine arrangementEngine = XMLUtils.getInstance(ArrangementEngine.class,
+                    arrangementEngineNode,xpath,randomSeed ^ 123454893l);
+        arrangementEngine.setStructure(structure);
         long startTime = System.nanoTime();
-		Arrangement arrangement = arrangementEngine.render();
-		long time = System.nanoTime() - startTime;
+        Arrangement arrangement = arrangementEngine.render();
+        long time = System.nanoTime() - startTime;
 
-		if (logger.isDebugEnabled()) {
-			logger.debug("Rendering took " + (time / 1000000) + " ms");
-		}
-		
-		Player player = XMLUtils.getInstance(Player.class,playerNode,xpath,randomSeed ^ 5915925127l);
-		player.setArrangement(arrangement);
-		return player;
-	}
-	
-	/**
-	 * Parses the structure tag and creates a Structure instance. Note that
-	 * no HarmonyEngine is set yet.
-	 * 
-	 * @param random the random generator
-	 * @param node the node of the tag
-	 * @param xpath an XPath instance
-	 * 
-	 * @return a Structure
-	 * 
-	 * @throws XPathException
-	 */
-	
-	private static Structure parseStructure(Random random,Node node,XPath xpath) throws XPathException {
-		int bars = XMLUtils.parseInteger(random,"bars",node,xpath);
-		int beatsPerBar = XMLUtils.parseInteger(random,"beatsPerBar",node,xpath);
-		int ticksPerBeat = XMLUtils.parseInteger(random,"ticksPerBeat",node,xpath);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Rendering took " + (time / 1000000) + " ms");
+        }
+        
+        Player player = XMLUtils.getInstance(Player.class,playerNode,xpath,randomSeed ^ 5915925127l);
+        player.setArrangement(arrangement);
+        return player;
+    }
+    
+    /**
+     * Parses the structure tag and creates a Structure instance. Note that
+     * no HarmonyEngine is set yet.
+     * 
+     * @param random the random generator
+     * @param node the node of the tag
+     * @param xpath an XPath instance
+     * 
+     * @return a Structure
+     * 
+     * @throws XPathException
+     */
+    
+    private static Structure parseStructure(Random random,Node node,XPath xpath) throws XPathException {
+        int bars = XMLUtils.parseInteger(random,"bars",node,xpath);
+        int beatsPerBar = XMLUtils.parseInteger(random,"beatsPerBar",node,xpath);
+        int ticksPerBeat = XMLUtils.parseInteger(random,"ticksPerBeat",node,xpath);
 
-		if (bars <= 0) {
-			throw(new RuntimeException("Number of bars must be > 0"));
-		}
-		
-		if (beatsPerBar <= 0) {
-			throw(new RuntimeException("Number of beats per bar must be > 0"));
-		}
-		
-		if (ticksPerBeat <= 0) {
-			throw(new RuntimeException("Number of ticks per beat must be > 0"));
-		}
-		
-		Structure structure = new Structure(bars,beatsPerBar,ticksPerBeat);
+        if (bars <= 0) {
+            throw(new RuntimeException("Number of bars must be > 0"));
+        }
+        
+        if (beatsPerBar <= 0) {
+            throw(new RuntimeException("Number of beats per bar must be > 0"));
+        }
+        
+        if (ticksPerBeat <= 0) {
+            throw(new RuntimeException("Number of ticks per beat must be > 0"));
+        }
+        
+        Structure structure = new Structure(bars,beatsPerBar,ticksPerBeat);
 
-		return structure;
-	}
+        return structure;
+    }
 }

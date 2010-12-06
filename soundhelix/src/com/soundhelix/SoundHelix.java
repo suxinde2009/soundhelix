@@ -52,14 +52,18 @@ public class SoundHelix implements Runnable {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		System.out.println("SoundHelix " + BuildConstants.VERSION + " (r" + BuildConstants.REVISION + "), built on "
+        if (args.length == 1 && args[0].equals("-h") || args.length > 2) {
+            System.out.println("java SoundHelix [XML-File [Songtitle]] ");
+            System.exit(0);
+        }
+
+        // initialize log4j
+        PropertyConfigurator.configureAndWatch("log4j.properties",60 * 1000);
+
+        logger = Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
+		logger.info("SoundHelix " + BuildConstants.VERSION + " (r" + BuildConstants.REVISION + "), built on "
 						   + BuildConstants.BUILD_DATE);
 		
-		if (args.length == 1 && args[0].equals("-h") || args.length > 2) {
-			System.out.println("java SoundHelix [XML-File [Songtitle]] ");
-			System.exit(0);
-		}
-
 		String filename = (args.length >= 1 ? args[0] : "SoundHelix.xml");
 		
 		if (!new File(filename).exists()) {
@@ -67,12 +71,6 @@ public class SoundHelix implements Runnable {
 		}
 
 		String songtitle = (args.length == 2 ? args[1] : null);
-
-		// initialize log4j
-		PropertyConfigurator.configureAndWatch("log4j.properties",60 * 1000);
-
-		logger = Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
-		logger.debug("Starting");
 
 		long randomSeed;
 		
@@ -151,7 +149,7 @@ public class SoundHelix implements Runnable {
 			try {
 				if (songQueue.size() < 1 && generateNew) {
 					// the queue is empty; render a new song
-					songQueue.add(SongUtils.generateSong(new FileInputStream(filename),randomSeed));
+					songQueue.add(SongUtils.generateSongFromFile(filename,randomSeed));
 					randomSeed = random.nextLong();
 				}
 			} catch (Exception e) {

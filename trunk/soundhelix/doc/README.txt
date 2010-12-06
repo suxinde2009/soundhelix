@@ -52,14 +52,14 @@ Requirements
 
 End users:
 
-- Java Runtime Environment 5 or later
+- Java Runtime Environment 6 (JDK 6 or JRE 6) or later
 - a MIDI playback device or MIDI-capable software
 - some MIDI hub software (optional)
 
 
 Developers:
 
-- Java Software Development Kit 5 or later
+- Java Software Development Kit 6 (JDK 6) or later
 - ant (http://ant.apache.org)
 - Subversion client (http://subversion.tigris.org)
 - Eclipse (http://www.eclipse.org, optional)

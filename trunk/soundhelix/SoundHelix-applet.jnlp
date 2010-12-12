@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp spec="1.0+" version="0.0.3.1" codebase="http://www.soundhelix.com/applet/" href="http://www.soundhelix.com/applet/SoundHelix-applet.jnlp">
+    <information>
+        <title>SoundHelix</title>
+        <vendor>com.SoundHelix</vendor>
+    </information>
+    <resources>
+        <!-- Application Resources -->
+        <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se" />
+        <jar href="SoundHelix.jar" main="true" />
+        <jar href="lib/log4j.jar" main="false" />
+    </resources>
+    <applet-desc
+         name="SoundHelix Applet"
+         main-class="com.soundhelix.SoundHelixApplet"
+         width="1000"
+         height="600">
+     </applet-desc>
+     <update check="background"/>
+</jnlp>

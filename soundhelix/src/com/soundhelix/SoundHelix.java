@@ -149,7 +149,7 @@ public class SoundHelix implements Runnable {
 			try {
 				if (songQueue.size() < 1 && generateNew) {
 					// the queue is empty; render a new song
-					songQueue.add(SongUtils.generateSongFromFile(filename,randomSeed));
+					songQueue.add(SongUtils.generateSong(new File(filename),randomSeed));
 					randomSeed = random.nextLong();
 				}
 			} catch (Exception e) {

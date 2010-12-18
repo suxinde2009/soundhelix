@@ -46,9 +46,9 @@ public class SongUtils {
      * @return a Player
      */
     
-    public static Player generateSongFromUrl(String URL,long randomSeed) throws Exception {
-        logger.debug("Loading XML data from URL \"" + URL + "\"");
-        InputStream inputStream = new URL(URL).openConnection().getInputStream();
+    public static Player generateSong(URL url,long randomSeed) throws Exception {
+        logger.debug("Loading XML data from URL \"" + url + "\"");
+        InputStream inputStream = url.openConnection().getInputStream();
         return generateSong(inputStream,randomSeed);
     }
 
@@ -62,8 +62,7 @@ public class SongUtils {
      * @return a Player
      */
 
-    public static Player generateSongFromFile(String filename,long randomSeed) throws Exception {
-        File file = new File(filename);
+    public static Player generateSong(File file,long randomSeed) throws Exception {
         logger.debug("Loading XML data from file \"" + file.getAbsolutePath()+"\"");
         InputStream inputStream = new FileInputStream(file);
         return generateSong(inputStream,randomSeed);

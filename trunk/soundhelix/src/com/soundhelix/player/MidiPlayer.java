@@ -1165,16 +1165,18 @@ public class MidiPlayer extends AbstractPlayer {
     	}
 
     	public final boolean equals(Object object) {
-    		if (object == null || !(object instanceof DeviceChannel)) {
+    		if (!(object instanceof DeviceChannel)) {
     			return false;
+    		} else if (this == object) {
+    		    return true;
     		}
     		
     		DeviceChannel other = (DeviceChannel)object;    		
-    		return this == other || device.equals(other.device) && channel == other.channel && program == other.program;
+    		return device.equals(other.device) && channel == other.channel && program == other.program;
     	}
 
     	public final int hashCode() {
-    		return device.hashCode() * 4711 + channel * 513 + program;
+    		return device.hashCode() * 16273 + channel * 997 + program;
     	}    	
     }
     

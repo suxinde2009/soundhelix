@@ -473,8 +473,6 @@ public final class XMLUtils {
 			logger.warn("Exception: ",e);
 		}
 		
-		System.out.println("Nodelist: " + nodeList);
-		
 		int nodes = nodeList.getLength();
 	
 		for (int i = 0; i < nodes; i++) {

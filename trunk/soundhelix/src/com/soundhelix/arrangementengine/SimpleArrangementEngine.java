@@ -30,16 +30,18 @@ import com.soundhelix.util.XMLUtils;
  * ActivityVector activity can be constrained individually to enforce certain properties. All AVs are filled at
  * the same time because there is always the above-mentioned overall song constraint that defines the number of
  * active AVs for each chord section. For each chord section a choice is made to activate or deactivate AVs or to
- * leave the number of active AVs the same. The list of generated AVs are called an activity matrix.
+ * leave the number of active AVs unchanged. The list of generated AVs are called an activity matrix.
  *
  * The following constraints are supported for ActivityVectors:
  * 
- * - minActive(n): the AV must be active for at least n% of the song; granularity is at section level
- * - maxActive(n): the AV must be active for at most n% of the song; granularity is at section level
+ * - minActive(n): the AV must be active for at least n% of the song; granularity is at chord section level; it is
+ *                 also possible define that the AV may be inactive for the whole song or be active with at least n%
+ *                 of the song
+ * - maxActive(n): the AV must be active for at most n% of the song; granularity is at chord section level
  * - startAfterSection(n): the AV must not be active before section n+1
  * - stopBeforeSection(n): the AV must not be active after section n+1 counted from the end
- * - minSegmentCount(n): the AV must be active for at least n section segments
- * - maxSegmentCount(n): the AV must be active for at most n section segments
+ * - minSegmentCount(n): the AV must be active for at least n chord section segments
+ * - maxSegmentCount(n): the AV must be active for at most n chord section segments
  *
  * Local (peep-hole) constraints can be checked during AV generation when the activity per chord section is generated.
  * Such a constraint can be a success constraint, which means that a random choice can be redone on-the-fly until the

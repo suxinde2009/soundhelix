@@ -7,6 +7,16 @@ Author: Thomas Schürger (thomas@schuerger.com)
 Change log
 ----------
 
+0.0.4: 2011-01-15
+
+    - Added a first version of a JNLP-based applet. The applet is available at
+      http://www.soundhelix.com/applet/SoundHelix-applet.jnlp
+
+    - Added support for song name generation. Each XML file now requires a songNameEngine tag.
+
+    - A song can now be recreated by specifying its song name.
+
+
 0.0.3: 2010-11-11
 
     - Corrected small problems regarding random initialization.

@@ -13,43 +13,7 @@ import java.util.regex.Pattern;
  */
 
 public final class StringUtils {
-    private static Pattern variablePattern = Pattern.compile("\\$\\{(.*?)\\}");
-    
     private StringUtils() {}
-
-    /**
-     * Recursively replaces all variables in the given string by a randomly chosen value from the corresponding variable
-     * map values.
-     * 
-     * @param random the random generator to use
-     * @param string the string to perform replacements in
-     * @param variableMap the variable map
-     */
-     
-    public static String replaceVariables(Random random, String string, Map<String,String[]> variableMap) {
-        if (string.indexOf('$') < 0) {
-            // string contains no variables, return it unchanged
-            return string;
-        }
-        
-        Matcher matcher = variablePattern.matcher(string);
-        StringBuffer sb = new StringBuffer();
-        
-        while (matcher.find()) {
-            matcher.appendReplacement(sb, "");  
-            String[] replacements = variableMap.get(matcher.group(1));
-            
-            if (replacements == null) {
-                throw new RuntimeException("Variable \"" + matcher.group(1) + "\" is invalid");
-            }
-            
-            sb.append(replacements[random.nextInt(replacements.length)]);  
-        }
-
-        matcher.appendTail(sb);  
-        
-        return replaceVariables(random, sb.toString(), variableMap);
-    }
 
     /**
      * Returns a capitalized version of the given string. If the given string already starts with

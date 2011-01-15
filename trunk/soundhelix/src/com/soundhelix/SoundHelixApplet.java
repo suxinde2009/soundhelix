@@ -111,9 +111,7 @@ public class SoundHelixApplet extends JApplet implements Runnable {
                 remoteControl.setPlayer(null);
 				player.close();
 			} catch (Exception e) {
-				StringWriter sw = new StringWriter();
-				e.printStackTrace(new PrintWriter(sw));
-				logger.debug("Exception occurred:\n" + sw.toString());
+				logger.debug("Exception occurred", e);
 			}
 			
 			try {

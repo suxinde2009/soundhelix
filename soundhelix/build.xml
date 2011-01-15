@@ -106,7 +106,7 @@
 	<target name="packagebin" depends="init,jar">
 		<zip destfile="${binzip}"
 		     basedir=".."
-		     includes="soundhelix/SoundHelix.jar,soundhelix/run.bat,soundhelix/run.sh,soundhelix/examples/*,soundhelix/includes/*,soundhelix/doc/*,soundhelix/lib/*,soundhelix/log4j.*"/>		     
+		     includes="soundhelix/SoundHelix.jar,soundhelix/run.bat,soundhelix/run.sh,soundhelix/examples/SoundHelix-Piano.xml,soundhelix/includes/*,soundhelix/doc/*,soundhelix/lib/*,soundhelix/log4j.*"/>		     
 	</target>
 
     <target name="packagesrc" depends="init,jar,javadoc">

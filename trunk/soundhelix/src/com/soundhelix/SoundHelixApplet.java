@@ -87,10 +87,7 @@ public class SoundHelixApplet extends JApplet implements Runnable {
 	}
 	
 	public void run() {
-		Layout layout = new PatternLayout("%d{ISO8601} %-5p [%t] %c{1}: %m%n");
-		Appender consoleAppender = new TextRemoteControlAppender(layout, remoteControl);
-		rootLogger.addAppender(consoleAppender);
-		rootLogger.setLevel(Level.DEBUG);
+		initializeLog4j();
 
         logger.info("SoundHelix " + BuildConstants.VERSION + " (r" + BuildConstants.REVISION + "), built on "
                   + BuildConstants.BUILD_DATE);
@@ -123,6 +120,13 @@ public class SoundHelixApplet extends JApplet implements Runnable {
 			} catch (Exception e) {}
 		}
 	}
+
+    private void initializeLog4j() {
+        Layout layout = new PatternLayout("%d{ISO8601} %-5p [%t] %c{1}: %m%n");
+		Appender consoleAppender = new TextRemoteControlAppender(layout, remoteControl);
+		rootLogger.addAppender(consoleAppender);
+		rootLogger.setLevel(Level.DEBUG);
+    }
 	
 	public static class TextRemoteControlAppender extends AppenderSkeleton {
 		private Layout layout;

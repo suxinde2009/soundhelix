@@ -171,4 +171,8 @@ public final class RandomUtils {
 			return random.nextDouble() < probability;
 		}
 	}
+	
+	public long getRandomSeed(Object object) {
+	    return (object.getClass().hashCode() << 32) + object.hashCode();
+	}
 }

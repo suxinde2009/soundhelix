@@ -46,11 +46,20 @@ public class SoundHelix implements Runnable {
 	/** The random seed. */
 	private long randomSeed;
 
+	private String songName = null;
+	
 	public SoundHelix(String filename,long randomSeed) {
 		this.filename = filename;
 		this.randomSeed = randomSeed;
+		this.songName = null;
 	}
 	
+	public SoundHelix(String filename,String songName) {
+	    this.filename = filename;
+	    this.randomSeed = 0;
+	    this.songName = songName;
+	}
+
 	public static void main(String[] args) throws Exception {
         if (args.length == 1 && args[0].equals("-h") || args.length > 2) {
             System.out.println("java SoundHelix [XML-File [Songtitle]] ");
@@ -70,26 +79,27 @@ public class SoundHelix implements Runnable {
 			throw(new RuntimeException("Configuration file \"" + filename + "\" doesn't exist"));
 		}
 
-		String songtitle = (args.length == 2 ? args[1] : null);
+		String songName = (args.length == 2 ? args[1] : null);
 
-		long randomSeed;
+		long randomSeed = 0;
 		
-		if (songtitle != null && !songtitle.equals("")) {
-			if (songtitle.startsWith("seed:")) {
-				randomSeed = Long.parseLong(songtitle.substring(5));
-			} else {
-				randomSeed = songtitle.trim().toLowerCase().hashCode();
+		if (songName != null && !songName.equals("")) {
+			if (songName.startsWith("seed:")) {
+				randomSeed = Long.parseLong(songName.substring(5));
 			}
 		} else {
 			randomSeed = new Random().nextLong();
 		}
 		
-		logger.debug("Main random seed: " + randomSeed);
-
 		try {
 			// instantiate this class so we can launch a thread
-			SoundHelix soundHelix = new SoundHelix(filename,randomSeed);
-			
+		    SoundHelix soundHelix;
+		    
+		    if (songName != null && !songName.equals("")) {
+		        soundHelix = new SoundHelix(filename,songName);
+		    } else {
+                soundHelix = new SoundHelix(filename,randomSeed);		        
+		    }
 			// launch song generation thread with low priority
 			Thread t = new Thread(soundHelix,"Generator");
 			t.setPriority(Thread.MIN_PRIORITY);
@@ -143,17 +153,30 @@ public class SoundHelix implements Runnable {
 	
 	public void run() {
         long randomSeed = this.randomSeed;
-        Random random = new Random(randomSeed);
+        Random random;
+        
+        if (songName != null) {
+            random = new Random();
+        } else {
+            random = new Random(randomSeed);
+        }
         
         while (true) {
 			try {
 				if (songQueue.size() < 1 && generateNew) {
 					// the queue is empty; render a new song
-					songQueue.add(SongUtils.generateSong(new File(filename),randomSeed));
+				    
+				    if (songName != null) {
+				        songQueue.add(SongUtils.generateSong(new File(filename),songName));
+				    } else {
+				        songQueue.add(SongUtils.generateSong(new File(filename),randomSeed));
+				    }
+				    
+				    songName = null;
 					randomSeed = random.nextLong();
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.warn("Exception occurred", e);
 			}
 			
 			try {

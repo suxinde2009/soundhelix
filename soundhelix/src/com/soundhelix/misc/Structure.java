@@ -30,6 +30,7 @@ public class Structure {
 	private int beatsPerBar;
 	private int ticksPerBeat;
 	private HarmonyEngine harmonyEngine;
+	private String songName;
 	
 	// derived upon instantiation
 	private int ticksPerBar;
@@ -55,6 +56,10 @@ public class Structure {
 		return bars;
 	}
 	
+	public String getSongName() {
+	    return songName;
+	}
+	
 	public HarmonyEngine getHarmonyEngine() {
 		return harmonyEngine;
 	}
@@ -68,12 +73,14 @@ public class Structure {
 		harmonyEngine.setSongStructure(this);
 	}
 	
-	public Structure(int bars,int beatsPerBar,int ticksPerBeat) {
+	public Structure(int bars,int beatsPerBar,int ticksPerBeat, String songName) {
 		this.bars = bars;
 		this.beatsPerBar = beatsPerBar;
 		this.ticksPerBeat = ticksPerBeat;		
 
 		this.ticksPerBar = beatsPerBar * ticksPerBeat;
-		this.ticks = bars * ticksPerBar;		
+		this.ticks = bars * ticksPerBar;
+		
+		this.songName = songName;
 	}
 }

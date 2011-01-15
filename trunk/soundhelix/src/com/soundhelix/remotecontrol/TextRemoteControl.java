@@ -1,10 +1,11 @@
 package com.soundhelix.remotecontrol;
 
+import java.security.AccessControlException;
+
 import org.apache.log4j.Logger;
 
 import com.soundhelix.player.MidiPlayer;
 import com.soundhelix.player.Player;
-import java.security.AccessControlException;
 
 public abstract class TextRemoteControl implements RemoteControl {
 	/** The logger. */
@@ -47,6 +48,7 @@ public abstract class TextRemoteControl implements RemoteControl {
     							player.abortPlay();
     						}
                         } else if (canExit && line.equals("quit")) {
+                            writeLine("Quitting");
                             System.exit(0);
     					} else if (line.equals("help")) {
     						writeLine("\nAvailable commands");

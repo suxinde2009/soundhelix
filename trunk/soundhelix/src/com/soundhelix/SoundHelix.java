@@ -86,6 +86,7 @@ public class SoundHelix implements Runnable {
 		if (songName != null && !songName.equals("")) {
 			if (songName.startsWith("seed:")) {
 				randomSeed = Long.parseLong(songName.substring(5));
+				songName = null;
 			}
 		} else {
 			randomSeed = new Random().nextLong();

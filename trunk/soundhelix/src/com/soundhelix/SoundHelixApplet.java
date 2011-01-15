@@ -29,6 +29,12 @@ import com.soundhelix.remotecontrol.SwingRemoteControl;
 import com.soundhelix.remotecontrol.TextRemoteControl;
 import com.soundhelix.util.SongUtils;
 
+/**
+ * Implements a Swing-based applet for SoundHelix.
+ *
+ * @author Thomas Schürger (thomas@schuerger.com)
+ */
+
 public class SoundHelixApplet extends JApplet implements Runnable {
 
 	private static Logger rootLogger = Logger.getRootLogger();
@@ -99,16 +105,11 @@ public class SoundHelixApplet extends JApplet implements Runnable {
 				URL url = new URL(getDocumentBase(), "examples/SoundHelix-Piano.xml");				
 				Player player = SongUtils.generateSong(url,random.nextLong());
 				
-				remoteControl.setPlayer(player);
-				
-				logger.debug("Opening player");
 				player.open();
-				logger.debug("Playing");
+                remoteControl.setPlayer(player);
 				player.play();
-				logger.debug("Closing player");
-				player.close();
-
                 remoteControl.setPlayer(null);
+				player.close();
 			} catch (Exception e) {
 				StringWriter sw = new StringWriter();
 				e.printStackTrace(new PrintWriter(sw));
@@ -152,6 +153,16 @@ public class SoundHelixApplet extends JApplet implements Runnable {
 			}
 			
             remoteControl.writeLine(message);
+
+            if(layout.ignoresThrowable()) {
+                String s[] = event.getThrowableStrRep();
+                if(s != null) {
+                    int len = s.length;
+                    for(int i = 0; i < len; i++) {
+                        remoteControl.writeLine(s[i]);
+                    }
+                }
+            }
 		}
 		
 		public void close() {

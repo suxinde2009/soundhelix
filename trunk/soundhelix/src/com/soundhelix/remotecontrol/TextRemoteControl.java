@@ -1,11 +1,10 @@
 package com.soundhelix.remotecontrol;
 
-import java.io.Console;
-
 import org.apache.log4j.Logger;
 
 import com.soundhelix.player.MidiPlayer;
 import com.soundhelix.player.Player;
+import java.security.AccessControlException;
 
 public abstract class TextRemoteControl implements RemoteControl {
 	/** The logger. */
@@ -14,12 +13,14 @@ public abstract class TextRemoteControl implements RemoteControl {
 	private Player player;
 	
 		public void run() {
+		    boolean canExit = checkExitPermission(0);
+		    writeLine("Can exit: "+canExit);
+		    
 			while (true) {
 				try {
 					String line = readLine();
 
 					if (line != null && !line.equals("")) {
-    					
     					Player player = this.player;
     
     					if (line.startsWith("bpm ")) {
@@ -45,8 +46,7 @@ public abstract class TextRemoteControl implements RemoteControl {
     							writeLine("Next Song");
     							player.abortPlay();
     						}
-                        } else if (line.equals("quit")) {
-                            writeLine("Quitting");
+                        } else if (canExit && line.equals("quit")) {
                             System.exit(0);
     					} else if (line.equals("help")) {
     						writeLine("\nAvailable commands");
@@ -55,7 +55,9 @@ public abstract class TextRemoteControl implements RemoteControl {
     						writeLine("transposition <value>   Sets the transposition. Example: \"transposition 70\"");
     						writeLine("groove <value>          Sets the groove. Example: \"groove 130,70\"");
     						writeLine("next                    Aborts playing and starts the next song. Example: \"next\"");
-                            writeLine("quit                    Quits. Example: \"quit\"");
+                            if (canExit) {
+                                writeLine("quit                    Quits. Example: \"quit\"");
+                            }
     						writeLine("");
     					} else {
     						writeLine("Invalid command. Type \"help\" for help.");
@@ -66,7 +68,7 @@ public abstract class TextRemoteControl implements RemoteControl {
 				} catch (Exception e) {
 					logger.error("Exception in console thread",e);
 				}
-			}			
+			}
 		}
 	
 	public Player getPlayer() {
@@ -75,6 +77,20 @@ public abstract class TextRemoteControl implements RemoteControl {
 
 	public void setPlayer(Player player) {
 		this.player = player;
+	}
+
+	private boolean checkExitPermission(int returnCode) {
+        try {
+            SecurityManager securitymanager = System.getSecurityManager();
+
+            if(securitymanager != null) {
+                securitymanager.checkExit(returnCode);
+            }
+ 
+            return true;
+        } catch(AccessControlException e) {
+            return false;
+        }
 	}
 	
 	/**

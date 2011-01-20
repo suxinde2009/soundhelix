@@ -152,8 +152,8 @@ public class SoundHelixApplet extends JApplet implements Runnable {
 			
             remoteControl.writeLine(message);
 
-            if(layout.ignoresThrowable()) {
-                String s[] = event.getThrowableStrRep();
+            if (layout.ignoresThrowable()) {
+                String[] s = event.getThrowableStrRep();
                 if(s != null) {
                     int len = s.length;
                     for(int i = 0; i < len; i++) {

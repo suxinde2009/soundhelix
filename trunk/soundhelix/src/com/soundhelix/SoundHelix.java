@@ -1,7 +1,7 @@
 package com.soundhelix;
 
 import java.io.File;
-import java.io.FileInputStream;
+import java.net.URL;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -35,27 +35,28 @@ public class SoundHelix implements Runnable {
     private static Logger logger;
 
     /** Flag indicating whether a new song should be generated. */
-	private static boolean generateNew = false;
+	private static boolean generateNew;
 	
 	/** The queue for generated songs. */
 	private BlockingQueue<Player> songQueue = new LinkedBlockingQueue<Player>();
 
-	/** The XML configuration file. */
-	private String filename;
+	/** The XML document URL. */
+	private URL url;
 
 	/** The random seed. */
 	private long randomSeed;
 
-	private String songName = null;
+	/** The song name. */
+	private String songName;
 	
-	public SoundHelix(String filename,long randomSeed) {
-		this.filename = filename;
+	public SoundHelix(URL url,long randomSeed) {
+		this.url = url;
 		this.randomSeed = randomSeed;
 		this.songName = null;
 	}
 	
-	public SoundHelix(String filename,String songName) {
-	    this.filename = filename;
+	public SoundHelix(URL url,String songName) {
+	    this.url = url;
 	    this.randomSeed = 0;
 	    this.songName = songName;
 	}
@@ -63,23 +64,20 @@ public class SoundHelix implements Runnable {
 	public static void main(String[] args) throws Exception {
         if (args.length == 1 && args[0].equals("-h") || args.length > 2) {
             System.out.println("java SoundHelix [XML-File [Songtitle]] ");
+            System.out.println("java SoundHelix [URL [Songtitle]] ");
             System.exit(0);
         }
 
         // initialize log4j
-        PropertyConfigurator.configureAndWatch("log4j.properties",60 * 1000);
+        PropertyConfigurator.configureAndWatch("log4j.properties", 60 * 1000);
 
         logger = Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
 		logger.info("SoundHelix " + BuildConstants.VERSION + " (r" + BuildConstants.REVISION + "), built on "
 						   + BuildConstants.BUILD_DATE);
 		
-		String filename = (args.length >= 1 ? args[0] : "SoundHelix.xml");
+		String filename = args.length >= 1 ? args[0] : "SoundHelix.xml";
 		
-		if (!new File(filename).exists()) {
-			throw(new RuntimeException("Configuration file \"" + filename + "\" doesn't exist"));
-		}
-
-		String songName = (args.length == 2 ? args[1] : null);
+		String songName = args.length == 2 ? args[1] : null;
 
 		long randomSeed = 0;
 		
@@ -95,20 +93,29 @@ public class SoundHelix implements Runnable {
 		try {
 			// instantiate this class so we can launch a thread
 		    SoundHelix soundHelix;
+		    URL url;
+		    
+		    if (filename.startsWith("http://") || filename.startsWith("https://")
+		                                       || filename.startsWith("ftp://")
+		                                       || filename.startsWith("file:/")) {
+		        url = new URL(filename);
+		    } else {
+                url = new File(filename).toURI().toURL();
+		    }
 		    
 		    if (songName != null && !songName.equals("")) {
-		        soundHelix = new SoundHelix(filename,songName);
+		        soundHelix = new SoundHelix(url, songName);
 		    } else {
-                soundHelix = new SoundHelix(filename,randomSeed);		        
+                soundHelix = new SoundHelix(url, randomSeed);
 		    }
 			// launch song generation thread with low priority
-			Thread t = new Thread(soundHelix,"Generator");
+			Thread t = new Thread(soundHelix, "Generator");
 			t.setPriority(Thread.MIN_PRIORITY);
 			t.start();
 
 			RemoteControl remoteControl = new ConsoleRemoteControl();		
 			
-			Thread consoleThread = new Thread(remoteControl,"Console");
+			Thread consoleThread = new Thread(remoteControl, "Console");
 			consoleThread.setPriority(Thread.MIN_PRIORITY);
 			consoleThread.start();
 
@@ -133,7 +140,7 @@ public class SoundHelix implements Runnable {
 					remoteControl.setPlayer(null);
 					player.close();
 				} catch (Exception e) {
-					logger.warn("Exception during playback",e);
+					logger.warn("Exception during playback", e);
 				}
 				
 				generateNew = true;
@@ -142,8 +149,8 @@ public class SoundHelix implements Runnable {
 				Runtime.getRuntime().removeShutdownHook(shutdownHook);
 			}
 		} catch (Exception e) {
-			logger.warn("Exception detected",e);
-			throw(e);
+			logger.warn("Exception detected", e);
+			throw e;
 		}
     }
 	
@@ -168,9 +175,9 @@ public class SoundHelix implements Runnable {
 					// the queue is empty; render a new song
 				    
 				    if (songName != null) {
-				        songQueue.add(SongUtils.generateSong(new File(filename),songName));
+				        songQueue.add(SongUtils.generateSong(url, songName));
 				    } else {
-				        songQueue.add(SongUtils.generateSong(new File(filename),randomSeed));
+				        songQueue.add(SongUtils.generateSong(url, randomSeed));
 				    }
 				    
 				    songName = null;
@@ -227,7 +234,7 @@ public class SoundHelix implements Runnable {
 				// so the player may be using already closed resources.
 				
 				if (player instanceof MidiPlayer) {
-					((MidiPlayer)player).muteAllChannels();
+					((MidiPlayer) player).muteAllChannels();
 				}
 			} catch (Exception e) {
 			}

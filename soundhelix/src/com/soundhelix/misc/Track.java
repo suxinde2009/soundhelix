@@ -110,7 +110,7 @@ public class Track {
 		
 		if (type == TrackType.RHYTHM) {
 			// non-zero transposition is forbidden for this type
-			throw(new IllegalArgumentException("Tracks of type RHYTHM must not be transposed"));
+			throw new IllegalArgumentException("Tracks of type RHYTHM must not be transposed");
 		}
 		
 		// transpose all the sequences of this track up by the number of halftones

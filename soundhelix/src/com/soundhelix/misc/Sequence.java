@@ -25,7 +25,7 @@ public class Sequence {
 	private int totalTicks;
 	
 	/** Flag indicating whether the last note added was a pause. */
-	private boolean lastWasPause = false;
+	private boolean lastWasPause;
 
 	/**
 	 * Calls addNote(pitch,ticks,Short.MAX_VALUE).
@@ -35,7 +35,7 @@ public class Sequence {
 	 */
 
 	public void addNote(int pitch, int ticks) {
-		addNote(pitch,ticks,Short.MAX_VALUE);
+		addNote(pitch, ticks, Short.MAX_VALUE);
 	}
 
 	/**
@@ -194,7 +194,7 @@ public class Sequence {
 	 * @param entry the SequenceEntry to insert
 	 */
 	
-	public void replaceEntry(int tick,SequenceEntry entry) {
+	public void replaceEntry(int tick, SequenceEntry entry) {
 		// determine the insertion offset
 		
 		// FIXME: doesn't correctly cover all cases
@@ -232,7 +232,7 @@ public class Sequence {
 				} while(diff > prevLength);
 
 				if (diff < prevLength) {
-					sequence.add(offset,new SequenceEntry(0, (short) -1, prevLength - diff, false));
+                    sequence.add(offset, new SequenceEntry(0, (short) -1, prevLength - diff, false));
 				}
 				return;
 			}
@@ -257,7 +257,7 @@ public class Sequence {
 				} while(entry.ticks > prevLength);
 
 				if (entry.ticks < prevLength) {
-					sequence.add(offset,new SequenceEntry(0, (short) -1, prevLength - entry.ticks, false));
+                    sequence.add(offset, new SequenceEntry(0, (short) -1, prevLength - entry.ticks, false));
 				}
 			}
 		}
@@ -267,7 +267,7 @@ public class Sequence {
 		private int pitch;
 		private short velocity;
 		private int ticks;
-		boolean legato;
+		private boolean legato;
 
 		public SequenceEntry(int pitch, short velocity, int ticks, boolean legato) {
 			this.pitch = pitch;
@@ -321,7 +321,7 @@ public class Sequence {
 		seq.addNote(50, 16);
 		seq.addNote(50, 16);
 
-		test(number++,seq, 16, 60, 16, "#64{50/16,60/16,50/16,50/16}");
+		test(number++, seq, 16, 60, 16, "#64{50/16,60/16,50/16,50/16}");
 
 		seq = new Sequence();
 
@@ -330,8 +330,8 @@ public class Sequence {
 		seq.addNote(50, 16);
 		seq.addNote(50, 16);
 
-		test(number++,seq, 16, 60, 8, "#64{50/16,60/8,-/8,50/16,50/16}");
-		test(number++,seq, 16, Integer.MIN_VALUE, 8, "#64{50/16,-/8,-/8,50/16,50/16}");
+		test(number++, seq, 16, 60, 8, "#64{50/16,60/8,-/8,50/16,50/16}");
+		test(number++, seq, 16, Integer.MIN_VALUE, 8, "#64{50/16,-/8,-/8,50/16,50/16}");
 
 		seq = new Sequence();
 
@@ -340,7 +340,7 @@ public class Sequence {
 		seq.addNote(50, 16);
 		seq.addNote(50, 16);
 
-		test(number++,seq, 16, 60, 24, "#64{50/16,60/24,-/8,50/16}");
+		test(number++, seq, 16, 60, 24, "#64{50/16,60/24,-/8,50/16}");
 
 		seq = new Sequence();
 
@@ -349,7 +349,7 @@ public class Sequence {
 		seq.addNote(50, 16);
 		seq.addNote(50, 16);
 
-		test(number++,seq, 16, 60, 32, "#64{50/16,60/32,50/16}");
+		test(number++, seq, 16, 60, 32, "#64{50/16,60/32,50/16}");
 
 		seq = new Sequence();
 
@@ -358,7 +358,7 @@ public class Sequence {
 		seq.addNote(50, 16);
 		seq.addNote(50, 16);
 
-		test(number++,seq, 16, 60, 33, "#64{50/16,60/33,-/15}");
+		test(number++, seq, 16, 60, 33, "#64{50/16,60/33,-/15}");
 
 		seq = new Sequence();
 
@@ -367,7 +367,7 @@ public class Sequence {
 		seq.addNote(50, 16);
 		seq.addNote(50, 16);
 
-		test(number++,seq, 16, 60, 48, "#64{50/16,60/48}");
+		test(number++, seq, 16, 60, 48, "#64{50/16,60/48}");
 
 		seq = new Sequence();
 
@@ -376,8 +376,8 @@ public class Sequence {
 		seq.addNote(50, 16);
 		seq.addNote(50, 16);
 
-		test(number++,seq, -1, 50, 20, "#64{50/16,50/16,50/16,50/16}");
-		test(number++,seq, 16, 60, 16, "#64{50/16,60/16,50/16,50/16}");
+		test(number++, seq, -1, 50, 20, "#64{50/16,50/16,50/16,50/16}");
+		test(number++, seq, 16, 60, 16, "#64{50/16,60/16,50/16,50/16}");
 
 		seq = new Sequence();
 		
@@ -386,7 +386,7 @@ public class Sequence {
 		seq.addNote(50, 16);
 		seq.addNote(50, 16);
 
-		test(number++,seq, 16, 60, 47, "#64{50/16,60/47,-/1}");
+		test(number++, seq, 16, 60, 47, "#64{50/16,60/47,-/1}");
 
 		number = 101;
 		
@@ -397,7 +397,7 @@ public class Sequence {
 		seq.addNote(50, 16);
 		seq.addNote(50, 16);
 
-		test(number++,seq, 8, 60, 20, "#64{50/8,60/20,-/4,50/16,50/16}");
+		test(number++, seq, 8, 60, 20, "#64{50/8,60/20,-/4,50/16,50/16}");
 
 		seq = new Sequence();
 		
@@ -406,7 +406,7 @@ public class Sequence {
 		seq.addNote(50, 16);
 		seq.addNote(50, 16);
 
-		test(number++,seq, 8, 60, 8, "#64{50/8,60/8,50/16,50/16,50/16}");
+		test(number++, seq, 8, 60, 8, "#64{50/8,60/8,50/16,50/16,50/16}");
 
 		seq = new Sequence();
 		
@@ -415,7 +415,7 @@ public class Sequence {
 		seq.addNote(50, 16);
 		seq.addNote(50, 16);
 
-		test(number++,seq, 8, 60, 4, "#64{50/8,60/4,-/4,50/16,50/16,50/16}");
+		test(number++, seq, 8, 60, 4, "#64{50/8,60/4,-/4,50/16,50/16,50/16}");
 
 		seq = new Sequence();
 		
@@ -424,7 +424,7 @@ public class Sequence {
 		seq.addNote(50, 16);
 		seq.addNote(50, 16);
 
-		test(number++,seq, 8, 60, 24, "#64{50/8,60/24,50/16,50/16}");
+		test(number++, seq, 8, 60, 24, "#64{50/8,60/24,50/16,50/16}");
 
 		seq = new Sequence();
 		
@@ -433,7 +433,7 @@ public class Sequence {
 		seq.addNote(50, 16);
 		seq.addNote(50, 16);
 
-		test(number++,seq, 8, 60, 30, "#64{50/8,60/30,-/10,50/16}");
+		test(number++, seq, 8, 60, 30, "#64{50/8,60/30,-/10,50/16}");
 
 		seq = new Sequence();
 		
@@ -442,7 +442,7 @@ public class Sequence {
 		seq.addNote(50, 16);
 		seq.addNote(50, 16);
 
-		test(number++,seq, 8, 60, 40, "#64{50/8,60/40,50/16}");
+		test(number++, seq, 8, 60, 40, "#64{50/8,60/40,50/16}");
 
 		seq = new Sequence();
 		
@@ -451,7 +451,7 @@ public class Sequence {
 		seq.addNote(50, 16);
 		seq.addNote(50, 16);
 
-		test(number++,seq, 8, 60, 56, "#64{50/8,60/56}");
+		test(number++, seq, 8, 60, 56, "#64{50/8,60/56}");
 
 		seq = new Sequence();
 		
@@ -460,17 +460,16 @@ public class Sequence {
 		seq.addNote(50, 16);
 		seq.addNote(50, 16);
 
-		test(number++,seq, 8, 60, 55, "#64{50/8,60/55,-/1}");
-
+		test(number++, seq, 8, 60, 55, "#64{50/8,60/55,-/1}");
 	}
 	
-	private static boolean tested = false;
+	private static boolean tested;
 	
-	public static void test(int number,Sequence seq, int tick, int pitch, int ticks, String str) {
+	public static void test(int number, Sequence seq, int tick, int pitch, int ticks, String str) {
 		try {
 			if (tick >= 0) {
 				seq.replaceEntry(tick,
-						new SequenceEntry(pitch,pitch == Integer.MIN_VALUE ? -1 : (short)32767,ticks,false));
+                    new SequenceEntry(pitch, pitch == Integer.MIN_VALUE ? -1 : (short) 32767, ticks, false));
 			}
 			
 			int size = seq.size();
@@ -483,7 +482,7 @@ public class Sequence {
 			if (t != seq.totalTicks) {
 				System.out.println("Test " + number + " Expected: " + str);
 				System.out.println("          Found: " + seq.toString());
-				System.out.println("   ** MISMATCH: Expected " + seq.totalTicks + " ticks, got " + t + " ticks");
+                System.out.println("   ** MISMATCH: Expected " + seq.totalTicks + " ticks, got " + t + " ticks");
 				return;
 			}
 		} catch (Exception e) {
@@ -496,10 +495,10 @@ public class Sequence {
 		String s = seq.toString();
 		
 		if (!s.equals(str)) {
-			System.out.println("Test " + number + " Expected: " + str);
-			System.out.println("          Found: " + s + "\n");
+		    System.out.println("Test " + number + " Expected: " + str);
+		    System.out.println("          Found: " + s + "\n");
 		} else {
-			System.out.println("Test " + number + " succeeded");
+		    System.out.println("Test " + number + " succeeded");
 		}
 	}	
 }

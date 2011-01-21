@@ -1,7 +1,8 @@
 package com.soundhelix.util;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.List;
 
 import com.soundhelix.harmonyengine.HarmonyEngine;
@@ -55,7 +56,7 @@ public final class HarmonyEngineUtils {
 	 * @return a chord section string (or null if the tick parameter is invalid)
 	 */
 	
-	public static String getChordSectionString(Structure structure,int tick) {
+	public static String getChordSectionString(Structure structure, int tick) {
 		if (tick < 0 || tick >= structure.getTicks()) {
 			return null;
 		}
@@ -78,7 +79,7 @@ public final class HarmonyEngineUtils {
 			
 			// the chord section might end before a chord change occurs
 			// therefore we need to use Math.min()
-			sb.append(Math.min(tickEnd - tick,len));
+			sb.append(Math.min(tickEnd - tick, len));
 
 			tick += len;
 		}
@@ -98,10 +99,10 @@ public final class HarmonyEngineUtils {
 		HarmonyEngine harmonyEngine = structure.getHarmonyEngine();
 		int ticks = structure.getTicks();
 		
-		Hashtable<String,Boolean> ht = new Hashtable<String,Boolean>();
+		Map<String, Boolean> ht = new HashMap<String, Boolean>();
 
 	    for (int tick = 0; tick < ticks; tick += harmonyEngine.getChordSectionTicks(tick)) {
-			ht.put(getChordSectionString(structure,tick),true);
+			ht.put(getChordSectionString(structure, tick), true);
 		}
 
 		return ht.size();
@@ -119,7 +120,7 @@ public final class HarmonyEngineUtils {
 		
 	public static List<Integer> getChordSectionStartTicks(Structure structure) {
 		HarmonyEngine harmonyEngine = structure.getHarmonyEngine();
-		ArrayList<Integer> list = new ArrayList<Integer>(20);
+		List<Integer> list = new ArrayList<Integer>();
 
 	    int ticks = structure.getTicks();
 	    

@@ -1,7 +1,8 @@
 package com.soundhelix.sequenceengine;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -15,11 +16,11 @@ import org.w3c.dom.NodeList;
 import com.soundhelix.harmonyengine.HarmonyEngine;
 import com.soundhelix.misc.ActivityVector;
 import com.soundhelix.misc.Chord;
+import com.soundhelix.misc.Chord.ChordSubtype;
 import com.soundhelix.misc.Pattern;
+import com.soundhelix.misc.Pattern.PatternEntry;
 import com.soundhelix.misc.Sequence;
 import com.soundhelix.misc.Track;
-import com.soundhelix.misc.Chord.ChordSubtype;
-import com.soundhelix.misc.Pattern.PatternEntry;
 import com.soundhelix.misc.Track.TrackType;
 import com.soundhelix.util.HarmonyEngineUtils;
 import com.soundhelix.util.XMLUtils;
@@ -41,13 +42,13 @@ import com.soundhelix.util.XMLUtils;
  */
 
 public class RandomPatternSequenceEngine extends AbstractSequenceEngine {	
+    private static final int[] MAJOR_TABLE = new int[] {0, 4, 7};
+    private static final int[] MINOR_TABLE = new int[] {0, 3, 7};
+
 	private static String defaultPatternString = "0";
 	private Pattern pattern;
 	private int patternLength;
 	private int[] offsets;
-
-	private static final int[] MAJOR_TABLE = new int[] {0,4,7};
-	private static final int[] MINOR_TABLE = new int[] {0,3,7};
 
 	private Random random;
 	
@@ -69,11 +70,11 @@ public class RandomPatternSequenceEngine extends AbstractSequenceEngine {
         int tick = 0;
         int ticks = structure.getTicks();
         
-        Hashtable<String,Pattern> melodyHashtable = createMelodies();
+        Map<String, Pattern> melodyHashtable = createMelodies();
         
 		while (tick < ticks) {
         	int len = harmonyEngine.getChordSectionTicks(tick);
-        	Pattern p = melodyHashtable.get(HarmonyEngineUtils.getChordSectionString(structure,tick));
+        	Pattern p = melodyHashtable.get(HarmonyEngineUtils.getChordSectionString(structure, tick));
         	int pos = 0;
         	
         	for (int i = 0; i < len;) {
@@ -85,7 +86,7 @@ public class RandomPatternSequenceEngine extends AbstractSequenceEngine {
             			// add pause
             			seq.addPause(l);
         			} else {
-        				seq.addNote(entry.getPitch(),l,entry.getVelocity(),entry.isLegato());
+        				seq.addNote(entry.getPitch(), l, entry.getVelocity(), entry.isLegato());
         			}
         		} else {
         			// add pause
@@ -112,18 +113,18 @@ public class RandomPatternSequenceEngine extends AbstractSequenceEngine {
      * @return a hashtable mapping chord section strings to pitch patterns
      */
     
-    private Hashtable<String,Pattern> createMelodies() {
+    private Map<String, Pattern> createMelodies() {
     	HarmonyEngine he = structure.getHarmonyEngine();
     	
-    	Hashtable<String,Pattern> ht = new Hashtable<String,Pattern>();
+    	Map<String, Pattern> sectionMap = new HashMap<String, Pattern>();
     	
     	int tick = 0;
     	
     	while (tick < structure.getTicks()) {
-    		String section = HarmonyEngineUtils.getChordSectionString(structure,tick);
+    		String section = HarmonyEngineUtils.getChordSectionString(structure, tick);
             int len = he.getChordSectionTicks(tick);
     		
-    		if (!ht.containsKey(section)) {
+    		if (!sectionMap.containsKey(section)) {
     			// no pattern created yet; create one
     			List<PatternEntry> list = new ArrayList<PatternEntry>();    			
     			
@@ -152,15 +153,15 @@ public class RandomPatternSequenceEngine extends AbstractSequenceEngine {
             				}
             			}
         				
-            			int octave = (value >= 0 ? value / 3 : (value - 2) / 3);
+            			int octave = value >= 0 ? value / 3 : (value - 2) / 3;
             			int offset = ((value % 3) + 3) % 3;
             			
             	 	    if (chord.isMajor()) {
             			    list.add(new PatternEntry(octave * 12 + MAJOR_TABLE[offset] + chord.getPitch(),
-            			    		                  entry.getVelocity(),t,entry.isLegato()));
+            			    		                  entry.getVelocity(), t, entry.isLegato()));
             		    } else {
             			    list.add(new PatternEntry(octave * 12 + MINOR_TABLE[offset] + chord.getPitch(),
-            			    		                  entry.getVelocity(),t,entry.isLegato()));
+            			    		                  entry.getVelocity(), t, entry.isLegato()));
             		    }
         				
         				lastValue = value;
@@ -170,7 +171,7 @@ public class RandomPatternSequenceEngine extends AbstractSequenceEngine {
         			i += t;
     			}
    
-    			ht.put(section,new Pattern(list.toArray(new PatternEntry[list.size()])));
+    			sectionMap.put(section, new Pattern(list.toArray(new PatternEntry[list.size()])));
     		} else {
     			// melody already created, skip chord section
     		}
@@ -178,16 +179,16 @@ public class RandomPatternSequenceEngine extends AbstractSequenceEngine {
     		tick += len;
     	}
     	
-    	return ht;
+    	return sectionMap;
     }
     
-    public void configure(Node node,XPath xpath) throws XPathException {
+    public void configure(Node node, XPath xpath) throws XPathException {
     	random = new Random(randomSeed);
     	
-		NodeList nodeList = (NodeList)xpath.evaluate("pattern",node,XPathConstants.NODESET);
-		setPattern(XMLUtils.parseString(random,nodeList.item(random.nextInt(nodeList.getLength())),xpath));
+		NodeList nodeList = (NodeList) xpath.evaluate("pattern", node, XPathConstants.NODESET);
+		setPattern(XMLUtils.parseString(random, nodeList.item(random.nextInt(nodeList.getLength())), xpath));
 		
-		String offsetString = XMLUtils.parseString(random,"offsets",node,xpath);
+		String offsetString = XMLUtils.parseString(random, "offsets", node, xpath);
     	
     	if (offsetString == null || offsetString.equals("")) {
     		offsetString = "0,1,2";
@@ -197,7 +198,7 @@ public class RandomPatternSequenceEngine extends AbstractSequenceEngine {
     	
     	int[] offsets = new int[offsetList.length];
     	
-    	for (int i = 0; i < offsetList.length;i++) {
+    	for (int i = 0; i < offsetList.length; i++) {
     		offsets[i] = Integer.parseInt(offsetList[i]);
     	}
     	
@@ -205,7 +206,7 @@ public class RandomPatternSequenceEngine extends AbstractSequenceEngine {
     }
     
 	public void setPattern(String patternString) {
-		this.pattern = Pattern.parseString(patternString,"");
+		this.pattern = Pattern.parseString(patternString, "");
 		this.patternLength = pattern.size();
 	}
 	

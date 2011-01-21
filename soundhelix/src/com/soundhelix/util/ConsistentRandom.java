@@ -15,7 +15,7 @@ import java.util.Random;
  */
 
 public class ConsistentRandom {
-	// main seed
+	/** The main random seed. */
 	private long constantSeed;
     
 	// pertubation seed for booleans
@@ -37,13 +37,13 @@ public class ConsistentRandom {
      * @return a random integer
      */
     
-    public int getInteger(int min,int max,long seed) {
-    	Random r = new Random(min * 167852533l + max * 7531057l + constantSeed + seed);
+    public int getInteger(int min, int max, long seed) {
+    	Random r = new Random(min * 167852533L + max * 7531057L + constantSeed + seed);
     	return min + r.nextInt(max - min);
     }
 
-    public int getInteger(int min,int max,Object seedObject) {
-    	return getInteger(min,max,seedObject.hashCode());
+    public int getInteger(int min, int max, Object seedObject) {
+    	return getInteger(min, max, seedObject.hashCode());
     }
 
     public boolean getBoolean(long seed) {

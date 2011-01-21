@@ -66,14 +66,14 @@ public class Structure {
 	
 	public void setHarmonyEngine(HarmonyEngine harmonyEngine) {
 		if (harmonyEngine == null) {
-			throw(new RuntimeException("HarmonyEngine already set"));
+			throw new RuntimeException("HarmonyEngine already set");
 		}
 		
 		this.harmonyEngine = harmonyEngine;
 		harmonyEngine.setSongStructure(this);
 	}
 	
-	public Structure(int bars,int beatsPerBar,int ticksPerBeat, String songName) {
+	public Structure(int bars, int beatsPerBar, int ticksPerBeat, String songName) {
 		this.bars = bars;
 		this.beatsPerBar = beatsPerBar;
 		this.ticksPerBeat = ticksPerBeat;		

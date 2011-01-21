@@ -36,8 +36,8 @@ import com.soundhelix.util.XMLUtils;
 
 public class PadSequenceEngine extends AbstractSequenceEngine {
 	
-	private static final int[] MAJOR_TABLE = new int[] {0,4,7};
-	private static final int[] MINOR_TABLE = new int[] {0,3,7};
+	private static final int[] MAJOR_TABLE = new int[] {0, 4, 7};
+	private static final int[] MINOR_TABLE = new int[] {0, 3, 7};
 	
 	private Random random;
 	
@@ -54,8 +54,8 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
 	}
 	
 	public void setOffsets(int[] offsets) {
-		if(offsets.length == 0) {
-			throw(new RuntimeException("Array of offsets must not be empty"));
+		if (offsets.length == 0) {
+			throw new RuntimeException("Array of offsets must not be empty");
 		}
 		
 		this.offsets = offsets;
@@ -75,7 +75,7 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
 
 		Track track = new Track(TrackType.MELODY);
 		
-        for(int i=0;i<voiceCount;i++) {
+        for (int i = 0; i < voiceCount; i++) {
         	track.add(new Sequence());
         }
 
@@ -85,7 +85,7 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
         
         int tick = 0;
         
-        while(tick < structure.getTicks()) {
+        while (tick < structure.getTicks()) {
         	Chord chord = firstChord.findClosestChord(ce.getChord(tick));
            	int len = ce.getChordTicks(tick);
            	
@@ -103,30 +103,32 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
         		}
         	}
 	
-        	for(int i=0;i<voiceCount;i++) {
+        	for (int i = 0; i < voiceCount; i++) {
         		Sequence seq = track.get(i);
 
         		int pos = offsets[i] + shift;
         		
-        		int octave = (pos >= 0 ? pos / 3 : (pos - 2) / 3);
+        		int octave = pos >= 0 ? pos / 3 : (pos - 2) / 3;
         		int offset = ((pos % 3) + 3) % 3;
         		
         		if (chord.isMajor()) {
-        			seq.addNote(octave*12+MAJOR_TABLE[offset]+chord.getPitch(),Math.min(activityLen,len)-postPauseTicks, velocity);
-        			seq.addPause(len-Math.min(activityLen,len));
+        			seq.addNote(octave * 12 + MAJOR_TABLE[offset] + chord.getPitch(),
+        			            Math.min(activityLen, len) - postPauseTicks, velocity);
+        			seq.addPause(len - Math.min(activityLen, len));
         		} else {
-        			seq.addNote(octave*12+MINOR_TABLE[offset]+chord.getPitch(),Math.min(activityLen,len)-postPauseTicks, velocity);        			
-        			seq.addPause(len-Math.min(activityLen,len));
+        			seq.addNote(octave * 12 + MINOR_TABLE[offset] + chord.getPitch(),
+        			            Math.min(activityLen, len) - postPauseTicks, velocity);
+        			seq.addPause(len - Math.min(activityLen, len));
         		}
         		
-        		if(postPauseTicks > 0) {
+        		if (postPauseTicks > 0) {
         			seq.addPause(postPauseTicks);
         		}
         		     		
         		pos++;
         	}
         	} else {
-        		for (int i=0;i<voiceCount;i++) {
+        		for (int i = 0; i < voiceCount; i++) {
         		  track.get(i).addPause(len);
         		}
         	}
@@ -136,12 +138,12 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
         return track;
 	}
 	
-    public void configure(Node node,XPath xpath) throws XPathException {
+    public void configure(Node node, XPath xpath) throws XPathException {
     	random = new Random();
     	
-    	String offsetString = XMLUtils.parseString(random,"offsets",node,xpath);
+    	String offsetString = XMLUtils.parseString(random, "offsets", node, xpath);
     	
-    	if(offsetString == null || offsetString.equals("")) {
+    	if (offsetString == null || offsetString.equals("")) {
     		offsetString = "0,1,2";
     	}
 
@@ -149,18 +151,18 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
     	
     	int[] offsets = new int[offsetList.length];
     	
-    	for(int i=0;i<offsetList.length;i++) {
+    	for (int i = 0; i < offsetList.length; i++) {
     		offsets[i] = Integer.parseInt(offsetList[i]);
     	}
     	
     	setOffsets(offsets);
     	
 		try {
-			setObeyChordSubtype(XMLUtils.parseBoolean(random,"obeyChordSubtype",node,xpath));
-		} catch(Exception e) {}
+			setObeyChordSubtype(XMLUtils.parseBoolean(random, "obeyChordSubtype", node, xpath));
+		} catch (Exception e) {}
 
 		try {
-			setVelocity((short) XMLUtils.parseInteger(random,"velocity",node,xpath));
-		} catch(Exception e) {}
+			setVelocity((short) XMLUtils.parseInteger(random, "velocity", node, xpath));
+		} catch (Exception e) {}
 	}
 }

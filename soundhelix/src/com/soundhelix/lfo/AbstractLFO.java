@@ -14,7 +14,7 @@ package com.soundhelix.lfo;
  */
 
 public abstract class AbstractLFO implements LFO {
-	private static final double TWO_PI = 2.0d*Math.PI;
+	private static final double TWO_PI = 2.0d * Math.PI;
 
 	/** The minimum amplitude value. */
 	private int returnMinimum = Integer.MIN_VALUE;
@@ -58,12 +58,12 @@ public abstract class AbstractLFO implements LFO {
 
     public int getTickValue(int tick) {
         if (!isConfigured) {
-            throw(new RuntimeException("LFO speed not set yet"));           
+            throw new RuntimeException("LFO speed not set yet");           
         }
         
         double angle = (TWO_PI / 1000000d) * ((double) tick * microRotationsPerTick + microRotationShift);
         
-        int value = amplitudeMinimum + (int)(0.5d + (amplitudeMaximum - amplitudeMinimum) * getValue(angle));
+        int value = amplitudeMinimum + (int) (0.5d + (amplitudeMaximum - amplitudeMinimum) * getValue(angle));
         
         if (value > returnMaximum) {
         	return returnMaximum;
@@ -75,12 +75,12 @@ public abstract class AbstractLFO implements LFO {
     }
 
 	public void setBeatSpeed(int milliRotationsPerBeat,int ticksPerBeat,int milliBPM) {
-		this.microRotationsPerTick = milliRotationsPerBeat*1000L/ticksPerBeat; 
+		this.microRotationsPerTick = milliRotationsPerBeat * 1000L / ticksPerBeat; 
 		isConfigured = true;
 	}
 
 	public void setSongSpeed(int milliRotationsPerSong,int ticksPerSong,int milliBPM) {
-		this.microRotationsPerTick = milliRotationsPerSong*1000L/ticksPerSong; 
+		this.microRotationsPerTick = milliRotationsPerSong * 1000L / ticksPerSong; 
 		isConfigured = true;
 	}
 

@@ -22,13 +22,23 @@ public abstract class AbstractArrangementEngine implements ArrangementEngine {
 	/** The random seed. */
 	protected long randomSeed;
 	
+	/**
+	 * Constructor.
+	 */
+	
 	public AbstractArrangementEngine() {
 		logger = Logger.getLogger(getClass());
 	}	
 
+	/**
+	 * Sets the structure.
+	 * 
+	 * @param structure the structure
+	 */
+	
 	public void setStructure(Structure structure) {
 		if (this.structure != null) {
-			throw(new RuntimeException("Structure already set"));
+			throw new RuntimeException("Structure already set");
 		}
 		
 		this.structure = structure;
@@ -42,11 +52,23 @@ public abstract class AbstractArrangementEngine implements ArrangementEngine {
 	
     public abstract Arrangement render();
     
+    /**
+     * Sets the random seed.
+     * 
+     * @param randomSeed the random seed
+     */
+    
     public void setRandomSeed(long randomSeed) {
-    	 this.randomSeed = randomSeed;
-     }
+        this.randomSeed = randomSeed;
+    }
 
-     public long getRandomSeed() {
-    	 return randomSeed;
-     }
+    /**
+     * Returns the random seed.
+     * 
+     * @return the random seed
+     */
+    
+    public long getRandomSeed() {
+        return randomSeed;
+    }
 }

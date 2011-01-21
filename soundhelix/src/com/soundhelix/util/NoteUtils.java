@@ -1,6 +1,7 @@
 package com.soundhelix.util;
 
-import java.util.Hashtable;
+import java.util.Map;
+import java.util.HashMap;
 
 import com.soundhelix.misc.Chord;
 
@@ -15,20 +16,20 @@ public final class NoteUtils {
 	// form the white keys on the piano keyboard, starting with c
 	// this equals all even indexes < 5 and all odd indexes >= 5
 	private static final boolean[] SCALE_TABLE = new boolean[] {
-		true,false,true,false,true,true,false,true,false,true,false,true};
+		true, false, true, false, true, true, false, true, false, true, false, true};
 
 	/** The list of all note names, starting with c. */
 	private static String[] noteNames = {
-		"c","c#","d","d#","e","f","f#","g","g#","a","a#","b"
+		"c", "c#", "d", "d#", "e", "f", "f#", "g", "g#", "a", "a#", "b"
 	};
 	
 	/** Maps note names to normalized pitches. */
-	private static Hashtable<String,Integer> h = new Hashtable<String,Integer>();
+	private static Map<String, Integer> h = new HashMap<String, Integer>();
 	
 	static {
 		// build a reverse lookup table for noteNames
-		for (int i = 0; i < 12;i++) {
-			h.put(noteNames[i],i);
+		for (int i = 0; i < 12; i++) {
+			h.put(noteNames[i], i);
 		}
 	}
 	
@@ -100,7 +101,7 @@ public final class NoteUtils {
 	 * @return a transition pitch
 	 */
 	
-	public static int getTransitionPitch(Chord chord,Chord nextChord) {
+	public static int getTransitionPitch(Chord chord, Chord nextChord) {
 		if (nextChord == null) {
 			// next chord is undefined, just return the current pitch
 			return chord.getPitch();
@@ -125,14 +126,14 @@ public final class NoteUtils {
 			return pitch1;
 		} else if (diff > 0) {
 			// we have a pitch difference of at least 3 halftones up
-			pitch1 += Math.min(0,absdiff / 2 - 1);
+			pitch1 += Math.min(0, absdiff / 2 - 1);
 			do {
 				pitch1++;
 			} while(!isOnScale(pitch1));
 		   	return pitch1;
 		} else {
 			// we have a pitch difference of at least 3 halftones down
-			pitch1 -= Math.min(0,absdiff / 2 - 1);
+			pitch1 -= Math.min(0, absdiff / 2 - 1);
 			do {
 				pitch1--;
 			} while(!isOnScale(pitch1));

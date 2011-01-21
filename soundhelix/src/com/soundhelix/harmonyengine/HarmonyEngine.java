@@ -54,8 +54,15 @@ import com.soundhelix.misc.XMLConfigurable;
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
-public interface HarmonyEngine extends XMLConfigurable,RandomSeedable {
-	public void setSongStructure(Structure structure);
+public interface HarmonyEngine extends XMLConfigurable, RandomSeedable {
+    
+    /**
+     * Sets the song structure.
+     * 
+     * @param structure the structure
+     */
+    
+	void setSongStructure(Structure structure);
 	
     /**
      * Returns the chord to use at the specified point in time.
@@ -66,7 +73,7 @@ public interface HarmonyEngine extends XMLConfigurable,RandomSeedable {
      * @return the Chord
      */
 	
-	public Chord getChord(int tick);
+	Chord getChord(int tick);
 	
 	/**
 	 * Returns the number of ticks the current chord will
@@ -82,7 +89,7 @@ public interface HarmonyEngine extends XMLConfigurable,RandomSeedable {
 	 * @return the number of ticks before the next chord change
 	 */
 	
-	public int getChordTicks(int tick);
+	int getChordTicks(int tick);
 
 	/**
 	 * Returns the number of ticks the current chord section will be played from
@@ -97,5 +104,5 @@ public interface HarmonyEngine extends XMLConfigurable,RandomSeedable {
 	 * @return the number of ticks before the next chord section begins or the song will end
 	 */
 	
-	public int getChordSectionTicks(int tick);
+	int getChordSectionTicks(int tick);
 }

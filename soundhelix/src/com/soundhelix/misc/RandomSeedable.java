@@ -21,7 +21,7 @@ public interface RandomSeedable {
 	 * @param seed the random seed
 	 */
 	
-	public void setRandomSeed(long seed);
+	void setRandomSeed(long seed);
 
 	/**
 	 * Returns the current random seed, which is the last seed set by setRandomSeed()
@@ -30,5 +30,5 @@ public interface RandomSeedable {
 	 * @return the random seed
 	 */
 		
-	public long getRandomSeed();
+	long getRandomSeed();
 }

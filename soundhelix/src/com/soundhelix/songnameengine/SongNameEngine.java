@@ -1,6 +1,9 @@
 package com.soundhelix.songnameengine;
 
-public interface SongNameEngine {
+import com.soundhelix.misc.RandomSeedable;
+import com.soundhelix.misc.XMLConfigurable;
+
+public interface SongNameEngine extends RandomSeedable, XMLConfigurable {
     /**
      * Generates and returns a song name.
      * 

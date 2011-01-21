@@ -15,12 +15,12 @@ import com.soundhelix.misc.XMLConfigurable;
 // TODO: check if more methods should be available, for example,
 // getting the current tick, setting the current tick
 
-public interface Player extends XMLConfigurable,RandomSeedable {
+public interface Player extends XMLConfigurable, RandomSeedable {
 	/**
 	 * Opens all required resources for playing.
 	 */
 
-    public void open();
+    void open();
     
     /**
      * Gets the arrangement to play.
@@ -32,6 +32,8 @@ public interface Player extends XMLConfigurable,RandomSeedable {
 
     /**
      * Sets the arrangement to play.
+     * 
+     * @param arrangement the arrangement
      */
     
     void setArrangement(Arrangement arrangement);
@@ -49,7 +51,7 @@ public interface Player extends XMLConfigurable,RandomSeedable {
  	 * open() has been called after that.
  	 */
 
-    abstract void close();
+    void close();
 
     /**
      * Gets the playback speed in milli-BPM.

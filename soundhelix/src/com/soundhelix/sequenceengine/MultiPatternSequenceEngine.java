@@ -32,21 +32,21 @@ public class MultiPatternSequenceEngine extends AbstractMultiPatternSequenceEngi
 		super();
 	}
 
-	public void configure(Node node,XPath xpath) throws XPathException {
+	public void configure(Node node, XPath xpath) throws XPathException {
 		random = new Random(randomSeed);
 
-		NodeList patternsList = (NodeList)xpath.evaluate("patternEngines",node,XPathConstants.NODESET);
+		NodeList patternsList = (NodeList) xpath.evaluate("patternEngines", node, XPathConstants.NODESET);
 
 		if (patternsList.getLength() == 0) {
-			throw(new RuntimeException("Need at least 1 list of patternEngines"));
+			throw new RuntimeException("Need at least 1 list of patternEngines");
 		}
 
 		Node patternsNode = patternsList.item(random.nextInt(patternsList.getLength()));
 
-		NodeList patternList = (NodeList) xpath.evaluate("patternEngine", patternsNode,XPathConstants.NODESET);
+		NodeList patternList = (NodeList) xpath.evaluate("patternEngine", patternsNode, XPathConstants.NODESET);
 
 		if (patternList.getLength() == 0) {
-			throw(new RuntimeException("Need at least 1 pattern"));
+			throw new RuntimeException("Need at least 1 pattern");
 		}
 
 		Pattern[] patterns = new Pattern[patternList.getLength()];
@@ -55,10 +55,10 @@ public class MultiPatternSequenceEngine extends AbstractMultiPatternSequenceEngi
 			PatternEngine patternEngine;
 			
 			try {
-				patternEngine = XMLUtils.getInstance(PatternEngine.class,patternList.item(i),
-						xpath,randomSeed ^ 47351842858l);
+				patternEngine = XMLUtils.getInstance(PatternEngine.class, patternList.item(i),
+						xpath, randomSeed ^ 47351842858L);
 			} catch (Exception e) {
-				throw(new RuntimeException("Error instantiating PatternEngine",e));
+				throw new RuntimeException("Error instantiating PatternEngine", e);
 			}
 		
 			patterns[i] = patternEngine.render("" + TRANSITION);
@@ -67,7 +67,7 @@ public class MultiPatternSequenceEngine extends AbstractMultiPatternSequenceEngi
 		setPatterns(patterns);
 
 		try {
-			setObeyChordSubtype(XMLUtils.parseBoolean(random,"obeyChordSubtype",node,xpath));
+			setObeyChordSubtype(XMLUtils.parseBoolean(random, "obeyChordSubtype", node, xpath));
 		} catch (Exception e) {}
 	}
 }

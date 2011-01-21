@@ -46,7 +46,7 @@ public class ChordSequenceEngine extends MultiPatternSequenceEngine {
 
 	public void setOffsets(int[] offsets) {
 		if (offsets.length == 0) {
-			throw(new RuntimeException("Array of offsets must not be empty"));
+			throw new RuntimeException("Array of offsets must not be empty");
 		}
 		
 		this.offsets = offsets;
@@ -56,10 +56,10 @@ public class ChordSequenceEngine extends MultiPatternSequenceEngine {
 		this.obeyChordSubtype = obeyChordSubtype;
 	}
 
-    public void configure(Node node,XPath xpath) throws XPathException {
+    public void configure(Node node, XPath xpath) throws XPathException {
     	random = new Random(randomSeed);
 
-    	String offsetString = XMLUtils.parseString(random,"offsets",node,xpath);
+    	String offsetString = XMLUtils.parseString(random, "offsets", node, xpath);
     	
     	if (offsetString == null || offsetString.equals("")) {
     		offsetString = "0,1,2";
@@ -76,23 +76,23 @@ public class ChordSequenceEngine extends MultiPatternSequenceEngine {
     	setOffsets(offsets);
     	
 		try {
-			setObeyChordSubtype(XMLUtils.parseBoolean(random,"obeyChordSubtype",node,xpath));
+			setObeyChordSubtype(XMLUtils.parseBoolean(random, "obeyChordSubtype", node, xpath));
 		} catch (Exception e) {}
 
-		NodeList nodeList = (NodeList)xpath.evaluate("patternEngine",node,XPathConstants.NODESET);
+		NodeList nodeList = (NodeList) xpath.evaluate("patternEngine", node, XPathConstants.NODESET);
 
 		if (nodeList.getLength() == 0) {
-			throw(new RuntimeException("Need at least 1 pattern"));
+			throw new RuntimeException("Need at least 1 pattern");
 		}
 		
 		PatternEngine patternEngine;
 		
 		try {
 			int i = random.nextInt(nodeList.getLength());
-			patternEngine = XMLUtils.getInstance(PatternEngine.class,nodeList.item(i),
-					xpath,randomSeed ^ 47351842858l);
+			patternEngine = XMLUtils.getInstance(PatternEngine.class, nodeList.item(i),
+					xpath, randomSeed ^ 47351842858L);
 		} catch (Exception e) {
-			throw(new RuntimeException("Error instantiating PatternEngine",e));
+			throw new RuntimeException("Error instantiating PatternEngine", e);
 		}
 		
 		// render base pattern
@@ -102,7 +102,7 @@ public class ChordSequenceEngine extends MultiPatternSequenceEngine {
 		
 		Pattern[] patterns = new Pattern[offsets.length];
 		
-		for (int i = 0; i < offsets.length;i++) {
+		for (int i = 0; i < offsets.length; i++) {
 			patterns[i] = pattern.transpose(offsets[i]);
 		}
 		

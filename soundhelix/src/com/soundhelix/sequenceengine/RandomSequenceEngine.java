@@ -52,11 +52,11 @@ public class RandomSequenceEngine extends AbstractMultiPatternSequenceEngine {
 	private double maxVelocity = 20000d;
 	
 	/** The list of offsets to choose from. The list may contain values more than once for extra weight. */
-	private int[] offsets = {0,1,2,3,4,5,6};
+	private int[] offsets = {0, 1, 2, 3, 4, 5, 6};
 	/** The list of note lengths to choose from. The list may contain values more than once for extra weight. */
-	private int[] noteLengths = {1,2,3,2,1,1};
+	private int[] noteLengths = {1, 2, 3, 2, 1, 1};
 	/** The list of pause lengths to choose from. The list may contain values more than once for extra weight. */
-	private int[] pauseLengths = {1,2,3,2,1,1};
+	private int[] pauseLengths = {1, 2, 3, 2, 1, 1};
 	/** The minimum number of active ticks. */
 	private int minActiveTicks = 1;
 	/** The maximum number of active ticks. */
@@ -64,39 +64,39 @@ public class RandomSequenceEngine extends AbstractMultiPatternSequenceEngine {
 
 	
 	/**
-	 * The correlation between pitch and velocity. If 1, the velocity depends only on the pitch and not on the random
+     * The correlation between pitch and velocity. If 1, the velocity depends only on the pitch and not on the random
 	 * value; if 0, the velocity only depends on the random value.
 	 */
 	private double pitchVelocityCorrelation = 0.75;
 	
 	/**
 	 * The exponent for the power distribution used for velocity. 1 distributes linearly between minimum and maximum
-	 * velocity, 2 quadratically, 0.5 like a square-root, etc. The same happens for a negative exponent, but reverses
+     * velocity, 2 quadratically, 0.5 like a square-root, etc. The same happens for a negative exponent, but reverses
 	 * the meaning of minimum and maximum velocity.
 	 */
 	private double velocityExponent = 3.0d;
 	
-    public void configure(Node node,XPath xpath) throws XPathException {
+    public void configure(Node node, XPath xpath) throws XPathException {
     	random = new Random(randomSeed);
     	
 		try {
-			setObeyChordSubtype(XMLUtils.parseBoolean(random,"obeyChordSubtype",node,xpath));
+			setObeyChordSubtype(XMLUtils.parseBoolean(random, "obeyChordSubtype", node, xpath));
 		} catch (Exception e) {
 		}
 
-		setPatternTicks(XMLUtils.parseInteger(random,"patternTicks",node,xpath));
-		setNoteProbability(XMLUtils.parseDouble(random,"noteProbability",node,xpath) / 100.0);
-		setLegatoProbability(XMLUtils.parseDouble(random,"legatoProbability",node,xpath) / 100.0);
-		setMinVelocity(XMLUtils.parseInteger(random,"minVelocity",node,xpath));
-		setMaxVelocity(XMLUtils.parseInteger(random,"maxVelocity",node,xpath));
-		setMinActiveTicks(XMLUtils.parseInteger(random,"minActiveTicks",node,xpath));
-		setMaxActiveTicks(XMLUtils.parseInteger(random,"maxActiveTicks",node,xpath));
-    	setOffsets(XMLUtils.parseIntegerListString(random,"offsets",node,xpath));
-    	setNoteLengths(XMLUtils.parseIntegerListString(random,"noteLengths",node,xpath));
-    	setPauseLengths(XMLUtils.parseIntegerListString(random,"pauseLengths",node,xpath));
-		setPitchVelocityCorrelation(XMLUtils.parseDouble(random,"pitchVelocityCorrelation",node,xpath) / 100.0d);
-		setVelocityExponent(XMLUtils.parseDouble(random,"velocityExponent",node,xpath));
-		setPatternString(XMLUtils.parseString(random,"patternString",node,xpath));
+		setPatternTicks(XMLUtils.parseInteger(random, "patternTicks", node, xpath));
+		setNoteProbability(XMLUtils.parseDouble(random, "noteProbability", node, xpath) / 100.0);
+		setLegatoProbability(XMLUtils.parseDouble(random, "legatoProbability", node, xpath) / 100.0);
+		setMinVelocity(XMLUtils.parseInteger(random, "minVelocity", node, xpath));
+		setMaxVelocity(XMLUtils.parseInteger(random, "maxVelocity", node, xpath));
+		setMinActiveTicks(XMLUtils.parseInteger(random, "minActiveTicks", node, xpath));
+		setMaxActiveTicks(XMLUtils.parseInteger(random, "maxActiveTicks", node, xpath));
+    	setOffsets(XMLUtils.parseIntegerListString(random, "offsets", node, xpath));
+    	setNoteLengths(XMLUtils.parseIntegerListString(random, "noteLengths", node, xpath));
+    	setPauseLengths(XMLUtils.parseIntegerListString(random, "pauseLengths", node, xpath));
+        setPitchVelocityCorrelation(XMLUtils.parseDouble(random, "pitchVelocityCorrelation", node, xpath) / 100.0d);
+		setVelocityExponent(XMLUtils.parseDouble(random, "velocityExponent", node, xpath));
+		setPatternString(XMLUtils.parseString(random, "patternString", node, xpath));
 		setPatterns(new Pattern[] {Pattern.parseString(generatePattern(patternString))});
     }
     
@@ -111,13 +111,13 @@ public class RandomSequenceEngine extends AbstractMultiPatternSequenceEngine {
     
     private String generatePattern(String patternPattern) {
     	// maps base pattern characters (e.g., 'A') to patterns
-    	Map <Character,String> basePatternMap = new HashMap<Character,String>();
+    	Map<Character, String> basePatternMap = new HashMap<Character, String>();
     	
     	// maps pattern strings (e.g., 'A1') to patterns 
-    	Map <String,String> patternMap = new HashMap<String,String>();
+    	Map<String, String> patternMap = new HashMap<String, String>();
 
     	// contains all patterns generated so far
-    	Set <String> patternSet = new HashSet<String>();
+    	Set<String> patternSet = new HashSet<String>();
     	
     	StringBuilder totalPattern = new StringBuilder();
 
@@ -125,8 +125,8 @@ public class RandomSequenceEngine extends AbstractMultiPatternSequenceEngine {
 
     	for (String patternString : patterns) {
     		if (patternString.length() != 2) {
-    			throw(new RuntimeException("Pattern part \"" + patternString +
-    					"\" is invalid (2 characters required)"));
+    			throw new RuntimeException("Pattern part \"" + patternString
+    					+ "\" is invalid (2 characters required)");
     		}
     		
     		String p = patternMap.get(patternString);
@@ -151,10 +151,10 @@ public class RandomSequenceEngine extends AbstractMultiPatternSequenceEngine {
     					tries++;
 
     					if (tries > 10000) {
-    						throw(new RuntimeException("Could not create non-used variation of pattern"));
+                            throw new RuntimeException("Could not create non-used variation of pattern");
     					}
 
-    					p = modifyPattern(basePattern,2);
+    					p = modifyPattern(basePattern, 2);
     					
     				} while(patternSet.contains(p));
     			}
@@ -163,7 +163,7 @@ public class RandomSequenceEngine extends AbstractMultiPatternSequenceEngine {
     				logger.debug("Pattern " + patternString + ": " + p);    			
     			}
     			
-				patternMap.put(patternString,p);
+				patternMap.put(patternString, p);
 				patternSet.add(p);
     		}
 
@@ -218,24 +218,24 @@ public class RandomSequenceEngine extends AbstractMultiPatternSequenceEngine {
     			if (currentIsNote) {    		
     				int pitch = offsets[random.nextInt(offsets.length)];
 
-    				double v = (pitchDiff == 0 ? 0.5 : ((1.0d - pitchVelocityCorrelation) * random.nextDouble() +
-    						pitchVelocityCorrelation * (pitch - minPitch) / pitchDiff));
+                    double v = pitchDiff == 0 ? 0.5 : ((1.0d - pitchVelocityCorrelation) * random.nextDouble()
+    						   + pitchVelocityCorrelation * (pitch - minPitch) / pitchDiff);
 
     				int volume;
 
     				if (velocityExponent >= 0.0d) {
-    					volume = (int) RandomUtils.getPowerDouble(v, minVelocity, maxVelocity, velocityExponent);
+                        volume = (int) RandomUtils.getPowerDouble(v, minVelocity, maxVelocity, velocityExponent);
     				} else {
-    					volume = (int) RandomUtils.getPowerDouble(v, maxVelocity, minVelocity, -velocityExponent);
+                        volume = (int) RandomUtils.getPowerDouble(v, maxVelocity, minVelocity, -velocityExponent);
     				}
 
-    				boolean isLegato = nextIsNote && (i + length < patternTicks) &&
-    								   random.nextDouble() < legatoProbability;
+    				boolean isLegato = nextIsNote && (i + length < patternTicks)
+    								   && random.nextDouble() < legatoProbability;
 
     				if (isLegato) {
     					sb.append(pitch).append("~/").append(length).append(':').append(volume);
     				} else {
-    					sb.append(pitch).append("/").append(length).append(':').append(volume);   			
+                        sb.append(pitch).append("/").append(length).append(':').append(volume);   			
     				}
     				
     				activeTicks += length;
@@ -271,7 +271,8 @@ public class RandomSequenceEngine extends AbstractMultiPatternSequenceEngine {
     	int length = values.length;
     	
     	for (int i = 0; i < modifications; i++) {
-    		int x,y;
+    		int x;
+    		int y;
     		
     		do {
     			x = random.nextInt(length);
@@ -285,7 +286,7 @@ public class RandomSequenceEngine extends AbstractMultiPatternSequenceEngine {
     	
     	StringBuilder sb = new StringBuilder();
     	
-    	for (int i = 0; i < length;i++) {
+    	for (int i = 0; i < length; i++) {
     		sb.append(values[i]);
     		
     		if (i < length - 1) {

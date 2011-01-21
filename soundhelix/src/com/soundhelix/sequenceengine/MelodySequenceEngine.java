@@ -1,6 +1,7 @@
 package com.soundhelix.sequenceengine;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
@@ -16,9 +17,9 @@ import com.soundhelix.harmonyengine.HarmonyEngine;
 import com.soundhelix.misc.ActivityVector;
 import com.soundhelix.misc.Chord;
 import com.soundhelix.misc.Pattern;
+import com.soundhelix.misc.Pattern.PatternEntry;
 import com.soundhelix.misc.Sequence;
 import com.soundhelix.misc.Track;
-import com.soundhelix.misc.Pattern.PatternEntry;
 import com.soundhelix.misc.Track.TrackType;
 import com.soundhelix.patternengine.PatternEngine;
 import com.soundhelix.util.HarmonyEngineUtils;
@@ -62,11 +63,11 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
         int tick = 0;
         int ticks = structure.getTicks();
         
-        HashMap<String,Pattern> melodyHashMap = createMelodies();
+        Map<String, Pattern> melodyHashMap = createMelodies();
         
 		while (tick < ticks) {
         	int len = harmonyEngine.getChordSectionTicks(tick);
-        	Pattern p = melodyHashMap.get(HarmonyEngineUtils.getChordSectionString(structure,tick));
+        	Pattern p = melodyHashMap.get(HarmonyEngineUtils.getChordSectionString(structure, tick));
         	int pos = 0;
         	
         	for (int i = 0; i < len; i++) {
@@ -78,7 +79,7 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
             			// add pause
             			seq.addPause(l);
         			} else {
-        				seq.addNote(entry.getPitch(),l);
+        				seq.addNote(entry.getPitch(), l);
         			}
         		} else {
         			// add pause
@@ -106,7 +107,7 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
      * @return the random pitch
      */
     
-    private int getRandomPitch(int pitch,int maxDistanceDown,int maxDistanceUp) {
+    private int getRandomPitch(int pitch, int maxDistanceDown, int maxDistanceUp) {
     	int p = pitch;
     	boolean again;
     	
@@ -156,7 +157,7 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
      * @return the random pitch
      */
     
-    private int getRandomPitch(Chord chord,int pitch,int maxDistanceDown,int maxDistanceUp) {
+    private int getRandomPitch(Chord chord, int pitch, int maxDistanceDown, int maxDistanceUp) {
     	int p;
     	boolean again;
     	
@@ -202,17 +203,17 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
      * @return a hashtable mapping chord section strings to melody arrays
      */
     
-    private HashMap<String,Pattern> createMelodies() {
+    private Map<String, Pattern> createMelodies() {
     	HarmonyEngine he = structure.getHarmonyEngine();
     	
-    	HashMap<String,Pattern> ht = new HashMap<String,Pattern>();
+    	Map<String, Pattern> ht = new HashMap<String, Pattern>();
     	
     	int ticks = structure.getTicks();
     	int tick = 0;
     	int pos = 0;
     	
     	while (tick < ticks) {
-    		String section = HarmonyEngineUtils.getChordSectionString(structure,tick);
+    		String section = HarmonyEngineUtils.getChordSectionString(structure, tick);
             int len = he.getChordSectionTicks(tick);
     		
     		if (!ht.containsKey(section)) {
@@ -229,22 +230,22 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
         			if (entry.isPause()) {
         				list.add(new PatternEntry(t));
         			} else if (entry.isWildcard() && entry.getWildcardCharacter() == FREE) {
-        				pitch = getRandomPitch(pitch == Integer.MIN_VALUE ? 0 : pitch,2,2);
-        				list.add(new PatternEntry(pitch,entry.getVelocity(),t,entry.isLegato()));
-        			} else if (entry.isWildcard() && entry.getWildcardCharacter() == REPEAT &&
-        					   pitch != Integer.MIN_VALUE && chord.containsPitch(pitch)) {
+        				pitch = getRandomPitch(pitch == Integer.MIN_VALUE ? 0 : pitch, 2, 2);
+        				list.add(new PatternEntry(pitch, entry.getVelocity(), t, entry.isLegato()));
+        			} else if (entry.isWildcard() && entry.getWildcardCharacter() == REPEAT
+        					   && pitch != Integer.MIN_VALUE && chord.containsPitch(pitch)) {
         				// reuse the previous pitch
-        				list.add(new PatternEntry(pitch,entry.getVelocity(),t,entry.isLegato()));
+        				list.add(new PatternEntry(pitch, entry.getVelocity(), t, entry.isLegato()));
         			} else {
-        				pitch = getRandomPitch(chord,pitch == Integer.MIN_VALUE ? 0 : pitch,2,2);
-        				list.add(new PatternEntry(pitch,entry.getVelocity(),t,entry.isLegato()));
+        				pitch = getRandomPitch(chord, pitch == Integer.MIN_VALUE ? 0 : pitch, 2, 2);
+        				list.add(new PatternEntry(pitch, entry.getVelocity(), t, entry.isLegato()));
         			}
         			
         			pos++;
         			i += t;
     			}
    
-    			ht.put(section,new Pattern(list.toArray(new PatternEntry[list.size()])));
+    			ht.put(section, new Pattern(list.toArray(new PatternEntry[list.size()])));
     		} else {
     			// melody already created, skip chord section
     		}
@@ -255,23 +256,24 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
     	return ht;
     }
     
-    public void configure(Node node,XPath xpath) throws XPathException {
+    public void configure(Node node, XPath xpath) throws XPathException {
     	random = new Random(randomSeed);
     	
-		NodeList nodeList = (NodeList)xpath.evaluate("patternEngine",node,XPathConstants.NODESET);
+		NodeList nodeList = (NodeList) xpath.evaluate("patternEngine", node, XPathConstants.NODESET);
 
 		if (nodeList.getLength() == 0) {
-			return; // Use default pattern
+		    // use default pattern
+			return;
 		}
 		
 		PatternEngine patternEngine;
 		
 		try {
 			int i = random.nextInt(nodeList.getLength());
-			patternEngine = XMLUtils.getInstance(PatternEngine.class,nodeList.item(i),
-					xpath,randomSeed ^ 47351842858l);
+			patternEngine = XMLUtils.getInstance(PatternEngine.class, nodeList.item(i),
+					xpath, randomSeed ^ 47351842858L);
 		} catch (Exception e) {
-			throw(new RuntimeException("Error instantiating PatternEngine",e));
+			throw new RuntimeException("Error instantiating PatternEngine", e);
 		}
 		
 		Pattern pattern = patternEngine.render("" + FREE + REPEAT);

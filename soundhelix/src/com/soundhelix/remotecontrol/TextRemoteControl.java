@@ -7,6 +7,12 @@ import org.apache.log4j.Logger;
 import com.soundhelix.player.MidiPlayer;
 import com.soundhelix.player.Player;
 
+/**
+ * Implements an abstract simple text-based remote control.
+ * 
+ * @author Thomas Schürger (thomas@schuerger.com)
+ */
+
 public abstract class TextRemoteControl implements RemoteControl {
 	/** The logger. */
     private static Logger logger = Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
@@ -27,19 +33,19 @@ public abstract class TextRemoteControl implements RemoteControl {
 	                    if (player != null) {
 	                        writeLine("Setting BPM");
 
-	                        player.setMilliBPM((int)(1000 * Double.parseDouble(line.substring(4))));
+	                        player.setMilliBPM((int) (1000 * Double.parseDouble(line.substring(4))));
 	                    }
 	                } else if (line.startsWith("transposition ")) {
 	                    if (player != null && player instanceof MidiPlayer) {
 	                        writeLine("Setting transposition");
 
-	                        ((MidiPlayer)player).setTransposition(Integer.parseInt(line.substring(14)));
+	                        ((MidiPlayer) player).setTransposition(Integer.parseInt(line.substring(14)));
 	                    }
 	                } else if (line.startsWith("groove ")) {
 	                    if (player != null && player instanceof MidiPlayer) {
 	                        writeLine("Setting groove");
 
-	                        ((MidiPlayer)player).setGroove(line.substring(7));
+	                        ((MidiPlayer) player).setGroove(line.substring(7));
 	                    }
 	                } else if (line.equals("next")) {
 	                    if (player != null) {
@@ -55,7 +61,7 @@ public abstract class TextRemoteControl implements RemoteControl {
 	                    writeLine("bpm <value>             Sets the BPM. Example: \"bpm 140\"");
 	                    writeLine("transposition <value>   Sets the transposition. Example: \"transposition 70\"");
 	                    writeLine("groove <value>          Sets the groove. Example: \"groove 130,70\"");
-	                    writeLine("next                    Aborts playing and starts the next song. Example: \"next\"");
+                        writeLine("next                    Aborts playing and starts the next song. Example: \"next\"");
 	                    if (hasExitPermission) {
 	                        writeLine("quit                    Quits. Example: \"quit\"");
 	                    }
@@ -67,7 +73,7 @@ public abstract class TextRemoteControl implements RemoteControl {
 	                Thread.sleep(100);
 	            }
 	        } catch (Exception e) {
-	            logger.error("Exception in console thread",e);
+	            logger.error("Exception in console thread", e);
 	        }
 	    }
 	}
@@ -76,6 +82,8 @@ public abstract class TextRemoteControl implements RemoteControl {
 	 * Checks if the JVM environment supports calling System.exit(). Returns true if this
 	 * is the case, false otherwise.
 	 * 
+	 * @param returnCode the return code to consider
+	 * 
 	 * @return true if System.exit() is supported, false otherwise
 	 */
 
@@ -83,12 +91,12 @@ public abstract class TextRemoteControl implements RemoteControl {
 	    try {
 	        SecurityManager securitymanager = System.getSecurityManager();
 
-	        if(securitymanager != null) {
+	        if (securitymanager != null) {
 	            securitymanager.checkExit(returnCode);
 	        }
 
 	        return true;
-	    } catch(AccessControlException e) {
+	    } catch (AccessControlException e) {
 	        return false;
 	    }
 	}

@@ -27,7 +27,7 @@ public final class RandomUtils {
 	 * @return a uniformly distributed integer
 	 */
 	
-	public static int getUniformInteger(Random random,int min,int max,int step) {
+	public static int getUniformInteger(Random random, int min, int max, int step) {
 		return min + step * random.nextInt((max - min) / step + 1);
 	}
 
@@ -45,7 +45,7 @@ public final class RandomUtils {
 	 * @return a uniformly distributed integer
 	 */
 	
-	public static double getUniformDouble(Random random,double min,double max) {
+	public static double getUniformDouble(Random random, double min, double max) {
 		return min + (max - min) * random.nextDouble();
 	}
 
@@ -64,7 +64,7 @@ public final class RandomUtils {
 	 * @return a uniformly distributed double
 	 */
 	
-	public static double getUniformDouble(Random random,double min,double max,double step) {
+	public static double getUniformDouble(Random random, double min, double max, double step) {
 		return min + step * Math.floor((max - min) * random.nextDouble() / step);
 	}
 
@@ -84,11 +84,11 @@ public final class RandomUtils {
 	 * @return a normally distributed integer 
 	 */
 	
-	public static int getNormalInteger(Random random,int min,int max,double mean,double variance) {
+	public static int getNormalInteger(Random random, int min, int max, double mean, double variance) {
 		int value;
 		
 		do {
-			value = (int)(mean + variance * random.nextGaussian());
+			value = (int) (mean + variance * random.nextGaussian());
 		} while (value < min || value > max);
 
 		return value;
@@ -110,7 +110,7 @@ public final class RandomUtils {
 	 * @return a normally distributed double
 	 */
 	
-	public static double getNormalDouble(Random random,double min,double max,double mean,double variance) {
+	public static double getNormalDouble(Random random, double min, double max, double mean, double variance) {
 		double value;
 		
 		do {
@@ -121,7 +121,7 @@ public final class RandomUtils {
 	}
 	
 	/**
-	 * Returns a random double with a power distribution of the given order between min (inclusive) and max (exclusive).
+     * Returns a random double with a power distribution of the given order between min (inclusive) and max (exclusive).
 	 * 
 	 * @param random the random generator
 	 * @param min the minimum value (inclusive)
@@ -160,7 +160,7 @@ public final class RandomUtils {
 	 * @return a boolean being true with the given probability
 	 */
 	
-	public static boolean getBoolean(Random random,double probability) {
+	public static boolean getBoolean(Random random, double probability) {
 	    if (probability == 0.5d) {
 	    	return random.nextBoolean();
 	    } else if (probability >= 1.0d) {

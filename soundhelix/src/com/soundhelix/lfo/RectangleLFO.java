@@ -9,7 +9,7 @@ package com.soundhelix.lfo;
 
 public class RectangleLFO extends AbstractLFO {
 	/** The value of two times Pi. */
-	private static final double TWO_PI = 2.0d*Math.PI;
+	private static final double TWO_PI = 2.0d * Math.PI;
 
 	public double getValue(double angle) {
 		// normalize angle into the range [0,2*Pi[

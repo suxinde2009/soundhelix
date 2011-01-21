@@ -1,6 +1,5 @@
 package com.soundhelix.songnameengine;
 
-import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -24,8 +23,11 @@ import com.soundhelix.util.XMLUtils;
  */
 
 public class CFGSongNameEngine extends AbstractSongNameEngine {
+    /** The pattern for variable replacement. */
     private static Pattern variablePattern = Pattern.compile("\\$\\{(.*?)\\}");
-    private Map<String,RandomStringArray> variableMap;
+    
+    /** The variable map. */
+    private Map<String, RandomStringArray> variableMap;
     
     public String createSongName() {
         Random random = new Random(randomSeed);
@@ -42,21 +44,21 @@ public class CFGSongNameEngine extends AbstractSongNameEngine {
         return StringUtils.capitalize(songName);
     }
     
-    public void configure(Node node,XPath xpath) throws XPathException {
+    public void configure(Node node, XPath xpath) throws XPathException {
         Random random = new Random(randomSeed);
         
-        NodeList nodeList = (NodeList)xpath.evaluate("variable",node,XPathConstants.NODESET);
+        NodeList nodeList = (NodeList) xpath.evaluate("variable", node, XPathConstants.NODESET);
         int variableCount = nodeList.getLength();
 
-        Map <String,RandomStringArray> variableMap = new HashMap<String,RandomStringArray>(variableCount);
+        Map<String, RandomStringArray> variableMap = new HashMap<String, RandomStringArray>(variableCount);
 
         for (int i = 0; i < variableCount; i++) {
-            String name = XMLUtils.parseString(random,"attribute::name",nodeList.item(i),xpath);
+            String name = XMLUtils.parseString(random, "attribute::name", nodeList.item(i), xpath);
             boolean once;
             
             try {
-                once = XMLUtils.parseBoolean(random,"attribute::once",nodeList.item(i),xpath);
-            } catch(Exception e) {
+                once = XMLUtils.parseBoolean(random, "attribute::once", nodeList.item(i), xpath);
+            } catch (Exception e) {
                 once = true;
             }
 
@@ -64,7 +66,7 @@ public class CFGSongNameEngine extends AbstractSongNameEngine {
                 throw new RuntimeException("Variable \"" + name + "\" defined more than once");
             }
             
-            String valueString = XMLUtils.parseString(random,nodeList.item(i),xpath);
+            String valueString = XMLUtils.parseString(random, nodeList.item(i), xpath);
             String[] values = valueString.split(",");
             
             variableMap.put(name, new RandomStringArray(values, once));
@@ -80,9 +82,11 @@ public class CFGSongNameEngine extends AbstractSongNameEngine {
      * @param random the random generator to use
      * @param string the string to perform replacements in
      * @param variableMap the variable map
+     * 
+     * @return the string with all variables replaced
      */
      
-    public static String replaceVariables(Random random, String string, Map<String,RandomStringArray> variableMap) {
+    public static String replaceVariables(Random random, String string, Map<String, RandomStringArray> variableMap) {
         if (string.indexOf('$') < 0) {
             // string contains no variables, return it unchanged
             return string;
@@ -116,7 +120,7 @@ public class CFGSongNameEngine extends AbstractSongNameEngine {
      * @return the random string
      */
     
-    private static String getRandomString(Random random,RandomStringArray randomList) {
+    private static String getRandomString(Random random, RandomStringArray randomList) {
         if (randomList.selectOnce) {
             String[] strings = randomList.strings;
             int remaining = randomList.remaining;
@@ -150,10 +154,10 @@ public class CFGSongNameEngine extends AbstractSongNameEngine {
         this.variableMap = variableMap;
     }
     
-    public static class RandomStringArray {
-        public String[] strings;
-        public int remaining;
-        boolean selectOnce = true;
+    private static class RandomStringArray {
+        private String[] strings;
+        private int remaining;
+        private boolean selectOnce = true;
         
         public RandomStringArray(String[] strings, boolean selectOnce) {
             this.strings = strings;

@@ -127,8 +127,8 @@ public class Chord {
 		}
 		
 		Chord otherChord = (Chord)other;
-		return this == otherChord ||
-				this.pitch == otherChord.pitch && this.type == otherChord.type && this.subtype == otherChord.subtype;
+		return this == otherChord
+               || this.pitch == otherChord.pitch && this.type == otherChord.type && this.subtype == otherChord.subtype;
 	}
 	
 	/**
@@ -138,9 +138,9 @@ public class Chord {
 	 */
 	
 	public String toString() {
-		return NoteUtils.getNoteName(pitch).toUpperCase() + (isMinor() ? "m" : "") +
-				(subtype == ChordSubtype.BASE_4 ? "4" : subtype == ChordSubtype.BASE_6 ? "6" : "") +
-				"+" + getLowPitch() + "/" + getMiddlePitch() + "/" + getHighPitch();
+		return NoteUtils.getNoteName(pitch).toUpperCase() + (isMinor() ? "m" : "")
+			   + (subtype == ChordSubtype.BASE_4 ? "4" : subtype == ChordSubtype.BASE_6 ? "6" : "")
+			   + "+" + getLowPitch() + "/" + getMiddlePitch() + "/" + getHighPitch();
 	}
 
 	/**
@@ -321,11 +321,11 @@ public class Chord {
 	
     public Chord getHigherChord() {
         if (subtype == ChordSubtype.BASE_0) {
-        	return new Chord(getPitch(),getType(),ChordSubtype.BASE_4);
+        	return new Chord(getPitch(), getType(), ChordSubtype.BASE_4);
         } else if (subtype == ChordSubtype.BASE_4) {
-        	return new Chord(getPitch() + 12,getType(),ChordSubtype.BASE_6);
+        	return new Chord(getPitch() + 12, getType(), ChordSubtype.BASE_6);
         } else {
-        	return new Chord(getPitch(),getType(),ChordSubtype.BASE_0);
+        	return new Chord(getPitch(), getType(), ChordSubtype.BASE_0);
         }
     }
     
@@ -341,11 +341,11 @@ public class Chord {
     
     public Chord getLowerChord() {
         if (subtype == ChordSubtype.BASE_0) {
-        	return new Chord(getPitch(),getType(),ChordSubtype.BASE_6);
+        	return new Chord(getPitch(), getType(), ChordSubtype.BASE_6);
         } else if (subtype == ChordSubtype.BASE_4) {
-        	return new Chord(getPitch(),getType(),ChordSubtype.BASE_0);
+        	return new Chord(getPitch(), getType(), ChordSubtype.BASE_0);
         } else {
-        	return new Chord(getPitch() - 12,getType(),ChordSubtype.BASE_4);
+        	return new Chord(getPitch() - 12, getType(), ChordSubtype.BASE_4);
         }    	
     }
     

@@ -39,23 +39,23 @@ public class FreePatternSequenceEngine extends AbstractFreeMultiPatternSequenceE
 		super();
 	}
 
-    public void configure(Node node,XPath xpath) throws XPathException {
+    public void configure(Node node, XPath xpath) throws XPathException {
     	random = new Random(randomSeed);
     	
-		NodeList nodeList = (NodeList)xpath.evaluate("patternEngine",node,XPathConstants.NODESET);
+		NodeList nodeList = (NodeList) xpath.evaluate("patternEngine", node, XPathConstants.NODESET);
 
 		if (nodeList.getLength() == 0) {
-			throw(new RuntimeException("Need at least 1 patternEngine"));
+			throw new RuntimeException("Need at least 1 patternEngine");
 		}
 		
 		PatternEngine patternEngine;
 		
 		try {
 			int i = random.nextInt(nodeList.getLength());
-			patternEngine = XMLUtils.getInstance(PatternEngine.class,nodeList.item(i),
-					xpath,randomSeed ^ 47351842858l);
+			patternEngine = XMLUtils.getInstance(PatternEngine.class, nodeList.item(i),
+					xpath, randomSeed ^ 47351842858L);
 		} catch (Exception e) {
-			throw(new RuntimeException("Error instantiating PatternEngine",e));
+			throw new RuntimeException("Error instantiating PatternEngine", e);
 		}
 		
 		Pattern pattern = patternEngine.render("");

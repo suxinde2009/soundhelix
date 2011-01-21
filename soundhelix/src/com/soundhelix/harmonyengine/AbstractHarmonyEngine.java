@@ -55,13 +55,15 @@ import com.soundhelix.misc.Structure;
  */
 
 public abstract class AbstractHarmonyEngine implements HarmonyEngine {
-	protected transient final Logger logger;
+    /** The logger. */
+	protected final Logger logger;
 
-	protected Structure structure;	
-	private int chordSections = -1;
-	private int distinctChordSections = -1;
-	protected long randomSeed;
+	/** The structure. */
+	protected Structure structure;
 	
+	/** The random seed. */
+    protected long randomSeed;
+
 	public AbstractHarmonyEngine() {
 		logger = Logger.getLogger(getClass());
 	}
@@ -119,14 +121,14 @@ public abstract class AbstractHarmonyEngine implements HarmonyEngine {
 	public void dumpChords() {
 		int tick = 0;
          
-        while(tick < structure.getTicks()) {
+        while (tick < structure.getTicks()) {
         	Chord chord = getChord(tick);
         	int len = getChordTicks(tick);
 
-        	if(tick > 0) {
-        		System.out.print(","+chord+"/"+len);
+        	if (tick > 0) {
+        		System.out.print("," + chord + "/" + len);
         	} else {
-                System.out.print(chord+"/"+len);
+                System.out.print(chord + "/" + len);
         	}
         	
          	tick += len;
@@ -144,42 +146,42 @@ public abstract class AbstractHarmonyEngine implements HarmonyEngine {
 	 */
 	
     public void checkSanity() {
-         
         Chord lastChord = null;
         int lastChordTicks = 1;
         int lastChordSectionTicks = 1;
  
         int ticks = structure.getTicks();
         
-        for(int tick=0;tick<ticks;tick++) {
+        for (int tick = 0; tick < ticks; tick++) {
         	Chord chord = getChord(tick);
         	
-        	if(chord == null) {
-        		throw(new RuntimeException("Null chord returned at tick "+tick));
+        	if (chord == null) {
+        		throw new RuntimeException("Null chord returned at tick " + tick);
         	}
 
         	int chordTicks = getChordTicks(tick);
         	
-        	if(chordTicks <= 0) {
-        		throw(new RuntimeException("Chord ticks <= 0 at tick "+tick));
+        	if (chordTicks <= 0) {
+        		throw new RuntimeException("Chord ticks <= 0 at tick " + tick);
         	}
 
-        	if(lastChordTicks > 1 && chordTicks != lastChordTicks-1) {
-        		throw(new RuntimeException("Chord tick not decremented at "+tick));        		
+        	if (lastChordTicks > 1 && chordTicks != lastChordTicks - 1) {
+        		throw new RuntimeException("Chord tick not decremented at " + tick);        		
         	}
         	
         	int chordSectionTicks = getChordSectionTicks(tick);
 
-        	if(chordSectionTicks <= 0) {
-        		throw(new RuntimeException("Chord section ticks <= 0 at tick "+tick));
+        	if (chordSectionTicks <= 0) {
+        		throw new RuntimeException("Chord section ticks <= 0 at tick " + tick);
         	}
 
-        	if(lastChordSectionTicks > 1 && chordSectionTicks != lastChordSectionTicks-1) {
-        		throw(new RuntimeException("Chord section tick not decremented at "+tick));        		
+        	if (lastChordSectionTicks > 1 && chordSectionTicks != lastChordSectionTicks - 1) {
+        		throw new RuntimeException("Chord section tick not decremented at " + tick);        		
         	}
 
-        	if(!chord.equals(lastChord) && lastChordTicks != 1) {
-        		throw(new RuntimeException("Chord changes unexpectedly from "+lastChord+" to "+chord+" at tick "+tick));
+        	if (!chord.equals(lastChord) && lastChordTicks != 1) {
+        		throw new RuntimeException("Chord changes unexpectedly from " + lastChord + " to " + chord
+        		                           + " at tick " + tick);
         	}
         	
         	lastChord = chord;
@@ -187,12 +189,12 @@ public abstract class AbstractHarmonyEngine implements HarmonyEngine {
         	lastChordSectionTicks = chordSectionTicks;
         }
         
-        if(lastChordTicks != 1) {
-        	throw(new RuntimeException("Chord ticks is not 1 at last tick"));
+        if (lastChordTicks != 1) {
+        	throw new RuntimeException("Chord ticks is not 1 at last tick");
         }
         
-        if(lastChordSectionTicks != 1) {
-        	throw(new RuntimeException("Chord section ticks is not 1 at last tick"));
+        if (lastChordSectionTicks != 1) {
+        	throw new RuntimeException("Chord section ticks is not 1 at last tick");
         }
     }
     

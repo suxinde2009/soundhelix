@@ -18,4 +18,11 @@ public class BuildConstants {
 	
 	/** The time of the build (hh:mm:ss). */
 	public static final String BUILD_TIME = "???";
+
+	/**
+	 * Private constructor.
+	 */
+	
+	private BuildConstants() {
+	}
 }

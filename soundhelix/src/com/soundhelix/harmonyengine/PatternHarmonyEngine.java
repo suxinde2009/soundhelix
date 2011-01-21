@@ -1,8 +1,8 @@
 package com.soundhelix.harmonyengine;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
-import java.util.Vector;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -51,6 +51,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 	private String[] chordPatterns;
 	private String[][] chordRandomTables;
 	
+	/** The random generator. */
 	private Random random;
 	
 	public PatternHarmonyEngine() {
@@ -114,7 +115,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 		int pos = 0;
 		int sTicks = 0;
 		
-		Vector<Integer> sectionVector = new Vector<Integer>();
+		List<Integer> sectionVector = new ArrayList<Integer>();
 		
 		Chord firstChord = null;
 		Chord previousChord = null;
@@ -124,7 +125,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 
 			boolean newSection = false;
 			
-			int len = (int)(Integer.parseInt(p[1]) * structure.getTicksPerBeat());
+			int len = (int) (Integer.parseInt(p[1]) * structure.getTicksPerBeat());
 			
 			String cho = p[0];
 			
@@ -145,13 +146,13 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 			// check whether we have a major or minor chord
 			
 			if (cho.endsWith("m")) {
-				pitch = NoteUtils.getNotePitch(cho.substring(0,cho.length() - 1));
+				pitch = NoteUtils.getNotePitch(cho.substring(0, cho.length() - 1));
 				
 				if (pitch > 0) {
 					pitch -= 12;
 				}
 				
-				ch = new Chord(pitch,ChordType.MINOR,Chord.ChordSubtype.BASE_0);
+				ch = new Chord(pitch, ChordType.MINOR, Chord.ChordSubtype.BASE_0);
 			} else {
 				pitch = NoteUtils.getNotePitch(cho);
 				
@@ -159,7 +160,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 					pitch -= 12;
 				}
 				
-				ch = new Chord(pitch,ChordType.MAJOR,Chord.ChordSubtype.BASE_0);
+				ch = new Chord(pitch, ChordType.MAJOR, Chord.ChordSubtype.BASE_0);
 			}
 
 			if (firstChord == null) {
@@ -176,7 +177,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 			int songTicks = structure.getTicks();
 			
 			for (int j = 0; j < len && tick < songTicks; j++) {
-				ticks[tick] = (tick + len - j >= songTicks ? songTicks - tick : len - j);
+				ticks[tick] = tick + len - j >= songTicks ? songTicks - tick : len - j;
 				chords[tick] = ch;
 				tick++;
 				sTicks++;
@@ -206,7 +207,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 
 	public void setChordPatterns(String[] chordPatterns) {
 		if (chordPatterns == null || chordPatterns.length == 0) {
-			throw(new IllegalArgumentException("Need at least 1 chord pattern"));
+			throw new IllegalArgumentException("Need at least 1 chord pattern");
 		}
 		
 		this.chordPatterns = chordPatterns;
@@ -214,7 +215,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 	
 	public void setChordRandomTables(String[][] chordRandomTables) {
 		if (chordRandomTables == null) {
-			throw(new IllegalArgumentException("chordRandomTables must not be null"));
+			throw new IllegalArgumentException("chordRandomTables must not be null");
 		}
 
 		this.chordRandomTables = chordRandomTables;
@@ -237,7 +238,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 		String firstChord = null;
 		String prevChord = null;
 
-		ArrayList<String> chordList = new ArrayList<String>();
+		List<String> chordList = new ArrayList<String>();
 		
 		for (int i = 0; i < count; i++) {
 			if (sb.length() > 0) {
@@ -262,15 +263,15 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 				int refnum = Integer.parseInt(spec[0].substring(1));
 				
 				if (refnum < 0 || refnum >= chordList.size()) {
-					throw(new RuntimeException("Invalid back reference $" + refnum));
+					throw new RuntimeException("Invalid back reference $" + refnum);
 				}
 				
 				chord = chordList.get(refnum);
 			} else {
 				// check if we have a note or a random table number
 				
-				int pitch = NoteUtils.getNotePitch(spec[0].endsWith("m") ?
-								spec[0].substring(0,spec[0].length() - 1) : spec[0]);
+				int pitch = NoteUtils.getNotePitch(spec[0].endsWith("m")
+								? spec[0].substring(0, spec[0].length() - 1) : spec[0]);
 				
 				if (pitch == Integer.MIN_VALUE) {
 					// we have a random chord table number
@@ -281,7 +282,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 					int notrefnum;
 					
 					if (pos > 0) {
-						table = Integer.parseInt(spec[0].substring(0,pos));
+						table = Integer.parseInt(spec[0].substring(0, pos));
 						notrefnum = Integer.parseInt(spec[0].substring(pos + 1));
 					} else {
 						table = Integer.parseInt(spec[0]);
@@ -299,8 +300,8 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 							// try again
 							return createPattern();
 						}
-					} while(chord.equals(prevChord) || i == count - 1 && chord.equals(firstChord) ||
-							notrefnum >= 0 && chord.equals(chordList.get(notrefnum)));
+					} while(chord.equals(prevChord) || i == count - 1 && chord.equals(firstChord)
+							|| notrefnum >= 0 && chord.equals(chordList.get(notrefnum)));
 				} else {
 					// we have a note, take the note (include 'm' suffix, if present)
 					chord = spec[0];				
@@ -320,23 +321,23 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 		return sb.toString();	
 	}
 	
-	public void configure(Node node,XPath xpath) throws XPathException {		
+	public void configure(Node node, XPath xpath) throws XPathException {		
 		random = new Random(randomSeed);
 
-		NodeList nodeList = (NodeList)xpath.evaluate("chordPattern",node,XPathConstants.NODESET);
+		NodeList nodeList = (NodeList) xpath.evaluate("chordPattern", node, XPathConstants.NODESET);
 		String[] chordPatterns = new String[nodeList.getLength()];
 		
 		for (int i = 0; i < nodeList.getLength(); i++) {
-			chordPatterns[i] = XMLUtils.parseString(random,nodeList.item(i),xpath);
+			chordPatterns[i] = XMLUtils.parseString(random, nodeList.item(i), xpath);
 		}
 
 		setChordPatterns(chordPatterns);
 
-		nodeList = (NodeList)xpath.evaluate("chordRandomTable",node,XPathConstants.NODESET);
+		nodeList = (NodeList) xpath.evaluate("chordRandomTable", node, XPathConstants.NODESET);
 		String[][] chordRandomTables = new String[nodeList.getLength()][];
 		
 		for (int i = 0; i < nodeList.getLength(); i++) {
-			String table = XMLUtils.parseString(random,nodeList.item(i),xpath);
+			String table = XMLUtils.parseString(random, nodeList.item(i), xpath);
 			chordRandomTables[i] = table.split(",");
 		}
 		

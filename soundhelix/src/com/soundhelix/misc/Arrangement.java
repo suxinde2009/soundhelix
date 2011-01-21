@@ -32,8 +32,8 @@ public class Arrangement implements Iterable<Arrangement.ArrangementEntry> {
     	this.structure = structure;
     }
     
-    public void add(Track track,String instrument) {
-    	entryList.add(new ArrangementEntry(track,instrument));
+    public void add(Track track, String instrument) {
+    	entryList.add(new ArrangementEntry(track, instrument));
     }
     
     public Iterator<ArrangementEntry> iterator() {
@@ -63,11 +63,11 @@ public class Arrangement implements Iterable<Arrangement.ArrangementEntry> {
      * @return the read arrangement
      */
 
-    public static Arrangement loadArrangement(String filename) throws IOException,ClassNotFoundException {
+    public static Arrangement loadArrangement(String filename) throws IOException, ClassNotFoundException {
 		FileInputStream fis = new FileInputStream(filename);
 		GZIPInputStream gis = new GZIPInputStream(fis);
 		ObjectInputStream ois = new ObjectInputStream(gis);
-		Arrangement arrangement = (Arrangement)ois.readObject();
+		Arrangement arrangement = (Arrangement) ois.readObject();
 		ois.close();
 		gis.close();
 		fis.close();
@@ -84,7 +84,7 @@ public class Arrangement implements Iterable<Arrangement.ArrangementEntry> {
      * @throws IOException in case of an I/O problem
      */
     
-    public static void saveArrangement(Arrangement arrangement,String filename) throws IOException {
+    public static void saveArrangement(Arrangement arrangement, String filename) throws IOException {
     	FileOutputStream fos = new FileOutputStream(filename);
     	GZIPOutputStream gos = new GZIPOutputStream(fos, 1 << 18);
 		ObjectOutputStream oos = new ObjectOutputStream(gos);
@@ -101,7 +101,7 @@ public class Arrangement implements Iterable<Arrangement.ArrangementEntry> {
     	/** The instrument. */
     	private final String instrument;
     	
-    	private ArrangementEntry(Track track,String instrument) {
+    	private ArrangementEntry(Track track, String instrument) {
     		this.track = track;
     		this.instrument = instrument;
     	}

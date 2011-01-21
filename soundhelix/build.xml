@@ -123,4 +123,8 @@
     	<delete file="${binzip}"/>
         <delete file="${srczip}"/>
     </target>
+
+    <target name="createsvntag" description="create SVN tag for current trunk">
+        <echo message="Not implemented yet."/>
+    </target>
 </project>

@@ -1,10 +1,5 @@
 package com.soundhelix.util;
 
-import java.util.Map;
-import java.util.Random;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /**
  * Implements some static methods for random numbers. All methods need a random generator as
  * a parameter.

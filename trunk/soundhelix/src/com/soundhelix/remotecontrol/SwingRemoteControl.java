@@ -9,15 +9,19 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 public class SwingRemoteControl extends TextRemoteControl {
-    JTextField inputTextField;
-    JTextArea outputTextArea;
+    /** The input text field. */
+    private JTextField inputTextField;
     
-    BlockingQueue<String> textQueue = new LinkedBlockingQueue<String>();
+    /** The output text area. */
+    private JTextArea outputTextArea;
+    
+    /** The queue for entered texts lines. */
+    private BlockingQueue<String> textQueue = new LinkedBlockingQueue<String>();
     
     private SwingRemoteControl() {
     }
 
-    public SwingRemoteControl(JTextField inputTextField,JTextArea outputTextArea) {
+    public SwingRemoteControl(JTextField inputTextField, JTextArea outputTextArea) {
         this.inputTextField = inputTextField;
         this.outputTextArea = outputTextArea;
         
@@ -33,7 +37,7 @@ public class SwingRemoteControl extends TextRemoteControl {
     public String readLine() {
         try {
             return  textQueue.take();
-        } catch(InterruptedException e) {}
+        } catch (InterruptedException e) {}
         
         return null;
     }

@@ -14,7 +14,7 @@ import com.soundhelix.misc.Structure;
 import com.soundhelix.misc.Track;
 import com.soundhelix.misc.XMLConfigurable;
 
-public interface SequenceEngine extends XMLConfigurable,RandomSeedable {
+public interface SequenceEngine extends XMLConfigurable, RandomSeedable {
 	/**
 	 * Sets the structure.
 	 * 

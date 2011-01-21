@@ -20,8 +20,9 @@ import com.soundhelix.misc.Track.TrackType;
 
 public class RhythmSequenceEngine extends AbstractSequenceEngine {
 
-	// pitch for each of the note pattern strings
-	int[] pitch = {1,0,1,0,1,0,1,0,1,1,1,0,1,0,0,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0};
+	/** The pitch for each of the note pattern strings. */
+    private int[] pitch = {1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0,
+                           1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0};
 			
 	public RhythmSequenceEngine() {
 		super();
@@ -37,13 +38,13 @@ public class RhythmSequenceEngine extends AbstractSequenceEngine {
       	int ticksPerBeat = structure.getTicksPerBeat();
       	
       	int p = 0;
-      	for(int tick=0,patternTick=0;tick<structure.getTicks();tick++,patternTick++) {
-      		if((patternTick % pitch.length) == 0) {
+      	for (int tick = 0, patternTick = 0; tick < structure.getTicks(); tick++, patternTick++) {
+      		if ((patternTick % pitch.length) == 0) {
       			p = 36;
       		}
 
-      		if(activityVector.isActive(tick) && pitch[patternTick % pitch.length] > 0) {
-      			seq.addNote(p,1);
+      		if (activityVector.isActive(tick) && pitch[patternTick % pitch.length] > 0) {
+      			seq.addNote(p, 1);
       			p++;
       		} else {
       			seq.addPause(1);
@@ -71,6 +72,6 @@ public class RhythmSequenceEngine extends AbstractSequenceEngine {
 	}
 	
 	
-    public void configure(Node node,XPath xpath) throws XPathException {
+    public void configure(Node node, XPath xpath) throws XPathException {
     }
 }

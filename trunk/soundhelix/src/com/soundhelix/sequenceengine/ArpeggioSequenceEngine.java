@@ -49,8 +49,8 @@ import com.soundhelix.util.XMLUtils;
 // TODO: allow specifying velocities in arpeggio patterns (like in the PatternSequenceEngine)
 
 public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
-	private static final int[] MAJOR_TABLE = new int[] {0,4,7};
-	private static final int[] MINOR_TABLE = new int[] {0,3,7};
+	private static final int[] MAJOR_TABLE = new int[] {0, 4, 7};
+	private static final int[] MINOR_TABLE = new int[] {0, 3, 7};
 
 	private static boolean obeyChordSubtype = true;
 
@@ -70,7 +70,7 @@ public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
         
         int tick = 0;
         
-        while(tick < structure.getTicks()) {
+        while (tick < structure.getTicks()) {
         	Chord chord = ce.getChord(tick);
         	int len = ce.getChordTicks(tick);
         	
@@ -78,33 +78,33 @@ public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
 			int[] pattern = getArpeggioPattern(len);
         	int patternLen = pattern.length;
 			
-        	for(int i=0;i<len;i++) {
-        		if(activityVector.isActive(tick)) {
+        	for (int i = 0; i < len; i++) {
+        		if (activityVector.isActive(tick)) {
         			// add next note for major/minor chord
         			
-        			int value = pattern[i%patternLen];
+        			int value = pattern[i % patternLen];
         			
-        			if(value == Integer.MIN_VALUE) {
+        			if (value == Integer.MIN_VALUE) {
             			// add pause
             			seq.addPause(1);
         				continue;
         			}
         			
-        			if(obeyChordSubtype) {
-        				if(chord.getSubtype() == ChordSubtype.BASE_4) {
+        			if (obeyChordSubtype) {
+        				if (chord.getSubtype() == ChordSubtype.BASE_4) {
         					value++;
-        				} else if(chord.getSubtype() == ChordSubtype.BASE_6) {
+        				} else if (chord.getSubtype() == ChordSubtype.BASE_6) {
         					value--;
         				}
         			}
         			
-        			int octave = (value >= 0 ? value/3 : (value-2)/3);
-        			int offset = ((value%3)+3)%3;
+        			int octave = value >= 0 ? value / 3 : (value - 2) / 3;
+        			int offset = ((value % 3) + 3) % 3;
         			
-        	 	    if(chord.isMajor()) {
-        			    seq.addNote(octave*12+MAJOR_TABLE[offset]+chord.getPitch(),1);
+        	 	    if (chord.isMajor()) {
+        			    seq.addNote(octave * 12 + MAJOR_TABLE[offset] + chord.getPitch(), 1);
         		    } else {
-           			    seq.addNote(octave*12+MINOR_TABLE[offset]+chord.getPitch(),1);
+           			    seq.addNote(octave * 12 + MINOR_TABLE[offset] + chord.getPitch(), 1);
         		    }
         		} else {
         			// add pause
@@ -143,19 +143,19 @@ public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
 		int maxIndex = -1;
 		int maxIndexLen = -1;
 		
-		for(int i=0;i<patterns.length;i++) {
+		for (int i = 0; i < patterns.length; i++) {
 			int l = patterns[i].length;
 			
-			if(l >= len && l < bestIndexLen) {
+			if (l >= len && l < bestIndexLen) {
 				bestIndex = i;
 				bestIndexLen = l;
-			} else if(l >= maxIndexLen) {
+			} else if (l >= maxIndexLen) {
 				maxIndex = i;
 				maxIndexLen = l;
 			}		
 		}
 		
-		if(bestIndex != -1) {
+		if (bestIndex != -1) {
 			return patterns[bestIndex];
 		} else {
 			// we haven't found an optimal pattern
@@ -171,25 +171,25 @@ public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
     public void configure(Node node,XPath xpath) throws XPathException {
     	Random random = new Random(randomSeed);
     	
-		NodeList nodeList = (NodeList)xpath.evaluate("pattern",node,XPathConstants.NODESET);
+		NodeList nodeList = (NodeList) xpath.evaluate("pattern", node, XPathConstants.NODESET);
 
 		int patterns = nodeList.getLength();
 		
-		if(nodeList.getLength() == 0) {
-			throw(new RuntimeException("Need at least 1 pattern"));
+		if (nodeList.getLength() == 0) {
+			throw new RuntimeException("Need at least 1 pattern");
 		}
 		
 		int[][] array = new int[patterns][];
 		
-		for(int i=0;i<patterns;i++) {
-			String pattern = XMLUtils.parseString(random,nodeList.item(i),xpath);
+		for (int i = 0; i < patterns; i++) {
+			String pattern = XMLUtils.parseString(random, nodeList.item(i), xpath);
 
 			String[] p = pattern.split(",");
 			
 			int[] l = new int[p.length];
 			
-			for(int k=0;k<p.length;k++) {
-				if(p[k].equals("-")) {
+			for (int k = 0; k < p.length; k++) {
+				if (p[k].equals("-")) {
 					l[k] = Integer.MIN_VALUE;
 				} else {
 				    l[k] = Integer.parseInt(p[k]);

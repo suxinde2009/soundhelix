@@ -124,9 +124,9 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
         				// add pause
         				seq.addPause(len);
         			} else {
-        				boolean useLegato = entry.isLegato() ? pattern.isLegatoLegal(activityVector, tick + len,
+                        boolean useLegato = entry.isLegato() ? pattern.isLegatoLegal(activityVector, tick + len,
         					                                   pos + 1) : false;
-        				seq.addNote(pitch,len,vel,useLegato);
+        				seq.addNote(pitch, len, vel, useLegato);
         			}
         		} else {
         			// add pause
@@ -153,7 +153,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
     		// start with the second chord section
     		int tick = harmonyEngine.getChordSectionTicks(0);
 
-    		String previousActivity = getActivityString(tick-1, activityVectors);
+    		String previousActivity = getActivityString(tick - 1, activityVectors);
     		
     		// the tick where the pattern was applied last (last tick of the pattern + 1)
     		int lastMatchedTick = Integer.MIN_VALUE;
@@ -186,25 +186,25 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
     	    			// jump back to where the pattern will start
     					tick -= patternTicks;
 
-    					logger.debug("Applying conditional pattern " + i + " with length " + patternTicks +
-    								 " for targets " + Arrays.toString(targets) + " at ticks " + tick + "-" +
-    								 (tick + patternTicks - 1));
+                        logger.debug("Applying conditional pattern " + i + " with length " + patternTicks
+                                     + " for targets " + Arrays.toString(targets) + " at ticks " + tick + "-"
+                                     + (tick + patternTicks - 1));
     					
     					int len = pattern.size();
 
     					for (int k = 0; k < len; k++) {
     						PatternEntry entry = pattern.get(k);
 
-        					for (int j = 0;j < targets.length; j++) {
+        					for (int j = 0; j < targets.length; j++) {
         			       		Sequence seq = seqs[targets[j]];
         			    		int pitch = drumEntries[targets[j]].pitch;
 
         						if (entry.isNote()) {
-        							seq.replaceEntry(tick, new Sequence.SequenceEntry(pitch,entry.getVelocity(),
-        									entry.getTicks(),entry.isLegato()));
+                                    seq.replaceEntry(tick, new Sequence.SequenceEntry(pitch, entry.getVelocity(),
+        									entry.getTicks(), entry.isLegato()));
         						} else if (mode == MODE_REPLACE) {
-        							seq.replaceEntry(tick, new Sequence.SequenceEntry(Integer.MIN_VALUE,(short)-1,
-        									entry.getTicks(),entry.isLegato()));
+                                    seq.replaceEntry(tick, new Sequence.SequenceEntry(Integer.MIN_VALUE, (short) -1,
+        									entry.getTicks(), entry.isLegato()));
         						}
         					}
     						tick += entry.getTicks();
@@ -232,7 +232,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
 	 * @return the activity string
 	 */
 	
-	private String getActivityString(int tick,ActivityVector[] activityVectors) {
+	private String getActivityString(int tick, ActivityVector[] activityVectors) {
 		StringBuilder sb = new StringBuilder(activityVectors.length);
 		
 		for (ActivityVector av : activityVectors) {
@@ -250,39 +250,39 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
 		return drumEntries.length;
 	}
 	
-    public void configure(Node node,XPath xpath) throws XPathException {
+    public void configure(Node node, XPath xpath) throws XPathException {
     	random = new Random(randomSeed);
     	
-		NodeList nodeList = (NodeList)xpath.evaluate("pattern",node,XPathConstants.NODESET);
+		NodeList nodeList = (NodeList) xpath.evaluate("pattern", node, XPathConstants.NODESET);
 		int patterns = nodeList.getLength();
 		
 		DrumEntry[] drumEntries = new DrumEntry[patterns];
 		
 		if (patterns == 0) {
-			throw(new RuntimeException("Need at least 1 pattern"));
+			throw new RuntimeException("Need at least 1 pattern");
 		}
 		
 		for (int i = 0; i < patterns; i++) {
 			int pitch = XMLUtils.parseInteger(random, "pitch", nodeList.item(i), xpath);
-				
-			Node patternEngineNode = (Node)xpath.evaluate("patternEngine",nodeList.item(i),XPathConstants.NODE);
+			
+            Node patternEngineNode = (Node) xpath.evaluate("patternEngine", nodeList.item(i), XPathConstants.NODE);
 		
 			PatternEngine patternEngine;
 			
 			try {
-				patternEngine = XMLUtils.getInstance(PatternEngine.class,patternEngineNode,
-						xpath,randomSeed ^ 47351842858l);
+				patternEngine = XMLUtils.getInstance(PatternEngine.class, patternEngineNode,
+						xpath, randomSeed ^ 47351842858L);
 			} catch (Exception e) {
-				throw(new RuntimeException("Error instantiating PatternEngine",e));
+				throw new RuntimeException("Error instantiating PatternEngine", e);
 			}
 			
 			Pattern pattern = patternEngine.render("");
-			drumEntries[i] = new DrumEntry(pattern,pitch);
+			drumEntries[i] = new DrumEntry(pattern, pitch);
 		}
 
 		setDrumEntries(drumEntries);
 
-		nodeList = (NodeList)xpath.evaluate("conditionalPattern",node,XPathConstants.NODESET);
+		nodeList = (NodeList) xpath.evaluate("conditionalPattern", node, XPathConstants.NODESET);
 		patterns = nodeList.getLength();
 		
 		ConditionalEntry[] conditionalEntries = new ConditionalEntry[patterns];
@@ -297,7 +297,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
 			}
 
 			String conditionString = XMLUtils.parseString(random, "condition", nodeList.item(i), xpath);
-			conditionString = conditionString.replaceAll(">","").replaceAll(",","|").replaceAll("-",".");
+			conditionString = conditionString.replaceAll(">", "").replaceAll(",", "|").replaceAll("-", ".");
 			java.util.regex.Pattern condition = java.util.regex.Pattern.compile(conditionString);
 			
 			String modeString = XMLUtils.parseString(random, "mode", nodeList.item(i), xpath);
@@ -308,25 +308,25 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
 			} else if (modeString.equals("replace")) {
 				mode = MODE_REPLACE;
 			} else {
-				throw(new RuntimeException("Unknown mode \"" + modeString + "\""));
+				throw new RuntimeException("Unknown mode \"" + modeString + "\"");
 			}
 			
-			double probability = XMLUtils.parseDouble(random, "probability", nodeList.item(i), xpath) / 100.0d;
+            double probability = XMLUtils.parseDouble(random, "probability", nodeList.item(i), xpath) / 100.0d;
 
-			Node patternEngineNode = (Node)xpath.evaluate("patternEngine",nodeList.item(i),XPathConstants.NODE);
+            Node patternEngineNode = (Node) xpath.evaluate("patternEngine", nodeList.item(i), XPathConstants.NODE);
 		
 			PatternEngine patternEngine;
 			
 			try {
-				patternEngine = XMLUtils.getInstance(PatternEngine.class,patternEngineNode,
-						xpath,randomSeed ^ 47351842858l);
+				patternEngine = XMLUtils.getInstance(PatternEngine.class, patternEngineNode,
+						xpath, randomSeed ^ 47351842858L);
 			} catch (Exception e) {
-				throw(new RuntimeException("Error instantiating PatternEngine",e));
+				throw new RuntimeException("Error instantiating PatternEngine", e);
 			}
 
 			Pattern pattern = patternEngine.render("");
 			
-			conditionalEntries[i] = new ConditionalEntry(pattern,condition,mode,targets,probability);
+			conditionalEntries[i] = new ConditionalEntry(pattern, condition, mode, targets, probability);
 		}
 		
 		setConditionalEntries(conditionalEntries);
@@ -343,7 +343,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
      * @return true if the value matches the pattern, false otherwise
      */
     
-    private boolean matchesPattern(String value,String pattern) {
+    private boolean matchesPattern(String value, String pattern) {
     	if (value == null || pattern == null) {
     		return false;
     	}
@@ -351,8 +351,8 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
     	int len = pattern.length();
     	
     	if (len != value.length()) {
-    		throw new RuntimeException("The activity value \"" + value + "\" is not compatible with the pattern \"" + 
-    								   pattern + "\"");
+            throw new RuntimeException("The activity value \"" + value + "\" is not compatible with the pattern \""
+                                       + pattern + "\"");
     	}
     	
     	for (int i = 0; i < len; i++) {
@@ -368,7 +368,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
     			// acts as a wildcard
     			break;
     		default:
-    			throw(new RuntimeException("Invalid pattern character \"" + c + "\" in pattern \"" + pattern + "\""));
+                throw new RuntimeException("Invalid pattern character \"" + c + "\" in pattern \"" + pattern + "\"");
     		}
     	}
     	
@@ -379,7 +379,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
     	private final Pattern pattern;
     	private final int pitch;
     	
-    	private DrumEntry(Pattern pattern,int pitch) {
+    	private DrumEntry(Pattern pattern, int pitch) {
     		this.pattern = pattern;
     		this.pitch = pitch;
     	}
@@ -392,7 +392,8 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
     	private final int[] targets;
     	private final double probability;
     	
-    	private ConditionalEntry(Pattern pattern,java.util.regex.Pattern condition,int mode,int[] targets,double probability) {
+    	private ConditionalEntry(Pattern pattern, java.util.regex.Pattern condition, int mode, int[] targets,
+    	                         double probability) {
     		this.pattern = pattern;
        		this.condition = condition;
        		this.mode = mode;

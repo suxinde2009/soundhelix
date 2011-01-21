@@ -32,7 +32,7 @@ public class ActivityVector {
      */
     
     public void addActivity(int ticks) {
-    	bitSet.set(totalTicks,totalTicks + ticks);
+    	bitSet.set(totalTicks, totalTicks + ticks);
     	totalTicks += ticks;
     }
 
@@ -44,7 +44,7 @@ public class ActivityVector {
      */
     
     public void addInactivity(int ticks) {
-    	bitSet.clear(totalTicks,totalTicks + ticks);
+    	bitSet.clear(totalTicks, totalTicks + ticks);
     	totalTicks += ticks;
     }
     
@@ -173,7 +173,7 @@ public class ActivityVector {
     		totalTicks = till;
     	}
     	
-    	bitSet.set(from,till,state);
+    	bitSet.set(from, till, state);
     }
     
 	/**
@@ -188,7 +188,7 @@ public class ActivityVector {
 	 * @param stopTicks the number of ticks to prepone or postpone stopping
 	 */
 	
-	public void shiftIntervalBoundaries(int startTicks,int stopTicks) {
+	public void shiftIntervalBoundaries(int startTicks, int stopTicks) {
 		if (startTicks == 0 && stopTicks == 0) {
 			return;
 		}
@@ -201,14 +201,14 @@ public class ActivityVector {
 			boolean active = isActive(tick);
 			
 			if (stopTicks < 0 && !active) {
-				setActivityState(tick + stopTicks,tick,false);
+				setActivityState(tick + stopTicks, tick, false);
 			} else if (stopTicks > 0 && tick < totalTicks && !active) {
-				setActivityState(tick,tick + stopTicks,true);
+				setActivityState(tick, tick + stopTicks, true);
 				tick  += stopTicks;
 			} else if (startTicks < 0 && active) {				
-				setActivityState(tick + startTicks,tick,true);
+				setActivityState(tick + startTicks, tick, true);
 			} else if (startTicks > 0 && active) {
-				setActivityState(tick,tick + startTicks,false);
+				setActivityState(tick, tick + startTicks, false);
 				tick  += startTicks;
 			}
 		}

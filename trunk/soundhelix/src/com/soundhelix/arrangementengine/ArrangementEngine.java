@@ -11,7 +11,7 @@ import com.soundhelix.misc.XMLConfigurable;
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
-public interface ArrangementEngine extends XMLConfigurable,RandomSeedable {
+public interface ArrangementEngine extends XMLConfigurable, RandomSeedable {
 
 	/**
 	 * Sets the structure.

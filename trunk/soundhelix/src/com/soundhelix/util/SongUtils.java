@@ -89,6 +89,9 @@ public class SongUtils {
      * @param randomSeed the random seed
      *
      * @return the player
+     * 
+     * @throws ClassNotFoundException if a class cannot be found
+     * @throws InstantiationException if a class cannot be instantiated
      */
     
     private static Player generateSong(Document doc, long randomSeed)
@@ -113,11 +116,11 @@ public class SongUtils {
         Structure structure = parseStructure(random.nextLong(), structureNode, xpath, null);
     
         HarmonyEngine harmonyEngine = XMLUtils.getInstance(HarmonyEngine.class,
-                    harmonyEngineNode, xpath, randomSeed ^ 47357892832l);
+                    harmonyEngineNode, xpath, randomSeed ^ 47357892832L);
         structure.setHarmonyEngine(harmonyEngine);    
 
         ArrangementEngine arrangementEngine = XMLUtils.getInstance(ArrangementEngine.class,
-                    arrangementEngineNode, xpath, randomSeed ^ 123454893l);
+                    arrangementEngineNode, xpath, randomSeed ^ 123454893L);
         arrangementEngine.setStructure(structure);
         long startTime = System.nanoTime();
         Arrangement arrangement = arrangementEngine.render();
@@ -127,7 +130,7 @@ public class SongUtils {
             logger.debug("Rendering took " + (time / 1000000) + " ms");
         }
         
-        Player player = XMLUtils.getInstance(Player.class, playerNode, xpath, randomSeed ^ 5915925127l);
+        Player player = XMLUtils.getInstance(Player.class, playerNode, xpath, randomSeed ^ 5915925127L);
         player.setArrangement(arrangement);
         return player;
     }

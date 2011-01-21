@@ -16,6 +16,7 @@ import com.soundhelix.misc.Arrangement;
 // getting the current tick, setting the current tick
 
 public abstract class AbstractPlayer implements Player {
+    /** The logger. */
 	protected final Logger logger;
 
 	/** The random seed. */

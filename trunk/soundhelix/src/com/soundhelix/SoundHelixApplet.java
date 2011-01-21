@@ -2,18 +2,15 @@ package com.soundhelix;
 
 import java.awt.BorderLayout;
 import java.awt.Font;
-import java.awt.Dimension;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.URL;
 import java.util.Random;
 
 import javax.swing.JApplet;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.JScrollPane;
-import javax.swing.JLabel;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.AppenderSkeleton;
@@ -37,9 +34,13 @@ import com.soundhelix.util.SongUtils;
 
 public class SoundHelixApplet extends JApplet implements Runnable {
 
+    /** The root logger. */
 	private static Logger rootLogger = Logger.getRootLogger();
+	
+	/** The logger. */
 	private static Logger logger = Logger.getLogger(SoundHelixApplet.class);
 
+	/** The remote control. */
 	private TextRemoteControl remoteControl;
 	
 	public static void main(String[] args) {
@@ -68,20 +69,20 @@ public class SoundHelixApplet extends JApplet implements Runnable {
 		panel.add(inputTextField, BorderLayout.CENTER);
 		add(panel, BorderLayout.SOUTH);
 
-		remoteControl = new SwingRemoteControl(inputTextField,outputTextArea);
+		remoteControl = new SwingRemoteControl(inputTextField, outputTextArea);
 
         // launch console thread with normal priority
         Thread consoleThread = new Thread(new Runnable() {
             public void run() {
                 remoteControl.run();
             }
-        },"Console");
+        }, "Console");
         
         consoleThread.setPriority(Thread.NORM_PRIORITY);
         consoleThread.start();
 
 		// launch song generation and playing thread with high priority
-		Thread playerThread = new Thread(this,"Player");
+		Thread playerThread = new Thread(this, "Player");
 		playerThread.setPriority(Thread.MAX_PRIORITY);
 		playerThread.start();
 	}
@@ -102,8 +103,8 @@ public class SoundHelixApplet extends JApplet implements Runnable {
 	
 		for (;;) {
 			try {
-				URL url = new URL(getDocumentBase(), "examples/SoundHelix-Piano.xml");				
-				Player player = SongUtils.generateSong(url,random.nextLong());
+				URL url = new URL(getDocumentBase(), "examples/SoundHelix-Piano.xml");
+				Player player = SongUtils.generateSong(url, random.nextLong());
 				
 				player.open();
                 remoteControl.setPlayer(player);
@@ -128,10 +129,13 @@ public class SoundHelixApplet extends JApplet implements Runnable {
     }
 	
 	public static class TextRemoteControlAppender extends AppenderSkeleton {
+	    /** The layout. */
 		private Layout layout;
+		
+		/** The remote control. */
 		private TextRemoteControl remoteControl;
 		
-		public TextRemoteControlAppender(Layout layout,TextRemoteControl remoteControl) {
+		public TextRemoteControlAppender(Layout layout, TextRemoteControl remoteControl) {
 			super();
 			this.layout = layout;
 			this.remoteControl = remoteControl;
@@ -145,18 +149,18 @@ public class SoundHelixApplet extends JApplet implements Runnable {
 			String message = layout.format(event);
 			
 			if (message.endsWith("\r\n")) {
-			    message = message.substring(0,message.length()-2);
+			    message = message.substring(0, message.length() - 2);
 			} else if (message.endsWith("\n")) {
-                message = message.substring(0,message.length()-1);			    
+                message = message.substring(0, message.length() - 1);			    
 			}
 			
             remoteControl.writeLine(message);
 
             if (layout.ignoresThrowable()) {
                 String[] s = event.getThrowableStrRep();
-                if(s != null) {
+                if (s != null) {
                     int len = s.length;
-                    for(int i = 0; i < len; i++) {
+                    for (int i = 0; i < len; i++) {
                         remoteControl.writeLine(s[i]);
                     }
                 }

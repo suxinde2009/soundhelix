@@ -12,7 +12,7 @@ import com.soundhelix.misc.XMLConfigurable;
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
-public interface PatternEngine extends XMLConfigurable,RandomSeedable {
+public interface PatternEngine extends XMLConfigurable, RandomSeedable {
 	/**
 	 * Generates a pattern.
 	 * 

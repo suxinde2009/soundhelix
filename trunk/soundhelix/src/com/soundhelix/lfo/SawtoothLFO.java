@@ -10,7 +10,7 @@ package com.soundhelix.lfo;
 
 public class SawtoothLFO extends AbstractLFO {
 	/** The value of two times Pi. */
-	private static final double TWO_PI = 2.0d*Math.PI;
+	private static final double TWO_PI = 2.0d * Math.PI;
 
 	/** Flag indicating whether the LFO is an ascending or a descending sawtooth. */
 	private boolean up;

@@ -67,10 +67,10 @@ public abstract class AbstractFreeMultiPatternSequenceEngine extends AbstractSeq
         				int pitch = entry.getPitch();
 
         				boolean useLegato = entry.isLegato() 
-        				                          ? pattern.isLegatoLegal(activityVector, tick + len, pos + 1)
-        										  : false;
+                                            ? pattern.isLegatoLegal(activityVector, tick + len, pos + 1)
+        								    : false;
 
-       					seq.addNote(pitch,len,vel,useLegato);
+       					seq.addNote(pitch, len, vel, useLegato);
         			}
         		} else {
         			// add pause

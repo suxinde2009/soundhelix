@@ -27,10 +27,10 @@ public class Pattern {
 	}
 	
 	public static Pattern parseString(String patternString) {
-		return parseString(patternString,"");
+		return parseString(patternString, "");
 	}
 
-	public static Pattern parseString(String patternString,String wildcardString) {
+	public static Pattern parseString(String patternString, String wildcardString) {
 		if (wildcardString == null) {
 			wildcardString = "";
 		}
@@ -46,23 +46,23 @@ public class Pattern {
 		
 		for (int i = 0; i < len; i++) {
 			String[] a = p[i].split(":");
-			short v = (a.length > 1 ? Short.parseShort(a[1]) : Short.MAX_VALUE);
+			short v = a.length > 1 ? Short.parseShort(a[1]) : Short.MAX_VALUE;
 			String[] b = a[0].split("/");
-			int t = (b.length > 1 ? Integer.parseInt(b[1]) : 1);
+			int t = b.length > 1 ? Integer.parseInt(b[1]) : 1;
 			
 			boolean legato = b[0].endsWith("~");
 			
 			if (legato) {
 				// cut off legato character
-				b[0] = b[0].substring(0,b[0].length() - 1);
+				b[0] = b[0].substring(0, b[0].length() - 1);
 			}
 
 			if (b[0].equals("-")) {
 				pattern[i] = new Pattern.PatternEntry(t);
 			} else if (b[0].length() == 1 && wildcardString.indexOf(b[0]) >= 0) {
-				pattern[i] = new PatternEntry(b[0].charAt(0),v,t,legato);
+				pattern[i] = new PatternEntry(b[0].charAt(0), v, t, legato);
 			} else {
-				pattern[i] = new PatternEntry(Integer.parseInt(b[0]),v,t,legato);
+				pattern[i] = new PatternEntry(Integer.parseInt(b[0]), v, t, legato);
 			}
 		}
 
@@ -91,7 +91,7 @@ public class Pattern {
 			PatternEntry entry = pattern[i];
 			if (entry.isNote()) {
 				// make a modified copy of the PatternEntry
-				p[i] = new PatternEntry(entry.pitch + pitch,entry.velocity,entry.ticks,entry.legato);
+				p[i] = new PatternEntry(entry.pitch + pitch, entry.velocity, entry.ticks, entry.legato);
 			} else {
 				// just use the original PatternEntry
 				p[i] = entry;
@@ -156,6 +156,10 @@ public class Pattern {
 		return sb.append('}').toString();
 	}
 	
+	/**
+	 * Represents a pattern entry.
+	 */
+	
 	public static final class PatternEntry {
 		private int pitch;
 		private short velocity;
@@ -169,14 +173,14 @@ public class Pattern {
 			this.ticks = ticks;
 		}
 
-		public PatternEntry(int pitch,short velocity,int ticks,boolean legato) {
+		public PatternEntry(int pitch, short velocity, int ticks, boolean legato) {
 			this.pitch = pitch;
 			this.velocity = velocity;
 			this.ticks = ticks;
 			this.legato = legato;
 		}
 
-		public PatternEntry(char wildcardCharacter,short velocity,int ticks,boolean legato) {
+		public PatternEntry(char wildcardCharacter, short velocity, int ticks, boolean legato) {
 			this.velocity = velocity;
 			this.ticks = ticks;
 			this.wildcardCharacter = wildcardCharacter;
@@ -220,8 +224,8 @@ public class Pattern {
 			if (isPause()) {
 				return "-" + (ticks > 1 ? "/" + ticks : "");
 			} else {
-				return (isWildcard ? "" + wildcardCharacter : "" + pitch) + (ticks > 1 ? "/" + ticks : "") +
-						(velocity == Short.MAX_VALUE ? "" : ":" + velocity);
+                return (isWildcard ? "" + wildcardCharacter : "" + pitch) + (ticks > 1 ? "/" + ticks : "")
+					   + (velocity == Short.MAX_VALUE ? "" : ":" + velocity);
 			}
 		}
 	}
@@ -240,7 +244,7 @@ public class Pattern {
 	 * @return true if legato is legal, false otherwise
 	 */
 	
-	public boolean isLegatoLegal(ActivityVector activityVector,int tick,int patternOffset) {	
+	public boolean isLegatoLegal(ActivityVector activityVector, int tick, int patternOffset) {	
 		if (!activityVector.isActive(tick)) {
 			return false;
 		}

@@ -2,12 +2,8 @@ package com.soundhelix.remotecontrol;
 
 import java.io.Console;
 
-import org.apache.log4j.Logger;
-
-import com.soundhelix.player.MidiPlayer;
-import com.soundhelix.player.Player;
-
 public class ConsoleRemoteControl extends TextRemoteControl {
+    /** The console. */
     private Console console;
 
     public ConsoleRemoteControl() {    

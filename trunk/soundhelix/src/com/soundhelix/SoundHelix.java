@@ -49,13 +49,13 @@ public class SoundHelix implements Runnable {
 	/** The song name. */
 	private String songName;
 	
-	public SoundHelix(URL url,long randomSeed) {
+	public SoundHelix(URL url, long randomSeed) {
 		this.url = url;
 		this.randomSeed = randomSeed;
 		this.songName = null;
 	}
 	
-	public SoundHelix(URL url,String songName) {
+	public SoundHelix(URL url, String songName) {
 	    this.url = url;
 	    this.randomSeed = 0;
 	    this.songName = songName;
@@ -199,6 +199,8 @@ public class SoundHelix implements Runnable {
 	 * block until an entry is available.
 	 * 
 	 * @return the next SongQueueEntry
+	 * 
+	 * @throws InterruptedException if interrupted
 	 */
 	
 	public Player getNextSongFromQueue() throws InterruptedException {

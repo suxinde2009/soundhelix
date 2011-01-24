@@ -41,8 +41,11 @@ import com.soundhelix.util.XMLUtils;
 
 // TODO: work on this (not really usable yet)
 
-public class MelodySequenceEngine extends AbstractSequenceEngine {	
+public class MelodySequenceEngine extends AbstractSequenceEngine {
+    /** Wildcard for free pitch. */
 	private static final char FREE = '+';
+	
+	/** Wildcard for repeated pitch. */
 	private static final char REPEAT = '*';
 	
 	private Pattern pattern;
@@ -68,21 +71,25 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
 		while (tick < ticks) {
         	int len = harmonyEngine.getChordSectionTicks(tick);
         	Pattern p = melodyHashMap.get(HarmonyEngineUtils.getChordSectionString(structure, tick));
+
         	int pos = 0;
+        	int tickEnd = tick + len;
         	
-        	for (int i = 0; i < len; i++) {
-    			PatternEntry entry = p.get(pos);
+        	while (tick < tickEnd) {
+    			PatternEntry entry = p.get(pos % p.size());
     			int l = entry.getTicks();
+    			
+    			if (tick + l > tickEnd) {
+    			    l = tickEnd - tick;
+    			}
 
     			if (activityVector.isActive(tick)) {	
         			if (entry.isPause()) {
-            			// add pause
             			seq.addPause(l);
         			} else {
         				seq.addNote(entry.getPitch(), l);
         			}
         		} else {
-        			// add pause
         			seq.addPause(l);
         		}
         		
@@ -196,11 +203,10 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
     }
 
     /**
-     * Creates a melody for each distinct chord section and
-     * returns a hashtable mapping chord section strings to
+     * Creates a melody for each distinct chord section and returns a map mapping chord section strings to
      * melody patterns.
      * 
-     * @return a hashtable mapping chord section strings to melody arrays
+     * @return a map mapping chord section strings to melody patterns
      */
     
     private Map<String, Pattern> createMelodies() {
@@ -246,8 +252,6 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
     			}
    
     			ht.put(section, new Pattern(list.toArray(new PatternEntry[list.size()])));
-    		} else {
-    			// melody already created, skip chord section
     		}
     		
     		tick += len;

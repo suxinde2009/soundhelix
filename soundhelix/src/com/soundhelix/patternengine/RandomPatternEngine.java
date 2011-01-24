@@ -53,7 +53,7 @@ public class RandomPatternEngine extends StringPatternEngine {
 	private double maxVelocity = 20000d;
 	
 	/** The list of offsets to choose from. The list may contain values more than once for extra weight. */
-	private int[] offsets = {0, 1, 2, 3, 4, 5, 6};
+	private PatternEntry[] offsets = {};
 	/** The list of note lengths to choose from. The list may contain values more than once for extra weight. */
 	private int[] noteLengths = {1, 2, 3, 2, 1, 1};
 	/** The list of pause lengths to choose from. The list may contain values more than once for extra weight. */
@@ -87,7 +87,7 @@ public class RandomPatternEngine extends StringPatternEngine {
 		setMaxVelocity(XMLUtils.parseInteger(random, "maxVelocity", node, xpath));
 		setMinActiveTicks(XMLUtils.parseInteger(random, "minActiveTicks", node, xpath));
 		setMaxActiveTicks(XMLUtils.parseInteger(random, "maxActiveTicks", node, xpath));
-    	setOffsets(XMLUtils.parseIntegerListString(random, "offsets", node, xpath));
+    	setOffsets(parsePatternEntryListString(random, "offsets", node, xpath));
     	setNoteLengths(XMLUtils.parseIntegerListString(random, "noteLengths", node, xpath));
     	setPauseLengths(XMLUtils.parseIntegerListString(random, "pauseLengths", node, xpath));
         setPitchVelocityCorrelation(XMLUtils.parseDouble(random, "pitchVelocityCorrelation", node, xpath) / 100.0d);
@@ -194,6 +194,7 @@ public class RandomPatternEngine extends StringPatternEngine {
     		boolean currentIsNote;
     		boolean nextIsNote = random.nextDouble() < noteProbability;
 
+    		int previousPitch = 0;
     		
     		for (int i = 0; i < patternTicks;) {
     			currentIsNote = nextIsNote;
@@ -212,10 +213,11 @@ public class RandomPatternEngine extends StringPatternEngine {
     			}
 
     			if (currentIsNote) {    		
-    				int pitch = offsets[random.nextInt(offsets.length)];
-
+    				PatternEntry entry = offsets[random.nextInt(offsets.length)];
+                    boolean isWildcard = entry.isWildcard;
+                    
                     double v = pitchDiff == 0 ? 0.5 : ((1.0d - pitchVelocityCorrelation) * random.nextDouble()
-    						   + pitchVelocityCorrelation * (pitch - minPitch) / pitchDiff);
+    						   + pitchVelocityCorrelation * ((isWildcard ? previousPitch : entry.offset) - minPitch) / pitchDiff);
 
     				int volume;
 
@@ -229,9 +231,17 @@ public class RandomPatternEngine extends StringPatternEngine {
     								   && random.nextDouble() < legatoProbability;
 
     				if (isLegato) {
-    					sb.append(pitch).append("~/");
+    				    if (isWildcard) {
+    				        sb.append(entry.wildcard).append("~/");
+    				    } else {
+    				        sb.append(entry.offset).append("~/");
+    				    }
     				} else {
-    					sb.append(pitch).append('/');   			
+    				    if (isWildcard) {
+    				        sb.append(entry.wildcard).append('/');
+    				    } else {
+    				        sb.append(entry.offset).append('/');
+    				    }
     				}
     				
     				if (volume != Short.MAX_VALUE) {
@@ -242,6 +252,9 @@ public class RandomPatternEngine extends StringPatternEngine {
     				
     				activeTicks += length;
     				
+    				if (!isWildcard) {
+    				    previousPitch = entry.offset;
+    				}
     			} else {
     				sb.append("-/").append(length);
     			}
@@ -308,12 +321,14 @@ public class RandomPatternEngine extends StringPatternEngine {
      * @return the maximum integer from the list
      */
     
-    private int findMaximum(int[] list) {
+    private int findMaximum(PatternEntry[] list) {
     	int maximum = Integer.MIN_VALUE;
     	int num = list.length;
     	
     	for (int i = 0; i < num; i++) {
-    		maximum = Math.max(list[i], maximum);
+    	    if (!list[i].isWildcard) {
+    	        maximum = Math.max(list[i].offset, maximum);
+    	    }
     	}
     	
     	return maximum;
@@ -328,12 +343,14 @@ public class RandomPatternEngine extends StringPatternEngine {
      * @return the minimum integer from the list
      */
 
-    private int findMinimum(int[] list) {
+    private int findMinimum(PatternEntry[] list) {
     	int minimum = Integer.MAX_VALUE;
     	int num = list.length;
     	
     	for (int i = 0; i < num; i++) {
-    		minimum = Math.min(list[i], minimum);
+            if (!list[i].isWildcard) {
+                minimum = Math.min(list[i].offset, minimum);
+            }
     	}
     	
     	return minimum;
@@ -351,7 +368,7 @@ public class RandomPatternEngine extends StringPatternEngine {
     	this.legatoProbability = legatoProbability;
     }
     
-    public void setOffsets(int[] offsets) {
+    public void setOffsets(PatternEntry[] offsets) {
     	this.offsets = offsets;
     }
 
@@ -389,5 +406,43 @@ public class RandomPatternEngine extends StringPatternEngine {
 
 	public void setMaxActiveTicks(int maxActiveTicks) {
 		this.maxActiveTicks = maxActiveTicks;
+	}
+
+	public static PatternEntry[] parsePatternEntryListString(Random random, String path, Node parentNode, XPath xpath) {
+	    String string = XMLUtils.parseString(random, path, parentNode, xpath);
+
+	    if (string == null || string.equals("")) {
+	        return null;
+	    }
+
+	    String[] stringArray = string.split(",");
+	    int length = stringArray.length;
+
+	    PatternEntry[] array = new PatternEntry[length];
+
+	    for (int i = 0; i < length; i++) {
+	        if (Character.isDigit(stringArray[i].charAt(0))) {
+	            array[i] = new PatternEntry(Integer.parseInt(stringArray[i]));
+	        } else {
+	            array[i] = new PatternEntry(stringArray[i].charAt(0));
+	        }
+	    }
+
+	    return array;
+	}
+
+	private static class PatternEntry {
+	    private int offset;
+	    private char wildcard;
+	    private boolean isWildcard;
+	    
+	    private PatternEntry(int offset) {
+	        this.offset = offset;
+	    }
+	    
+	    private PatternEntry(char wildcard) {
+	        this.wildcard = wildcard;
+	        this.isWildcard = true;
+	    }	    
 	}
 }

@@ -129,16 +129,21 @@
       <instrument>melody</instrument>
       <transposition>12</transposition>
       <sequenceEngine class="MelodySequenceEngine">
- 	    <patternEngine class="StringPatternEngine">
-          <string>0,-,-,-,+,-,+,+,0,-,-,-,+,-,+,-,0,-,-,-,+,-,+,+,0,-,-,-,0,+,+,+</string>
-		  <string>0,-,-,-,-,-,-,-,0,-,+,-,0,-,+,-,0,-,-,-,-,-,-,-,0,-,+,-,0,-,+,-,0,-,-,-,-,-,-,-,0,-,+,-,0,-,+,-,0,-,-,-,-,-,-,-,0,-,+,-,0,-,+,+,0,-,-,-,-,-,-,-,0,-,+,-,0,-,+,-,0,-,-,-,-,-,-,-,0,-,+,-,0,-,+,-,0,-,-,-,-,-,-,-,0,-,+,-,0,-,+,-,0,-,-,-,-,-,-,0,-,-,+,-,-,0,-,+</string>
-          <string>0,-,-,0,-,-,+,-,0,-,-,0,-,-,+,-,0,-,-,0,-,-,+,-,0,-,-,0,-,+,0,+</string>
-          <string>0,-,-,-,0,-,-,-,0,-,0,-,-,-,-,-,0,-,+,-,+,-,+,-,0,-,-,-,-,-,-,-,0,-,-,-,0,-,-,-,0,-,0,-,-,-,-,-,0,-,+,-,+,-,+,-,0,-,+,-,-,0,-,0</string>
-          <string>0,-,-,-,0,-,-,-,0,-,-,+,-,-,-,+,0,-,-,-,0,-,-,-,-,+,-,0,-,-,0,-,0,-,-,-,0,-,-,-,0,-,-,+,-,-,-,+,0,-,-,-,0,-,-,-,+,-,-,0,-,0,-,+</string>
-          <string>0,-,+,-,0,-,+,-,0,+,-,0,-,-,-,+,0,-,+,-,0,-,+,-,0,+,-,0,-,-,-,-</string>
-          <string>0,-,-,-,0,-,-,0,-,-,+,-,-,0,-,-,0,-,-,+,-,-,-,0,-,-,+,-,-,0,-,+,0,-,-,+,-,-,-,0,-,-,+,-,-,0,-,-,0,-,-,+,-,-,-,0,-,-,+,-,0,-,0,-</string>
-          <string>0,-,-,-,-,-,-,-,0,-,+,-,+,-,+,-,0,+,-,+,0,-,+,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,+,-,+,-,-,0,-,0,-,+,0,-,+,-,0,-,-,-,-,-,0,-</string>
-		</patternEngine>
+        <patternEngine class="RandomPatternEngine"> 
+          <patternTicks>16</patternTicks>
+          <patternString><random list="A1,A2,A1,A3,A1,A2,A1,B1"/></patternString>
+          <noteProbability>75</noteProbability>
+          <legatoProbability>0</legatoProbability>
+          <minVelocity>32767</minVelocity>
+          <maxVelocity>32767</maxVelocity>
+          <minActiveTicks>8</minActiveTicks>
+          <maxActiveTicks>14</maxActiveTicks>
+          <offsets>0,0,0,0,0,0,+,+</offsets>
+          <noteLengths>2,2,2,3,2,2,2,1</noteLengths>
+          <pauseLengths>1,2</pauseLengths>
+          <pitchVelocityCorrelation>100</pitchVelocityCorrelation>
+          <velocityExponent>3</velocityExponent>
+        </patternEngine>
 	  </sequenceEngine>
       <activityVector>melody</activityVector>
     </track>
@@ -275,7 +280,7 @@
     <transposition><random min="64" max="68"/></transposition>
     <beforePlayWaitTicks>0</beforePlayWaitTicks>
     <afterPlayWaitTicks>16</afterPlayWaitTicks>
-    <groove><random list="100|110,90|115,85|125,75,115,85|130,70"/></groove>
+    <groove><random list="100|110,90|115,85|125,75,115,85"/></groove>
     <device name="device1" clockSynchronization="true">Microsoft GS Wavetable Synth,Microsoft GS Wavetable SW Synth,Java Sound Synthesizer</device>
 	<map instrument="arpeggio" device="device1" channel="1" program="1"/>
 	<map instrument="accomp" device="device1" channel="2" program="1"/>

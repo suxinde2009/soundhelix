@@ -54,8 +54,6 @@ public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
 
 	private static boolean obeyChordSubtype = true;
 
-	private Random random;
-	
 	private int[][] patterns;
 
 	public ArpeggioSequenceEngine() {
@@ -168,7 +166,7 @@ public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
 		this.patterns = patterns;
 	}
 	
-    public void configure(Node node,XPath xpath) throws XPathException {
+    public void configure(Node node, XPath xpath) throws XPathException {
     	Random random = new Random(randomSeed);
     	
 		NodeList nodeList = (NodeList) xpath.evaluate("pattern", node, XPathConstants.NODESET);

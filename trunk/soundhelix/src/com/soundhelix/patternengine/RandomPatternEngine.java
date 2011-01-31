@@ -217,7 +217,8 @@ public class RandomPatternEngine extends StringPatternEngine {
                     boolean isWildcard = entry.isWildcard;
                     
                     double v = pitchDiff == 0 ? 0.5 : ((1.0d - pitchVelocityCorrelation) * random.nextDouble()
-    						   + pitchVelocityCorrelation * ((isWildcard ? previousPitch : entry.offset) - minPitch) / pitchDiff);
+                            + pitchVelocityCorrelation * ((isWildcard ? previousPitch : entry.offset) - minPitch)
+    						/ pitchDiff);
 
     				int volume;
 
@@ -408,7 +409,7 @@ public class RandomPatternEngine extends StringPatternEngine {
 		this.maxActiveTicks = maxActiveTicks;
 	}
 
-	public static PatternEntry[] parsePatternEntryListString(Random random, String path, Node parentNode, XPath xpath) {
+    public static PatternEntry[] parsePatternEntryListString(Random random, String path, Node parentNode, XPath xpath) {
 	    String string = XMLUtils.parseString(random, path, parentNode, xpath);
 
 	    if (string == null || string.equals("")) {

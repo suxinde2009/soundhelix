@@ -39,7 +39,7 @@ import com.soundhelix.util.XMLUtils;
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
-// TODO: work on this (not really usable yet)
+// TODO: add proper configurability
 
 public class MelodySequenceEngine extends AbstractSequenceEngine {
     /** Wildcard for free pitch. */

@@ -20,17 +20,17 @@ import com.soundhelix.util.XMLUtils;
  * Implements a flexible HarmonyEngine based on user-specified patterns. The patterns consist
  * of chord patterns and random table patterns. One of the given
  * chord patterns is chosen at random. A chord pattern consists of comma-separated combinations of chords
- * and lengths in beats (separated by a slash). A chord is either a simple chord name ("C" for C major, "Am" for A minor, etc.),
- * a random table number (starting from 0), a random table number (starting from 0) with a negative backreference (e.g.,
- * "0!0") to an already generated chord at an earlier position or it can be a positive backreference to an already
- * generated chord at an earlier position ("$0" for first chord, "$1" for second chord, etc.). If a random table number
- * is given, a chord is randomly chosen from that table. Chord random tables a comma-separated lists of chord names
- * (e.g., "Am,G,F,Em,Dm"), they are numbered starting from 0. For example, the chord pattern "Am/4,0/4,0!1/4,$1/4"
- * means "A minor for 4 beats, a random chord from random table 0 for 4 beats, a random chord from random table 0 but
- * not the same as the one from position 1 for 4 beats and the second chord again for 4 beats" and could result in
- * the chord sequence "Am/4,F/4,G/4,F/4" (given suitable random tables). Normally, each chord pattern is an individual
- * chord section. A pattern can be split into two or more chord sections by using "+" signs directly before a
- * chord/length combination (e.g., "Am/4,F/4,G/4,C/4,+Am/4,F/4,G/4,Em/4").
+ * and lengths in beats (separated by a slash). A chord is either a simple chord name ("C" for C major, "Am" for A
+ * minor, etc.), a random table number (starting from 0), a random table number (starting from 0) with a negative
+ * backreference (e.g., "0!0") to an already generated chord at an earlier position or it can be a positive
+ * backreference to an already generated chord at an earlier position ("$0" for first chord, "$1" for second chord,
+ * etc.). If a random table number is given, a chord is randomly chosen from that table. Chord random tables a
+ * comma-separated lists of chord names (e.g., "Am,G,F,Em,Dm"), they are numbered starting from 0. For example, the
+ * chord pattern "Am/4,0/4,0!1/4,$1/4" means "A minor for 4 beats, a random chord from random table 0 for 4 beats, a
+ * random chord from random table 0 but not the same as the one from position 1 for 4 beats and the second chord again
+ * for 4 beats" and could result in the chord sequence "Am/4,F/4,G/4,F/4" (given suitable random tables). Normally,
+ * each chord pattern is an individual chord section. A pattern can be split into two or more chord sections by using
+ * "+" signs directly before a chord/length combination (e.g., "Am/4,F/4,G/4,C/4,+Am/4,F/4,G/4,Em/4").
  *
  * <br><br>
  * <b>XML-Configuration</b>

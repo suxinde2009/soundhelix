@@ -168,7 +168,7 @@ public class ActivityVector {
      * @param state the state of the interval
      */
     
-    public void setActivityState(int from,int till,boolean state) {
+    public void setActivityState(int from, int till, boolean state) {
     	if (till > totalTicks) {
     		totalTicks = till;
     	}

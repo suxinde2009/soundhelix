@@ -35,7 +35,7 @@ public interface LFO {
      * @param milliBPM the milli-BPM
      */
   
-	void setBeatSpeed(int milliRotationsPerBeat,int ticksPerBeat,int milliBPM);
+	void setBeatSpeed(int milliRotationsPerBeat, int ticksPerBeat, int milliBPM);
 
     /**
      * Makes this LFO synchronized to the song length and sets the parameters.
@@ -45,7 +45,7 @@ public interface LFO {
      * @param milliBPM the milli-BPM
      */
 	
-	void setSongSpeed(int milliRotationsPerSong,int ticksPerSong,int milliBPM);
+	void setSongSpeed(int milliRotationsPerSong, int ticksPerSong, int milliBPM);
 
     /**
      * Makes this LFO synchronized to a tick range and sets the parameters.
@@ -56,7 +56,7 @@ public interface LFO {
      * @param milliBPM the milli-BPM
      */
 	
-	void setActivitySpeed(int milliRotationsPerActivity,int startTick,int endTick,int milliBPM);
+	void setActivitySpeed(int milliRotationsPerActivity, int startTick, int endTick, int milliBPM);
 
     /**
      * Makes this LFO synchronized to time and sets the parameters.
@@ -66,7 +66,7 @@ public interface LFO {
      * @param milliBPM the milli-BPM
      */
 	
-	void setTimeSpeed(int milliRotationsPerSecond,int ticksPerBeat,int milliBPM);
+	void setTimeSpeed(int milliRotationsPerSecond, int ticksPerBeat, int milliBPM);
 
 	/**
 	 * Set the starting phase (the phase to use for tick 0).

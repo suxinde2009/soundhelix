@@ -53,7 +53,7 @@ public class Chord {
     /** The subtype of the chord. */
     private final ChordSubtype subtype;
 
-	public Chord(int pitch,ChordType type,ChordSubtype subtype) {
+	public Chord(int pitch, ChordType type, ChordSubtype subtype) {
 		this.pitch = pitch;
 		this.type = type;
 		this.subtype = subtype;
@@ -125,7 +125,7 @@ public class Chord {
 			return false;
 		}
 		
-		Chord otherChord = (Chord)other;
+		Chord otherChord = (Chord) other;
 		return this == otherChord
                || this.pitch == otherChord.pitch && this.type == otherChord.type && this.subtype == otherChord.subtype;
 	}
@@ -204,7 +204,7 @@ public class Chord {
 						// randomly, but consistently
 
 						if (random == null) {
-							random = new ConsistentRandom(577385l);
+							random = new ConsistentRandom(577385L);
 						}
 						
 						if (random.getBoolean(lastChord.toString() + "#" + chord.toString())) {
@@ -217,7 +217,7 @@ public class Chord {
 				
 				lastChord = chord;
 			}
-		} else {   // pitch2 > pitch1
+		} else {
 			Chord lastChord = otherChord;
 			
 			while (true) {
@@ -242,7 +242,7 @@ public class Chord {
 						// randomly, but consistently
 						
 						if (random == null) {
-							random = new ConsistentRandom(577385577385l);
+							random = new ConsistentRandom(577385577385L);
 						}
 						
 						if (random.getBoolean(lastChord.toString() + "#" + chord.toString())) {
@@ -359,11 +359,11 @@ public class Chord {
      */
     
     public boolean containsPitch(int pitch) {
-    	pitch = (((pitch % 12) + 12) % 12);
+    	pitch = ((pitch % 12) + 12) % 12;
     	
-    	return pitch == (((getLowPitch() % 12) + 12) % 12) ||
-    	   pitch == (((getMiddlePitch() % 12) + 12) % 12) ||
-    	   pitch == (((getHighPitch() % 12) + 12) % 12);
+    	return pitch == (((getLowPitch() % 12) + 12) % 12)
+    	        || pitch == (((getMiddlePitch() % 12) + 12) % 12)
+    	        || pitch == (((getHighPitch() % 12) + 12) % 12);
     }
     
     public int hashCode() {

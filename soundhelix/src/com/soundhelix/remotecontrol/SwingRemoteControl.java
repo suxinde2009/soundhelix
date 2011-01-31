@@ -2,16 +2,13 @@ package com.soundhelix.remotecontrol;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 
 public class SwingRemoteControl extends TextRemoteControl {
-    /** The input text field. */
-    private JTextField inputTextField;
-    
     /** The output text area. */
     private JTextArea outputTextArea;
     
@@ -22,7 +19,6 @@ public class SwingRemoteControl extends TextRemoteControl {
     }
 
     public SwingRemoteControl(JTextField inputTextField, JTextArea outputTextArea) {
-        this.inputTextField = inputTextField;
         this.outputTextArea = outputTextArea;
         
         inputTextField.addActionListener(new ActionListener() {

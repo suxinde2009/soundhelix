@@ -228,8 +228,8 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
 			    if (tries >= maxIterations) {
 			    	if (logger.isDebugEnabled()) {
-			    		for (String key : constraintFailure.keySet()) {
-			    			logger.debug("Constraint failures for " + key + ": " + constraintFailure.get(key));
+			    		for (Map.Entry<String, Integer> entry : constraintFailure.entrySet()) {
+			    			logger.debug("Constraint failures for " + entry.getKey() + ": " + entry.getValue());
 			    		}
 			    	}
 			    					    	
@@ -290,8 +290,8 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
 				    if (tries >= maxIterations) {
 				    	if (logger.isDebugEnabled()) {
-				    		for (String k : constraintFailure.keySet()) {
-				    			logger.debug("Constraint failures for " + k + ": " + constraintFailure.get(k));
+				    		for (Map.Entry<String, Integer> entry : constraintFailure.entrySet()) {
+				    			logger.debug("Constraint failures for " + entry.getKey() + ": " + entry.getValue());
 				    		}
 				    	}
 				    					    	
@@ -926,7 +926,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 		this.maxIterations = maxIterations;
 	}
 	
-	private class ConstraintException extends RuntimeException {
+	private static class ConstraintException extends RuntimeException {
 		private ActivityVectorConfiguration avc;
 		private String reason;
 		

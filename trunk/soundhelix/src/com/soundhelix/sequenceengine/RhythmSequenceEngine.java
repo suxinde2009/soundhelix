@@ -62,7 +62,8 @@ public class RhythmSequenceEngine extends AbstractSequenceEngine {
       			seq.addPause(3);
       			tick += 3;
       			break;
-
+      		default:
+      		    throw new RuntimeException("Number of ticks per beat " + ticksPerBeat + " is not supported");
       		}
       	}
       	

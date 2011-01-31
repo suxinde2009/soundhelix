@@ -35,18 +35,28 @@ import com.soundhelix.util.XMLUtils;
  */
 
 public class PadSequenceEngine extends AbstractSequenceEngine {
-	
+    /** The number of ticks to wait before a pause. */
+    private static int postPauseTicks;
+    	
+    /** The major table. */
 	private static final int[] MAJOR_TABLE = new int[] {0, 4, 7};
+	
+	/** The minor table. */
 	private static final int[] MINOR_TABLE = new int[] {0, 3, 7};
 	
+	/** The random generator. */
 	private Random random;
-	
+
+	/** Flag indicating whether chord subtypes should be used. */
 	private boolean obeyChordSubtype = true;
 	
-	private static int postPauseTicks = 0;
-	
+	/** The number of voices. */
 	private int voiceCount = -1;
+	
+	/** The offsets to use. */
 	private int[] offsets;
+	
+	/** The velocity to use. */
 	private short velocity = Short.MAX_VALUE;
 	
 	public PadSequenceEngine() {

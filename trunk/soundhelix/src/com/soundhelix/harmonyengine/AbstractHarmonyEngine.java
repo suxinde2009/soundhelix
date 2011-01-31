@@ -141,8 +141,6 @@ public abstract class AbstractHarmonyEngine implements HarmonyEngine {
 	 * Checks if the 3 abstract methods return consistent and correct
 	 * results. In case of a detected problem, a RuntimeException will
 	 * be thrown.
-	 * 
-	 * @throws RuntimeException in case of an error
 	 */
 	
     public void checkSanity() {

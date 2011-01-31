@@ -31,5 +31,5 @@ public interface XMLConfigurable {
 	 * @throws XPathException
 	 */
 	
-	void configure(Node node,XPath xpath) throws XPathException;
+	void configure(Node node, XPath xpath) throws XPathException;
 }

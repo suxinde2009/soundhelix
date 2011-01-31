@@ -25,7 +25,7 @@ public interface LFO {
 	 * 
 	 * @return the LFO's value
 	 */
-    public int getTickValue(int tick);
+    int getTickValue(int tick);
 
     /**
      * Makes this LFO synchronized to beats and sets the parameters.
@@ -35,7 +35,7 @@ public interface LFO {
      * @param milliBPM the milli-BPM
      */
   
-	public void setBeatSpeed(int milliRotationsPerBeat,int ticksPerBeat,int milliBPM);
+	void setBeatSpeed(int milliRotationsPerBeat,int ticksPerBeat,int milliBPM);
 
     /**
      * Makes this LFO synchronized to the song length and sets the parameters.
@@ -45,7 +45,7 @@ public interface LFO {
      * @param milliBPM the milli-BPM
      */
 	
-	public void setSongSpeed(int milliRotationsPerSong,int ticksPerSong,int milliBPM);
+	void setSongSpeed(int milliRotationsPerSong,int ticksPerSong,int milliBPM);
 
     /**
      * Makes this LFO synchronized to a tick range and sets the parameters.
@@ -56,7 +56,7 @@ public interface LFO {
      * @param milliBPM the milli-BPM
      */
 	
-	public void setActivitySpeed(int milliRotationsPerActivity,int startTick,int endTick,int milliBPM);
+	void setActivitySpeed(int milliRotationsPerActivity,int startTick,int endTick,int milliBPM);
 
     /**
      * Makes this LFO synchronized to time and sets the parameters.
@@ -66,7 +66,7 @@ public interface LFO {
      * @param milliBPM the milli-BPM
      */
 	
-	public void setTimeSpeed(int milliRotationsPerSecond,int ticksPerBeat,int milliBPM);
+	void setTimeSpeed(int milliRotationsPerSecond,int ticksPerBeat,int milliBPM);
 
 	/**
 	 * Set the starting phase (the phase to use for tick 0).
@@ -74,7 +74,7 @@ public interface LFO {
 	 * @param microRotations the microrotations
 	 */
 	
-	public void setPhase(int microRotations);	
+	void setPhase(int microRotations);	
 
 	/**
 	 * Sets the minimum value to return. If this value is greater than the amplitude minimum, this results
@@ -83,7 +83,7 @@ public interface LFO {
 	 * @param minimum the value minimum
 	 */
 	
-	public void setValueMinimum(int minimum);
+	void setValueMinimum(int minimum);
 
 	/**
 	 * Sets the maximum value to return. If this value is smaller than the amplitude maximum, this results
@@ -92,7 +92,7 @@ public interface LFO {
 	 * @param maximum the value maximum
 	 */
 
-	public void setValueMaximum(int maximum);
+	void setValueMaximum(int maximum);
 
 	/**
 	 * Sets the minimum value of the amplitude.
@@ -100,7 +100,7 @@ public interface LFO {
 	 * @param minimum the amplitude minimum
 	 */
 	
-	public void setAmplitudeMinimum(int minimum);
+	void setAmplitudeMinimum(int minimum);
 
 	/**
 	 * Sets the maximum value of the amplitude.
@@ -108,5 +108,5 @@ public interface LFO {
 	 * @param maximum the amplitude maximum
 	 */
 
-	public void setAmplitudeMaximum(int maximum);
+	void setAmplitudeMaximum(int maximum);
 }

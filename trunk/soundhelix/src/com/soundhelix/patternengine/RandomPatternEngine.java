@@ -431,7 +431,7 @@ public class RandomPatternEngine extends StringPatternEngine {
 	    return array;
 	}
 
-	private static class PatternEntry {
+	private static final class PatternEntry {
 	    private int offset;
 	    private char wildcard;
 	    private boolean isWildcard;

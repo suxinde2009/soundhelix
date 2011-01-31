@@ -16,7 +16,6 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathException;
-import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.apache.log4j.Logger;
@@ -95,8 +94,7 @@ public class SongUtils {
      */
     
     private static Player generateSong(Document doc, long randomSeed)
-            throws XPathExpressionException, InstantiationException,
-            XPathException, IllegalAccessException, ClassNotFoundException {
+            throws InstantiationException, XPathException, IllegalAccessException, ClassNotFoundException {
 
         logger.debug("Rendering new song");
         

@@ -74,23 +74,23 @@ public abstract class AbstractLFO implements LFO {
         }
     }
 
-	public void setBeatSpeed(int milliRotationsPerBeat,int ticksPerBeat,int milliBPM) {
+	public void setBeatSpeed(int milliRotationsPerBeat, int ticksPerBeat, int milliBPM) {
 		this.microRotationsPerTick = milliRotationsPerBeat * 1000L / ticksPerBeat; 
 		isConfigured = true;
 	}
 
-	public void setSongSpeed(int milliRotationsPerSong,int ticksPerSong,int milliBPM) {
+	public void setSongSpeed(int milliRotationsPerSong, int ticksPerSong, int milliBPM) {
 		this.microRotationsPerTick = milliRotationsPerSong * 1000L / ticksPerSong; 
 		isConfigured = true;
 	}
 
-	public void setActivitySpeed(int milliRotationsPerActivity,int startTick,int endTick,int milliBPM) {
+	public void setActivitySpeed(int milliRotationsPerActivity, int startTick, int endTick, int milliBPM) {
 		this.microRotationsPerTick = milliRotationsPerActivity * 1000L / (endTick - startTick);		
 		this.microRotationShift -= microRotationsPerTick * startTick;
 		isConfigured = true;
 	}
 
-	public void setTimeSpeed(int milliRotationsPerSecond,int ticksPerBeat,int milliBPM) {
+	public void setTimeSpeed(int milliRotationsPerSecond, int ticksPerBeat, int milliBPM) {
 		this.microRotationsPerTick = milliRotationsPerSecond * 60000000L / milliBPM / ticksPerBeat;
 		isConfigured = true;
 	}

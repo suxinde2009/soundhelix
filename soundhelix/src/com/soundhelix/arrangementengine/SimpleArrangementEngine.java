@@ -89,8 +89,8 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 	/** The minimum number of active ActivityVectors. */
 	private int minActivityCount = 2;
 	
-    /** The maximum number of active ActivityVectors. */
-	private int maxActivityCount;   // determined dynamically if <= 0
+    /** The maximum number of active ActivityVectors (determined dynamically if <= 0). */
+	private int maxActivityCount;
 	
 	private String startActivityCountsString;
 	private String stopActivityCountsString;
@@ -112,7 +112,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
 		ActivityVectorConfiguration[] vectors = neededActivityVectors.values().toArray(new ActivityVectorConfiguration[neededActivityVectors.size()]);
 		
-		createConstrainedActivityVectors(structure.getTicks(),tracks,vectors);
+		createConstrainedActivityVectors(structure.getTicks(), tracks, vectors);
 		dumpActivityVectors(vectors);
 		shiftIntervalBoundaries(neededActivityVectors);
 
@@ -121,8 +121,8 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 	}
 
 	private Map<String, ActivityVectorConfiguration> getNeededActivityVectors() {
-		Map<String,ActivityVectorConfiguration> neededActivityVector =
-					new LinkedHashMap<String,ActivityVectorConfiguration>();
+		Map<String, ActivityVectorConfiguration> neededActivityVector =
+					new LinkedHashMap<String, ActivityVectorConfiguration>();
 
 		for (ArrangementEntry entry : arrangementEntries) {
 			SequenceEngine sequenceEngine = entry.sequenceEngine;
@@ -139,7 +139,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 					throw new RuntimeException("Unknown ActivityVector \"" + name + "\"");
 				}
 				
-				neededActivityVector.put(name,avc);
+				neededActivityVector.put(name, avc);
 			}
 		}
 		return neededActivityVector;
@@ -160,8 +160,8 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 			String[] names = entry.activityVectorNames;
 			
 			if (names.length != num) {
-				throw new RuntimeException("Need " + num + " ActivityVector" + (num == 1 ? "" : "s") +
-						" for instrument " + entry.instrument + ", found " + names.length);
+				throw new RuntimeException("Need " + num + " ActivityVector" + (num == 1 ? "" : "s")
+				        + " for instrument " + entry.instrument + ", found " + names.length);
 			}
 			
 			for (int k = 0; k < num; k++) {
@@ -178,11 +178,11 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
 	private void shiftIntervalBoundaries(Map<String, ActivityVectorConfiguration> neededActivityVector) {
 		for (ActivityVectorConfiguration avc : neededActivityVector.values()) {
-			avc.activityVector.shiftIntervalBoundaries(avc.startShift,avc.stopShift);
+			avc.activityVector.shiftIntervalBoundaries(avc.startShift, avc.stopShift);
 		}
 	}
 
-	private void createConstrainedActivityVectors(int ticks,int tracks,ActivityVectorConfiguration[] activityVectorConfigurations) {
+	private void createConstrainedActivityVectors(int ticks, int tracks, ActivityVectorConfiguration[] activityVectorConfigurations) {
 		List<Integer> chordSectionStartTicks = HarmonyEngineUtils.getChordSectionStartTicks(structure);
 		int chordSections = chordSectionStartTicks.size();
 		
@@ -216,8 +216,8 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 				activityVectors = createActivityVectors(activityVectorConfigurations);
 			} catch (ConstraintException e) {
 				if (isDebug) {
-					String name = e.getActivityVectorConfiguration() != null ?
-							e.getActivityVectorConfiguration().name : "unknown";
+					String name = e.getActivityVectorConfiguration() != null
+					        ? e.getActivityVectorConfiguration().name : "unknown";
 					String key = name + "/" + e.getReason();
 					Integer current = constraintFailure.get(key);
 
@@ -233,7 +233,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 			    		}
 			    	}
 			    					    	
-                    throw new RuntimeException("Couldn't satisfy activity constraints within "+tries+" iterations");
+                    throw new RuntimeException("Couldn't satisfy activity constraints within " + tries + " iterations");
 			    } else {
 			        // we haven't reached the iteration limit yet, retry
 			        continue again;
@@ -250,11 +250,11 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 				int firstActiveTick = av.getFirstActiveTick();
 				int segmentCount = av.getSegmentCount();
 				
-				if (active < avc.minActive && (!avc.allowInactive || active > 0) || active > avc.maxActive ||
-				   avc.startAfterSection + 1 >= chordSections || avc.stopBeforeSection + 1 >= chordSections ||
-				   avc.stopBeforeSection >= 0 && av.getLastActiveTick() >= chordSectionStartTicks.get(chordSections - 1 - avc.stopBeforeSection) ||
-				   avc.startAfterSection >= 0 && firstActiveTick >= 0 && firstActiveTick < chordSectionStartTicks.get(avc.startAfterSection+1) ||
-				   (avc.minSegmentCount >=0 || avc.maxSegmentCount < Integer.MAX_VALUE) && (segmentCount < avc.minSegmentCount || segmentCount > avc.maxSegmentCount)) {
+				if (active < avc.minActive && (!avc.allowInactive || active > 0) || active > avc.maxActive
+				        || avc.startAfterSection + 1 >= chordSections || avc.stopBeforeSection + 1 >= chordSections
+				        || avc.stopBeforeSection >= 0 && av.getLastActiveTick() >= chordSectionStartTicks.get(chordSections - 1 - avc.stopBeforeSection)
+				        || avc.startAfterSection >= 0 && firstActiveTick >= 0 && firstActiveTick < chordSectionStartTicks.get(avc.startAfterSection + 1)
+				        || (avc.minSegmentCount >= 0 || avc.maxSegmentCount < Integer.MAX_VALUE) && (segmentCount < avc.minSegmentCount || segmentCount > avc.maxSegmentCount)) {
 				    
 					if (isDebug) {
 						String reason;
@@ -267,9 +267,9 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 							reason = "startAfterSection";
 						} else if (avc.stopBeforeSection + 1 >= chordSections) {
 							reason = "stopBeforeSection";
-						} else if (avc.stopBeforeSection >= 0 && av.getLastActiveTick() >= chordSectionStartTicks.get(chordSections-1-avc.stopBeforeSection)) {
+						} else if (avc.stopBeforeSection >= 0 && av.getLastActiveTick() >= chordSectionStartTicks.get(chordSections - 1 - avc.stopBeforeSection)) {
 							reason = "stopBeforeSection";
-						} else if (avc.startAfterSection >= 0 && firstActiveTick >= 0 && firstActiveTick < chordSectionStartTicks.get(avc.startAfterSection+1)) {
+						} else if (avc.startAfterSection >= 0 && firstActiveTick >= 0 && firstActiveTick < chordSectionStartTicks.get(avc.startAfterSection + 1)) {
 							// should not happen as this is already checked in createActivityVectors()
 							reason = "startAfterSection";
 						} else if (segmentCount < avc.minSegmentCount) {
@@ -295,8 +295,8 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 				    		}
 				    	}
 				    					    	
-				        throw new RuntimeException("Couldn't satisfy activity constraints within " +
-				        		tries + " iterations");
+				        throw new RuntimeException("Couldn't satisfy activity constraints within "
+				                + tries + " iterations");
 				    } else {
 				        // we haven't reached the iteration limit yet, retry
 				        continue again;
@@ -554,9 +554,14 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         	// section
         	
         	if (active < wantedActivityVectors) {
-        		do {lastAddedBit = setRandomBit(bitset,vectors,lastRemovedBit,section,sections,activityVectorConfigurations,activeSegments);} while (bitset.cardinality() < wantedActivityVectors);
+        		do {
+        		    lastAddedBit = setRandomBit(bitset, vectors, lastRemovedBit, section, sections,
+        		            activityVectorConfigurations, activeSegments);
+        		} while (bitset.cardinality() < wantedActivityVectors);
         	} else if (active > wantedActivityVectors) {
-        		do {lastRemovedBit = clearRandomBit(bitset,lastAddedBit);} while (bitset.cardinality() > wantedActivityVectors);
+        		do {
+        		    lastRemovedBit = clearRandomBit(bitset, lastAddedBit);
+        		} while (bitset.cardinality() > wantedActivityVectors);
         	}
         	
         	// check the BitSet and add activity or inactivity intervals
@@ -576,7 +581,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
             		// check if the still missing active sections are more than what is left
             		// we only need to check this in the inactive case
         			
-    			    if (!activityVectorConfigurations[i].allowInactive && minActiveSections[i] - activeSections[i] > sections-1-section) {
+    			    if (!activityVectorConfigurations[i].allowInactive && minActiveSections[i] - activeSections[i] > sections - 1 - section) {
     			    	throw new ConstraintException(activityVectorConfigurations[i], "earlyMinActive");
     			    }
     			    
@@ -657,7 +662,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 		this.stopActivityCountsString = stopActivityCountsString;
 	}
 	
-	public void configure(Node node,XPath xpath) throws XPathException {
+	public void configure(Node node, XPath xpath) throws XPathException {
 		random = new Random(randomSeed);
 
 		int maxIterations = 100000;
@@ -714,64 +719,56 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 			
 			double minActive = 0;
 			
-			try {
-				minActive = Double.parseDouble(XMLUtils.parseString(random,"minActive", nodeList.item(i), xpath));
-			} catch (Exception e) {
-			}
+            try {
+                minActive = Double.parseDouble(XMLUtils.parseString(random, "minActive", nodeList.item(i), xpath));
+			} catch (Exception e) {}
 			
 			boolean allowInactive = false;
 
 			try {
-				allowInactive = XMLUtils.parseBoolean(random, "minActive/attribute::allowInactive", nodeList.item(i), xpath);
-			} catch (Exception e) {
-			}
+                allowInactive = XMLUtils.parseBoolean(random, "minActive/attribute::allowInactive", nodeList.item(i),
+				        xpath);
+			} catch (Exception e) {}
 
 			double maxActive = 100.0d;
 			
 			try {
-				maxActive = Double.parseDouble(XMLUtils.parseString(random,"maxActive",nodeList.item(i),xpath));
-			} catch (Exception e) {
-			}
+                maxActive = Double.parseDouble(XMLUtils.parseString(random, "maxActive", nodeList.item(i), xpath));
+			} catch (Exception e) {}
 			
 			int startShift = 0;
 			try {
 				startShift = XMLUtils.parseInteger(random, "startShift", nodeList.item(i), xpath);
-			} catch (Exception e) {
-			}
+			} catch (Exception e) {}
 			
 			int stopShift = 0;
 			try {
 				stopShift = XMLUtils.parseInteger(random, "stopShift", nodeList.item(i), xpath);
-			} catch (Exception e) {
-			}
+			} catch (Exception e) {}
 
 			int startAfterSection = -1;
 			try {
-			    startAfterSection = XMLUtils.parseInteger(random, "startAfterSection", nodeList.item(i), xpath);
-			} catch (Exception e) {
-			}
+                startAfterSection = XMLUtils.parseInteger(random, "startAfterSection", nodeList.item(i), xpath);
+			} catch (Exception e) {}
 
 			int stopBeforeSection = -1;
 			try {
-			    stopBeforeSection = XMLUtils.parseInteger(random, "stopBeforeSection", nodeList.item(i), xpath);
-			} catch (Exception e) {
-			}
+                stopBeforeSection = XMLUtils.parseInteger(random, "stopBeforeSection", nodeList.item(i), xpath);
+			} catch (Exception e) {}
 
 			int minSegmentCount = 0;
 			try {
 			    minSegmentCount = XMLUtils.parseInteger(random, "minSegmentCount", nodeList.item(i), xpath);
-			} catch (Exception e) {
-			}
+			} catch (Exception e) {}
 
 			int maxSegmentCount = Integer.MAX_VALUE;
 			try {
 			    maxSegmentCount = XMLUtils.parseInteger(random, "maxSegmentCount", nodeList.item(i), xpath);
-			} catch (Exception e) {
-			}
+			} catch (Exception e) {}
 
-			activityVectorConfigurationHashMap.put(name, new ActivityVectorConfiguration(name, minActive, allowInactive,
-							maxActive, startShift, stopShift, startAfterSection, stopBeforeSection,
-							minSegmentCount, maxSegmentCount));		
+            activityVectorConfigurationHashMap.put(name, new ActivityVectorConfiguration(name, minActive, allowInactive,
+                    maxActive, startShift, stopShift, startAfterSection, stopBeforeSection, minSegmentCount,
+                    maxSegmentCount));		
 		}
 				
 		setActivityVectorConfiguration(activityVectorConfigurationHashMap);
@@ -796,13 +793,14 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 			int transposition = 0;
 			
 			try {
-			    transposition = XMLUtils.parseInteger(random,"transposition", nodeList.item(i), xpath);
+			    transposition = XMLUtils.parseInteger(random, "transposition", nodeList.item(i), xpath);
 			} catch (Exception e) {
 			}
 			
 			Node sequenceEngineNode = (Node) xpath.evaluate("sequenceEngine", nodeList.item(i), XPathConstants.NODE);
 
-			NodeList nameNodeList = (NodeList) xpath.evaluate("activityVector", nodeList.item(i), XPathConstants.NODESET);
+			NodeList nameNodeList = (NodeList) xpath.evaluate("activityVector", nodeList.item(i),
+			        XPathConstants.NODESET);
 			
 			String[] activityVectorNames = new String[nameNodeList.getLength()];
 			
@@ -848,7 +846,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 		this.activityVectorConfigurationHashMap = activityVectorConfigurationHashMap;
 	}
 
-	private int[] parseActivityCounts(String string,int maxCount) {
+	private int[] parseActivityCounts(String string, int maxCount) {
 		String[] c = string.split(",");
 		int[] activityCounts = new int[c.length];
 		
@@ -856,13 +854,13 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 			try {
 				activityCounts[i] = Integer.parseInt(c[i]);
 			} catch (NumberFormatException e) {
-				throw new RuntimeException("Element \"" + c[i] + "\" in activity count string \""+
-						string + "\" is not a number");
+				throw new RuntimeException("Element \"" + c[i] + "\" in activity count string \""
+				        + string + "\" is not a number");
 			}
 		
 			if (activityCounts[i] <= 0) {
-				throw new RuntimeException("Element \"" + activityCounts[i] + "\" in activity count string \""+
-						string + "\" is not positive");
+				throw new RuntimeException("Element \"" + activityCounts[i] + "\" in activity count string \""
+				        + string + "\" is not positive");
 			} else if (activityCounts[i] > maxCount) {
 				activityCounts[i] = maxCount;
 			}	
@@ -877,7 +875,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 		private int transposition;
 		private String[] activityVectorNames;
 		
-		private ArrangementEntry(String instrument,SequenceEngine sequenceEngine,int transposition,String[] activityVectorNames) {
+		private ArrangementEntry(String instrument, SequenceEngine sequenceEngine, int transposition, String[] activityVectorNames) {
 			this.instrument = instrument;
 			this.sequenceEngine = sequenceEngine;
 			this.transposition = transposition;
@@ -898,7 +896,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         private int maxSegmentCount;
 		private ActivityVector activityVector;
 
-		private ActivityVectorConfiguration(String name,double minActive,boolean allowInactive,double maxActive,int startShift,int stopShift,int startAfterSection,int stopBeforeSection,int minSegmentCount,int maxSegmentCount) {
+		private ActivityVectorConfiguration(String name, double minActive, boolean allowInactive, double maxActive, int startShift, int stopShift, int startAfterSection, int stopBeforeSection, int minSegmentCount, int maxSegmentCount) {
 			this.name = name;
 			this.minActive = minActive;
 			this.allowInactive = allowInactive;

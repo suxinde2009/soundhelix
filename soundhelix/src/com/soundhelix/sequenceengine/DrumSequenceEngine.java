@@ -65,9 +65,6 @@ import com.soundhelix.util.XMLUtils;
 
 public class DrumSequenceEngine extends AbstractSequenceEngine {
 
-	private static final int CONDITION_INACTIVE_TO_ACTIVE = 0;
-	private static final int CONDITION_ACTIVE_TO_INACTIVE = 1;
-
 	private static final int MODE_ADD = 0;
 	private static final int MODE_REPLACE = 1;
 

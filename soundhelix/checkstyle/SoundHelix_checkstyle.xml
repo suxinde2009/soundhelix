@@ -12,6 +12,7 @@ SoundHelix checkstyle configuration
 <module name="Checker">
   <property name="severity" value="warning"/>
   <module name="TreeWalker">
+    <property name="tabWidth" value="4"/>
     <module name="JavadocMethod">
       <property name="severity" value="warning"/>
     </module>
@@ -68,7 +69,6 @@ SoundHelix checkstyle configuration
     <module name="DoubleCheckedLocking"/>
     <module name="EmptyStatement"/>
     <module name="EqualsHashCode"/>
-    <module name="HiddenField"/>
     <module name="IllegalInstantiation"/>
     <module name="InnerAssignment"/>
     <module name="MagicNumber">
@@ -113,13 +113,14 @@ SoundHelix checkstyle configuration
     </module>
     <module name="BooleanExpressionComplexity"/>
     <module name="ClassFanOutComplexity">
-      <property name="max" value="10"/>
+      <property name="max" value="15"/>
     </module>
-    <module name="CyclomaticComplexity">
-      <property name="max" value="7"/>
-    </module>
+    <module name="CyclomaticComplexity"/>
     <module name="EmptyForIteratorPad"/>
-    <module name="ExecutableStatementCount"/>
+    <module name="ExecutableStatementCount">
+      <property name="max" value="50"/>
+      <property name="tokens" value="INSTANCE_INIT,STATIC_INIT,METHOD_DEF,CTOR_DEF"/>
+    </module>
     <module name="ExplicitInitialization"/>
     <module name="IllegalThrows"/>
     <module name="IllegalType"/>
@@ -151,7 +152,7 @@ SoundHelix checkstyle configuration
     <module name="StringLiteralEquality"/>
     <module name="SuperClone"/>
     <module name="ThrowsCount">
-      <property name="max" value="2"/>
+      <property name="max" value="5"/>
     </module>
     <module name="TrailingComment"/>
     <module name="RegexpSinglelineJava">
@@ -179,6 +180,14 @@ SoundHelix checkstyle configuration
       <property name="severity" value="ignore"/>
       <property name="format" value="(.*)new BigDecimal\((.+)\.doubleValue\(\)\)(.*)"/>
       <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="error"/>
+    </module>
+    <module name="EmptyBlock">
+      <property name="severity" value="info"/>
+    </module>
+    <module name="HiddenField">
+      <property name="severity" value="info"/>
+      <property name="ignoreConstructorParameter" value="true"/>
+      <property name="ignoreSetter" value="true"/>
     </module>
   </module>
   <module name="JavadocPackage">

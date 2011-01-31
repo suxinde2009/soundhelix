@@ -821,7 +821,7 @@ public class MidiPlayer extends AbstractPlayer {
      */
     
 	private long getTickNanos(int tick, int ticksPerBeat) {
-		return 60000000000L * groove[tick % groove.length] / (ticksPerBeat * milliBPM);
+		return 60000000000L * groove[tick % groove.length] / ((long) ticksPerBeat * milliBPM);
 	}
 
 	/**
@@ -834,7 +834,7 @@ public class MidiPlayer extends AbstractPlayer {
 	 */
 	
 	private long getTimingTickNanos(int ticksPerBeat, int clockTimingsPerTick) {
-		return 60000000000000L / (ticksPerBeat * milliBPM * clockTimingsPerTick);
+		return 60000000000000L / ((long) ticksPerBeat * milliBPM * clockTimingsPerTick);
 	}
     
     /**
@@ -1171,7 +1171,7 @@ public class MidiPlayer extends AbstractPlayer {
     	}
     }
     
-    public class DeviceChannel {
+    public static class DeviceChannel {
     	private final Device device;
     	private final int channel;
     	private final int program;
@@ -1198,7 +1198,7 @@ public class MidiPlayer extends AbstractPlayer {
     	}    	
     }
     
-    private class ControllerLFO {
+    private static class ControllerLFO {
     	private LFO lfo;
     	private final String deviceName;
     	private int channel;

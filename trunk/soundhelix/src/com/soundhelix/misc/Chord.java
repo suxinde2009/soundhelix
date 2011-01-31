@@ -1,5 +1,7 @@
 package com.soundhelix.misc;
 
+import java.io.Serializable;
+
 import com.soundhelix.util.ConsistentRandom;
 import com.soundhelix.util.NoteUtils;
 
@@ -22,7 +24,7 @@ import com.soundhelix.util.NoteUtils;
 
 // TODO: improve usage of ConsistentRandom class
 
-public class Chord {
+public class Chord implements Serializable {
     /** The consistent random generator. */
     private static ConsistentRandom random;
 	

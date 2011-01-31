@@ -128,7 +128,7 @@ public class SoundHelix implements Runnable {
 				generateNew = false;
 
 				// create shutdown hook
-				Thread shutdownHook = new Thread(soundHelix.new ShutdownRunnable(player));
+				Thread shutdownHook = new Thread(new ShutdownRunnable(player));
 				Runtime.getRuntime().addShutdownHook(shutdownHook);
 
 				try {
@@ -214,7 +214,7 @@ public class SoundHelix implements Runnable {
 	 * SIGTERM), shutdown hooks are not run.
 	 */
 	
-	private class ShutdownRunnable implements Runnable {
+	private static class ShutdownRunnable implements Runnable {
 		/** The player. */
 		private Player player;
 		

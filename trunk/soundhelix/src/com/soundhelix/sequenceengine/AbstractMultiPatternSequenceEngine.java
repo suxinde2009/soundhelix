@@ -5,10 +5,10 @@ import java.util.Random;
 import com.soundhelix.harmonyengine.HarmonyEngine;
 import com.soundhelix.misc.ActivityVector;
 import com.soundhelix.misc.Chord;
+import com.soundhelix.misc.Chord.ChordSubtype;
 import com.soundhelix.misc.Pattern;
 import com.soundhelix.misc.Sequence;
 import com.soundhelix.misc.Track;
-import com.soundhelix.misc.Chord.ChordSubtype;
 import com.soundhelix.misc.Track.TrackType;
 import com.soundhelix.util.NoteUtils;
 

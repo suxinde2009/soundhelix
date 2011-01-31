@@ -173,6 +173,6 @@ public final class RandomUtils {
 	}
 	
 	public long getRandomSeed(Object object) {
-	    return (object.getClass().hashCode() << 32) + object.hashCode();
+	    return ((long) object.getClass().hashCode() << 32) + (long) object.hashCode();
 	}
 }

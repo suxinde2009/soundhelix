@@ -38,20 +38,10 @@ import com.soundhelix.util.XMLUtils;
 
 public class ChordSequenceEngine extends MultiPatternSequenceEngine {
 	
-	private int[] offsets;
-
 	public ChordSequenceEngine() {
 		super();
 	}
 
-	public void setOffsets(int[] offsets) {
-		if (offsets.length == 0) {
-			throw new RuntimeException("Array of offsets must not be empty");
-		}
-		
-		this.offsets = offsets;
-	}
-	
 	public void setObeyChordSubtype(boolean obeyChordSubtype) {
 		this.obeyChordSubtype = obeyChordSubtype;
 	}
@@ -72,8 +62,6 @@ public class ChordSequenceEngine extends MultiPatternSequenceEngine {
     	for (int i = 0; i < offsetList.length; i++) {
     		offsets[i] = Integer.parseInt(offsetList[i]);
     	}
-    	
-    	setOffsets(offsets);
     	
 		try {
 			setObeyChordSubtype(XMLUtils.parseBoolean(random, "obeyChordSubtype", node, xpath));

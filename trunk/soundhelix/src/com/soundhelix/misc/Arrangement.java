@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -21,7 +22,7 @@ import java.util.zip.GZIPOutputStream;
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
-public class Arrangement implements Iterable<Arrangement.ArrangementEntry> {
+public class Arrangement implements Iterable<Arrangement.ArrangementEntry>, Serializable {
 	/** The structure. */
 	private final Structure structure;
 	

@@ -550,7 +550,7 @@ public class MidiPlayer extends AbstractPlayer {
 		int ticksPerBar = structure.getTicksPerBar();
 
 		if ((tick % (4 * ticksPerBar)) == 0) {
-			logger.debug(String.format("Tick: %5d   Seconds: %4d  %5.1f %%", tick,
+			logger.debug(String.format("Tick: %5d   Seconds: %4d   Progress: %5.1f %%", tick,
 					tick * 60 * 1000 / (structure.getTicksPerBeat() * milliBPM),
 					(double) tick * 100 / structure.getTicks()));
 		}

@@ -9,12 +9,12 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import com.soundhelix.constants.BuildConstants;
 import com.soundhelix.player.MidiPlayer;
 import com.soundhelix.player.Player;
 import com.soundhelix.remotecontrol.ConsoleRemoteControl;
 import com.soundhelix.remotecontrol.RemoteControl;
 import com.soundhelix.util.SongUtils;
+import com.soundhelix.util.VersionUtils;
 
 /**
  * Implements the main class. The main() method determines the configuration
@@ -72,11 +72,9 @@ public class SoundHelix implements Runnable {
         PropertyConfigurator.configureAndWatch("log4j.properties", 60 * 1000);
 
         logger = Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
-		logger.info("SoundHelix " + BuildConstants.VERSION + " (r" + BuildConstants.REVISION + "), built on "
-						   + BuildConstants.BUILD_DATE);
+        VersionUtils.logVersion();
 		
 		String filename = args.length >= 1 ? args[0] : "SoundHelix.xml";
-		
 		String songName = args.length == 2 ? args[1] : null;
 
 		long randomSeed = 0;

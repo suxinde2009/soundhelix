@@ -16,6 +16,7 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathException;
+import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.apache.log4j.Logger;
@@ -24,6 +25,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import com.soundhelix.arrangementengine.ArrangementEngine;
+import com.soundhelix.constants.BuildConstants;
 import com.soundhelix.harmonyengine.HarmonyEngine;
 import com.soundhelix.misc.Arrangement;
 import com.soundhelix.misc.Structure;
@@ -54,8 +56,10 @@ public class SongUtils {
         Document doc = parseDocument(url);
         
         XPath xpath = XPathFactory.newInstance().newXPath();
-        Node mainNode = (Node) xpath.evaluate("/*", doc, XPathConstants.NODE);
-        Node songNameEngineNode = (Node) xpath.evaluate("songNameEngine", mainNode, XPathConstants.NODE);
+        Node rootNode = (Node) xpath.evaluate("/*", doc, XPathConstants.NODE);        
+        checkVersion(rootNode, xpath);
+            
+        Node songNameEngineNode = (Node) xpath.evaluate("songNameEngine", rootNode, XPathConstants.NODE);
         SongNameEngine songNameEngine = XMLUtils.getInstance(SongNameEngine.class,
                 songNameEngineNode, xpath, randomSeed ^ 12345);
         
@@ -67,7 +71,7 @@ public class SongUtils {
         player.getArrangement().getStructure().setSongName(songName);
         
         return player;
-    }
+    }   
 
     /**
      * Parses the XML file provided by the given input stream, creates an arrangement and a player and configures
@@ -81,6 +85,11 @@ public class SongUtils {
     
     public static Player generateSong(URL url, String songName) throws Exception {
         Document doc = parseDocument(url);
+
+        XPath xpath = XPathFactory.newInstance().newXPath();
+        Node rootNode = (Node) xpath.evaluate("/*", doc, XPathConstants.NODE);        
+        checkVersion(rootNode, xpath);
+        
         logger.info("Song name: \"" + songName + "\"");        
         Player player = generateSong(doc, getSongRandomSeed(songName));
 
@@ -106,7 +115,7 @@ public class SongUtils {
     private static Player generateSong(Document doc, long randomSeed)
             throws InstantiationException, XPathException, IllegalAccessException, ClassNotFoundException {
 
-        logger.debug("Rendering new song");
+        logger.debug("Rendering new song with random seed " + randomSeed);
         
         XPath xpath = XPathFactory.newInstance().newXPath();
 
@@ -118,7 +127,6 @@ public class SongUtils {
         Node arrangementEngineNode = (Node) xpath.evaluate("arrangementEngine",  mainNode, XPathConstants.NODE);
         Node playerNode = (Node) xpath.evaluate("player", mainNode, XPathConstants.NODE);
 
-        logger.debug("Using song random seed " + randomSeed);
         Random random = new Random(randomSeed);
 
         Structure structure = parseStructure(random.nextLong(), structureNode, xpath, null);
@@ -181,7 +189,7 @@ public class SongUtils {
                 throw e;
             }
         }
-        
+
         return doc;
     }
     
@@ -221,6 +229,35 @@ public class SongUtils {
         return structure;
     }
     
+    /**
+     * Checks if the version of the XML document is compatible with the application version. If the versions are not
+     * compatible a RuntimeException will be thrown with an appropriate message.
+     *
+     * @param xpath the XPath instance
+     * @param rootNode the root node
+     */
+
+    private static void checkVersion(Node rootNode, XPath xpath) throws XPathExpressionException {
+        String version = (String) xpath.evaluate("attribute::version", rootNode, XPathConstants.STRING);
+
+        if (version != null && !version.equals("")) {        
+            if (version.endsWith("+")) {
+                // strip off "+" character
+                version = version.substring(0, version.length() - 1);
+                
+                if (VersionUtils.compareTo(BuildConstants.VERSION, version) < 0) {
+                    throw new RuntimeException("Document requires at least version " + version
+                            + ", but application version is " + BuildConstants.VERSION);
+                }        
+            } else {            
+                if (VersionUtils.compareTo(BuildConstants.VERSION, version) != 0) {
+                    throw new RuntimeException("Document requires exactly version " + version
+                            + ", but application version is " + BuildConstants.VERSION);
+                }
+            }
+        }
+    }
+
     /**
      * Returns the random seed for the song title.
      * 

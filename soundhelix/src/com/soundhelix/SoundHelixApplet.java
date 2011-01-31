@@ -24,11 +24,11 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.spi.LoggingEvent;
 
-import com.soundhelix.constants.BuildConstants;
 import com.soundhelix.player.Player;
 import com.soundhelix.remotecontrol.SwingRemoteControl;
 import com.soundhelix.remotecontrol.TextRemoteControl;
 import com.soundhelix.util.SongUtils;
+import com.soundhelix.util.VersionUtils;
 
 /**
  * Implements a Swing-based applet for SoundHelix.
@@ -154,10 +154,8 @@ public class SoundHelixApplet extends JApplet implements Runnable {
     
     public void run() {
         initializeLog4j();
-
-        logger.info("SoundHelix " + BuildConstants.VERSION + " (r" + BuildConstants.REVISION + "), built on "
-                  + BuildConstants.BUILD_DATE);
-
+        VersionUtils.logVersion();
+        
         Random random = new Random();
     
         for (;;) {

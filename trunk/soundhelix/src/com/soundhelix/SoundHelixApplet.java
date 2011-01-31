@@ -87,7 +87,7 @@ public class SoundHelixApplet extends JApplet implements Runnable {
 
         JPanel songNamePanel = new JPanel();
         songNamePanel.setLayout(new BorderLayout());
-        songNamePanel.add(new JLabel(" Song title: "), BorderLayout.WEST);
+        songNamePanel.add(new JLabel(" Song name: "), BorderLayout.WEST);
         JTextField songNameTextField = new JTextField();
         songNamePanel.add(songNameTextField, BorderLayout.CENTER);
         this.songNameTextField = songNameTextField;

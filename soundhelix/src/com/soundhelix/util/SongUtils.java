@@ -61,7 +61,12 @@ public class SongUtils {
         
         String songName = songNameEngine.createSongName();
         logger.info("Song name: \"" + songName + "\"");        
-        return generateSong(doc, getSongRandomSeed(songName));
+        Player player = generateSong(doc, getSongRandomSeed(songName));
+        
+        // store the song name
+        player.getArrangement().getStructure().setSongName(songName);
+        
+        return player;
     }
 
     /**
@@ -77,7 +82,12 @@ public class SongUtils {
     public static Player generateSong(URL url, String songName) throws Exception {
         Document doc = parseDocument(url);
         logger.info("Song name: \"" + songName + "\"");        
-        return generateSong(doc, getSongRandomSeed(songName));
+        Player player = generateSong(doc, getSongRandomSeed(songName));
+
+        // store the song name
+        player.getArrangement().getStructure().setSongName(songName);
+
+        return player;
     }
 
     /**
@@ -219,7 +229,7 @@ public class SongUtils {
      * @return the random seed
      */
     
-    private static long getSongRandomSeed(String title) {
+    public static long getSongRandomSeed(String title) {
         return title.trim().toLowerCase().hashCode();
     }
 }

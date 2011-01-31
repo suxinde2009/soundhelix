@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.Frame;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.net.URL;
 import java.util.Random;
 
@@ -45,6 +47,18 @@ public class SoundHelixApplet extends JApplet implements Runnable {
     /** The remote control. */
     private TextRemoteControl remoteControl;
     
+    /** The text field for the song name. */
+    private JTextField songNameTextField;
+
+    /** The current song name. */
+    private String currentSongName;
+    
+    /** The song name of the next song. */
+    private String nextSongName;
+
+    /** The player. */
+    private Player player;
+    
     /**
      * Starts the applet.
      * 
@@ -71,25 +85,46 @@ public class SoundHelixApplet extends JApplet implements Runnable {
         
         setLayout(new BorderLayout());
 
-        JTextArea outputTextArea;
-        outputTextArea = new JTextArea();
+        JPanel songNamePanel = new JPanel();
+        songNamePanel.setLayout(new BorderLayout());
+        songNamePanel.add(new JLabel(" Song title: "), BorderLayout.WEST);
+        JTextField songNameTextField = new JTextField();
+        songNamePanel.add(songNameTextField, BorderLayout.CENTER);
+        this.songNameTextField = songNameTextField;
+        add(songNamePanel, BorderLayout.NORTH);
+        
+        songNameTextField.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JTextField textField = (JTextField) e.getSource();
+                
+                String songName = textField.getText();
+                
+                if (!songName.equals("")
+                        && SongUtils.getSongRandomSeed(songName) != SongUtils.getSongRandomSeed(currentSongName)) {
+                    nextSongName = songName;
+                    player.abortPlay();
+                }
+            }
+        });
+        
+        JTextArea outputTextArea = new JTextArea();
         Font font = new Font("Monospaced", Font.PLAIN, 11);
         outputTextArea.setFont(font);
         outputTextArea.setEditable(false);
         
         add(new JScrollPane(outputTextArea), BorderLayout.CENTER);
 
-        JPanel panel = new JPanel();
-        panel.setLayout(new BorderLayout());
-        panel.add(new JLabel(" Command: "), BorderLayout.WEST);
-        JTextField inputTextField = new JTextField();
-        inputTextField.requestFocus();
-        panel.add(inputTextField, BorderLayout.CENTER);
-        add(panel, BorderLayout.SOUTH);
+        JPanel commandPanel = new JPanel();
+        commandPanel.setLayout(new BorderLayout());
+        commandPanel.add(new JLabel(" Command: "), BorderLayout.WEST);
+        JTextField commandTextField = new JTextField();
+        commandTextField.requestFocus();
+        commandPanel.add(commandTextField, BorderLayout.CENTER);
+        add(commandPanel, BorderLayout.SOUTH);
 
         super.start();
 
-        remoteControl = new SwingRemoteControl(inputTextField, outputTextArea);
+        remoteControl = new SwingRemoteControl(commandTextField, outputTextArea);
 
         // launch console thread with normal priority
         Thread consoleThread = new Thread(new Runnable() {
@@ -128,7 +163,19 @@ public class SoundHelixApplet extends JApplet implements Runnable {
         for (;;) {
             try {
                 URL url = new URL(getDocumentBase(), "examples/SoundHelix-Piano.xml");
-                Player player = SongUtils.generateSong(url, random.nextLong());
+                Player player;
+                
+                if (nextSongName != null) {
+                    player = SongUtils.generateSong(url, nextSongName);
+                    nextSongName = null;
+                } else {
+                    player = SongUtils.generateSong(url, random.nextLong());
+                }
+                
+                this.player = player;
+                
+                this.currentSongName = player.getArrangement().getStructure().getSongName();
+                songNameTextField.setText(this.currentSongName);
                 
                 player.open();
                 remoteControl.setPlayer(player);

@@ -81,7 +81,11 @@ public class Structure {
 	public String getSongName() {
 	    return songName;
 	}
-	
+
+	public void setSongName(String songName) {
+	    this.songName = songName;
+	}
+
 	public HarmonyEngine getHarmonyEngine() {
 		return harmonyEngine;
 	}

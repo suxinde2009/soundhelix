@@ -7,6 +7,19 @@ Author: Thomas Schürger (thomas@schuerger.com)
 Change log
 ----------
 
+0.0.5:
+    - Set base URL (xml:base) is now set correctly when XML documents are parsed. This means that
+      XInclude can now be used properly. All relative URLs referenced in the XML documents are now
+      relative to the document URL. The example has been changed accordingly.
+ 
+    - The command-line version of SoundHelix now accepts document URLs as well instead of only files, so XML files
+      can be referenced by using HTTP URLs directly
+
+    - The RandomPatternEngine now also supports wildcards as offsets.
+
+    - Added song name text field to the applet. A new song with a given name can be created by entering it into the field.
+
+
 0.0.4: 2011-01-15
 
     - Added a first version of a JNLP-based applet. The applet is available at

@@ -23,6 +23,8 @@ import com.soundhelix.util.NoteUtils;
 // TODO: improve usage of ConsistentRandom class
 
 public class Chord {
+    /** The consistent random generator. */
+    private static ConsistentRandom random;
 	
 	/** The possible chord types. */
 	public enum ChordType {
@@ -57,9 +59,6 @@ public class Chord {
 		this.subtype = subtype;
 	}
 	
-	/** The consistent random generator. */
-	private static ConsistentRandom random;
-
 	/**
 	 * Returns the pitch of the chord's base note. Note that
 	 * this need not be the low note of the chord.

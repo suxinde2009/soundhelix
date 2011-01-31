@@ -6,7 +6,7 @@ package com.soundhelix.util;
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
-public class ClassUtils {
+public final class ClassUtils {
 	
 	private ClassUtils() {
 	}

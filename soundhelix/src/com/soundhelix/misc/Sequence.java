@@ -18,6 +18,9 @@ import java.util.List;
  */
 
 public class Sequence {
+    /** Flag indicating if the class was tested. */
+    private static boolean tested;    
+
 	/** The list of sequence entries. */
 	private List<Sequence.SequenceEntry> sequence = new ArrayList<Sequence.SequenceEntry>();
 
@@ -462,8 +465,6 @@ public class Sequence {
 
 		test(number++, seq, 8, 60, 55, "#64{50/8,60/55,-/1}");
 	}
-	
-	private static boolean tested;
 	
 	public static void test(int number, Sequence seq, int tick, int pitch, int ticks, String str) {
 		try {

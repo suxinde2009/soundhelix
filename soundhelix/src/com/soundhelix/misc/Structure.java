@@ -26,16 +26,38 @@ import com.soundhelix.harmonyengine.HarmonyEngine;
  */
 
 public class Structure {
+    /** The number of bars. */
 	private int bars;
+	
+	/** The number of beats per bar. */
 	private int beatsPerBar;
+	
+	/** The number of ticks per beat. */
 	private int ticksPerBeat;
+	
+	/** The HarmonyEngine. */
 	private HarmonyEngine harmonyEngine;
+	
+	/** The song name. */
 	private String songName;
 	
-	// derived upon instantiation
+	/** The number of ticks per bar (derived). */
 	private int ticksPerBar;
+	
+	/** The number of ticks (derived). */
 	private int ticks;
 	
+	public Structure(int bars, int beatsPerBar, int ticksPerBeat, String songName) {
+	    this.bars = bars;
+	    this.beatsPerBar = beatsPerBar;
+	    this.ticksPerBeat = ticksPerBeat;       
+
+	    this.ticksPerBar = beatsPerBar * ticksPerBeat;
+	    this.ticks = bars * ticksPerBar;
+
+	    this.songName = songName;
+	}
+
 	public int getBeatsPerBar() {
 		return beatsPerBar;
 	}
@@ -71,16 +93,5 @@ public class Structure {
 		
 		this.harmonyEngine = harmonyEngine;
 		harmonyEngine.setSongStructure(this);
-	}
-	
-	public Structure(int bars, int beatsPerBar, int ticksPerBeat, String songName) {
-		this.bars = bars;
-		this.beatsPerBar = beatsPerBar;
-		this.ticksPerBeat = ticksPerBeat;		
-
-		this.ticksPerBar = beatsPerBar * ticksPerBeat;
-		this.ticks = bars * ticksPerBar;
-		
-		this.songName = songName;
-	}
+	}	
 }

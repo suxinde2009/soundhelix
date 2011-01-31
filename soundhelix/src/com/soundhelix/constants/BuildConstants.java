@@ -6,7 +6,7 @@ package com.soundhelix.constants;
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
-public class BuildConstants {
+public final class BuildConstants {
 	/** The application version of the build. */
 	public static final String VERSION = "???";
 	

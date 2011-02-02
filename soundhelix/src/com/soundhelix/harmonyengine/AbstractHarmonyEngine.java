@@ -182,6 +182,10 @@ public abstract class AbstractHarmonyEngine implements HarmonyEngine {
         		                           + " at tick " + tick);
         	}
         	
+            if (chord.equals(lastChord) && lastChordTicks == 1) {
+                throw new RuntimeException("Chord was not changed at tick " + tick);
+            }
+
         	lastChord = chord;
         	lastChordTicks = chordTicks;
         	lastChordSectionTicks = chordSectionTicks;

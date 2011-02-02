@@ -45,7 +45,7 @@ import com.soundhelix.util.XMLUtils;
 
 public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 	private Chord[] chords;
-	private int[] ticks;
+	private int[] chordTicks;
 	private int[] sectionTicks;
 	
 	private String[] chordPatterns;
@@ -76,7 +76,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 		}
 
 		if (tick >= 0 && tick < structure.getTicks()) {
-			return ticks[tick];
+			return chordTicks[tick];
 		} else {
 			return 0;
 		}
@@ -95,9 +95,11 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 	}
 	
 	private void parsePattern() {
-		chords = new Chord[structure.getTicks()];
-		ticks = new int[structure.getTicks()];
-		sectionTicks = new int[structure.getTicks()];
+        int ticks = structure.getTicks();
+        
+		chords = new Chord[ticks];
+		chordTicks = new int[ticks];
+		sectionTicks = new int[ticks];
 		
 		String pat = createPattern();
 		
@@ -120,7 +122,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 		Chord firstChord = null;
 		Chord previousChord = null;
 		
-		while (tick < structure.getTicks()) {
+		while (tick < ticks) {
 			String[] p = c[pos % c.length].split("/");
 
 			boolean newSection = false;
@@ -174,10 +176,8 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 				ch = firstChord.findClosestChord(ch);
 			}
 			
-			int songTicks = structure.getTicks();
-			
-			for (int j = 0; j < len && tick < songTicks; j++) {
-				ticks[tick] = tick + len - j >= songTicks ? songTicks - tick : len - j;
+			for (int j = 0; j < len && tick < ticks; j++) {
+				chordTicks[tick] = tick + len - j >= ticks ? ticks - tick : len - j;
 				chords[tick] = ch;
 				tick++;
 				sTicks++;
@@ -187,7 +187,9 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 			
 			pos++;
 		}
-		
+
+        mergeAdjacentChords();        
+
 		sectionVector.add(sTicks);
 		
 		logger.debug("Chord sections: " + sectionVector.size());
@@ -204,6 +206,31 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 		
 		checkSanity();
 	}
+
+	/**
+	 * Merges all adjacent equal chords into one chord.
+	 */
+	
+    private void mergeAdjacentChords() {
+        int ticks = structure.getTicks();
+        int tick = 0;
+
+        while (tick < ticks) {
+            int t = tick + chordTicks[tick];
+            
+            while (t < ticks && chords[t].equals(chords[tick])) {
+                t += chordTicks[t];
+            }
+            
+            if (t != tick + chordTicks[tick]) {
+                for (int i = tick; i < t; i++) {
+                    chordTicks[i] = t - i;
+                }
+            }
+
+            tick = t;
+        }
+    }
 
 	public void setChordPatterns(String[] chordPatterns) {
 		if (chordPatterns == null || chordPatterns.length == 0) {

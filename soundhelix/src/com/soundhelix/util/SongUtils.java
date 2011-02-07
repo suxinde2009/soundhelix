@@ -231,13 +231,18 @@ public class SongUtils {
     
     /**
      * Checks if the version of the XML document is compatible with the application version. If the versions are not
-     * compatible a RuntimeException will be thrown with an appropriate message.
+     * compatible a RuntimeException will be thrown with an appropriate message. If the application version is
+     * undefined ("???"), the check is skipped.
      *
      * @param xpath the XPath instance
      * @param rootNode the root node
      */
 
     private static void checkVersion(Node rootNode, XPath xpath) throws XPathExpressionException {
+        if (BuildConstants.VERSION.equals("???")) {
+            return;
+        }
+        
         String version = (String) xpath.evaluate("attribute::version", rootNode, XPathConstants.STRING);
 
         if (version != null && !version.equals("")) {        

@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<SoundHelix xmlns:xi="http://www.w3.org/2001/XInclude">
+<SoundHelix version="0.0.4.3+" xmlns:xi="http://www.w3.org/2001/XInclude">
   <xi:include href="../includes/Standard-SongNameEngine.xml"/>
   <structure>
      <bars><random min="80" max="128" step="16"/></bars> 
@@ -97,9 +97,9 @@
     </track>
     <track>
       <instrument>accomp</instrument>
-	  <transposition>-24</transposition>
+      <transposition>-24</transposition>
       <sequenceEngine class="MultiPatternSequenceEngine">
-	    <patternEngines>
+        <patternEngines>
 		  <patternEngine class="StringPatternEngine">
 		  <string>-,-,-,-,5,-,-,-,-,-,-,-,5,-,-,-</string>
 		  </patternEngine>
@@ -136,11 +136,11 @@
           <legatoProbability>0</legatoProbability>
           <minVelocity>32767</minVelocity>
           <maxVelocity>32767</maxVelocity>
-          <minActiveTicks>8</minActiveTicks>
-          <maxActiveTicks>14</maxActiveTicks>
+          <minActiveTicks>7</minActiveTicks>
+          <maxActiveTicks>13</maxActiveTicks>
           <offsets>0,0,0,0,0,0,+,+</offsets>
-          <noteLengths>2,2,2,3,2,2,2,1</noteLengths>
-          <pauseLengths>1,2</pauseLengths>
+          <noteLengths>2,2,2,3,2,2,2,1,2</noteLengths>
+          <pauseLengths>2,2,2,2,1,2</pauseLengths>
           <pitchVelocityCorrelation>100</pitchVelocityCorrelation>
           <velocityExponent>3</velocityExponent>
         </patternEngine>

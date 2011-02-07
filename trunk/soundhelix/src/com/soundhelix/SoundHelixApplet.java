@@ -99,8 +99,7 @@ public class SoundHelixApplet extends JApplet implements Runnable {
                 
                 String songName = textField.getText();
                 
-                if (!songName.equals("")
-                        && SongUtils.getSongRandomSeed(songName) != SongUtils.getSongRandomSeed(currentSongName)) {
+                if (!songName.equals("")) {
                     nextSongName = songName;
                     player.abortPlay();
                 }
@@ -118,9 +117,10 @@ public class SoundHelixApplet extends JApplet implements Runnable {
         commandPanel.setLayout(new BorderLayout());
         commandPanel.add(new JLabel(" Command: "), BorderLayout.WEST);
         JTextField commandTextField = new JTextField();
-        commandTextField.requestFocus();
         commandPanel.add(commandTextField, BorderLayout.CENTER);
         add(commandPanel, BorderLayout.SOUTH);
+
+        commandTextField.requestFocus();
 
         super.start();
 

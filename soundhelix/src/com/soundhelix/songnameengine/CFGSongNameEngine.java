@@ -29,13 +29,19 @@ public class CFGSongNameEngine extends AbstractSongNameEngine {
     /** The variable map. */
     private Map<String, RandomStringArray> variableMap;
     
+    /** The start variable. */
+    private String startVariable = "songName";
+    
+    /** The separator. */
+    private char stringSeparator = ',';
+    
     public String createSongName() {
         Random random = new Random(randomSeed);
 
-        RandomStringArray rsa = variableMap.get("songName");
+        RandomStringArray rsa = variableMap.get(startVariable);
 
         if (rsa == null || rsa.strings.length == 0) {
-            throw new RuntimeException("Variable \"songName\" is undefined or has no values");
+            throw new RuntimeException("Variable \"" + startVariable + "\" is undefined or has no values");
         }
 
         String songName = getRandomString(random, rsa);
@@ -62,12 +68,14 @@ public class CFGSongNameEngine extends AbstractSongNameEngine {
                 once = true;
             }
 
+            // TODO: merge the variable definitions instead
+            
             if (variableMap.containsKey(name)) {
                 throw new RuntimeException("Variable \"" + name + "\" defined more than once");
             }
             
             String valueString = XMLUtils.parseString(random, nodeList.item(i), xpath);
-            String[] values = valueString.split(",");
+            String[] values = valueString.split(String.valueOf(stringSeparator));
             
             variableMap.put(name, new RandomStringArray(values, once));
         }

@@ -92,20 +92,7 @@ public class SoundHelixApplet extends JApplet implements Runnable {
         songNamePanel.add(songNameTextField, BorderLayout.CENTER);
         this.songNameTextField = songNameTextField;
         add(songNamePanel, BorderLayout.NORTH);
-        
-        songNameTextField.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                JTextField textField = (JTextField) e.getSource();
-                
-                String songName = textField.getText();
-                
-                if (!songName.equals("")) {
-                    nextSongName = songName;
-                    player.abortPlay();
-                }
-            }
-        });
-        
+               
         JTextArea outputTextArea = new JTextArea();
         Font font = new Font("Monospaced", Font.PLAIN, 11);
         outputTextArea.setFont(font);
@@ -116,12 +103,26 @@ public class SoundHelixApplet extends JApplet implements Runnable {
         JPanel commandPanel = new JPanel();
         commandPanel.setLayout(new BorderLayout());
         commandPanel.add(new JLabel(" Command: "), BorderLayout.WEST);
-        JTextField commandTextField = new JTextField();
+        final JTextField commandTextField = new JTextField();
         commandPanel.add(commandTextField, BorderLayout.CENTER);
         add(commandPanel, BorderLayout.SOUTH);
 
-        commandTextField.requestFocus();
+        commandTextField.requestFocusInWindow();
 
+        songNameTextField.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JTextField textField = (JTextField) e.getSource();
+                
+                String songName = textField.getText();
+                
+                if (!songName.equals("")) {
+                    nextSongName = songName;
+                    player.abortPlay();
+                    commandTextField.requestFocusInWindow();
+                }                
+            }
+        });
+ 
         super.start();
 
         remoteControl = new SwingRemoteControl(commandTextField, outputTextArea);

@@ -2,14 +2,21 @@ package com.soundhelix;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Random;
 
+import javax.swing.ImageIcon;
 import javax.swing.JApplet;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -44,11 +51,17 @@ public class SoundHelixApplet extends JApplet implements Runnable {
     /** The logger. */
     private static Logger logger = Logger.getLogger(SoundHelixApplet.class);
 
+    /** The desktop. */
+    private Desktop desktop;
+    
     /** The remote control. */
     private TextRemoteControl remoteControl;
     
     /** The text field for the song name. */
     private JTextField songNameTextField;
+
+    /** The button. */
+    private JButton shareButton;
 
     /** The current song name. */
     private String currentSongName;
@@ -71,18 +84,16 @@ public class SoundHelixApplet extends JApplet implements Runnable {
     
     @Override
     public void start() {
-        Component parent = this;
+        makeResizable();
 
-        while (parent.getParent() != null) {
-            parent = parent.getParent();
-        }
+        desktop = getDesktop();
         
-        if (parent instanceof Frame) {
-            if (!((Frame) parent).isResizable()) {
-                ((Frame) parent).setResizable(true);
-            }
-        }
+        String songName = getParameter("songName");
         
+        if (songName != null && !songName.equals("")) {
+            nextSongName = songName;
+        }
+                
         setLayout(new BorderLayout());
 
         JPanel songNamePanel = new JPanel();
@@ -91,6 +102,16 @@ public class SoundHelixApplet extends JApplet implements Runnable {
         JTextField songNameTextField = new JTextField();
         songNamePanel.add(songNameTextField, BorderLayout.CENTER);
         this.songNameTextField = songNameTextField;
+
+        if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+            try {            
+                JButton shareButton = new JButton("Share!", new ImageIcon(
+                                            new URL("http://www.soundhelix.com/applet/images/facebook-share.png")));
+                songNamePanel.add(shareButton, BorderLayout.EAST);
+                this.shareButton = shareButton;
+            } catch (MalformedURLException e) {}
+        }
+        
         add(songNamePanel, BorderLayout.NORTH);
                
         JTextArea outputTextArea = new JTextArea();
@@ -123,9 +144,25 @@ public class SoundHelixApplet extends JApplet implements Runnable {
             }
         });
  
+        if (shareButton != null) {
+            shareButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    if (desktop != null && currentSongName != null) {
+                        try {
+                            desktop.browse(new URI(getFacebookUrl(currentSongName)));
+                        } catch (Exception e2) {
+                            logger.error("Exception", e2);
+                        }
+                    }
+                }
+            });
+        }
+            
         super.start();
 
         remoteControl = new SwingRemoteControl(commandTextField, outputTextArea);
+
+        initializeLog4j();
 
         // launch console thread with normal priority
         Thread consoleThread = new Thread(new Runnable() {
@@ -143,6 +180,24 @@ public class SoundHelixApplet extends JApplet implements Runnable {
         playerThread.start();
     }
 
+    /**
+     * Makes the applet frame resizable.
+     */
+    
+    private void makeResizable() {
+        Component parent = this;
+
+        while (parent.getParent() != null) {
+            parent = parent.getParent();
+        }
+        
+        if (parent instanceof Frame) {
+            if (!((Frame) parent).isResizable()) {
+                ((Frame) parent).setResizable(true);
+            }
+        }
+    }
+
     @Override
     public void stop() {
         // TODO Auto-generated method stub
@@ -150,11 +205,42 @@ public class SoundHelixApplet extends JApplet implements Runnable {
     }
     
     /**
+     * Gets the desktop, if available.
+     * 
+     * @return the desktop (or null)
+     */
+    
+    private Desktop getDesktop() {
+        if (Desktop.isDesktopSupported()) {
+            return Desktop.getDesktop();
+        } else {
+            return null;
+        }
+    }
+    
+    /**
+     * Generates and returns a Facebook URL for sharing the given song.
+     * 
+     * @param songName the song name
+     * 
+     * @return the URL
+     */
+    
+    private static String getFacebookUrl(String songName) {
+        try {
+            return "http://www.facebook.com/sharer.php?u="
+                   + URLEncoder.encode("http://www.soundhelix.com/applet/SoundHelix-applet.jnlp?songName="
+                   + URLEncoder.encode(songName, "ISO-8859-1"), "ISO-8859-1");
+        } catch (UnsupportedEncodingException e) {
+            return null;
+        }
+    }
+    
+    /**
      * Implements the player thread functionality.
      */
     
     public void run() {
-        initializeLog4j();
         VersionUtils.logVersion();
         
         Random random = new Random();
@@ -183,11 +269,11 @@ public class SoundHelixApplet extends JApplet implements Runnable {
                 player.close();
             } catch (Exception e) {
                 logger.debug("Exception occurred", e);
-            }
-            
-            try {
-                Thread.sleep(1000);
-            } catch (Exception e) {}
+                
+                try {
+                    Thread.sleep(3000);
+                } catch (Exception e2) {}
+            }            
         }
     }
 

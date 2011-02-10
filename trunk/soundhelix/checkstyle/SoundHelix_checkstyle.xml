@@ -163,7 +163,7 @@ SoundHelix checkstyle configuration
       <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="error"/>
     </module>
     <module name="RegexpSinglelineJava">
-      <property name="severity" value="ignore"/>
+      <property name="severity" value="error"/>
       <property name="format" value="(.*)System.(out|err).print(.*)"/>
       <property name="message" value="Use logger methods to log messages and not system.out calls."/>
       <metadata name="com.atlassw.tools.eclipse.checkstyle.comment" value="SYSOUT: Do not use either System.out.xxx or System.err.xxxx. Use logger methods instead."/>
@@ -189,6 +189,31 @@ SoundHelix checkstyle configuration
       <property name="ignoreConstructorParameter" value="true"/>
       <property name="ignoreSetter" value="true"/>
     </module>
+    <module name="AbstractClassName">
+      <property name="format" value="^Abstract.*$"/>
+    </module>
+    <module name="ClassTypeParameterName"/>
+    <module name="AvoidStaticImport"/>
+    <module name="OuterTypeNumber"/>
+    <module name="EmptyForInitializerPad"/>
+    <module name="CovariantEquals">
+      <property name="severity" value="warning"/>
+    </module>
+    <module name="FallThrough"/>
+    <module name="MultipleStringLiterals"/>
+    <module name="SuperFinalize">
+      <property name="severity" value="error"/>
+    </module>
+    <module name="InnerTypeLast">
+      <property name="severity" value="warning"/>
+    </module>
+    <module name="MutableException">
+      <property name="severity" value="warning"/>
+    </module>
+    <module name="ClassDataAbstractionCoupling"/>
+    <module name="Indentation">
+      <property name="severity" value="info"/>
+    </module>
   </module>
   <module name="JavadocPackage">
     <property name="severity" value="ignore"/>
@@ -202,15 +227,21 @@ SoundHelix checkstyle configuration
   <module name="Translation"/>
   <module name="FileLength"/>
   <module name="FileTabCharacter">
-    <property name="severity" value="ignore"/>
+    <property name="severity" value="info"/>
     <property name="eachLine" value="true"/>
-    <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
   </module>
   <module name="RegexpSingleline">
-    <property name="severity" value="ignore"/>
+    <property name="severity" value="info"/>
     <property name="format" value="\s+$"/>
     <property name="message" value="Line has trailing spaces."/>
     <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
   </module>
   <module name="StrictDuplicateCode"/>
+  <module name="RegexpMultiline">
+    <property name="severity" value="warning"/>
+    <property name="format" value="^ \*  @author "/>
+    <property name="message" value="Tag @author is missing"/>
+    <property name="minimum" value="1"/>
+    <property name="maximum" value="1"/>
+  </module>
 </module>

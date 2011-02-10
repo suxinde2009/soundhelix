@@ -13,7 +13,7 @@ import com.soundhelix.player.Player;
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
-public abstract class TextRemoteControl implements RemoteControl {
+public abstract class AbstractTextRemoteControl implements RemoteControl {
 	/** The logger. */
     private static Logger logger = Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
 

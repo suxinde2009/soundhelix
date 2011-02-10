@@ -32,6 +32,10 @@ import com.soundhelix.misc.Structure;
 import com.soundhelix.player.Player;
 import com.soundhelix.songnameengine.SongNameEngine;
 
+/**
+ * @author Thomas Schuerger
+ */
+
 public class SongUtils {
     /** The logger. */
     private static Logger logger = Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
@@ -113,7 +117,7 @@ public class SongUtils {
      */
     
     private static Player generateSong(Document doc, long randomSeed)
-            throws InstantiationException, XPathException, IllegalAccessException, ClassNotFoundException {
+        throws InstantiationException, XPathException, IllegalAccessException, ClassNotFoundException {
 
         logger.debug("Rendering new song with random seed " + randomSeed);
         

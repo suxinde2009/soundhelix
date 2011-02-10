@@ -49,26 +49,26 @@ public abstract class AbstractSequenceEngine implements SequenceEngine {
 	 * @return the track
 	 */
 
-     public abstract Track render(ActivityVector[] activityVectors);
+    public abstract Track render(ActivityVector[] activityVectors);
 
-     /**
-      * Returns the required number of ActivityVectors. For most implementations,
-      * this will be 1, but certain implementations, like for multi-instrument
-      * sequences, more than 1 might be required. Subclasses should override
-      * this.
-      * 
-      * @return the number of ActivityVectors
-      */
-     
-     public int getActivityVectorCount() {
-    	 return 1;
-     }
-     
-     public void setRandomSeed(long randomSeed) {
-    	 this.randomSeed = randomSeed;
-     }
+    /**
+     * Returns the required number of ActivityVectors. For most implementations,
+     * this will be 1, but certain implementations, like for multi-instrument
+     * sequences, more than 1 might be required. Subclasses should override
+     * this.
+     * 
+     * @return the number of ActivityVectors
+     */
 
-     public long getRandomSeed() {
-    	 return randomSeed;
-     }
+    public int getActivityVectorCount() {
+        return 1;
+    }
+
+    public void setRandomSeed(long randomSeed) {
+        this.randomSeed = randomSeed;
+    }
+
+    public long getRandomSeed() {
+        return randomSeed;
+    }
 }

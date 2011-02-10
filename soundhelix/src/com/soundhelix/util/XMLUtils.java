@@ -19,9 +19,6 @@ import com.soundhelix.misc.XMLConfigurable;
  */
 
 public final class XMLUtils {
-	/** The read buffer to use for reading files. */
-	private static final int READ_BUFFER = 16384;
-	
 	/** The logger. */
 	private static Logger logger = Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
 	
@@ -108,10 +105,9 @@ public final class XMLUtils {
 	 */
 
 	public static int parseInteger(Random random, Node node, XPath xpath) {
-		try {
-		  return Integer.parseInt(node.getTextContent());
-		} catch (RuntimeException e) {
-		}
+	    try {
+	        return Integer.parseInt(node.getTextContent());
+	    } catch (RuntimeException e) {}
 
 		Node n = getFirstElementChild(node);
 	
@@ -371,7 +367,7 @@ public final class XMLUtils {
 	 */
 	
 	public static <T> T getInstance(Class<T> clazz, Node node, XPath xpath, long randomSeed)
-			throws InstantiationException, XPathException,
+        throws InstantiationException, XPathException,
 				   IllegalAccessException, ClassNotFoundException {
 		if (node == null) {
 			throw new IllegalArgumentException("Node is null");

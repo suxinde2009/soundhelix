@@ -25,8 +25,8 @@ public final class ClassUtils {
 	 * @throws IllegalAccessException 
 	 */
 	
-    public static <T> T newInstance(String className, Class<T> clazz)
-    		throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+	public static <T> T newInstance(String className, Class<T> clazz)
+        throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 		return Class.forName(className).asSubclass(clazz).newInstance();
 	}
 }

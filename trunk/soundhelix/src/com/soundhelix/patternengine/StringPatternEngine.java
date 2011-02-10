@@ -13,6 +13,10 @@ import com.soundhelix.misc.Pattern;
 import com.soundhelix.misc.Pattern.PatternEntry;
 import com.soundhelix.util.XMLUtils;
 
+/**
+ * @author Thomas Schuerger
+ */
+
 public class StringPatternEngine extends AbstractPatternEngine {
     /** The pattern string. */
     private String patternString;

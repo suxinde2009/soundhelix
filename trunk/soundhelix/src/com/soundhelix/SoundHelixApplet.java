@@ -33,7 +33,7 @@ import org.apache.log4j.spi.LoggingEvent;
 
 import com.soundhelix.player.Player;
 import com.soundhelix.remotecontrol.SwingRemoteControl;
-import com.soundhelix.remotecontrol.TextRemoteControl;
+import com.soundhelix.remotecontrol.AbstractTextRemoteControl;
 import com.soundhelix.util.SongUtils;
 import com.soundhelix.util.VersionUtils;
 
@@ -55,7 +55,7 @@ public class SoundHelixApplet extends JApplet implements Runnable {
     private Desktop desktop;
     
     /** The remote control. */
-    private TextRemoteControl remoteControl;
+    private AbstractTextRemoteControl remoteControl;
     
     /** The text field for the song name. */
     private JTextField songNameTextField;
@@ -229,8 +229,8 @@ public class SoundHelixApplet extends JApplet implements Runnable {
     private static String getFacebookUrl(String songName) {
         try {
             return "http://www.facebook.com/sharer.php?u="
-                   + URLEncoder.encode("http://www.soundhelix.com/applet/SoundHelix-applet.jnlp?songName="
-                   + URLEncoder.encode(songName, "ISO-8859-1"), "ISO-8859-1");
+                + URLEncoder.encode("http://www.soundhelix.com/applet/SoundHelix-applet.jnlp?songName="
+                    + URLEncoder.encode(songName, "ISO-8859-1"), "ISO-8859-1");
         } catch (UnsupportedEncodingException e) {
             return null;
         }
@@ -297,9 +297,9 @@ public class SoundHelixApplet extends JApplet implements Runnable {
         private Layout layout;
         
         /** The remote control. */
-        private TextRemoteControl remoteControl;
+        private AbstractTextRemoteControl remoteControl;
         
-        public TextRemoteControlAppender(Layout layout, TextRemoteControl remoteControl) {
+        public TextRemoteControlAppender(Layout layout, AbstractTextRemoteControl remoteControl) {
             super();
             this.layout = layout;
             this.remoteControl = remoteControl;

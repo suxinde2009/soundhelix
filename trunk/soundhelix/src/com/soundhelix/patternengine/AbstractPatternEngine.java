@@ -5,6 +5,10 @@ import org.apache.log4j.Logger;
 import com.soundhelix.misc.RandomSeedable;
 import com.soundhelix.misc.XMLConfigurable;
 
+/**
+ * @author Thomas Schuerger
+ */
+
 public abstract class AbstractPatternEngine implements PatternEngine, RandomSeedable, XMLConfigurable {
     /** The logger. */
     protected final Logger logger;

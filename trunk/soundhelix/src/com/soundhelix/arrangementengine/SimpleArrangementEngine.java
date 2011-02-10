@@ -203,112 +203,113 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 			constraintFailure = new HashMap<String, Integer>();
 		}
 		
-		again: while (true) {
-			// create ActivityVectors at random
-			// then check if the constraints are met for each ActivityVector
+    again:
+        while (true) {
+            // create ActivityVectors at random
+            // then check if the constraints are met for each ActivityVector
 
-			// note that the constraint startAfterSection is already taken care of in the following method
-			// (unfortunately, it's not simple to do the same for stopBeforeSection)
+            // note that the constraint startAfterSection is already taken care of in the following method
+            // (unfortunately, it's not simple to do the same for stopBeforeSection)
 
-			ActivityVector[] activityVectors;
-			
-			try {
-				activityVectors = createActivityVectors(activityVectorConfigurations);
-			} catch (ConstraintException e) {
-				if (isDebug) {
-					String name = e.getActivityVectorConfiguration() != null
-					        ? e.getActivityVectorConfiguration().name : "unknown";
-					String key = name + "/" + e.getReason();
-					Integer current = constraintFailure.get(key);
+            ActivityVector[] activityVectors;
 
-					constraintFailure.put(key, current != null ? current + 1 : 1);
-				}
-				
-				tries++;
+            try {
+                activityVectors = createActivityVectors(activityVectorConfigurations);
+            } catch (ConstraintException e) {
+                if (isDebug) {
+                    String name = e.getActivityVectorConfiguration() != null
+                        ? e.getActivityVectorConfiguration().name : "unknown";
+                    String key = name + "/" + e.getReason();
+                    Integer current = constraintFailure.get(key);
 
-			    if (tries >= maxIterations) {
-			    	if (logger.isDebugEnabled()) {
-			    		for (Map.Entry<String, Integer> entry : constraintFailure.entrySet()) {
-			    			logger.debug("Constraint failures for " + entry.getKey() + ": " + entry.getValue());
-			    		}
-			    	}
-			    					    	
+                    constraintFailure.put(key, current != null ? current + 1 : 1);
+                }
+
+                tries++;
+
+                if (tries >= maxIterations) {
+                    if (logger.isDebugEnabled()) {
+                        for (Map.Entry<String, Integer> entry : constraintFailure.entrySet()) {
+                            logger.debug("Constraint failures for " + entry.getKey() + ": " + entry.getValue());
+                        }
+                    }
+
                     throw new RuntimeException("Couldn't satisfy activity constraints within " + tries + " iterations");
-			    } else {
-			        // we haven't reached the iteration limit yet, retry
-			        continue again;
-			    }				        
-			}
-			
-			for (int i = 0; i < vectors; i++) {
-				ActivityVector av = activityVectors[i];
-				ActivityVectorConfiguration avc = activityVectorConfigurations[i];
-				
-				// check if one of the constraints is violated
+                } else {
+                    // we haven't reached the iteration limit yet, retry
+                    continue again;
+                }				        
+            }
 
-				double active = 100.0d * av.getActiveTicks() / ticks;
-				int firstActiveTick = av.getFirstActiveTick();
-				int segmentCount = av.getSegmentCount();
-				
-				if (active < avc.minActive && (!avc.allowInactive || active > 0) || active > avc.maxActive
-				        || avc.startAfterSection + 1 >= chordSections || avc.stopBeforeSection + 1 >= chordSections
-				        || avc.stopBeforeSection >= 0 && av.getLastActiveTick() >= chordSectionStartTicks.get(chordSections - 1 - avc.stopBeforeSection)
-				        || avc.startAfterSection >= 0 && firstActiveTick >= 0 && firstActiveTick < chordSectionStartTicks.get(avc.startAfterSection + 1)
-				        || (avc.minSegmentCount >= 0 || avc.maxSegmentCount < Integer.MAX_VALUE) && (segmentCount < avc.minSegmentCount || segmentCount > avc.maxSegmentCount)) {
-				    
-					if (isDebug) {
-						String reason;
-						
-						if (active < avc.minActive && (!avc.allowInactive || active > 0)) {
-							reason = "minActive";
-						} else if (active > avc.maxActive) {
-							reason = "maxActive";
-						} else if (avc.startAfterSection + 1 >= chordSections) {
-							reason = "startAfterSection";
-						} else if (avc.stopBeforeSection + 1 >= chordSections) {
-							reason = "stopBeforeSection";
-						} else if (avc.stopBeforeSection >= 0 && av.getLastActiveTick() >= chordSectionStartTicks.get(chordSections - 1 - avc.stopBeforeSection)) {
-							reason = "stopBeforeSection";
-						} else if (avc.startAfterSection >= 0 && firstActiveTick >= 0 && firstActiveTick < chordSectionStartTicks.get(avc.startAfterSection + 1)) {
-							// should not happen as this is already checked in createActivityVectors()
-							reason = "startAfterSection";
-						} else if (segmentCount < avc.minSegmentCount) {
-							reason = "minSegmentCount";
-						} else if (segmentCount > avc.maxSegmentCount) {
-							reason = "maxSegmentCount";
-						} else {
-							reason = "unknown";
-						}
-						
-						String key = avc.name + "/" + reason;
-						Integer current = constraintFailure.get(key);
-						
-						constraintFailure.put(key, current != null ? current + 1 : 1);
-					}
-							
-					tries++;
+            for (int i = 0; i < vectors; i++) {
+                ActivityVector av = activityVectors[i];
+                ActivityVectorConfiguration avc = activityVectorConfigurations[i];
 
-				    if (tries >= maxIterations) {
-				    	if (logger.isDebugEnabled()) {
-				    		for (Map.Entry<String, Integer> entry : constraintFailure.entrySet()) {
-				    			logger.debug("Constraint failures for " + entry.getKey() + ": " + entry.getValue());
-				    		}
-				    	}
-				    					    	
-				        throw new RuntimeException("Couldn't satisfy activity constraints within "
-				                + tries + " iterations");
-				    } else {
-				        // we haven't reached the iteration limit yet, retry
-				        continue again;
-				    }				        
-				}
-			}
+                // check if one of the constraints is violated
 
-			break;
-		}
-		
+                double active = 100.0d * av.getActiveTicks() / ticks;
+                int firstActiveTick = av.getFirstActiveTick();
+                int segmentCount = av.getSegmentCount();
+
+                if (active < avc.minActive && (!avc.allowInactive || active > 0) || active > avc.maxActive
+                        || avc.startAfterSection + 1 >= chordSections || avc.stopBeforeSection + 1 >= chordSections
+                        || avc.stopBeforeSection >= 0 && av.getLastActiveTick() >= chordSectionStartTicks.get(chordSections - 1 - avc.stopBeforeSection)
+                        || avc.startAfterSection >= 0 && firstActiveTick >= 0 && firstActiveTick < chordSectionStartTicks.get(avc.startAfterSection + 1)
+                        || (avc.minSegmentCount >= 0 || avc.maxSegmentCount < Integer.MAX_VALUE) && (segmentCount < avc.minSegmentCount || segmentCount > avc.maxSegmentCount)) {
+
+                    if (isDebug) {
+                        String reason;
+
+                        if (active < avc.minActive && (!avc.allowInactive || active > 0)) {
+                            reason = "minActive";
+                        } else if (active > avc.maxActive) {
+                            reason = "maxActive";
+                        } else if (avc.startAfterSection + 1 >= chordSections) {
+                            reason = "startAfterSection";
+                        } else if (avc.stopBeforeSection + 1 >= chordSections) {
+                            reason = "stopBeforeSection";
+                        } else if (avc.stopBeforeSection >= 0 && av.getLastActiveTick() >= chordSectionStartTicks.get(chordSections - 1 - avc.stopBeforeSection)) {
+                            reason = "stopBeforeSection";
+                        } else if (avc.startAfterSection >= 0 && firstActiveTick >= 0 && firstActiveTick < chordSectionStartTicks.get(avc.startAfterSection + 1)) {
+                            // should not happen as this is already checked in createActivityVectors()
+                            reason = "startAfterSection";
+                        } else if (segmentCount < avc.minSegmentCount) {
+                            reason = "minSegmentCount";
+                        } else if (segmentCount > avc.maxSegmentCount) {
+                            reason = "maxSegmentCount";
+                        } else {
+                            reason = "unknown";
+                        }
+
+                        String key = avc.name + "/" + reason;
+                        Integer current = constraintFailure.get(key);
+
+                        constraintFailure.put(key, current != null ? current + 1 : 1);
+                    }
+
+                    tries++;
+
+                    if (tries >= maxIterations) {
+                        if (logger.isDebugEnabled()) {
+                            for (Map.Entry<String, Integer> entry : constraintFailure.entrySet()) {
+                                logger.debug("Constraint failures for " + entry.getKey() + ": " + entry.getValue());
+                            }
+                        }
+
+                        throw new RuntimeException("Couldn't satisfy activity constraints within "
+                                + tries + " iterations");
+                    } else {
+                        // we haven't reached the iteration limit yet, retry
+                        continue again;
+                    }				        
+                }
+            }
+
+            break;
+        }
+
 		if (logger.isDebugEnabled()) {
-			logger.debug("Needed " + (tries + 1) + " iteration" + (tries > 0 ? "s" : "") + " to satisfy constraints");
+		    logger.debug("Needed " + (tries + 1) + " iteration" + (tries > 0 ? "s" : "") + " to satisfy constraints");
 		}
 	}
 

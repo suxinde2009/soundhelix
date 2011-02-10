@@ -8,7 +8,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-public class SwingRemoteControl extends TextRemoteControl {
+/**
+ * @author Thomas Schuerger
+ */
+
+public class SwingRemoteControl extends AbstractTextRemoteControl {
     /** The output text area. */
     private JTextArea outputTextArea;
     

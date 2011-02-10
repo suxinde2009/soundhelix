@@ -4,6 +4,8 @@ import com.soundhelix.player.Player;
 
 /**
  * Interface for remote-controlling a player.
+ *
+ * @author Thomas Schuerger
  */
 
 public interface RemoteControl extends Runnable {

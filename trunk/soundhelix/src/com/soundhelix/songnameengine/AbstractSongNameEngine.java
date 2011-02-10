@@ -1,5 +1,9 @@
 package com.soundhelix.songnameengine;
 
+/**
+ * @author Thomas Schuerger
+ */
+
 public abstract class AbstractSongNameEngine implements SongNameEngine {
     /** The random seed. */
     protected long randomSeed;

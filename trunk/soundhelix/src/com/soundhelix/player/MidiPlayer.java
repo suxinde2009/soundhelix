@@ -494,7 +494,7 @@ public class MidiPlayer extends AbstractPlayer {
      */
     
 	private void muteActiveChannels(Arrangement arrangement, List<int[]> posList, List<int[]> pitchList)
-            throws InvalidMidiDataException {
+        throws InvalidMidiDataException {
 		ShortMessage sm = new ShortMessage();
 
 		int k = 0;
@@ -542,8 +542,7 @@ public class MidiPlayer extends AbstractPlayer {
 	 */
 	
 	private void playTick(Arrangement arrangement, int tick, List<int[]> tickList, List<int[]> posList,
-			List<int[]> pitchList)
-			throws InvalidMidiDataException {
+			List<int[]> pitchList) throws InvalidMidiDataException {
 		final ShortMessage sm = new ShortMessage();
 		
 		Structure structure = arrangement.getStructure();
@@ -760,7 +759,7 @@ public class MidiPlayer extends AbstractPlayer {
      */
     
     private long waitTicks(long referenceTime, int ticks, int clockTimingsPerTick, int ticksPerBeat)
-    		throws InvalidMidiDataException, InterruptedException {
+        throws InvalidMidiDataException, InterruptedException {
     	long lastWantedNanos = referenceTime;
     	
     	for (int t = 0; t < ticks && !isAborted; t++) {

@@ -51,19 +51,19 @@ public class RhythmSequenceEngine extends AbstractSequenceEngine {
       		}
 
       		switch(ticksPerBeat) {
-      		case 8:
-      		case 6:
-      			seq.addPause(1);
-      			tick++;
-      			break;
-      		
-      		case 12:
-      		case 16:
-      			seq.addPause(3);
-      			tick += 3;
-      			break;
-      		default:
-      		    throw new RuntimeException("Number of ticks per beat " + ticksPerBeat + " is not supported");
+      		    case 8:
+      		    case 6:
+      		        seq.addPause(1);
+      		        tick++;
+      		        break;
+
+      		    case 12:
+      		    case 16:
+      		        seq.addPause(3);
+      		        tick += 3;
+      		        break;
+      		    default:
+      		        throw new RuntimeException("Number of ticks per beat " + ticksPerBeat + " is not supported");
       		}
       	}
       	

@@ -312,7 +312,7 @@ public final class XMLUtils {
 					throw new RuntimeException("Attribute \"list\" is empty");
 				}
 
-				String[] str = s.split("\\|");
+				String[] str = StringUtils.split(s, '|');
 
 				return str[random.nextInt(str.length)];
 			} catch (Exception e) {

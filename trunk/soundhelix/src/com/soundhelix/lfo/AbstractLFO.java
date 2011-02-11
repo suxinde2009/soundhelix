@@ -14,7 +14,8 @@ package com.soundhelix.lfo;
  */
 
 public abstract class AbstractLFO implements LFO {
-	private static final double TWO_PI = 2.0d * Math.PI;
+    /** Two times Pi. */
+    private static final double TWO_PI = 2.0d * Math.PI;
 
 	/** The minimum amplitude value. */
 	private int returnMinimum = Integer.MIN_VALUE;

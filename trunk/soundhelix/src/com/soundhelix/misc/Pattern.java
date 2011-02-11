@@ -254,7 +254,8 @@ public class Pattern {
 
 		int patternLength = size();
 		
-		for (int i = 0; i < activityLength; i++) {
+		int i = 0;
+		while (i < activityLength) {
 			PatternEntry entry = get(patternOffset % patternLength);
 		
 			if (entry.isNote() || entry.isWildcard() && entry.getVelocity() > 0) {

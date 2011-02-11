@@ -131,7 +131,7 @@ public final class XMLUtils {
 						try {
                             step = Integer.parseInt((String) xpath.evaluate("attribute::step",
 							                        n, XPathConstants.STRING));
-						} catch (Exception e) {
+						} catch (NumberFormatException e) {
 						}
 
 						return RandomUtils.getUniformInteger(random, min, max, step);

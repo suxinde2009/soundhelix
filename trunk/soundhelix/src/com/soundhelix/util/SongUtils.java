@@ -36,7 +36,7 @@ import com.soundhelix.songnameengine.SongNameEngine;
  * @author Thomas Schuerger
  */
 
-public class SongUtils {
+public final class SongUtils {
     /** The logger. */
     private static Logger logger = Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
 
@@ -46,6 +46,9 @@ public class SongUtils {
     /** The XSD schema to use for schema validation. */
     private static final String VALIDATION_SCHEMA_FILENAME = "SoundHelix.xsd";
 
+    private SongUtils() {
+    }
+    
     /**
      * Parses the XML file provided by the given input stream, creates an arrangement and a player and configures
      * the player to use this arrangement.

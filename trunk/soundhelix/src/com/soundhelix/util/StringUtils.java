@@ -36,6 +36,8 @@ public final class StringUtils {
      * 
      * @param string the string
      * @param separatorChar the separator character
+     * 
+     * @return the string arrays
      */
     
     public static String[] split(String string, char separatorChar) {
@@ -51,7 +53,7 @@ public final class StringUtils {
      * @param separatorChar the separator character
      * @param escapeChar the escape character
      * 
-     * @return a string array
+     * @return the string array
      */
     
     public static String[] split(String string, char separatorChar, char escapeChar) {

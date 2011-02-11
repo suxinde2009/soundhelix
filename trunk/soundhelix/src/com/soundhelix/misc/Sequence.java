@@ -265,48 +265,6 @@ public class Sequence {
         }
     }
 
-    public static class SequenceEntry {
-        private int pitch;
-        private short velocity;
-        private int ticks;
-        private boolean legato;
-
-        public SequenceEntry(int pitch, short velocity, int ticks, boolean legato) {
-            this.pitch = pitch;
-            this.velocity = velocity;
-            this.ticks = ticks;
-            this.legato = legato;
-        }
-
-        public int getPitch() {
-            return pitch;
-        }
-
-        public short getVelocity() {
-            return velocity;
-        }
-
-        public int getTicks() {
-            return ticks;
-        }
-
-        public boolean isNote() {
-            return velocity > 0;
-        }
-        
-        public boolean isPause() {
-            return velocity <= 0;
-        }
-
-        public boolean isLegato() {
-            return legato;
-        }
-        
-        public String toString() {
-            return pitch + "/" + ticks + "/" + velocity;
-        }
-    }
-    
     public static void test() {
         if (tested) {
             return;
@@ -499,6 +457,48 @@ public class Sequence {
             System.out.println("          Found: " + s + "\n");
         } else {
             System.out.println("Test " + number + " succeeded");
+        }
+    }    
+
+    public static class SequenceEntry {
+        private int pitch;
+        private short velocity;
+        private int ticks;
+        private boolean legato;
+
+        public SequenceEntry(int pitch, short velocity, int ticks, boolean legato) {
+            this.pitch = pitch;
+            this.velocity = velocity;
+            this.ticks = ticks;
+            this.legato = legato;
+        }
+
+        public int getPitch() {
+            return pitch;
+        }
+
+        public short getVelocity() {
+            return velocity;
+        }
+
+        public int getTicks() {
+            return ticks;
+        }
+
+        public boolean isNote() {
+            return velocity > 0;
+        }
+        
+        public boolean isPause() {
+            return velocity <= 0;
+        }
+
+        public boolean isLegato() {
+            return legato;
+        }
+        
+        public String toString() {
+            return pitch + "/" + ticks + "/" + velocity;
         }
     }    
 }

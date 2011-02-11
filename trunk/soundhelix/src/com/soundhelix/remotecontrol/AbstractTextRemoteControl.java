@@ -17,6 +17,7 @@ public abstract class AbstractTextRemoteControl implements RemoteControl {
 	/** The logger. */
     private static Logger logger = Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
 
+    /** The player. */
 	private Player player;
 	
 	/**

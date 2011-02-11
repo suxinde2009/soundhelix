@@ -75,7 +75,7 @@ public class CFGSongNameEngine extends AbstractSongNameEngine {
             }
             
             String valueString = XMLUtils.parseString(random, nodeList.item(i), xpath);
-            String[] values = valueString.split(String.valueOf(stringSeparator));
+            String[] values = StringUtils.split(valueString, stringSeparator);
             
             variableMap.put(name, new RandomStringArray(values, once));
         }

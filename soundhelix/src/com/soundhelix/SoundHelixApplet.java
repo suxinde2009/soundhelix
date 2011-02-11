@@ -60,8 +60,11 @@ public class SoundHelixApplet extends JApplet implements Runnable {
     /** The text field for the song name. */
     private JTextField songNameTextField;
 
-    /** The button. */
-    private JButton shareButton;
+    /** The Facebook share button. */
+    private JButton facebookShareButton;
+
+    /** The Twitter share button. */
+    private JButton twitterShareButton;
 
     /** The current song name. */
     private String currentSongName;
@@ -100,15 +103,27 @@ public class SoundHelixApplet extends JApplet implements Runnable {
         songNamePanel.setLayout(new BorderLayout());
         songNamePanel.add(new JLabel(" Song name: "), BorderLayout.WEST);
         JTextField songNameTextField = new JTextField();
+        songNameTextField.setToolTipText("Enter a song name here (this will generate a new song)");
         songNamePanel.add(songNameTextField, BorderLayout.CENTER);
         this.songNameTextField = songNameTextField;
 
         if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
-            try {            
-                JButton shareButton = new JButton("Share!", new ImageIcon(
+            try {
+                JPanel panel = new JPanel(new BorderLayout());
+                
+                JButton shareButton = new JButton(null, new ImageIcon(
                                             new URL("http://www.soundhelix.com/applet/images/facebook-share.png")));
-                songNamePanel.add(shareButton, BorderLayout.EAST);
-                this.shareButton = shareButton;
+                shareButton.setToolTipText("Share the current song on Facebook (shows preview)");
+                panel.add(shareButton, BorderLayout.WEST);
+                this.facebookShareButton = shareButton;
+
+                shareButton = new JButton(null, new ImageIcon(
+                        new URL("http://www.soundhelix.com/applet/images/twitter-share.png")));
+                shareButton.setToolTipText("Share the current song on Twitter (shows preview)");
+                panel.add(shareButton, BorderLayout.EAST);
+                this.twitterShareButton = shareButton;
+                
+                songNamePanel.add(panel, BorderLayout.EAST);
             } catch (MalformedURLException e) {}
         }
         
@@ -126,6 +141,7 @@ public class SoundHelixApplet extends JApplet implements Runnable {
         commandPanel.add(new JLabel(" Command: "), BorderLayout.WEST);
         final JTextField commandTextField = new JTextField();
         commandPanel.add(commandTextField, BorderLayout.CENTER);
+        commandTextField.setToolTipText("Enter command here (\"help\" for help)");
         add(commandPanel, BorderLayout.SOUTH);
 
         commandTextField.requestFocusInWindow();
@@ -144,8 +160,8 @@ public class SoundHelixApplet extends JApplet implements Runnable {
             }
         });
  
-        if (shareButton != null) {
-            shareButton.addActionListener(new ActionListener() {
+        if (facebookShareButton != null) {
+            facebookShareButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     if (desktop != null && currentSongName != null) {
                         try {
@@ -157,7 +173,21 @@ public class SoundHelixApplet extends JApplet implements Runnable {
                 }
             });
         }
-            
+
+        if (twitterShareButton != null) {
+            twitterShareButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    if (desktop != null && currentSongName != null) {
+                        try {
+                            desktop.browse(new URI(getTwitterUrl(currentSongName)));
+                        } catch (Exception e2) {
+                            logger.error("Exception", e2);
+                        }
+                    }
+                }
+            });
+        }
+
         super.start();
 
         remoteControl = new SwingRemoteControl(commandTextField, outputTextArea);
@@ -227,10 +257,39 @@ public class SoundHelixApplet extends JApplet implements Runnable {
      */
     
     private static String getFacebookUrl(String songName) {
+        return "http://www.facebook.com/sharer.php?u="
+            + encode("http://www.soundhelix.com/applet/SoundHelix-applet.jnlp?songName=" + encode(songName));
+    }
+
+    /**
+     * Generates and returns a Facebook URL for sharing the given song.
+     * 
+     * @param songName the song name
+     * 
+     * @return the URL
+     */
+    
+    private static String getTwitterUrl(String songName) {
+        String url = "http://www.soundhelix.com/applet/SoundHelix-applet.jnlp?songName=" + encode(songName);
+        String text = "Check out this cool song called \"" + songName + "\"! Needs audio and a browser with "
+            + "Java 6 plugin.";
+        
+        // URL shortener creates URL like http://t.co/CmVMQgu
+        
+        if (text.length() + 22 > 140) {
+            text = "Check out this cool song called \"" + songName + "\"!";
+            
+            if (text.length() + 22 > 140) {
+                text = "Check out this cool song!";
+            }            
+        }
+        
+        return "http://twitter.com/share?url=" + encode(url) + "&text=" + encode(text);
+    }
+
+    private static String encode(String text) {
         try {
-            return "http://www.facebook.com/sharer.php?u="
-                + URLEncoder.encode("http://www.soundhelix.com/applet/SoundHelix-applet.jnlp?songName="
-                    + URLEncoder.encode(songName, "ISO-8859-1"), "ISO-8859-1");
+            return URLEncoder.encode(text, "ISO-8859-1");
         } catch (UnsupportedEncodingException e) {
             return null;
         }

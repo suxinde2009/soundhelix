@@ -32,8 +32,8 @@ import org.apache.log4j.PatternLayout;
 import org.apache.log4j.spi.LoggingEvent;
 
 import com.soundhelix.player.Player;
-import com.soundhelix.remotecontrol.SwingRemoteControl;
 import com.soundhelix.remotecontrol.AbstractTextRemoteControl;
+import com.soundhelix.remotecontrol.SwingRemoteControl;
 import com.soundhelix.util.SongUtils;
 import com.soundhelix.util.VersionUtils;
 

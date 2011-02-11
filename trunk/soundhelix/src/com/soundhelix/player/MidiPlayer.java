@@ -28,6 +28,7 @@ import com.soundhelix.misc.Structure;
 import com.soundhelix.misc.Track;
 import com.soundhelix.misc.Track.TrackType;
 import com.soundhelix.util.ClassUtils;
+import com.soundhelix.util.StringUtils;
 import com.soundhelix.util.XMLUtils;
 
 /**
@@ -337,7 +338,7 @@ public class MidiPlayer extends AbstractPlayer {
     	    map.put(info.getName(), info);
     	} 
     	    
-    	String[] names = namesString.split(",");
+    	String[] names = StringUtils.split(namesString, ',');
  
     	for (String name : names) {
     	    MidiDevice.Info info = map.get(name);

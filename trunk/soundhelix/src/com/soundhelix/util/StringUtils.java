@@ -1,5 +1,8 @@
 package com.soundhelix.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Implements some static methods for random numbers. All methods need a random generator as
  * a parameter.
@@ -26,5 +29,66 @@ public final class StringUtils {
         }
         
         return Character.toUpperCase(string.charAt(0)) + string.substring(1);
+    }
+
+    /**
+     * Calls {@code return split(string, separatorChar, '\\')}.
+     * 
+     * @param string the string
+     * @param separatorChar the separator character
+     */
+    
+    public static String[] split(String string, char separatorChar) {
+        return split(string, separatorChar, '\\');
+    }
+    
+    /**
+     * Splits the given string at the given separator character. The separator character can be escaped by
+     * preceding it with the given escape character. Doubling the escape character results in the escape character.
+     * Escaping any other character results in that character.
+     * 
+     * @param string the string to split
+     * @param separatorChar the separator character
+     * @param escapeChar the escape character
+     * 
+     * @return a string array
+     */
+    
+    public static String[] split(String string, char separatorChar, char escapeChar) {
+        List<String> list = new ArrayList<String>();
+        int len = string.length();
+        boolean escaped = false;
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < len; i++) {
+            char c = string.charAt(i);
+            if (c == escapeChar) {
+                if (escaped) {
+                    sb.append(escapeChar);
+                    escaped = false;
+                } else {
+                    escaped = true;
+                }
+            } else if (c == separatorChar) {
+                if (escaped) {
+                    sb.append(separatorChar);
+                    escaped = false;
+                } else {
+                    list.add(sb.toString());
+                    sb.setLength(0);
+                }
+            } else {
+                sb.append(c);
+                escaped = false;
+            }
+        }
+
+        if (escaped) {
+            throw new IllegalArgumentException("Illegal trailing escape character in string \"" + string + "\"");
+        }
+
+        list.add(sb.toString());
+
+        return list.toArray(new String[list.size()]);
     }
 }

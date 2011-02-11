@@ -28,7 +28,7 @@ public class RhythmSequenceEngine extends AbstractSequenceEngine {
 		super();
 	}
 	
-	public Track render(ActivityVector... activityVectors) {
+	public Track render(ActivityVector[] activityVectors) {
 		ActivityVector activityVector = activityVectors[0];
 
 		Track track = new Track(TrackType.RHYTHM);

@@ -928,8 +928,8 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 	}
 	
 	private static class ConstraintException extends RuntimeException {
-		private ActivityVectorConfiguration avc;
-		private String reason;
+		private final ActivityVectorConfiguration avc;
+		private final String reason;
 		
 		public ConstraintException(ActivityVectorConfiguration avc, String reason) {
 			super();

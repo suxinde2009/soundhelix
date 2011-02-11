@@ -54,6 +54,8 @@ public class SongUtils {
      * @param randomSeed the random seed
      * 
      * @return the player
+     * 
+     * @throws Exception in case of a problem
      */
     
     public static Player generateSong(URL url, long randomSeed) throws Exception {
@@ -85,6 +87,8 @@ public class SongUtils {
      * @param songName the song name
      * 
      * @return the player
+     * 
+     * @throws Exception in case of a problem
      */
     
     public static Player generateSong(URL url, String songName) throws Exception {
@@ -112,8 +116,10 @@ public class SongUtils {
      *
      * @return the player
      * 
-     * @throws ClassNotFoundException if a class cannot be found
      * @throws InstantiationException if a class cannot be instantiated
+     * @throws XPathException in case of an XPath problem
+     * @throws IllegalAccessException if an illegal class access is made
+     * @throws ClassNotFoundException if a class cannot be found
      */
     
     private static Player generateSong(Document doc, long randomSeed)
@@ -163,6 +169,10 @@ public class SongUtils {
      * @param url the URL
      * 
      * @return the parsed document
+     * 
+     * @throws ParserConfigurationException in case of a parsing exception
+     * @throws SAXException if a SAX exception occurs
+     * @throws IOException in case of an I/O problem
      */
     
     private static Document parseDocument(URL url) throws ParserConfigurationException, SAXException, IOException {
@@ -240,6 +250,8 @@ public class SongUtils {
      *
      * @param xpath the XPath instance
      * @param rootNode the root node
+     * 
+     * @throws XPathExpressionException in case of an XPath expression problem
      */
 
     private static void checkVersion(Node rootNode, XPath xpath) throws XPathExpressionException {

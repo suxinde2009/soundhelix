@@ -19,6 +19,10 @@ public abstract class AbstractTextRemoteControl implements RemoteControl {
 
 	private Player player;
 	
+	/**
+	 * Implements the main functionality of the remote control.
+	 */
+	
 	public void run() {
 	    boolean hasExitPermission = hasExitPermission(0);
 

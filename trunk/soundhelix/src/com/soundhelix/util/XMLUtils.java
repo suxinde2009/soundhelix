@@ -362,6 +362,8 @@ public final class XMLUtils {
 	 * 
 	 * @return the instance
 	 * 
+	 * @throws InstantiationException if the class cannot be instantiated
+	 * @throws XPathException in case of an XPath problem
 	 * @throws ClassNotFoundException if the class cannot be found
 	 * @throws IllegalAccessException if the class cannot be instantiated
 	 */

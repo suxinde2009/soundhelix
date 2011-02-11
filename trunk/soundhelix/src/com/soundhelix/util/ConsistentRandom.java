@@ -28,29 +28,55 @@ public class ConsistentRandom {
     }
     
     /**
-     * Returns a random integer between min and max (inclusive).
+     * Returns a random integer between min and max (both inclusive), based on the given seed.
      * 
      * @param min the minimum value
      * @param max the maximum value (inclusive)
-     * @param seed the seed to use
+     * @param seed the random seed
      *
      * @return a random integer
      */
     
     public int getInteger(int min, int max, long seed) {
     	Random r = new Random(min * 167852533L + max * 7531057L + constantSeed + seed);
-    	return min + r.nextInt(max - min);
+    	return min + r.nextInt(max + 1 - min);
     }
+    
+    /**
+     * Returns a random integer between min and max (both inclusive), based on the given seedObject.
+     *
+     * @param min the minimum value
+     * @param max the maximum value
+     * @param seedObject the seed object
+     *
+     * @return an integer between min and max (both inclusive)
+     */
 
     public int getInteger(int min, int max, Object seedObject) {
     	return getInteger(min, max, seedObject.hashCode());
     }
 
+    /**
+     * Returns a boolean based on the given seed.
+     * 
+     * @param seed the seed
+     * 
+     * @return the boolean
+     */
+    
     public boolean getBoolean(long seed) {
     	Random r = new Random(millis + constantSeed + seed);
     	return r.nextBoolean();
     }
 
+    /**
+     * Returns a boolean based on the given seed object.
+     *
+     * @param seedObject the seed object
+     * 
+     * @return the boolean
+     */
+    
     public boolean getBoolean(Object seedObject) {
        	return getBoolean(seedObject.hashCode());
     }

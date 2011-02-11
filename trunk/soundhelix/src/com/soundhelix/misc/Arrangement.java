@@ -33,6 +33,13 @@ public class Arrangement implements Iterable<Arrangement.ArrangementEntry>, Seri
     	this.structure = structure;
     }
     
+    /**
+     * Adds the given track and assigns the given instrument to the track.
+     * 
+     * @param track the track
+     * @param instrument the instrument
+     */
+    
     public void add(Track track, String instrument) {
     	entryList.add(new ArrangementEntry(track, instrument));
     }

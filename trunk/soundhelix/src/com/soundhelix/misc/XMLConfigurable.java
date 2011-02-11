@@ -28,7 +28,7 @@ public interface XMLConfigurable {
 	 * @param node the parent XML node of the configuration tags
 	 * @param xpath the XPath instance to use
 	 * 
-	 * @throws XPathException
+	 * @throws XPathException in case of an XPath problem
 	 */
 	
 	void configure(Node node, XPath xpath) throws XPathException;

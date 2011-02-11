@@ -35,6 +35,10 @@ public class CFGSongNameEngine extends AbstractSongNameEngine {
     /** The separator. */
     private char stringSeparator = ',';
     
+    /**
+     * @see SongNameEngine.createSongName()
+     */
+    
     public String createSongName() {
         Random random = new Random(randomSeed);
 
@@ -162,9 +166,18 @@ public class CFGSongNameEngine extends AbstractSongNameEngine {
         this.variableMap = variableMap;
     }
     
+    /**
+     * Container for random string arrays.
+     */
+    
     private static class RandomStringArray {
+        /** The array of strings. */
         private String[] strings;
+        
+        /** The number of unused strings. */
         private int remaining;
+        
+        /** True if each string should be used only once. */
         private boolean selectOnce = true;
         
         public RandomStringArray(String[] strings, boolean selectOnce) {

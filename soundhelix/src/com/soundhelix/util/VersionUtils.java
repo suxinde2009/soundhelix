@@ -16,6 +16,10 @@ public final class VersionUtils {
     
     private VersionUtils() {}
 
+    /**
+     * Logs the application version.
+     */
+    
     public static void logVersion() {
         logger.info("SoundHelix " + BuildConstants.VERSION + " (r" + BuildConstants.REVISION + "), built on "
                 + BuildConstants.BUILD_DATE);

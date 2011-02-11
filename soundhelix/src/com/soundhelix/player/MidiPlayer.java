@@ -101,28 +101,43 @@ public class MidiPlayer extends AbstractPlayer {
 	 */
 	private static final int CLOCK_SYNCHRONIZATION_TICKS_PER_BEAT = 24;
 
+	/** The random generator. */
 	private Random random;
 	
+	/** The array of MIDI devices. */
 	private Device[] devices;
 	
+	/** The playback speed in milli-BPM. */
 	private int milliBPM;
+	
+	/** The transposition pitch. */
 	private int transposition;
+	
+	/** The array of groove integers. */
 	private int[] groove;
 	
+	/** The number of ticks to wait before playing. */
 	private int beforePlayWaitTicks;
+	
+	/** The number of ticks to wait after playing. */
 	private int afterPlayWaitTicks;
 	
+	/** The map that maps from channel names to device channels. */
 	private Map<String, DeviceChannel> channelMap;
+	
+	/** The map that maps from device name to MIDI device. */
 	private Map<String, Device> deviceMap;
 	
+	/** The array of controller LFOs. */
 	private ControllerLFO[] controllerLFOs;
 	
 	/** True if open() has been called, false otherwise. */
 	private boolean opened;
 	
-	// true if at least one MIDI device requires clock synchronization
+	/** True if at least one MIDI device requires clock synchronization. */
 	private boolean useClockSynchronization;
 
+	/** True if playing has been aborted. */
     private boolean isAborted;    
 
     public MidiPlayer() {
@@ -199,7 +214,6 @@ public class MidiPlayer extends AbstractPlayer {
     		}
     		
     		devices = null;
-    		
     		opened = false;
     	}
     }

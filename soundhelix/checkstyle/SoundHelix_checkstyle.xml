@@ -115,7 +115,7 @@ SoundHelix checkstyle configuration
       <property name="max" value="8"/>
     </module>
     <module name="ClassFanOutComplexity">
-      <property name="max" value="25"/>
+      <property name="max" value="30"/>
     </module>
     <module name="CyclomaticComplexity">
       <property name="max" value="15"/>

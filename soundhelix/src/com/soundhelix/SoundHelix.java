@@ -187,7 +187,7 @@ public class SoundHelix implements Runnable {
 			
 			try {
 				Thread.sleep(1000);
-			} catch (Exception e) {
+			} catch (InterruptedException e) {
 			}
 		}
 	}

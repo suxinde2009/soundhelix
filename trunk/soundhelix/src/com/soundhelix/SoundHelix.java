@@ -31,37 +31,37 @@ import com.soundhelix.util.VersionUtils;
 
 public class SoundHelix implements Runnable {
 
-	/** The logger. */
+    /** The logger. */
     private static Logger logger;
 
     /** Flag indicating whether a new song should be generated. */
-	private static boolean generateNew;
-	
-	/** The queue for generated songs. */
-	private BlockingQueue<Player> songQueue = new LinkedBlockingQueue<Player>();
+    private static boolean generateNew;
+    
+    /** The queue for generated songs. */
+    private BlockingQueue<Player> songQueue = new LinkedBlockingQueue<Player>();
 
-	/** The XML document URL. */
-	private URL url;
+    /** The XML document URL. */
+    private URL url;
 
-	/** The random seed. */
-	private long randomSeed;
+    /** The random seed. */
+    private long randomSeed;
 
-	/** The song name. */
-	private String songName;
-	
-	public SoundHelix(URL url, long randomSeed) {
-		this.url = url;
-		this.randomSeed = randomSeed;
-		this.songName = null;
-	}
-	
-	public SoundHelix(URL url, String songName) {
-	    this.url = url;
-	    this.randomSeed = 0;
-	    this.songName = songName;
-	}
+    /** The song name. */
+    private String songName;
+    
+    public SoundHelix(URL url, long randomSeed) {
+        this.url = url;
+        this.randomSeed = randomSeed;
+        this.songName = null;
+    }
+    
+    public SoundHelix(URL url, String songName) {
+        this.url = url;
+        this.randomSeed = 0;
+        this.songName = songName;
+    }
 
-	public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
         if (args.length == 1 && args[0].equals("-h") || args.length > 2) {
             System.out.println("java SoundHelix [XML-File [Songtitle]] ");
             System.out.println("java SoundHelix [URL [Songtitle]] ");
@@ -73,91 +73,91 @@ public class SoundHelix implements Runnable {
 
         logger = Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
         VersionUtils.logVersion();
-		
-		String filename = args.length >= 1 ? args[0] : "SoundHelix.xml";
-		String songName = args.length == 2 ? args[1] : null;
+        
+        String filename = args.length >= 1 ? args[0] : "SoundHelix.xml";
+        String songName = args.length == 2 ? args[1] : null;
 
-		long randomSeed = 0;
-		
-		if (songName != null && !songName.equals("")) {
-			if (songName.startsWith("seed:")) {
-				randomSeed = Long.parseLong(songName.substring(5));
-				songName = null;
-			}
-		} else {
-			randomSeed = new Random().nextLong();
-		}
-		
-		try {
-			// instantiate this class so we can launch a thread
-		    SoundHelix soundHelix;
-		    URL url;
-		    
-		    if (filename.startsWith("http://") || filename.startsWith("https://")
-		                                       || filename.startsWith("ftp://")
-		                                       || filename.startsWith("file:/")) {
-		        url = new URL(filename);
-		    } else {
+        long randomSeed = 0;
+        
+        if (songName != null && !songName.equals("")) {
+            if (songName.startsWith("seed:")) {
+                randomSeed = Long.parseLong(songName.substring(5));
+                songName = null;
+            }
+        } else {
+            randomSeed = new Random().nextLong();
+        }
+        
+        try {
+            // instantiate this class so we can launch a thread
+            SoundHelix soundHelix;
+            URL url;
+            
+            if (filename.startsWith("http://") || filename.startsWith("https://")
+                                               || filename.startsWith("ftp://")
+                                               || filename.startsWith("file:/")) {
+                url = new URL(filename);
+            } else {
                 url = new File(filename).toURI().toURL();
-		    }
-		    
-		    if (songName != null && !songName.equals("")) {
-		        soundHelix = new SoundHelix(url, songName);
-		    } else {
+            }
+            
+            if (songName != null && !songName.equals("")) {
+                soundHelix = new SoundHelix(url, songName);
+            } else {
                 soundHelix = new SoundHelix(url, randomSeed);
-		    }
-			// launch song generation thread with low priority
-			Thread t = new Thread(soundHelix, "Generator");
-			t.setPriority(Thread.MIN_PRIORITY);
-			t.start();
+            }
+            // launch song generation thread with low priority
+            Thread t = new Thread(soundHelix, "Generator");
+            t.setPriority(Thread.MIN_PRIORITY);
+            t.start();
 
-			RemoteControl remoteControl = new ConsoleRemoteControl();		
-			
-			Thread consoleThread = new Thread(remoteControl, "Console");
-			consoleThread.setPriority(Thread.MIN_PRIORITY);
-			consoleThread.start();
+            RemoteControl remoteControl = new ConsoleRemoteControl();        
+            
+            Thread consoleThread = new Thread(remoteControl, "Console");
+            consoleThread.setPriority(Thread.MIN_PRIORITY);
+            consoleThread.start();
 
             // increase priority of the current thread for playback
-			Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+            Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 
-			generateNew = true;
+            generateNew = true;
 
-			while (true) {
-				// this call will block until a song has been generated by the thread			
-				Player player = soundHelix.getNextSongFromQueue();
-				generateNew = false;
+            while (true) {
+                // this call will block until a song has been generated by the thread            
+                Player player = soundHelix.getNextSongFromQueue();
+                generateNew = false;
 
-				// create shutdown hook
-				Thread shutdownHook = new Thread(new ShutdownRunnable(player));
-				Runtime.getRuntime().addShutdownHook(shutdownHook);
+                // create shutdown hook
+                Thread shutdownHook = new Thread(new ShutdownRunnable(player));
+                Runtime.getRuntime().addShutdownHook(shutdownHook);
 
-				try {
-					player.open();
-					remoteControl.setPlayer(player);
-					player.play();
-					remoteControl.setPlayer(null);
-					player.close();
-				} catch (Exception e) {
-					logger.warn("Exception during playback", e);
-				}
-				
-				generateNew = true;
-				
+                try {
+                    player.open();
+                    remoteControl.setPlayer(player);
+                    player.play();
+                    remoteControl.setPlayer(null);
+                    player.close();
+                } catch (Exception e) {
+                    logger.warn("Exception during playback", e);
+                }
+                
+                generateNew = true;
+                
                 // remove shutdown hook
-				Runtime.getRuntime().removeShutdownHook(shutdownHook);
-			}
-		} catch (Exception e) {
-			logger.warn("Exception detected", e);
-			throw e;
-		}
+                Runtime.getRuntime().removeShutdownHook(shutdownHook);
+            }
+        } catch (Exception e) {
+            logger.warn("Exception detected", e);
+            throw e;
+        }
     }
-	
-	/**
-	 * Implements the functionality of the thread that generates songs. The method runs forever and generates a new
-	 * song as soon as it detects the queue to be empty.
-	 */
-	
-	public void run() {
+    
+    /**
+     * Implements the functionality of the thread that generates songs. The method runs forever and generates a new
+     * song as soon as it detects the queue to be empty.
+     */
+    
+    public void run() {
         long randomSeed = this.randomSeed;
         Random random;
         
@@ -168,76 +168,76 @@ public class SoundHelix implements Runnable {
         }
         
         while (true) {
-			try {
-				if (songQueue.size() < 1 && generateNew) {
-					// the queue is empty; render a new song
-				    
-				    if (songName != null) {
-				        songQueue.add(SongUtils.generateSong(url, songName));
-				    } else {
-				        songQueue.add(SongUtils.generateSong(url, randomSeed));
-				    }
-				    
-				    songName = null;
-					randomSeed = random.nextLong();
-				}
-			} catch (Exception e) {
-				logger.warn("Exception occurred", e);
-			}
-			
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-			}
-		}
-	}
-	
-	/**
-	 * Removes and returns the next SongQueueEntry from the queue. This method will
-	 * block until an entry is available.
-	 * 
-	 * @return the next SongQueueEntry
-	 * 
-	 * @throws InterruptedException if interrupted
-	 */
-	
-	public Player getNextSongFromQueue() throws InterruptedException {
-		return songQueue.take();
-	}
-	
-	/**
-	 * Implements a simple shutdown hook that can be run when the
-	 * JVM exits. The hook currently mutes all channels if the current
-	 * player is a MIDI player. Note that shutdown hooks are only run when the
-	 * JVM exits normally, e.g., by pressing CTRL+C, calls to System.exit()
-	 * or uncaught exceptions. If the JVM is killed however, (e.g., using
-	 * SIGTERM), shutdown hooks are not run.
-	 */
-	
-	private static class ShutdownRunnable implements Runnable {
-		/** The player. */
-		private Player player;
-		
-		public ShutdownRunnable(Player player) {
-			this.player = player;
-		}
-		
-		public void run() {
-			try {
-				// FIXME: this is a quick and dirty solution
-				
-				// the preferred solution would be to call
-				// player.close(). However, calling close()
-				// can cause the player to throw exceptions because
-				// the player thread doesn't seem to be already
-				// terminated when the shutdown hook is called, and
-				// so the player may be using already closed resources.
-				
-				if (player instanceof MidiPlayer) {
-					((MidiPlayer) player).muteAllChannels();
-				}
-			} catch (Exception e) {
-			}
-		}
-	}
+            try {
+                if (songQueue.size() < 1 && generateNew) {
+                    // the queue is empty; render a new song
+                    
+                    if (songName != null) {
+                        songQueue.add(SongUtils.generateSong(url, songName));
+                    } else {
+                        songQueue.add(SongUtils.generateSong(url, randomSeed));
+                    }                    
+                }
+            } catch (Exception e) {
+                logger.warn("Exception occurred", e);
+            }
+
+            songName = null;
+            randomSeed = random.nextLong();
+
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+            }
+        }
+    }
+    
+    /**
+     * Removes and returns the next SongQueueEntry from the queue. This method will
+     * block until an entry is available.
+     * 
+     * @return the next SongQueueEntry
+     * 
+     * @throws InterruptedException if interrupted
+     */
+    
+    public Player getNextSongFromQueue() throws InterruptedException {
+        return songQueue.take();
+    }
+    
+    /**
+     * Implements a simple shutdown hook that can be run when the
+     * JVM exits. The hook currently mutes all channels if the current
+     * player is a MIDI player. Note that shutdown hooks are only run when the
+     * JVM exits normally, e.g., by pressing CTRL+C, calls to System.exit()
+     * or uncaught exceptions. If the JVM is killed however, (e.g., using
+     * SIGTERM), shutdown hooks are not run.
+     */
+    
+    private static class ShutdownRunnable implements Runnable {
+        /** The player. */
+        private Player player;
+        
+        public ShutdownRunnable(Player player) {
+            this.player = player;
+        }
+        
+        public void run() {
+            try {
+                // FIXME: this is a quick and dirty solution
+                
+                // the preferred solution would be to call
+                // player.close(). However, calling close()
+                // can cause the player to throw exceptions because
+                // the player thread doesn't seem to be already
+                // terminated when the shutdown hook is called, and
+                // so the player may be using already closed resources.
+                
+                if (player instanceof MidiPlayer) {
+                    ((MidiPlayer) player).muteAllChannels();
+                }
+            } catch (Exception e) {
+            }
+        }
+    }
 }

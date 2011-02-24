@@ -27,7 +27,6 @@ import com.soundhelix.misc.Sequence.SequenceEntry;
 import com.soundhelix.misc.Structure;
 import com.soundhelix.misc.Track;
 import com.soundhelix.misc.Track.TrackType;
-import com.soundhelix.util.ClassUtils;
 import com.soundhelix.util.StringUtils;
 import com.soundhelix.util.XMLUtils;
 
@@ -1074,7 +1073,7 @@ public class MidiPlayer extends AbstractPlayer {
 	
 		setChannelMap(channelMap);
 		
-		nodeList = (NodeList) xpath.evaluate("lfo", node, XPathConstants.NODESET);
+		nodeList = (NodeList) xpath.evaluate("controllerLFO", node, XPathConstants.NODESET);
 		entries = nodeList.getLength();
 		ControllerLFO[] controllerLFOs = new ControllerLFO[entries];
 		
@@ -1089,7 +1088,7 @@ public class MidiPlayer extends AbstractPlayer {
 			String device = XMLUtils.parseString(random,
 					(Node) xpath.evaluate("device", nodeList.item(i), XPathConstants.NODE), xpath);
 			int channel = XMLUtils.parseInteger(random,
-					(Node) xpath.evaluate("channel", nodeList.item(i), XPathConstants.NODE), xpath);
+					(Node) xpath.evaluate("channel", nodeList.item(i), XPathConstants.NODE), xpath) - 1;
 			String controller = XMLUtils.parseString(random,
                     (Node) xpath.evaluate("controller", nodeList.item(i), XPathConstants.NODE), xpath);
 			String rotationUnit = XMLUtils.parseString(random,
@@ -1109,25 +1108,22 @@ public class MidiPlayer extends AbstractPlayer {
                         (Node) xpath.evaluate("instrument", nodeList.item(i), XPathConstants.NODE), xpath);
 			} catch (Exception e) {
 			}
-			
-            String className = (String) xpath.evaluate("attribute::class", nodeList.item(i), XPathConstants.STRING);
 
-			if (className.indexOf('.') < 0) {
-				// prefix the class name with the package name of the superclass
-                className = LFO.class.getName().substring(0, LFO.class.getName().lastIndexOf('.') + 1) + className;
-			}
-			
-			try {
-				LFO lfo = ClassUtils.newInstance(className, LFO.class);
-			
-				lfo.setAmplitudeMinimum(minimum);
-				lfo.setAmplitudeMaximum(maximum);
+	        Node lfoNode = (Node) xpath.evaluate("lfo",  nodeList.item(i), XPathConstants.NODE);
+	        
+	        LFO lfo;
+	        
+	        try {
+	            lfo = XMLUtils.getInstance(LFO.class, lfoNode, xpath, randomSeed ^ 8642387488L);
+	        } catch (Exception e) {
+	            throw new RuntimeException("Could not instantiate LFO", e);
+	        }
 
-				controllerLFOs[i] = new ControllerLFO(lfo, device, channel, controller, instrument,
+	        lfo.setAmplitudeMinimum(minimum);
+            lfo.setAmplitudeMaximum(maximum);
+
+            controllerLFOs[i] = new ControllerLFO(lfo, device, channel, controller, instrument,
 				                                      speed, rotationUnit, phase);
-			} catch (Exception e) {
-				throw new RuntimeException("Could not instantiate LFO", e);
-			}
 		}
 		
 		setControllerLFOs(controllerLFOs);

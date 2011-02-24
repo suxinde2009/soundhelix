@@ -17,6 +17,8 @@ public abstract class AbstractLFO implements LFO {
     /** Two times Pi. */
     private static final double TWO_PI = 2.0d * Math.PI;
 
+    protected long randomSeed;
+
 	/** The minimum amplitude value. */
 	private int returnMinimum = Integer.MIN_VALUE;
 	
@@ -138,4 +140,12 @@ public abstract class AbstractLFO implements LFO {
 	public void setAmplitudeMaximum(int maximum) {
 		this.amplitudeMaximum = maximum;
 	}
+	
+    public void setRandomSeed(long randomSeed) {
+        this.randomSeed = randomSeed;
+    }
+
+    public long getRandomSeed() {
+        return randomSeed;
+    }
 }

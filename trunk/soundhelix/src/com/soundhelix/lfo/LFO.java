@@ -1,5 +1,8 @@
 package com.soundhelix.lfo;
 
+import com.soundhelix.misc.RandomSeedable;
+import com.soundhelix.misc.XMLConfigurable;
+
 /**
  * Represents a low frequency oscillator (LFO). The oscillator can run in one of four
  * modes: synchronized to time (e.g, a full rotation every 5 seconds), synchronized to beat
@@ -15,9 +18,7 @@ package com.soundhelix.lfo;
  * @author Thomas Schürger
  */
 
-// TODO: make this interface and implementations XML-configurable
-
-public interface LFO {
+public interface LFO extends XMLConfigurable, RandomSeedable {
 	/**
 	 * Returns the LFO's value of the given tick.
 	 * 

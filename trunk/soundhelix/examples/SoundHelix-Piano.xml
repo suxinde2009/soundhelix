@@ -291,5 +291,15 @@
     <!-- <map instrument="plonk" device="device1" channel="7" program="1"/> -->
 	<map instrument="percussion" device="device1" channel="10"/>
 <!--	<map instrument="chord" device="device2" channel="1" program="1"/> -->
+<!--    <controllerLFO>
+      <lfo class="TriangleLFO"/>
+      <rotationUnit>beat</rotationUnit>
+      <speed>0.1</speed>
+      <minimum>0</minimum>
+      <maximum>16383</maximum>
+      <controller>pitchBend</controller>
+      <channel>1</channel>
+      <device>device1</device>
+    </controllerLFO> -->
   </player>
 </SoundHelix>

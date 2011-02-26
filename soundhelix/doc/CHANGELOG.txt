@@ -7,17 +7,46 @@ Author: Thomas Schürger (thomas@schuerger.com)
 Change log
 ----------
 
-0.0.5:
-    - Set base URL (xml:base) is now set correctly when XML documents are parsed. This means that
-      XInclude can now be used properly. All relative URLs referenced in the XML documents are now
-      relative to the document URL. The example has been changed accordingly.
- 
+0.0.5: 2011-02-27
+
     - The command-line version of SoundHelix now accepts document URLs as well instead of only files, so XML files
-      can be referenced by using HTTP URLs directly
+      can be referenced by using HTTP/HTTPS/FTP URLs directly. Note that HTTPS requires special JVM configuration.
 
-    - The RandomPatternEngine now also supports wildcards as offsets.
+    - The base URL (xml:base) is now set correctly when XML documents are parsed. This means that
+      XInclude can now be used properly. All relative URLs referenced in the XML documents are now
+      relative to the including document URLs. The example has been changed to source out the SongNameEngine and
+      the HarmonyEngine configuration as separate documents.
+ 
+    - The RandomPatternEngine now also supports wildcards as offsets. Useful for all SequenceEngines which allow wildcards
+      (e.g., the MelodySequenceEngine).
 
-    - Added song name text field to the applet. A new song with a given name can be created by entering it into the field.
+    - Introduced "version" attribute for the XML root tag. If present, the application version will be checked against the
+      specified version of the tag. If the version attribute ends with a "+" (e.g., "0.0.5+"), the application version must
+      be at least the given version, otherwise the versions must match exactly.
+
+    - Added escaping support for splitting strings. For example, now commas in MIDI device names can be escaped by preceding
+      them with a backslash.
+
+    - Fixed inconsistent XML structure of the "lfo" tag of the MidiPlayer. The tag is now called "controllerLFO" without
+      a "class" attribute, and it has (among others) a subtag called "lfo" with a "class" attribute. Fix your XML files accordingly.
+
+    - Fixed inconsistency in the controllerLFO/channel tag of the MidiPlayer (channels were numbered from 0-15 instead of
+      1-16 like in the "map" tag). Fix your XML files accordingly by increasing the LFO channels by 1.
+
+    - Added random seedability and XML configurability to the LFO interface.
+
+    - Added song name text field to the applet. A new song with a given name can be created by entering it into the field,
+      with the song name being used as the random seed.
+
+    - Added buttons for Facebook and Twitter to applet, which lets you share the current song easily on Facebook/Twitter.
+
+    - Added buttons for YouTube and SoundHelix to applet, which lets you visit the SoundHelix YouTube channel and the SoundHelix website
+
+    - Added tooltips to all text fields and buttons in the applet.
+
+    - Updated included log4j version from 1.2.8 to 1.2.16.
+
+    - Improved example.
 
 
 0.0.4: 2011-01-15

@@ -126,6 +126,8 @@
     </target>
 
     <target name="createsvntag" description="create SVN tag for current trunk">
-        <echo message="Not implemented yet."/>
+        <exec executable="svn">
+            <arg line="copy https://soundhelix.svn.sourceforge.net/svnroot/soundhelix/trunk/soundhelix https://soundhelix.svn.sourceforge.net/svnroot/soundhelix/tags/soundhelix-${version}"/>
+        </exec>
     </target>
 </project>

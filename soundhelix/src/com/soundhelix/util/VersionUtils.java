@@ -22,8 +22,7 @@ public final class VersionUtils {
     
     public static void logVersion() {
         logger.info("SoundHelix " + BuildConstants.VERSION + " (r" + BuildConstants.REVISION + "), built on "
-                + BuildConstants.BUILD_DATE);
-        logger.info("Visit http://www.soundhelix.com, http://www.twitter.com/SoundHelix");
+                + BuildConstants.BUILD_DATE + " *** http://www.soundhelix.com");
     }
   
     /**

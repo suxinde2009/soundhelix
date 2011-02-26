@@ -30,13 +30,6 @@ import com.soundhelix.util.XMLUtils;
  * from a list of possible offsets with a given rhythmic pattern. For each
  * distinct chord section, a set of random notes is generated and used for
  * each occurrence of the chord section.
- * <br><br>
- * <b>XML-Configuration</b>
- * <table border=1>
- * <tr><th>Tag</th> <th>#</th> <th>Example</th> <th>Description</th> <th>Required</th>
- * <tr><td><code>pattern</code></td> <td>+</td> <td><code>0,-,-,-,0,-,0,-</code></td> <td>Sets the patterns to use. One of the patterns is selected at random.</td> <td>no</td>
- * <tr><td><code>offsets</code></td> <td>+</td> <td><code>0,1,2,3,4,5</code></td> <td>The list of chord offsets to choose from.</td> <td>no</td>
- * </table>
  * 
  * @author Thomas Schürger (thomas@schuerger.com)
  */

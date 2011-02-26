@@ -32,14 +32,6 @@ import com.soundhelix.util.XMLUtils;
  * each chord pattern is an individual chord section. A pattern can be split into two or more chord sections by using
  * "+" signs directly before a chord/length combination (e.g., "Am/4,F/4,G/4,C/4,+Am/4,F/4,G/4,Em/4").
  *
- * <br><br>
- * <b>XML-Configuration</b>
- * <table border=1>
- * <tr><th>Tag</th> <th>#</th> <th>Example</th> <th>Description</th> <th>Required</th>
- * <tr><td><code>chordPattern</code></td> <td>+</td> <td><code>Am/4,1/4,1/4,2/4</code></td> <td>Sets the chord patterns to use. One of the patterns is chosen at random.</td> <td>yes</td>
- * <tr><td><code>chordRandomTable</code></td> <td>*</td> <td><code>C,Am,G,F,Em,Dm</code></td> <td>Adds a random table. Random tables can be accessed from patterns. The tables are numbered from 0 in the order of appearance.</td> <td>no</td>
- * </table>
- *
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 

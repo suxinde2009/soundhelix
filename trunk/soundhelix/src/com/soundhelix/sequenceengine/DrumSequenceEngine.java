@@ -31,35 +31,6 @@ import com.soundhelix.util.XMLUtils;
  * or silent. The activity groups must be numbered starting from 0, and the used groups must be
  * "dense" (i.e., without gaps).
  *
- * <h3>XML configuration</h3>
- * <table border=1>
- * <tr><th>Tag</th> <th>#</th> <th>Attributes</th> <th>Description</th> <th>Required</th>
- * <tr><td><code>pattern</code></td> <td>+</td> <td><code>pitch</code>, <code>activityGroup</code></td> <td>Defines the pattern to use with the given pitch. The pattern is put into the given activity group.</td> <td>yes</td>
- * </table>
- *
- * <h3>Configuration example</h3>
- * 
- * The following example uses 6 patterns with 4 activity groups:
- * <br>
- * <pre>
- * {@literal
- * <sequenceEngine class="DrumSequenceEngine">
- *   <!-- base drum -->
- *   <pattern pitch="36" activityGroup="0">10001000100010001000100010001001100010001000100010001000100010101000100010001000100010001000100110001000100010001000100011101011</pattern>
- *   <!-- clap -->
- *   <pattern pitch="37" activityGroup="1">00001000000010000000100000001000000010000000100000001000000110100000100000001000000010000000100000001000000010000000100001001000</pattern>
- *   <!-- closed hi-hat -->
- *   <pattern pitch="40" activityGroup="2">10001000100010001100100010001000</pattern>
- *   <!-- open hi-hat -->
- *   <pattern pitch="44" activityGroup="2">0010001000100010001000100010001000100010001000100010001000100101</pattern>
- *   <!-- other hi-hat -->
- *   <pattern pitch="39" activityGroup="2">001</pattern>
- *   <!-- snare -->
- *   <pattern pitch="42" activityGroup="3">00001000010010000000100001001010000010000100100000001000010010110000100001001000000010010100101000001000010010000000100101001011</pattern>
- * </sequenceEngine>
- * }
- * </pre>
- * 
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 

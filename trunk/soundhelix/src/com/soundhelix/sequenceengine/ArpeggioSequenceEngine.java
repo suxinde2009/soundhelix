@@ -25,24 +25,6 @@ import com.soundhelix.util.XMLUtils;
  * the pattern with the largest length if the former doesn't exist. At least some patterns with lengths of powers
  * of two should be provided.
  *
- * <h3>XML configuration</h3>
- * <table border=1>
- * <tr><th>Tag</th> <th>#</th> <th>Attributes</th> <th>Description</th> <th>Required</th>
- * <tr><td><code>pattern</code></td> <td>+</td> <td></td> <td>Defines the pattern to use.</td> <td>yes</td>
- * </table>
- *
- * <h3>Configuration example</h3>
- * <pre>
- * &lt;sequenceEngine class="ArpeggioSequenceEngine"&gt;
- *   &lt;pattern&gt;0&lt;/pattern&gt;
- *   &lt;pattern&gt;0,1&lt;/pattern&gt;
- *   &lt;pattern&gt;0,1,2,1&lt;/pattern&gt;
- *   &lt;pattern&gt;0,1,2,1,2,3,2,1&lt;/pattern&gt;
- *   &lt;pattern&gt;0,1,2,1,2,3,2,3,4,3,4,5,4,3,2,1&lt;/pattern&gt;
- *   &lt;pattern&gt;0,1,2,1,2,3,2,3,4,3,4,5,4,5,6,5,6,7,6,7,8,7,8,9,8,7,6,5,4,3,2,1&lt;/pattern&gt;
- * &lt;/sequenceEngine&gt;
- * </pre>
- * 
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 

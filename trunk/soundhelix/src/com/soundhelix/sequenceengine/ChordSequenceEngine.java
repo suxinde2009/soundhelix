@@ -16,23 +16,6 @@ import com.soundhelix.util.XMLUtils;
 /**
  * Implements a sequence engine that plays chords using user-specified patterns.
  *
- * <h3>XML configuration</h3>
- * <table border=1>
- * <tr><th>Tag</th> <th>#</th> <th>Attributes</th> <th>Description</th> <th>Required</th>
- * <tr><td><code>pattern</code></td> <td>+</td> <td></td> <td>Defines the pattern to use.</td> <td>yes</td>
- * <tr><td><code>offsets</code></td> <td>1</td> <td></td> <td>Defines the chord offsets to use (defaults to "0,1,2").</td> <td>no</td>
- * </table>
- *
- * <h3>Configuration example</h3>
- * 
- * <pre>
- * &lt;sequenceEngine class="ChordSequenceEngine"&gt;
- *   &lt;offsets&gt;-1,0,1,2&lt;/offsets&gt;
- *   &lt;pattern&gt;0,-,-,-,0,-,-,0,-,-,0,-,-,0,-,-,0,-,-,-,0,-,-,0,-,-,0,-,3,-,1,-,0,-,-,-,0,-,-,0,-,-,0,-,-,0,-,-,0,-,-,-,0,-,-,0,-,-,0,-,3,1,4,2&lt;/pattern&gt;
- *   &lt;pattern&gt;-,-,0,-&lt;/pattern&gt;
- * &lt;/sequenceEngine&gt;
- * </pre>
-
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 

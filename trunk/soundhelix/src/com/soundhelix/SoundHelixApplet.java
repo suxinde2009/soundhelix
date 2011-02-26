@@ -5,6 +5,8 @@ import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Font;
 import java.awt.Frame;
+import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.UnsupportedEncodingException;
@@ -66,6 +68,12 @@ public class SoundHelixApplet extends JApplet implements Runnable {
     /** The Twitter share button. */
     private JButton twitterShareButton;
 
+    /** The YouTube share button. */
+    private JButton youTubeShareButton;
+
+    /** The SoundHelix share button. */
+    private JButton soundHelixShareButton;
+
     /** The current song name. */
     private String currentSongName;
     
@@ -109,20 +117,29 @@ public class SoundHelixApplet extends JApplet implements Runnable {
 
         if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
             try {
-                JPanel panel = new JPanel(new BorderLayout());
+                JPanel panel = new JPanel(new GridLayout(0, 4));
+                JButton shareButton;
                 
-                JButton shareButton = new JButton(null, new ImageIcon(
-                                            new URL("http://www.soundhelix.com/applet/images/facebook-share.png")));
-                shareButton.setToolTipText("Share the current song on Facebook (shows preview)");
-                panel.add(shareButton, BorderLayout.WEST);
+                shareButton = getIconButton("http://www.soundhelix.com/applet/images/facebook-share.png",
+                        "Share the current song on Facebook (shows preview)");
+                panel.add(shareButton);
                 this.facebookShareButton = shareButton;
 
-                shareButton = new JButton(null, new ImageIcon(
-                        new URL("http://www.soundhelix.com/applet/images/twitter-share.png")));
-                shareButton.setToolTipText("Share the current song on Twitter (shows preview)");
-                panel.add(shareButton, BorderLayout.EAST);
+                shareButton = getIconButton("http://www.soundhelix.com/applet/images/twitter-share.png",
+                        "Share the current song on Twitter (shows preview)");
+                panel.add(shareButton);
                 this.twitterShareButton = shareButton;
-                
+
+                shareButton = getIconButton("http://www.soundhelix.com/applet/images/youtube-share.png",
+                        "Visit the SoundHelix channel on YouTube");
+                panel.add(shareButton);
+                this.youTubeShareButton = shareButton;
+
+                shareButton = getIconButton("http://www.soundhelix.com/applet/images/soundhelix-share.png",
+                        "Visit the SoundHelix website");
+                panel.add(shareButton);
+                this.soundHelixShareButton = shareButton;
+
                 songNamePanel.add(panel, BorderLayout.EAST);
             } catch (MalformedURLException e) {}
         }
@@ -160,33 +177,10 @@ public class SoundHelixApplet extends JApplet implements Runnable {
             }
         });
  
-        if (facebookShareButton != null) {
-            facebookShareButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    if (desktop != null && currentSongName != null) {
-                        try {
-                            desktop.browse(new URI(getFacebookUrl(currentSongName)));
-                        } catch (Exception e2) {
-                            logger.error("Exception", e2);
-                        }
-                    }
-                }
-            });
-        }
-
-        if (twitterShareButton != null) {
-            twitterShareButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    if (desktop != null && currentSongName != null) {
-                        try {
-                            desktop.browse(new URI(getTwitterUrl(currentSongName)));
-                        } catch (Exception e2) {
-                            logger.error("Exception", e2);
-                        }
-                    }
-                }
-            });
-        }
+        addUrlActionListener(facebookShareButton, true);
+        addUrlActionListener(twitterShareButton, true);
+        addUrlActionListener(youTubeShareButton, false);
+        addUrlActionListener(soundHelixShareButton, false);
 
         super.start();
 
@@ -208,6 +202,59 @@ public class SoundHelixApplet extends JApplet implements Runnable {
         Thread playerThread = new Thread(this, "Player");
         playerThread.setPriority(Thread.MAX_PRIORITY);
         playerThread.start();
+    }
+
+    /**
+     * Adds an action listener for the given button that opens an external website.
+     * 
+     * @param button the button
+     */
+    
+    private void addUrlActionListener(final JButton button, final boolean needsCurrentSongName) {
+        if (button != null) {
+            button.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    if (desktop != null && (!needsCurrentSongName || currentSongName != null)) {
+                        try {
+                            String url;
+                            
+                            if (button == facebookShareButton) {
+                                url = getFacebookUrl(currentSongName);
+                            } else if (button == twitterShareButton) {
+                                url = getTwitterUrl(currentSongName);
+                            } else if (button == youTubeShareButton) {
+                                url = "http://www.youtube.com/SoundHelix/";                                
+                            } else {
+                                url = "http://www.soundhelix.com";
+                            }
+                            
+                            desktop.browse(new URI(url));
+                        } catch (Exception e2) {
+                            logger.error("Exception", e2);
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    /**
+     * Creates a JButton with the given icon and the given tool tip.
+     * 
+     * @param iconUrl the icon URL
+     * @param toolTip the tool tip
+     * 
+     * @return the JButton
+     * 
+     * @throws MalformedURLException if the URL is malformed
+     */
+    
+    private JButton getIconButton(String iconUrl, String toolTip) throws MalformedURLException {
+        JButton shareButton;
+        shareButton = new JButton(null, new ImageIcon(new URL(iconUrl)));
+        shareButton.setToolTipText(toolTip);
+        shareButton.setMargin(new Insets(0, 0, 0, 0));
+        return shareButton;
     }
 
     /**

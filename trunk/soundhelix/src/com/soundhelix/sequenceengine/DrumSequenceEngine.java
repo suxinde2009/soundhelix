@@ -75,7 +75,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
             Pattern pattern = drumEntries[i].pattern;
 
             // the pitch is constant
-            int pitch = drumEntries[i].pitch;
+            int basePitch = drumEntries[i].pitch;
 
             int patternLength = pattern.size();
             int pos = 0;
@@ -83,6 +83,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
 
             while (tick < ticks) {
                 Pattern.PatternEntry entry = pattern.get(pos % patternLength);
+                int pitch = entry.getPitch();
                 int len = entry.getTicks();
 
                 if (activityVector.isActive(tick)) {
@@ -94,7 +95,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
                     } else {
                         boolean useLegato = entry.isLegato() ? pattern.isLegatoLegal(activityVector, tick + len,
                                 pos + 1) : false;
-                        seq.addNote(pitch, len, vel, useLegato);
+                        seq.addNote(basePitch + pitch, len, vel, useLegato);
                     }
                 } else {
                     // add pause
@@ -163,14 +164,14 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
 
                         for (int k = 0; k < len; k++) {
                             PatternEntry entry = pattern.get(k);
-
+                            
                             for (int j = 0; j < targets.length; j++) {
                                 Sequence seq = seqs[targets[j]];
-                                int pitch = drumEntries[targets[j]].pitch;
+                                int basePitch = drumEntries[targets[j]].pitch;
 
                                 if (entry.isNote()) {
-                                    seq.replaceEntry(tick, new Sequence.SequenceEntry(pitch, entry.getVelocity(),
-                                            entry.getTicks(), entry.isLegato()));
+                                    seq.replaceEntry(tick, new Sequence.SequenceEntry(basePitch + entry.getPitch(),
+                                            entry.getVelocity(), entry.getTicks(), entry.isLegato()));
                                 } else if (mode == MODE_REPLACE) {
                                     seq.replaceEntry(tick, new Sequence.SequenceEntry(Integer.MIN_VALUE, (short) -1,
                                             entry.getTicks(), entry.isLegato()));

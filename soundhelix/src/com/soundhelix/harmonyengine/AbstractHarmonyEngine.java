@@ -121,20 +121,22 @@ public abstract class AbstractHarmonyEngine implements HarmonyEngine {
 	public void dumpChords() {
 		int tick = 0;
          
-        while (tick < structure.getTicks()) {
-        	Chord chord = getChord(tick);
-        	int len = getChordTicks(tick);
+		StringBuilder sb = new StringBuilder();
 
-        	if (tick > 0) {
-        		System.out.print("," + chord + "/" + len);
-        	} else {
-                System.out.print(chord + "/" + len);
-        	}
-        	
-         	tick += len;
+        while (tick < structure.getTicks()) {
+            Chord chord = getChord(tick);
+            int len = getChordTicks(tick);
+
+            if (tick > 0) {
+                sb.append(',').append(chord).append('/').append(len);
+            } else {
+                sb.append(chord).append('/').append(len);
+            }
+
+            tick += len;
         }
-        
-        System.out.println();
+
+        logger.debug(sb.toString());
 	}
 	
 	/**

@@ -17,6 +17,7 @@ public abstract class AbstractLFO implements LFO {
     /** Two times Pi. */
     private static final double TWO_PI = 2.0d * Math.PI;
 
+    /** The random seed. */
     protected long randomSeed;
 
 	/** The minimum amplitude value. */

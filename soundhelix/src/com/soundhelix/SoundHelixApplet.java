@@ -208,6 +208,7 @@ public class SoundHelixApplet extends JApplet implements Runnable {
      * Adds an action listener for the given button that opens an external website.
      * 
      * @param button the button
+     * @param needsCurrentSongName flag indicating whether the current song name is needed
      */
     
     private void addUrlActionListener(final JButton button, final boolean needsCurrentSongName) {

@@ -870,6 +870,22 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 		return activityCounts;
 	}
 	
+	public void setMinActivityCount(int minActiveCount) {
+		this.minActivityCount = minActiveCount;
+	}
+
+	public void setMaxActivityCount(int maxActiveCount) {
+		this.maxActivityCount = maxActiveCount;
+	}
+
+	public void setMaxActivityChangeCount(int maxActivityChangeCount) {
+		this.maxActivityChangeCount = maxActivityChangeCount;
+	}
+
+	public void setMaxIterations(int maxIterations) {
+		this.maxIterations = maxIterations;
+	}
+	
 	private static final class ArrangementEntry {
 		private String instrument;
 		private SequenceEngine sequenceEngine;
@@ -883,7 +899,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 			this.activityVectorNames = activityVectorNames;
 		}
 	}
-	
+
 	private static final class ActivityVectorConfiguration {
 		private String name;
 		private double minActive;
@@ -909,22 +925,6 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 			this.minSegmentCount = minSegmentCount;
 			this.maxSegmentCount = maxSegmentCount;
 		}	
-	}
-
-	public void setMinActivityCount(int minActiveCount) {
-		this.minActivityCount = minActiveCount;
-	}
-
-	public void setMaxActivityCount(int maxActiveCount) {
-		this.maxActivityCount = maxActiveCount;
-	}
-
-	public void setMaxActivityChangeCount(int maxActivityChangeCount) {
-		this.maxActivityChangeCount = maxActivityChangeCount;
-	}
-
-	public void setMaxIterations(int maxIterations) {
-		this.maxIterations = maxIterations;
 	}
 	
 	private static class ConstraintException extends RuntimeException {

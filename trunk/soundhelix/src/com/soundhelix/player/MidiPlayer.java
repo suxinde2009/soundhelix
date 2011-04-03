@@ -1105,6 +1105,18 @@ public class MidiPlayer extends AbstractPlayer {
 		setControllerLFOs(controllerLFOs);
     }
     
+	public void abortPlay() {
+		this.isAborted = true;
+	}
+
+	public void setBeforePlayWaitTicks(int preWaitTicks) {
+		this.beforePlayWaitTicks = preWaitTicks;
+	}
+
+	public void setAfterPlayWaitTicks(int postWaitTicks) {
+		this.afterPlayWaitTicks = postWaitTicks;
+	}
+	
     private final class Device {
     	private final String name;
     	private final String midiName;
@@ -1207,16 +1219,4 @@ public class MidiPlayer extends AbstractPlayer {
     		this.phase = phase;
     	}
     }
-	
-	public void abortPlay() {
-		this.isAborted = true;
-	}
-
-	public void setBeforePlayWaitTicks(int preWaitTicks) {
-		this.beforePlayWaitTicks = preWaitTicks;
-	}
-
-	public void setAfterPlayWaitTicks(int postWaitTicks) {
-		this.afterPlayWaitTicks = postWaitTicks;
-	}
 }

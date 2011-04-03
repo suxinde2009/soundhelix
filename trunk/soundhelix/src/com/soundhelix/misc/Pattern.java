@@ -157,6 +157,45 @@ public class Pattern {
 	}
 	
 	/**
+	 * Checks whether it is legal to use legato at the note that ends on the given tick. The tick must
+	 * be the tick on which the note would be switched off if no legato was used; the same applies to
+	 * the pattern offset. Legato is legal for the tick if there is a subsequent note on the pattern
+	 * that lies in the activity range of the activity vector. I.e., it is illegal to use legato on a
+	 * note which ends outside of an activity interval.
+	 * 
+	 * @param activityVector the activity vector
+	 * @param tick the tick
+	 * @param patternOffset the pattern offset
+	 * 
+	 * @return true if legato is legal, false otherwise
+	 */
+	
+	public boolean isLegatoLegal(ActivityVector activityVector, int tick, int patternOffset) {	
+		if (!activityVector.isActive(tick)) {
+			return false;
+		}
+		
+		// get the remaining length of the activity interval
+		int activityLength = activityVector.getIntervalLength(tick);
+
+		int patternLength = size();
+		
+		int i = 0;
+		while (i < activityLength) {
+			PatternEntry entry = get(patternOffset % patternLength);
+		
+			if (entry.isNote() || entry.isWildcard() && entry.getVelocity() > 0) {
+				return true;
+			}
+			
+			patternOffset++;
+			i += entry.getTicks();
+		}
+		
+		return false;
+	}
+	
+	/**
 	 * Represents a pattern entry.
 	 */
 	
@@ -228,44 +267,5 @@ public class Pattern {
 					   + (velocity == Short.MAX_VALUE ? "" : ":" + velocity);
 			}
 		}
-	}
-	
-	/**
-	 * Checks whether it is legal to use legato at the note that ends on the given tick. The tick must
-	 * be the tick on which the note would be switched off if no legato was used; the same applies to
-	 * the pattern offset. Legato is legal for the tick if there is a subsequent note on the pattern
-	 * that lies in the activity range of the activity vector. I.e., it is illegal to use legato on a
-	 * note which ends outside of an activity interval.
-	 * 
-	 * @param activityVector the activity vector
-	 * @param tick the tick
-	 * @param patternOffset the pattern offset
-	 * 
-	 * @return true if legato is legal, false otherwise
-	 */
-	
-	public boolean isLegatoLegal(ActivityVector activityVector, int tick, int patternOffset) {	
-		if (!activityVector.isActive(tick)) {
-			return false;
-		}
-		
-		// get the remaining length of the activity interval
-		int activityLength = activityVector.getIntervalLength(tick);
-
-		int patternLength = size();
-		
-		int i = 0;
-		while (i < activityLength) {
-			PatternEntry entry = get(patternOffset % patternLength);
-		
-			if (entry.isNote() || entry.isWildcard() && entry.getVelocity() > 0) {
-				return true;
-			}
-			
-			patternOffset++;
-			i += entry.getTicks();
-		}
-		
-		return false;
 	}
 }

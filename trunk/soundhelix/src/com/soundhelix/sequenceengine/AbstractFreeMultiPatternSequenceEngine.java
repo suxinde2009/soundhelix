@@ -19,8 +19,10 @@ import com.soundhelix.misc.Track.TrackType;
 
 public abstract class AbstractFreeMultiPatternSequenceEngine extends AbstractSequenceEngine {
 	
+	/** The random generator. */
 	protected Random random;
 	
+	/** The Pattern array. */
 	private Pattern[] patterns;
 	
 	public AbstractFreeMultiPatternSequenceEngine() {

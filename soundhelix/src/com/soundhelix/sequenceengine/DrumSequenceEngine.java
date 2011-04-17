@@ -241,7 +241,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
             
             try {
                 patternEngine = XMLUtils.getInstance(PatternEngine.class, patternEngineNode,
-                        xpath, randomSeed ^ 47351842858L);
+                        xpath, randomSeed, i);
             } catch (Exception e) {
                 throw new RuntimeException("Error instantiating PatternEngine", e);
             }
@@ -289,7 +289,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
             
             try {
                 patternEngine = XMLUtils.getInstance(PatternEngine.class, patternEngineNode,
-                        xpath, randomSeed ^ 47351842858L);
+                        xpath, randomSeed ^ 47351842858L, i);
             } catch (Exception e) {
                 throw new RuntimeException("Error instantiating PatternEngine", e);
             }

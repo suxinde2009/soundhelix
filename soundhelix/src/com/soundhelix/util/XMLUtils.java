@@ -19,10 +19,14 @@ import com.soundhelix.misc.XMLConfigurable;
  */
 
 public final class XMLUtils {
+	/** The factor used for augmenting the random seed (56-bit prime). */
+	private static final long RANDOM_SEED_PRIME = 0xFFFFFFFFFFFFC7L;
+
 	/** The logger. */
 	private static Logger logger = Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
 	
-	private XMLUtils() {}
+	private XMLUtils() {
+	}
 	
 	/**
 	 * Returns the first child of the given node that is an element node. If
@@ -344,20 +348,18 @@ public final class XMLUtils {
 	}
 	
 	/**
-	 * Tries to instantiate an object from the class defined by the
-	 * node's attribute "class". If the given class name is not
-	 * fully qualified (i.e., contains no dot), the package of the
-	 * given superclass is prefixed to the class name. The class must
-	 * be a subclass of the given class to succeed. If the class
-	 * defines the interface XMLConfigurable, it is configured by calling
-	 * configure() with the node as the configuration root. If the class
-	 * defines the interface RandomSeedable, it is random-seeded by using
-	 * the specified random seed and the class name.
+	 * Tries to instantiate an object from the class defined by the node's attribute "class" by calling its nullary
+	 * constructor. If the given class name is not fully qualified (i.e., contains no dot), the package of the given
+	 * superclass is prefixed to the class name. The class must be a subclass of the given class to succeed. If the
+	 * class defines the interface RandomSeedable, it is random-seeded by creating a random seed based on the
+	 * specified random seed, the class name and the specified modifier. If the class defines the interface
+	 * XMLConfigurable, it is configured by calling configure() with the node as the configuration root. 
 	 * 
 	 * @param clazz the class
 	 * @param node the node to use for configuration
 	 * @param xpath an XPath instance
-	 * @param randomSeed the random seed to use
+	 * @param randomSeed the random seed origin to use
+	 * @param modifier the random modifier
 	 * @param <T> the type
 	 * 
 	 * @return the instance
@@ -368,7 +370,7 @@ public final class XMLUtils {
 	 * @throws IllegalAccessException if the class cannot be instantiated
 	 */
 	
-	public static <T> T getInstance(Class<T> clazz, Node node, XPath xpath, long randomSeed)
+	public static <T> T getInstance(Class<T> clazz, Node node, XPath xpath, long randomSeed, int modifier)
         throws InstantiationException, XPathException,
 				   IllegalAccessException, ClassNotFoundException {
 		if (node == null) {
@@ -398,20 +400,46 @@ public final class XMLUtils {
 		// (it's important to seed before configuring)
 
 		if (instance instanceof RandomSeedable) {
+			long derivedSeed = randomSeed + getLongHashCode(className)
+			                              - RANDOM_SEED_PRIME * modifier * Math.abs(modifier);
+			
 			if (logger.isTraceEnabled()) {
-				logger.trace("Base random seed: " + randomSeed + ", using "
-                        + (randomSeed ^ className.hashCode() - 1478923845823984391L * randomSeed));
+				logger.trace("Base random seed: " + randomSeed + ", using " + derivedSeed);
 			}
 			
-			((RandomSeedable) instance).setRandomSeed(randomSeed ^ className.hashCode());
+			((RandomSeedable) instance).setRandomSeed(derivedSeed);
 		}
-
+		
 		// configure instance if it is XML-configurable
 
 		if (instance instanceof XMLConfigurable) {
 			((XMLConfigurable) instance).configure(node, xpath);
 		}
-
+		
 		return instance;
+	}
+	
+	/**
+	 * Returns the hash code the given string as a long. This method works like String.hashCode(), but uses a long
+	 * internally and returns a long as the result.
+	 * 
+	 * @param str the string
+	 * 
+	 * @return the hash code as a long
+	 */
+	
+	private static long getLongHashCode(String str) {
+		if (str == null) {
+			return 0;
+		}
+		
+		long hash = 0;
+		int len = str.length();
+
+		for (int i = 0; i < len; i++) {
+			hash = 31 * hash + str.charAt(i);
+		}
+		
+		return hash;
 	}
 }

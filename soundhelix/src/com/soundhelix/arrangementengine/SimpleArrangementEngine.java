@@ -811,7 +811,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 			
 			try {
 			    SequenceEngine sequenceEngine = XMLUtils.getInstance(SequenceEngine.class,
-			    		sequenceEngineNode, xpath, randomSeed + 1 + i);
+			    		sequenceEngineNode, xpath, randomSeed, i);
 			    arrangementEntries[i] = new ArrangementEntry(instrument, sequenceEngine,
 			    		transposition, activityVectorNames);
 			} catch (Exception e) {

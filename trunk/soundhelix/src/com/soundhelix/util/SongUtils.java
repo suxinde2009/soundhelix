@@ -70,7 +70,7 @@ public final class SongUtils {
             
         Node songNameEngineNode = (Node) xpath.evaluate("songNameEngine", rootNode, XPathConstants.NODE);
         SongNameEngine songNameEngine = XMLUtils.getInstance(SongNameEngine.class,
-                songNameEngineNode, xpath, randomSeed ^ 12345);
+                songNameEngineNode, xpath, randomSeed ^ 12345, -1);
         
         String songName = songNameEngine.createSongName();
         logger.info("Song name: \"" + songName + "\"");        
@@ -145,11 +145,11 @@ public final class SongUtils {
         Structure structure = parseStructure(random.nextLong(), structureNode, xpath, null);
     
         HarmonyEngine harmonyEngine = XMLUtils.getInstance(HarmonyEngine.class,
-                    harmonyEngineNode, xpath, randomSeed ^ 47357892832L);
-        structure.setHarmonyEngine(harmonyEngine);    
+                    harmonyEngineNode, xpath, randomSeed, 0);
+        structure.setHarmonyEngine(harmonyEngine);
 
         ArrangementEngine arrangementEngine = XMLUtils.getInstance(ArrangementEngine.class,
-                    arrangementEngineNode, xpath, randomSeed ^ 123454893L);
+                    arrangementEngineNode, xpath, randomSeed, 1);
         arrangementEngine.setStructure(structure);
         long startTime = System.nanoTime();
         Arrangement arrangement = arrangementEngine.render();
@@ -159,7 +159,7 @@ public final class SongUtils {
             logger.debug("Rendering took " + (time / 1000000) + " ms");
         }
         
-        Player player = XMLUtils.getInstance(Player.class, playerNode, xpath, randomSeed ^ 5915925127L);
+        Player player = XMLUtils.getInstance(Player.class, playerNode, xpath, randomSeed, 2);
         player.setArrangement(arrangement);
         return player;
     }

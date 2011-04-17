@@ -1090,7 +1090,7 @@ public class MidiPlayer extends AbstractPlayer {
 	        LFO lfo;
 	        
 	        try {
-	            lfo = XMLUtils.getInstance(LFO.class, lfoNode, xpath, randomSeed ^ 8642387488L);
+	            lfo = XMLUtils.getInstance(LFO.class, lfoNode, xpath, randomSeed, i);
 	        } catch (Exception e) {
 	            throw new RuntimeException("Could not instantiate LFO", e);
 	        }

@@ -50,71 +50,113 @@
     <track>
       <instrument>arpeggio</instrument>
       <transposition>-12</transposition>
-      <sequenceEngine class="MultiPatternSequenceEngine">
-  	    <obeyChordSubtype>true</obeyChordSubtype>
-		<patternEngines>
-		  <patternEngine class="StringPatternEngine">
-		    <string>-/6,4/2</string>
-		  </patternEngine>
-		  <patternEngine class="StringPatternEngine">
-		    <string>-/4,3/4</string>
-		  </patternEngine>
-		  <patternEngine class="StringPatternEngine">
-		    <string>-/2,2/6</string>
-		  </patternEngine>
-		  <patternEngine class="StringPatternEngine">
-		    <string>0/8</string>
-		  </patternEngine>
-		</patternEngines>
-		<patternEngines>
-		  <patternEngine class="StringPatternEngine">
-		    <string>2/8</string>
-		  </patternEngine>
-		  <patternEngine class="StringPatternEngine">
-		    <string>-/2,0/6</string>
-		  </patternEngine>
-		  <patternEngine class="StringPatternEngine">
-		    <string>-/4,1/4</string>
-		  </patternEngine>
-		  <patternEngine class="StringPatternEngine">
-		    <string>-/6,0/2</string>
-		  </patternEngine>
-		</patternEngines>
-		<patternEngines>
-		  <patternEngine class="StringPatternEngine">
-		    <string>3/8</string>
-		  </patternEngine>
-		  <patternEngine class="StringPatternEngine">
-		    <string>-/2,1/6</string>
-		  </patternEngine>
-		  <patternEngine class="StringPatternEngine">
-		    <string>-/4,2/4</string>
-		  </patternEngine>
-		  <patternEngine class="StringPatternEngine">
-		    <string>-/6,0/2</string>
-		  </patternEngine>
-		</patternEngines>
+      <sequenceEngine class="ArpeggioSequenceEngine">
+        <obeyChordSubtype>true</obeyChordSubtype>
+        <patternEngines>
+          <patternEngine class="StringPatternEngine">
+            <string>0:26000,0:26000,1:26000,0:26000</string>
+          </patternEngine>
+          <patternEngine class="StringPatternEngine">
+            <string>0:26000,0:26000,1:26000,0:26000,1:26000,1:26000,2:26000,1:26000</string>
+          </patternEngine>
+          <patternEngine class="StringPatternEngine">
+            <string>0:26000,0:26000,1:26000,0:26000,1:26000,1:26000,2:26000,1:26000,2:26000,2:26000,3:26000,2:26000,3:26000,3:26000,4:26000,3:26000</string>
+          </patternEngine>
+          <patternEngine class="StringPatternEngine">
+            <string>0:26000,0:26000,1:26000,0:26000,1:26000,1:26000,2:26000,1:26000,2:26000,2:26000,3:26000,2:26000,3:26000,3:26000,4:26000,3:26000,4:26000,4:26000,5:26000,4:26000,5:26000,5:26000,6:26000,5:26000,6:26000,6:26000,7:26000,6:26000,7:26000,7:26000,8:26000,7:26000</string>
+          </patternEngine>
+        </patternEngines>
+        <patternEngines>
+          <patternEngine class="StringPatternEngine">
+            <string>0:26000,1:26000,2:26000,1:26000</string>
+          </patternEngine>
+          <patternEngine class="StringPatternEngine">
+            <string>0:26000,1:26000,2:26000,1:26000,2:26000,3:26000,2:26000,1:26000</string>
+          </patternEngine>
+          <patternEngine class="StringPatternEngine">
+            <string>0:26000,1:26000,2:26000,1:26000,2:26000,3:26000,2:26000,3:26000,4:26000,3:26000,4:26000,5:26000,4:26000,3:26000,2:26000,1:26000</string>
+          </patternEngine>
+          <patternEngine class="StringPatternEngine">
+            <string>0:26000,1:26000,2:26000,1:26000,2:26000,3:26000,2:26000,3:26000,4:26000,3:26000,4:26000,5:26000,4:26000,5:26000,6:26000,5:26000,6:26000,7:26000,6:26000,5:26000,4:26000,3:26000,2:26000,1:26000</string>
+          </patternEngine>
+          <patternEngine class="StringPatternEngine">
+            <string>0:26000,1:26000,2:26000,1:26000,2:26000,3:26000,2:26000,3:26000,4:26000,3:26000,4:26000,5:26000,4:26000,5:26000,6:26000,5:26000,6:26000,7:26000,6:26000,7:26000,8:26000,7:26000,8:26000,9:26000,8:26000,7:26000,6:26000,5:26000,4:26000,3:26000,2:26000,1:26000</string>
+          </patternEngine>
+          <patternEngine class="StringPatternEngine">
+            <string>0:26000,1:26000,2:26000,1:26000,2:26000,3:26000,2:26000,3:26000,4:26000,3:26000,4:26000,5:26000,4:26000,5:26000,6:26000,5:26000,6:26000,7:26000,6:26000,7:26000,8:26000,7:26000,8:26000,9:26000,8:26000,7:26000,6:26000,5:26000,4:26000,3:26000,2:26000,1:26000,0:26000,1:26000,2:26000,1:26000,2:26000,3:26000,2:26000,3:26000,4:26000,3:26000,4:26000,5:26000,4:26000,3:26000,2:26000,1:26000</string>
+          </patternEngine>
+        </patternEngines>
       </sequenceEngine>
       <activityVector>arpeggio</activityVector>
     </track>
+    <!-- <track>
+      <instrument>arpeggio</instrument>
+      <transposition>-12</transposition>
+      <sequenceEngine class="MultiPatternSequenceEngine">
+          <obeyChordSubtype>true</obeyChordSubtype>
+        <patternEngines>
+          <patternEngine class="StringPatternEngine">
+            <string>-/6,4/2</string>
+          </patternEngine>
+          <patternEngine class="StringPatternEngine">
+            <string>-/4,3/4</string>
+          </patternEngine>
+          <patternEngine class="StringPatternEngine">
+            <string>-/2,2/6</string>
+          </patternEngine>
+          <patternEngine class="StringPatternEngine">
+            <string>0/8</string>
+          </patternEngine>
+        </patternEngines>
+        <patternEngines>
+          <patternEngine class="StringPatternEngine">
+            <string>2/8</string>
+          </patternEngine>
+          <patternEngine class="StringPatternEngine">
+            <string>-/2,0/6</string>
+          </patternEngine>
+          <patternEngine class="StringPatternEngine">
+            <string>-/4,1/4</string>
+          </patternEngine>
+          <patternEngine class="StringPatternEngine">
+            <string>-/6,0/2</string>
+          </patternEngine>
+        </patternEngines>
+        <patternEngines>
+          <patternEngine class="StringPatternEngine">
+            <string>3/8</string>
+          </patternEngine>
+          <patternEngine class="StringPatternEngine">
+            <string>-/2,1/6</string>
+          </patternEngine>
+          <patternEngine class="StringPatternEngine">
+            <string>-/4,2/4</string>
+          </patternEngine>
+          <patternEngine class="StringPatternEngine">
+            <string>-/6,0/2</string>
+          </patternEngine>
+        </patternEngines>
+      </sequenceEngine>
+      <activityVector>arpeggio</activityVector>
+    </track> -->
     <track>
       <instrument>accomp</instrument>
       <transposition>-24</transposition>
       <sequenceEngine class="MultiPatternSequenceEngine">
         <patternEngines>
-		  <patternEngine class="StringPatternEngine">
-		  <string>-,-,-,-,5,-,-,-,-,-,-,-,5,-,-,-</string>
-		  </patternEngine>
-		  <patternEngine class="StringPatternEngine">
-		  <string>-,-,-,-,4,-,-,-,-,-,-,-,4,-,-,-</string>
-		  </patternEngine>
-		  <patternEngine class="StringPatternEngine">
-		  <string>-,-,-,-,3,-,-,-,-,-,-,-,3,-,-,-</string>
-		  </patternEngine>
-		  <patternEngine class="StringPatternEngine">
-		  <string>0,-,-,0,-,-,0,-,-,-,0,-,-,-,-,-,0,-,-,0,-,-,0,-,-,-,0,-,-,-,-,-,0,-,-,0,-,-,0,-,-,-,0,-,-,-,-,-,0,-,-,0,-,-,0,-,-,-,0,-,-,-,+,-,0,-,-,0,-,-,0,-,-,-,0,-,-,-,-,-,0,-,-,0,-,-,0,-,-,-,0,-,-,-,-,-,0,-,-,0,-,-,0,-,-,-,0,-,-,-,-,-,0,-,-,0,-,-,0,-,-,-,0,-,-,-,-1,+</string>
-		  </patternEngine>
-		</patternEngines>
+          <patternEngine class="StringPatternEngine">
+            <string>-,-,-,-,5,-,-,-,-,-,-,-,5,-,-,-</string>
+          </patternEngine>
+          <patternEngine class="StringPatternEngine">
+            <string>-,-,-,-,4,-,-,-,-,-,-,-,4,-,-,-</string>
+          </patternEngine>
+          <patternEngine class="StringPatternEngine">
+            <string>-,-,-,-,3,-,-,-,-,-,-,-,3,-,-,-</string>
+          </patternEngine>
+          <patternEngine class="StringPatternEngine">
+            <string>0,-,-,0,-,-,0,-,-,-,0,-,-,-,-,-,0,-,-,0,-,-,0,-,-,-,0,-,-,-,-,-,0,-,-,0,-,-,0,-,-,-,0,-,-,-,-,-,0,-,-,0,-,-,0,-,-,-,0,-,-,-,+,-,0,-,-,0,-,-,0,-,-,-,0,-,-,-,-,-,0,-,-,0,-,-,0,-,-,-,0,-,-,-,-,-,0,-,-,0,-,-,0,-,-,-,0,-,-,-,-,-,0,-,-,0,-,-,0,-,-,-,0,-,-,-,-1,+</string>
+          </patternEngine>
+        </patternEngines>
       </sequenceEngine>
       <activityVector>accomp</activityVector>
     </track>
@@ -146,47 +188,47 @@
           <pitchVelocityCorrelation>100</pitchVelocityCorrelation>
           <velocityExponent>3</velocityExponent>
         </patternEngine>
-	  </sequenceEngine>
+      </sequenceEngine>
       <activityVector>melody</activityVector>
     </track>
-	
-	<track>
+
+    <track>
       <instrument>percussion</instrument>
       <sequenceEngine class="DrumSequenceEngine">
         <pattern>
           <pitch>36</pitch>
           <patternEngine class="RandomFragmentPatternEngine">
-			<patternTicks>16</patternTicks>
-			<patternString>A1,B1,A1,B2,A1,B1,A1,B3</patternString>
-			<pattern group="A">0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-</pattern>
-			<pattern group="B">0,-,-,0,-,-,-,-,0,-,-,-,-,-,-,-|0,-,-,-,-,-,-,-,0,-,-,-,-,-,0,-|0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,0|0,-,-,-,-,-,-,-,0,-,-,-,-,-,0,0</pattern>
+            <patternTicks>16</patternTicks>
+            <patternString>A1,B1,A1,B2,A1,B1,A1,B3</patternString>
+            <pattern group="A">0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-</pattern>
+            <pattern group="B">0,-,-,0,-,-,-,-,0,-,-,-,-,-,-,-|0,-,-,-,-,-,-,-,0,-,-,-,-,-,0,-|0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,0|0,-,-,-,-,-,-,-,0,-,-,-,-,-,0,0</pattern>
           </patternEngine>
         </pattern>
         <pattern>
           <pitch>38</pitch>
           <patternEngine class="RandomFragmentPatternEngine">
-		    <patternTicks>8</patternTicks>
-			<patternString>A1,A1,A1,B1,A1,A1,A1,C1,A1,A1,A1,B1,A1,A1,A1,C2</patternString>
-			<pattern group="A">-,-,-,-,0,-,-,-</pattern>
-			<pattern group="B">-,-,-,-,0,-,-,-|-,-,-,-,0,-,-,0</pattern>
-			<pattern group="C">-,-,-,-,0,-,-,0|-,-,-,0,0,-,0,-|-,-,-,0,0,0,-,0|-,-,-,0,0,0,0,-</pattern>
+            <patternTicks>8</patternTicks>
+            <patternString>A1,A1,A1,B1,A1,A1,A1,C1,A1,A1,A1,B1,A1,A1,A1,C2</patternString>
+            <pattern group="A">-,-,-,-,0,-,-,-</pattern>
+            <pattern group="B">-,-,-,-,0,-,-,-|-,-,-,-,0,-,-,0</pattern>
+            <pattern group="C">-,-,-,-,0,-,-,0|-,-,-,0,0,-,0,-|-,-,-,0,0,0,-,0|-,-,-,0,0,0,0,-</pattern>
           </patternEngine>
         </pattern>
-		<pattern>
+        <pattern>
           <pitch>42</pitch>
           <patternEngine class="RandomFragmentPatternEngine">
-		    <patternTicks>4</patternTicks>
-			<patternString>A1,A2,A1,A3,A1,A2,A1,A4</patternString>
-			<pattern group="A">0:26000,0:26000,0:26000,0:26000|0:26000,0:26000,-,0:26000|0:26000,-,-,-|0:26000,-,0:26000,-|0:26000,0:26000,0:26000,-</pattern>
+            <patternTicks>4</patternTicks>
+            <patternString>A1,A2,A1,A3,A1,A2,A1,A4</patternString>
+            <pattern group="A">0:26000,0:26000,0:26000,0:26000|0:26000,0:26000,-,0:26000|0:26000,-,-,-|0:26000,-,0:26000,-|0:26000,0:26000,0:26000,-</pattern>
           </patternEngine>
         </pattern>
-		<pattern>
+        <pattern>
           <pitch>46</pitch>
           <patternEngine class="RandomFragmentPatternEngine">
-		    <patternTicks>8</patternTicks>
-			<patternString>A1,B1,A1,B2,A1,B1,A1,B3</patternString>
-			<pattern group="A">-,-,0:20000,-,-,-,0:20000,-</pattern>
-			<pattern group="B">-,-,0:20000,-,-,-,0:20000,-|-,-,0:20000,-,-,-,-,0:20000|-,-,0:20000,-,-,0:20000,-,0:20000</pattern>
+            <patternTicks>8</patternTicks>
+            <patternString>A1,B1,A1,B2,A1,B1,A1,B3</patternString>
+            <pattern group="A">-,-,0:20000,-,-,-,0:20000,-</pattern>
+            <pattern group="B">-,-,0:20000,-,-,-,0:20000,-|-,-,0:20000,-,-,-,-,0:20000|-,-,0:20000,-,-,0:20000,-,0:20000</pattern>
           </patternEngine>
         </pattern>
         <conditionalPattern>
@@ -207,37 +249,36 @@
             <string><random list="0,0,0,0|0,0,0,0,0,0,0,0"/></string>
           </patternEngine>
         </conditionalPattern>
-
       </sequenceEngine>
-      <activityVector>base_and_snare</activityVector>	
+      <activityVector>base_and_snare</activityVector>    
       <activityVector>base_and_snare</activityVector>
       <activityVector>hihat</activityVector>
       <activityVector>hihat</activityVector>
-	</track>
-	
-	<track>
+    </track>
+    
+    <track>
       <instrument>pad</instrument>
       <sequenceEngine class="PadSequenceEngine">
-	    <offsets>0,1,2</offsets>
-		<velocity>12000</velocity>
+        <offsets>0,1,2</offsets>
+        <velocity>12000</velocity>
       </sequenceEngine>
-      <activityVector>pad</activityVector>	      
-	</track>
-	
+      <activityVector>pad</activityVector>          
+    </track>
+    
     <track>
-	  <transposition>-24</transposition>
+      <transposition>-24</transposition>
       <instrument>bass</instrument>
       <sequenceEngine class="PatternSequenceEngine">
-	    <patternEngine class="StringPatternEngine">
+        <patternEngine class="StringPatternEngine">
         <string>0,-,-,-,0,-,-,0,-,-,0,-,-,-1,-,-,0,-,-,-,0,-,-,0,-,-,0,-,-,-,+,-,0,-,-,-,0,-,-,0,-,-,0,-,-,-1,-,-,0,-,-,-,0,-,-,0,-,0,-,-,0,-,+,-</string>
-		<string>0,-,-,0,-,-,0,2,0,-,-,0,-,-,-1,-,0,-,-,0,-,-,0,2,0,-,-,0,-,-,-1,-,0,-,-,0,-,-,0,2,0,-,-,0,-,-,-1,-,0,-,-,0,-,-,0,2,0,-,-,0,-,-,1,-</string>
+        <string>0,-,-,0,-,-,0,2,0,-,-,0,-,-,-1,-,0,-,-,0,-,-,0,2,0,-,-,0,-,-,-1,-,0,-,-,0,-,-,0,2,0,-,-,0,-,-,-1,-,0,-,-,0,-,-,0,2,0,-,-,0,-,-,1,-</string>
         <string>0,-,0,-,0,-,-,0,-,0,-,0,0,-,+,-</string> 
         <string>0,-,-,-,0,-,-,-,0,-,-,0,-,-,+,-,0,-,-,-,0,-,-,0,-,-,0,-,-,0,+,-,0,-,-,-,0,-,-,-,0,-,-,0,-,-,+,-,0,-,-,-,0,-,-,0,-,-,0,-,0,-,+,-</string>
         <string>-,-,0,-,-,-,0,-,-,-,0,-,-,-,0,-,-,-,0,-,-,-,0,-,-,-,0,-,-,-,+,-</string>
         <string>0,-,-,-,0,-,-,-,0,-,-,0,-,-,0,-,0,-,-,-,0,-,-,-,0,-,-,2,-,-,+,-,0,-,-,-,0,-,-,-,0,-,-,0,-,-,0,-,0,-,-,-,0,-,-,-,0,-,-,0,-,-,+,-</string>
-	    <string>0,-,-,3,-,-,0,-,1,-,-,0,-,-,3,-,0,-,-,3,-,-,0,-,1,-,-,0,-,2,1,-</string>
-		</patternEngine>
-	  </sequenceEngine>
+        <string>0,-,-,3,-,-,0,-,1,-,-,0,-,-,3,-,0,-,-,3,-,-,0,-,1,-,-,0,-,2,1,-</string>
+        </patternEngine>
+      </sequenceEngine>
       <activityVector>bass</activityVector>
     </track>
        
@@ -296,15 +337,15 @@
     <afterPlayWaitTicks>16</afterPlayWaitTicks>
     <groove><random list="100|110,90|115,85|125,75,115,85"/></groove>
     <device name="device1" clockSynchronization="true">Microsoft GS Wavetable Synth,Microsoft GS Wavetable SW Synth,Java Sound Synthesizer,Gervill</device>
-	<map instrument="arpeggio" device="device1" channel="1" program="1"/>
-	<map instrument="accomp" device="device1" channel="2" program="1"/>
-	<map instrument="melody" device="device1" channel="3" program="2"/>
-	<map instrument="pad" device="device1" channel="4" program="92"/>
-	<map instrument="bass" device="device1" channel="5" program="40"/>
+    <map instrument="arpeggio" device="device1" channel="1" program="1"/>
+    <map instrument="accomp" device="device1" channel="2" program="1"/>
+    <map instrument="melody" device="device1" channel="3" program="2"/>
+    <map instrument="pad" device="device1" channel="4" program="92"/>
+    <map instrument="bass" device="device1" channel="5" program="40"/>
     <map instrument="randombass" device="device1" channel="6" program="40"/>
     <!-- <map instrument="plonk" device="device1" channel="7" program="1"/> -->
-	<map instrument="percussion" device="device1" channel="10"/>
-<!--	<map instrument="chord" device="device2" channel="1" program="1"/> -->
+    <map instrument="percussion" device="device1" channel="10"/>
+<!--    <map instrument="chord" device="device2" channel="1" program="1"/> -->
 <!--    <controllerLFO>
       <lfo class="TriangleLFO"/>
       <rotationUnit>beat</rotationUnit>

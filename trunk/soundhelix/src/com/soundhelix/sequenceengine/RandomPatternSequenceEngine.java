@@ -51,6 +51,8 @@ public class RandomPatternSequenceEngine extends AbstractSequenceEngine {
 
 	public RandomPatternSequenceEngine(String patternString) {
 		super();
+		logger.warn("Class RandomPatternSequenceEngine is deprecated and will be removed. Please consider using "
+				    + "RandomPatternEngine or RandomFragmentPatternEngine with another SequenceEngine instead");
 		setPattern(patternString);
 	}
 

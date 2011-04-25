@@ -76,6 +76,12 @@ public class RandomSequenceEngine extends AbstractMultiPatternSequenceEngine {
 	 */
 	private double velocityExponent = 3.0d;
 	
+	public RandomSequenceEngine() {
+		super();
+		logger.warn("Class RandomSequenceEngine is deprecated and will be removed. Please consider using "
+			    + "RandomPatternEngine or RandomFragmentPatternEngine with another SequenceEngine instead");
+	}
+	
     public void configure(Node node, XPath xpath) throws XPathException {
     	random = new Random(randomSeed);
     	

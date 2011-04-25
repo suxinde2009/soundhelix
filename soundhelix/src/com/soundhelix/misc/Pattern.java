@@ -69,6 +69,23 @@ public class Pattern {
 		return new Pattern(pattern);
 	}
 	
+	public static int getStringTicks(String patternString) {
+		String[] p = patternString.split(",");
+		int len = p.length;
+		int ticks = 0;
+		
+		// format: offset/ticks:velocity or offset~/ticks:velocity
+		
+		for (int i = 0; i < len; i++) {
+			String[] a = p[i].split(":");
+			String[] b = a[0].split("/");
+			int t = b.length > 1 ? Integer.parseInt(b[1]) : 1;
+			ticks += t;
+		}
+		
+		return ticks;		
+	}
+	
 	/**
 	 * Transposes the pattern up by the given pitch (which may be negative) and returns it as a new pattern (or the
 	 * original pattern if pitch is 0). Only the notes will be affected by this operation (wildcards and pauses are

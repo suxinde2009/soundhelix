@@ -288,6 +288,35 @@ public final class XMLUtils {
 	}
 	
 	/**
+	 * Searches for the element pointed to by path and tries to parse
+	 * it as a string list, split by the given separator character.
+	 * 
+	 * @param random the random generator
+	 * @param path the XPath expression
+	 * @param parentNode the parent node to start searching from
+	 * @param separatorChar the separator character
+	 * @param xpath an XPath instance
+	 * 
+	 * @return the integer
+	 */
+	
+	public static String[] parseStringList(Random random, String path, Node parentNode, char separatorChar,
+			XPath xpath) {
+		try {
+			Node node = (Node) xpath.evaluate(path, parentNode, XPathConstants.NODE);
+
+			if (node == null) {
+				return null;
+			}
+
+			return StringUtils.split(XMLUtils.parseString(random, node, xpath), separatorChar);
+		} catch (Exception e) {
+			throw new RuntimeException("Error parsing string list", e);
+		}
+	}
+
+	
+	/**
 	 * Tries to parse the given node as a string.
 	 * 
 	 * @param random the random generator
@@ -319,6 +348,47 @@ public final class XMLUtils {
 				String[] str = StringUtils.split(s, '|');
 
 				return str[random.nextInt(str.length)];
+			} catch (Exception e) {
+				throw new RuntimeException("Error parsing random attributes", e);
+			}
+		} else {
+			throw new RuntimeException("Invalid element " + n.getNodeName());
+		}
+	}
+	
+	/**
+	 * Tries to parse the given node as a string.
+	 * 
+	 * @param random the random generator
+	 * @param node the node
+	 * @param separatorChar the separator character
+	 * @param xpath an XPath instance
+	 * 
+	 * @return the string (or null)
+	 */
+
+	public static String[] parseStringList(Random random, Node node, char separatorChar, XPath xpath) {
+		if (node == null) {
+			return null;
+		}
+		
+		Node n = getFirstElementChild(node);
+
+		if (n == null) {
+			return StringUtils.split(node.getTextContent(), separatorChar);
+		}
+
+		if (n.getNodeName().equals("random")) {
+			try {
+				String s = (String) xpath.evaluate("attribute::list", n, XPathConstants.STRING);
+
+				if (s == null || s.equals("")) {
+					throw new RuntimeException("Attribute \"list\" is empty");
+				}
+
+				String[] str = StringUtils.split(s, '|');
+
+				return StringUtils.split(str[random.nextInt(str.length)], separatorChar);
 			} catch (Exception e) {
 				throw new RuntimeException("Error parsing random attributes", e);
 			}

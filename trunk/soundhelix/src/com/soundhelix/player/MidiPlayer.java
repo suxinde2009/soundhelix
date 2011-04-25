@@ -698,33 +698,44 @@ public class MidiPlayer extends AbstractPlayer {
 				// value has changed or is the first value, send message
 				
 				String controller = clfo.controller;				
+				Device device = deviceMap.get(clfo.deviceName);
 				
 				if (controller.equals("pitchBend")) {
 					sm.setMessage(ShortMessage.PITCH_BEND, clfo.channel, value % 128, value / 128);
+					device.receiver.send(sm, -1);
 				} else if (controller.equals("modulationWheel")) {
 					sm.setMessage(ShortMessage.CONTROL_CHANGE, clfo.channel, 1, value);
+					device.receiver.send(sm, -1);
 				} else if (controller.equals("breath")) {
 					sm.setMessage(ShortMessage.CONTROL_CHANGE, clfo.channel, 2, value);
+					device.receiver.send(sm, -1);
 				} else if (controller.equals("footPedal")) {
 					sm.setMessage(ShortMessage.CONTROL_CHANGE, clfo.channel, 4, value);
+					device.receiver.send(sm, -1);
 				} else if (controller.equals("volume")) {
 					sm.setMessage(ShortMessage.CONTROL_CHANGE, clfo.channel, 7, value);
+					device.receiver.send(sm, -1);
 				} else if (controller.equals("balance")) {
 					sm.setMessage(ShortMessage.CONTROL_CHANGE, clfo.channel, 8, value);
+					device.receiver.send(sm, -1);
 				} else if (controller.equals("pan")) {
 					sm.setMessage(ShortMessage.CONTROL_CHANGE, clfo.channel, 10, value);
+					device.receiver.send(sm, -1);
 				} else if (controller.equals("expression")) {
 					sm.setMessage(ShortMessage.CONTROL_CHANGE, clfo.channel, 11, value);
+					device.receiver.send(sm, -1);
 				} else if (controller.equals("effect1")) {
 					sm.setMessage(ShortMessage.CONTROL_CHANGE, clfo.channel, 12, value);
+					device.receiver.send(sm, -1);
 				} else if (controller.equals("effect2")) {
 					sm.setMessage(ShortMessage.CONTROL_CHANGE, clfo.channel, 13, value);
+					device.receiver.send(sm, -1);
+				} else if (controller.equals("milliBPM")) {
+					System.out.println("Milli BPM: " + value);
+					setMilliBPM(value);
 				} else {
 					throw new RuntimeException("Invalid LFO controller \"" + controller + "\"");
 				}
-
-				Device device = deviceMap.get(clfo.deviceName);
-				device.receiver.send(sm, -1);
 				
 				clfo.lastSentValue = value;
 			}
@@ -1061,12 +1072,19 @@ public class MidiPlayer extends AbstractPlayer {
 			double speed = XMLUtils.parseDouble(random,
 					(Node) xpath.evaluate("speed", nodeList.item(i), XPathConstants.NODE), xpath);
 			
-			String device = XMLUtils.parseString(random,
-					(Node) xpath.evaluate("device", nodeList.item(i), XPathConstants.NODE), xpath);
-			int channel = XMLUtils.parseInteger(random,
-					(Node) xpath.evaluate("channel", nodeList.item(i), XPathConstants.NODE), xpath) - 1;
 			String controller = XMLUtils.parseString(random,
                     (Node) xpath.evaluate("controller", nodeList.item(i), XPathConstants.NODE), xpath);
+
+			String device = null;
+			int channel = -1;
+			
+			if (!controller.equals("milliBPM")) {
+			    device = XMLUtils.parseString(random,
+					(Node) xpath.evaluate("device", nodeList.item(i), XPathConstants.NODE), xpath);
+			    channel = XMLUtils.parseInteger(random,
+					(Node) xpath.evaluate("channel", nodeList.item(i), XPathConstants.NODE), xpath) - 1;
+			}
+			
 			String rotationUnit = XMLUtils.parseString(random,
                     (Node) xpath.evaluate("rotationUnit", nodeList.item(i), XPathConstants.NODE), xpath);
 			

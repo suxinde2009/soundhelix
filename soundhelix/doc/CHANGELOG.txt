@@ -7,6 +7,34 @@ Author: Thomas Schürger (thomas@schuerger.com)
 Change log
 ----------
 
+
+?.?.?: unreleased
+
+    - Added a better random seed augmentation scheme. Now random seeds from a component are passed on to subcomponents by
+      augmenting the value with a hash value of the implementation class of the subcomponent and the position of the subcomponent
+      within the parent component. This makes sure that each subcomponent receives a different random seed with very high
+      probability.
+
+    - The DrumSequenceEngine now supports using pitch offsets relative to the base pitch. For example, if the base pitch is
+      36, using "0" in the pattern uses pitch 36, "1" uses pitch 37, etc.
+
+    - Removed the RhythmSequenceEngine, because it was not configurable and not really usable. Use the DrumSequenceEngine instead.
+
+    - Added a new PatternEngine called RandomFragmentPatternEngine. This PatternEngine can be used for example to generate
+      drum patterns. It gives you more control over the results than the RandomPatternEngine by building a pattern by concatenating
+      provided pattern fragments, but does not support random velocity generation.
+
+    - The RandomSequenceEngine and the RandomPatternSequenceEngine are now deprecated (they will be removed in a future
+      version). Consider using the RandomPatternEngine or RandomFragmentPatternEngine with a different SequenceEngine instead.
+
+    - Added pseudo LFO controller "milliBPM" to the MidiPlayer. This allows changing the BPM during playback using an LFO. Note
+      that this has some side-effects on other time-dependent LFOs, because the BPM are used as the time basis.
+
+    - Re-implemented the ArpeggioSequenceEngine to use PatternEngines.
+
+    - Improved example. The example now uses the RandomFragmentPatternEngine for the percussion.
+
+
 0.0.5: 2011-02-27
 
     - The command-line version of SoundHelix now accepts document URLs as well instead of only files, so XML files

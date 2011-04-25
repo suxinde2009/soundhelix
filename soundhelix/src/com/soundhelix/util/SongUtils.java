@@ -70,7 +70,7 @@ public final class SongUtils {
             
         Node songNameEngineNode = (Node) xpath.evaluate("songNameEngine", rootNode, XPathConstants.NODE);
         SongNameEngine songNameEngine = XMLUtils.getInstance(SongNameEngine.class,
-                songNameEngineNode, xpath, randomSeed ^ 12345, -1);
+                songNameEngineNode, xpath, randomSeed, -1);
         
         String songName = songNameEngine.createSongName();
         logger.info("Song name: \"" + songName + "\"");        

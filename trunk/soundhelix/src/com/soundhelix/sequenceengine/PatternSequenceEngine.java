@@ -51,7 +51,7 @@ public class PatternSequenceEngine extends AbstractMultiPatternSequenceEngine {
 		try {
 			int i = random.nextInt(nodeList.getLength());
 			patternEngine = XMLUtils.getInstance(PatternEngine.class, nodeList.item(i),
-					xpath, randomSeed ^ 47351842858L, i);
+					xpath, randomSeed, i);
 		} catch (Exception e) {
 			throw new RuntimeException("Error instantiating PatternEngine", e);
 		}

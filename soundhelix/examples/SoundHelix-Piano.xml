@@ -33,6 +33,8 @@
     <activityVector name="hihat">
       <startAfterSection>0</startAfterSection>
       <stopBeforeSection>0</stopBeforeSection>
+      <minActive>25</minActive>
+      <maxActive>85</maxActive>
     </activityVector>
     <activityVector name="pad"/>
     <activityVector name="bass">
@@ -281,7 +283,7 @@
     <beforePlayWaitTicks>0</beforePlayWaitTicks>
     <afterPlayWaitTicks>16</afterPlayWaitTicks>
     <groove><random list="100|110,90|115,85|125,75,115,85"/></groove>
-    <device name="device1" clockSynchronization="true">Microsoft GS Wavetable Synth,Microsoft GS Wavetable SW Synth,Java Sound Synthesizer</device>
+    <device name="device1" clockSynchronization="true">Microsoft GS Wavetable Synth,Microsoft GS Wavetable SW Synth,Java Sound Synthesizer,Gervill</device>
 	<map instrument="arpeggio" device="device1" channel="1" program="1"/>
 	<map instrument="accomp" device="device1" channel="2" program="1"/>
 	<map instrument="melody" device="device1" channel="3" program="2"/>

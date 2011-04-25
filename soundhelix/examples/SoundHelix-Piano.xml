@@ -2,7 +2,7 @@
 <SoundHelix version="0.0.4.3+" xmlns:xi="http://www.w3.org/2001/XInclude">
   <xi:include href="../includes/Standard-SongNameEngine.xml"/>
   <structure>
-     <bars><random min="80" max="128" step="16"/></bars> 
+     <bars><random min="80" max="160" step="16"/></bars> 
      <beatsPerBar>4</beatsPerBar>
      <ticksPerBeat>4</ticksPerBeat>
   </structure>
@@ -155,26 +155,38 @@
       <sequenceEngine class="DrumSequenceEngine">
         <pattern>
           <pitch>36</pitch>
-          <patternEngine class="StringPatternEngine">
-            <string><random list="0,-,-,0,-,-,-,0,-,-,0,-,-,-,-,-|0,-,-,-,-,-,-,0,-,-,0,-,-,-,-,-,0,-,-,-,-,-,-,0,-,-,0,-,-,0,-,-,0,-,-,-,-,-,-,0,-,-,0,-,-,-,-,-,0,-,-,-,-,-,-,0,-,-,0,-,-,0,-,0|0,-,0,-,-,-,-,-,-,-,0,-,-,-,0,-,0,-,0,-,-,-,-,-,-,-,-,0,-,-,0,-"/></string>
+          <patternEngine class="RandomFragmentPatternEngine">
+			<patternTicks>16</patternTicks>
+			<patternString>A1,B1,A1,B2,A1,B1,A1,B3</patternString>
+			<pattern group="A">0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-</pattern>
+			<pattern group="B">0,-,-,0,-,-,-,-,0,-,-,-,-,-,-,-|0,-,-,-,-,-,-,-,0,-,-,-,-,-,0,-|0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,0|0,-,-,-,-,-,-,-,0,-,-,-,-,-,0,0</pattern>
           </patternEngine>
         </pattern>
         <pattern>
           <pitch>38</pitch>
-          <patternEngine class="StringPatternEngine">
-            <string><random list="-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,0,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,0,-,0,-,-,0,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,0,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,0,-,0,-,0,0|-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,0,0,-,0,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,0,-,-,0,-,-,-|-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,0|-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,0,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,0,-,-,0,-,0,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,0,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-,0,-,-,-,-,0,-,-,0,-,0,0,"/></string>
+          <patternEngine class="RandomFragmentPatternEngine">
+		    <patternTicks>8</patternTicks>
+			<patternString>A1,A1,A1,B1,A1,A1,A1,C1,A1,A1,A1,B1,A1,A1,A1,C2</patternString>
+			<pattern group="A">-,-,-,-,0,-,-,-</pattern>
+			<pattern group="B">-,-,-,-,0,-,-,-|-,-,-,-,0,-,-,0</pattern>
+			<pattern group="C">-,-,-,-,0,-,-,0|-,-,-,0,0,-,0,-|-,-,-,0,0,0,-,0|-,-,-,0,0,0,0,-</pattern>
           </patternEngine>
         </pattern>
 		<pattern>
           <pitch>42</pitch>
-          <patternEngine class="StringPatternEngine">
-            <string><random list="0:26000,-,-,-|0:26000,0:26000,-,-|0:26000,-,-,-,0:26000,-,-,-,0:26000,-,-,-,0:26000,0:26000,-,-"/></string>
+          <patternEngine class="RandomFragmentPatternEngine">
+		    <patternTicks>4</patternTicks>
+			<patternString>A1,A2,A1,A3,A1,A2,A1,A4</patternString>
+			<pattern group="A">0:26000,0:26000,0:26000,0:26000|0:26000,0:26000,-,0:26000|0:26000,-,-,-|0:26000,-,0:26000,-|0:26000,0:26000,0:26000,-</pattern>
           </patternEngine>
         </pattern>
 		<pattern>
           <pitch>46</pitch>
-          <patternEngine class="StringPatternEngine">
-            <string>-,-,0:20000,-</string>
+          <patternEngine class="RandomFragmentPatternEngine">
+		    <patternTicks>8</patternTicks>
+			<patternString>A1,B1,A1,B2,A1,B1,A1,B3</patternString>
+			<pattern group="A">-,-,0:20000,-,-,-,0:20000,-</pattern>
+			<pattern group="B">-,-,0:20000,-,-,-,0:20000,-|-,-,0:20000,-,-,-,-,0:20000|-,-,0:20000,-,-,0:20000,-,0:20000</pattern>
           </patternEngine>
         </pattern>
         <conditionalPattern>
@@ -302,6 +314,14 @@
       <controller>pitchBend</controller>
       <channel>1</channel>
       <device>device1</device>
+    </controllerLFO> -->
+<!--    <controllerLFO>
+      <lfo class="SineLFO"/>
+      <rotationUnit>beat</rotationUnit>
+      <speed>0.02</speed>
+      <minimum>100000</minimum>
+      <maximum>150000</maximum>
+      <controller>milliBPM</controller>
     </controllerLFO> -->
   </player>
 </SoundHelix>

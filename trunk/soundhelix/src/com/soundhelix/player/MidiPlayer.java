@@ -731,7 +731,6 @@ public class MidiPlayer extends AbstractPlayer {
 					sm.setMessage(ShortMessage.CONTROL_CHANGE, clfo.channel, 13, value);
 					device.receiver.send(sm, -1);
 				} else if (controller.equals("milliBPM")) {
-					System.out.println("Milli BPM: " + value);
 					setMilliBPM(value);
 				} else {
 					throw new RuntimeException("Invalid LFO controller \"" + controller + "\"");

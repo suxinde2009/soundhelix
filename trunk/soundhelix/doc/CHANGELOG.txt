@@ -24,6 +24,9 @@ Change log
       drum patterns. It gives you more control over the results than the RandomPatternEngine by building a pattern by concatenating
       provided pattern fragments, but does not support random velocity generation.
 
+    - Added the constraints startBeforeSection and stopAfterSection to the SimpleArrangementEntry, which are the counterparts of
+      startAfterSection and stopBeforeSection, respectively.
+
     - The RandomSequenceEngine and the RandomPatternSequenceEngine are now deprecated (they will be removed in a future
       version). Consider using the RandomPatternEngine or RandomFragmentPatternEngine with a different SequenceEngine instead.
 

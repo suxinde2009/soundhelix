@@ -49,7 +49,7 @@ import com.soundhelix.util.XMLUtils;
  * constraint can be checked locally but can make the whole creation fail. For example, the startAfterSection
  * constraint is a local success constraint, because if an AV is randomly chosen to become active too early, this
  * random selection can be repeated until an AV is chosen that does not violate that constraint (unless such an AV
- * doesn't exist). In contrast, the stopAfterSection constraint cannot be enforced so easily, because an AV can be
+ * doesn't exist). In contrast, the stopBeforeSection constraint cannot be enforced so easily, because an AV can be
  * active in a chord section either because it becomes active (then the constraint can be made a success by choosing
  * another AV to become active instead) or because it is already active and stays active (because the number of
  * active AVs should increase).
@@ -249,11 +249,14 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
                 double active = 100.0d * av.getActiveTicks() / ticks;
                 int firstActiveTick = av.getFirstActiveTick();
+                int lastActiveTick = av.getLastActiveTick();
                 int segmentCount = av.getSegmentCount();
 
                 if (active < avc.minActive && (!avc.allowInactive || active > 0) || active > avc.maxActive
                         || avc.startAfterSection + 1 >= chordSections || avc.stopBeforeSection + 1 >= chordSections
-                        || avc.stopBeforeSection >= 0 && av.getLastActiveTick() >= chordSectionStartTicks.get(chordSections - 1 - avc.stopBeforeSection)
+                        || avc.stopBeforeSection >= 0 && lastActiveTick >= chordSectionStartTicks.get(chordSections - 1 - avc.stopBeforeSection)
+                        || avc.stopAfterSection > 0 && lastActiveTick >= 0 && lastActiveTick < chordSectionStartTicks.get(chordSections - avc.stopAfterSection)
+                        || avc.startBeforeSection < Integer.MAX_VALUE && firstActiveTick >= 0 && firstActiveTick > chordSectionStartTicks.get(avc.startBeforeSection - 1)
                         || avc.startAfterSection >= 0 && firstActiveTick >= 0 && firstActiveTick < chordSectionStartTicks.get(avc.startAfterSection + 1)
                         || (avc.minSegmentCount >= 0 || avc.maxSegmentCount < Integer.MAX_VALUE) && (segmentCount < avc.minSegmentCount || segmentCount > avc.maxSegmentCount)) {
 
@@ -268,8 +271,12 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
                             reason = "startAfterSection";
                         } else if (avc.stopBeforeSection + 1 >= chordSections) {
                             reason = "stopBeforeSection";
-                        } else if (avc.stopBeforeSection >= 0 && av.getLastActiveTick() >= chordSectionStartTicks.get(chordSections - 1 - avc.stopBeforeSection)) {
+                        } else if (avc.stopBeforeSection >= 0 && lastActiveTick >= chordSectionStartTicks.get(chordSections - 1 - avc.stopBeforeSection)) {
                             reason = "stopBeforeSection";
+                        } else if (avc.stopAfterSection > 0 && lastActiveTick >= 0 && lastActiveTick < chordSectionStartTicks.get(chordSections - avc.stopAfterSection)) {
+                        	reason = "stopAfterSection";
+                        } else if (avc.startBeforeSection < Integer.MAX_VALUE && firstActiveTick >= 0 && firstActiveTick > chordSectionStartTicks.get(avc.startBeforeSection - 1)) {
+                        	reason = "startBeforeSection";
                         } else if (avc.startAfterSection >= 0 && firstActiveTick >= 0 && firstActiveTick < chordSectionStartTicks.get(avc.startAfterSection + 1)) {
                             // should not happen as this is already checked in createActivityVectors()
                             reason = "startAfterSection";
@@ -747,6 +754,11 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 				stopShift = XMLUtils.parseInteger(random, "stopShift", nodeList.item(i), xpath);
 			} catch (Exception e) {}
 
+			int startBeforeSection = Integer.MAX_VALUE;
+			try {
+                startBeforeSection = XMLUtils.parseInteger(random, "startBeforeSection", nodeList.item(i), xpath);
+			} catch (Exception e) {}
+
 			int startAfterSection = -1;
 			try {
                 startAfterSection = XMLUtils.parseInteger(random, "startAfterSection", nodeList.item(i), xpath);
@@ -755,6 +767,11 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 			int stopBeforeSection = -1;
 			try {
                 stopBeforeSection = XMLUtils.parseInteger(random, "stopBeforeSection", nodeList.item(i), xpath);
+			} catch (Exception e) {}
+
+			int stopAfterSection = 0;
+			try {
+                stopAfterSection = XMLUtils.parseInteger(random, "stopAfterSection", nodeList.item(i), xpath);
 			} catch (Exception e) {}
 
 			int minSegmentCount = 0;
@@ -768,8 +785,8 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 			} catch (Exception e) {}
 
             activityVectorConfigurationHashMap.put(name, new ActivityVectorConfiguration(name, minActive, allowInactive,
-                    maxActive, startShift, stopShift, startAfterSection, stopBeforeSection, minSegmentCount,
-                    maxSegmentCount));		
+                    maxActive, startShift, stopShift, startBeforeSection, startAfterSection, stopBeforeSection,
+                    stopAfterSection, minSegmentCount, maxSegmentCount));		
 		}
 				
 		setActivityVectorConfiguration(activityVectorConfigurationHashMap);
@@ -908,20 +925,24 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 		private int startShift;
 		private int stopShift;
 		private int startAfterSection;
+		private int startBeforeSection;
         private int stopBeforeSection;
+        private int stopAfterSection;
         private int minSegmentCount;
         private int maxSegmentCount;
 		private ActivityVector activityVector;
 
-		private ActivityVectorConfiguration(String name, double minActive, boolean allowInactive, double maxActive, int startShift, int stopShift, int startAfterSection, int stopBeforeSection, int minSegmentCount, int maxSegmentCount) {
+		private ActivityVectorConfiguration(String name, double minActive, boolean allowInactive, double maxActive, int startShift, int stopShift, int startBeforeSection, int startAfterSection, int stopBeforeSection, int stopAfterSection, int minSegmentCount, int maxSegmentCount) {
 			this.name = name;
 			this.minActive = minActive;
 			this.allowInactive = allowInactive;
 			this.maxActive = maxActive;
 			this.startShift = startShift;
 			this.stopShift = stopShift;
+			this.startBeforeSection = startBeforeSection;
 			this.startAfterSection = startAfterSection;
 			this.stopBeforeSection = stopBeforeSection;
+			this.stopAfterSection = stopAfterSection;
 			this.minSegmentCount = minSegmentCount;
 			this.maxSegmentCount = maxSegmentCount;
 		}	

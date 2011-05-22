@@ -8,7 +8,7 @@ Change log
 ----------
 
 
-0.0.6: unreleased
+0.1: 2011-05-22
 
     - Added a better random seed augmentation scheme. Now random seeds from a component are passed on to subcomponents by
       augmenting the value with a hash value of the implementation class of the subcomponent and the position of the subcomponent
@@ -39,7 +39,8 @@ Change log
 
     - The SoundHelix applet now sets the applet's window title to the current song name.
 
-    - Improved example. The example now uses the RandomFragmentPatternEngine for the percussion.
+    - Improved example. The example now uses the RandomFragmentPatternEngine for the percussion and the ArpeggioSequenceEngine for
+      arpeggios.
 
 
 0.0.5: 2011-02-27

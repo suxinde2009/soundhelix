@@ -25,10 +25,12 @@
       <stopShift>-3</stopShift>
     </activityVector>
     <activityVector name="base_and_snare">
-      <startAfterSection>0</startAfterSection>
+      <startAfterSection>1</startAfterSection>
       <stopBeforeSection>0</stopBeforeSection>
       <minActive>50</minActive>
       <maxActive>85</maxActive>
+      <minSegmentCount>2</minSegmentCount>
+      <maxSegmentCount>4</maxSegmentCount>
     </activityVector>
     <activityVector name="hihat">
       <startAfterSection>0</startAfterSection>
@@ -78,6 +80,9 @@
           </patternEngine>
           <patternEngine class="StringPatternEngine">
             <string>0:26000,1:26000,2:26000,1:26000,2:26000,3:26000,2:26000,3:26000,4:26000,3:26000,4:26000,5:26000,4:26000,5:26000,6:26000,5:26000,6:26000,7:26000,6:26000,5:26000,4:26000,3:26000,2:26000,1:26000</string>
+          </patternEngine>
+          <patternEngine class="StringPatternEngine">
+            <string>0:26000,1:26000,2:26000,1:26000,2:26000,3:26000,2:26000,3:26000,4:26000,3:26000,4:26000,5:26000,4:26000,5:26000,6:26000,5:26000,6:26000,7:26000,6:26000,7:26000,8:26000,7:26000,6:26000,5:26000,4:26000,3:26000,2:26000,1:26000</string>
           </patternEngine>
           <patternEngine class="StringPatternEngine">
             <string>0:26000,1:26000,2:26000,1:26000,2:26000,3:26000,2:26000,3:26000,4:26000,3:26000,4:26000,5:26000,4:26000,5:26000,6:26000,5:26000,6:26000,7:26000,6:26000,7:26000,8:26000,7:26000,8:26000,9:26000,8:26000,7:26000,6:26000,5:26000,4:26000,3:26000,2:26000,1:26000</string>

@@ -276,6 +276,24 @@ public class SoundHelixApplet extends JApplet implements Runnable {
         }
     }
 
+    /**
+     * Sets the title of the applet frame.
+     *
+     * @param title the frame title
+     */
+    
+    private void setFrameTitle(String title) {
+        Component parent = this;
+
+        while (parent.getParent() != null) {
+            parent = parent.getParent();
+        }
+        
+        if (parent instanceof Frame) {
+        	((Frame) parent).setTitle(title);
+        }
+    }
+    
     @Override
     public void stop() {
         // TODO Auto-generated method stub
@@ -368,6 +386,7 @@ public class SoundHelixApplet extends JApplet implements Runnable {
                 
                 this.currentSongName = player.getArrangement().getStructure().getSongName();
                 songNameTextField.setText(this.currentSongName);
+                setFrameTitle("SoundHelix Song \"" + this.currentSongName + "\"");
                 
                 player.open();
                 remoteControl.setPlayer(player);

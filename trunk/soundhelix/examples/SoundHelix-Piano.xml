@@ -31,7 +31,7 @@
       <startBeforeSection>4</startBeforeSection>
       <stopBeforeSection>0</stopBeforeSection>
       <stopAfterSection>3</stopAfterSection>
-      <minActive>55</minActive>
+      <minActive>50</minActive>
       <maxActive>85</maxActive>
       <minSegmentCount>2</minSegmentCount>
       <maxSegmentCount>4</maxSegmentCount>

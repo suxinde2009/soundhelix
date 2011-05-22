@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<SoundHelix version="0.0.4.3+" xmlns:xi="http://www.w3.org/2001/XInclude">
+<SoundHelix version="0.1+" xmlns:xi="http://www.w3.org/2001/XInclude">
   <xi:include href="../includes/Standard-SongNameEngine.xml"/>
   <structure>
      <bars><random min="80" max="160" step="16"/></bars> 

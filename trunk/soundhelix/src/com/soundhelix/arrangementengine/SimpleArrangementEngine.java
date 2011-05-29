@@ -808,6 +808,10 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 		for (int i = 0; i < tracks; i++) {
 			String instrument = XMLUtils.parseString(random, "instrument", nodeList.item(i), xpath);
 
+			if (instrument == null || instrument.equals("")) {
+				throw new RuntimeException("Track has no instrument");
+			}
+			
 			int transposition = 0;
 			
 			try {
@@ -832,7 +836,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 			    arrangementEntries[i] = new ArrangementEntry(instrument, sequenceEngine,
 			    		transposition, activityVectorNames);
 			} catch (Exception e) {
-				throw new RuntimeException("Error instantiating SequenceEngine", e);
+				throw new RuntimeException("Error instantiating SequenceEngine for instrument \"" + instrument + "\"", e);
 			}	
 		}
 		

@@ -645,7 +645,6 @@ public class MidiPlayer extends AbstractPlayer {
 				clfo.lfo.setSongSpeed((int) (1000f * clfo.speed), structure.getTicks(), milliBPM);
 				
 			} else if (clfo.rotationUnit.equals("activity")) {
-				
 				// if the instrument is inactive or not part of the song, we
 				// use the whole song as the length (this LFO is then a no-op)
 				
@@ -1102,6 +1101,10 @@ public class MidiPlayer extends AbstractPlayer {
 			} catch (Exception e) {
 			}
 
+			if (rotationUnit.equals("activity") && (instrument == null || instrument.equals(""))) {
+				throw new RuntimeException("Rotation unit \"activity\" requires an instrument");
+			}
+			
 	        Node lfoNode = (Node) xpath.evaluate("lfo",  nodeList.item(i), XPathConstants.NODE);
 	        
 	        LFO lfo;

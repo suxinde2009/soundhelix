@@ -211,7 +211,7 @@ public class Sequence {
         }
 
         if (tick < offsetTick) {
-        	sequence.get(offset - 1).ticks = tick - (offsetTick - sequence.get(offset - 1).ticks);
+            sequence.get(offset - 1).ticks = tick - (offsetTick - sequence.get(offset - 1).ticks);
 
             int diff = tick + entry.ticks - offsetTick;
 

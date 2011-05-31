@@ -33,7 +33,10 @@ import com.soundhelix.util.XMLUtils;
 
 public class DrumSequenceEngine extends AbstractSequenceEngine {
 
+    /** Conditional pattern add mode. */
     private static final int MODE_ADD = 0;
+    
+    /** Conditional pattern replace mode. */
     private static final int MODE_REPLACE = 1;
 
     private DrumEntry[] drumEntries;
@@ -79,11 +82,11 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
      * @param structure the structure
      */
     
-	private void processPatterns(ActivityVector[] activityVectors, Sequence[] seqs, Structure structure) {
+    private void processPatterns(ActivityVector[] activityVectors, Sequence[] seqs, Structure structure) {
         int ticks = structure.getTicks();
         int drumEntryCount = drumEntries.length;
-		
-		for (int i = 0; i < drumEntryCount; i++) {
+        
+        for (int i = 0; i < drumEntryCount; i++) {
             ActivityVector activityVector = activityVectors[i];
             Sequence seq = seqs[i];
             Pattern pattern = drumEntries[i].pattern;
@@ -120,21 +123,20 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
                 pos++;
             }
         }
-	}
-	
-	/**
-	 * Process all conditional patterns.
-	 * 
+    }
+    
+    /**
+     * Process all conditional patterns.
+     * 
      * @param activityVectors the array of activity vectors
      * @param seqs the array of sequences
      * @param structure the structure
-	 */
+     */
 
-	private void processConditionalPatterns(ActivityVector[] activityVectors,
-			Sequence[] seqs, Structure structure) {
-		HarmonyEngine harmonyEngine = structure.getHarmonyEngine();
-		int ticks = structure.getTicks();
-		int conditionalEntryCount = conditionalEntries.length;
+    private void processConditionalPatterns(ActivityVector[] activityVectors, Sequence[] seqs, Structure structure) {
+        HarmonyEngine harmonyEngine = structure.getHarmonyEngine();
+        int ticks = structure.getTicks();
+        int conditionalEntryCount = conditionalEntries.length;
 
     next:
             
@@ -213,7 +215,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
                 tick += harmonyEngine.getChordSectionTicks(tick);
             }
         }
-	}
+    }
     
     /**
      * Returns the activity string of the given tick. The activity string is a concatenation of '0' and '1'
@@ -313,7 +315,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
             
             try {
                 patternEngine = XMLUtils.getInstance(PatternEngine.class, patternEngineNode,
-                        xpath, randomSeed ^ 47351842858L, i);
+                        xpath, randomSeed, -i - 1);
             } catch (Exception e) {
                 throw new RuntimeException("Error instantiating PatternEngine", e);
             }

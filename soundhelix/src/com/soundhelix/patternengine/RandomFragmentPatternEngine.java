@@ -59,25 +59,25 @@ public class RandomFragmentPatternEngine extends StringPatternEngine {
         patternStringMap = new HashMap<Character, String[]>(patterns);
         
         for (int i = 0; i < patterns; i++) {
-        	String group = XMLUtils.parseString(random, "attribute::group", nodeList.item(i), xpath);
-        	
-        	if (group == null || group.length() != 1) {
-        		throw new RuntimeException("Need exactly one character, got \"" + group + "\"");
-        	}        
-        	
-        	char character = group.charAt(0);
-        	
-        	if (patternStringMap.containsKey(character)) {
-        		throw new RuntimeException("Pattern string for group \"" + character + "\" defined more than once");
-        	}
-        	
-        	String[] patternArray = XMLUtils.parseStringList(random, nodeList.item(i), '|', xpath);
-        	
-        	if (patternArray == null || patternArray.length == 0) {
-        		throw new RuntimeException("Pattern string for group \"" + character + "\" is empty");
-        	}
-        	
-        	patternStringMap.put(character, patternArray);
+            String group = XMLUtils.parseString(random, "attribute::group", nodeList.item(i), xpath);
+            
+            if (group == null || group.length() != 1) {
+                throw new RuntimeException("Need exactly one character, got \"" + group + "\"");
+            }        
+            
+            char character = group.charAt(0);
+            
+            if (patternStringMap.containsKey(character)) {
+                throw new RuntimeException("Pattern string for group \"" + character + "\" defined more than once");
+            }
+            
+            String[] patternArray = XMLUtils.parseStringList(random, nodeList.item(i), '|', xpath);
+            
+            if (patternArray == null || patternArray.length == 0) {
+                throw new RuntimeException("Pattern string for group \"" + character + "\" is empty");
+            }
+            
+            patternStringMap.put(character, patternArray);
         }
         
         super.setPatternString(generatePattern(patternString));
@@ -168,28 +168,28 @@ public class RandomFragmentPatternEngine extends StringPatternEngine {
         String[] patterns = patternStringMap.get(character);
         
         if (patterns == null || patterns.length == 0) {
-        	throw new RuntimeException("Patterns for character \"" + character + "\" not found");
+            throw new RuntimeException("Patterns for character \"" + character + "\" not found");
         }
 
         int patternCount = patterns.length;
         
-    	StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         int activeTicks = 0;
         
         while (activeTicks < patternTicks) {
-        	if (sb.length() > 0) {
-        		sb.append(',');
-        	}
-        	
-        	String patternString = patterns[random.nextInt(patternCount)];
-        	int stringTicks = Pattern.getStringTicks(patternString);
-        	
-        	sb.append(patternString);
-        	activeTicks += stringTicks;
-        	
-        	if (activeTicks > patternTicks) {
-        		throw new RuntimeException("Generated pattern is longer than " + patternTicks + " ticks");
-        	}        	
+            if (sb.length() > 0) {
+                sb.append(',');
+            }
+            
+            String patternString = patterns[random.nextInt(patternCount)];
+            int stringTicks = Pattern.getStringTicks(patternString);
+            
+            sb.append(patternString);
+            activeTicks += stringTicks;
+            
+            if (activeTicks > patternTicks) {
+                throw new RuntimeException("Generated pattern is longer than " + patternTicks + " ticks");
+            }            
         }
 
         return sb.toString();

@@ -15,16 +15,16 @@ import java.util.Random;
  */
 
 public class ConsistentRandom {
-	/** The main random seed. */
-	private long constantSeed;
+    /** The main random seed. */
+    private long constantSeed;
     
-	// pertubation seed for booleans
-	// nanoTime() and currentTimeMillis() are correlated,
-	// but this should be fine for our purposes
-	private long millis = System.currentTimeMillis();
+    // pertubation seed for booleans
+    // nanoTime() and currentTimeMillis() are correlated,
+    // but this should be fine for our purposes
+    private long millis = System.currentTimeMillis();
     
     public ConsistentRandom(long randomSeed) {
-    	this.constantSeed = randomSeed;
+        this.constantSeed = randomSeed;
     }
     
     /**
@@ -38,8 +38,8 @@ public class ConsistentRandom {
      */
     
     public int getInteger(int min, int max, long seed) {
-    	Random r = new Random(min * 167852533L + max * 7531057L + constantSeed + seed);
-    	return min + r.nextInt(max + 1 - min);
+        Random r = new Random(min * 167852533L + max * 7531057L + constantSeed + seed);
+        return min + r.nextInt(max + 1 - min);
     }
     
     /**
@@ -53,7 +53,7 @@ public class ConsistentRandom {
      */
 
     public int getInteger(int min, int max, Object seedObject) {
-    	return getInteger(min, max, seedObject.hashCode());
+        return getInteger(min, max, seedObject.hashCode());
     }
 
     /**
@@ -65,8 +65,8 @@ public class ConsistentRandom {
      */
     
     public boolean getBoolean(long seed) {
-    	Random r = new Random(millis + constantSeed + seed);
-    	return r.nextBoolean();
+        Random r = new Random(millis + constantSeed + seed);
+        return r.nextBoolean();
     }
 
     /**
@@ -78,6 +78,6 @@ public class ConsistentRandom {
      */
     
     public boolean getBoolean(Object seedObject) {
-       	return getBoolean(seedObject.hashCode());
+           return getBoolean(seedObject.hashCode());
     }
 }

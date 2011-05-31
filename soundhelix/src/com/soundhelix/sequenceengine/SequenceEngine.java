@@ -15,12 +15,12 @@ import com.soundhelix.misc.Track;
 import com.soundhelix.misc.XMLConfigurable;
 
 public interface SequenceEngine extends XMLConfigurable, RandomSeedable {
-	/**
-	 * Sets the structure.
-	 * 
-	 * @param structure the structure
-	 */
-	
+    /**
+     * Sets the structure.
+     * 
+     * @param structure the structure
+     */
+    
     void setStructure(Structure structure);
 
     /**

@@ -19,13 +19,13 @@ import com.soundhelix.misc.XMLConfigurable;
  */
 
 public interface LFO extends XMLConfigurable, RandomSeedable {
-	/**
-	 * Returns the LFO's value of the given tick.
-	 * 
-	 * @param tick the tick (non-negative)
-	 * 
-	 * @return the LFO's value
-	 */
+    /**
+     * Returns the LFO's value of the given tick.
+     * 
+     * @param tick the tick (non-negative)
+     * 
+     * @return the LFO's value
+     */
     int getTickValue(int tick);
 
     /**
@@ -36,7 +36,7 @@ public interface LFO extends XMLConfigurable, RandomSeedable {
      * @param milliBPM the milli-BPM
      */
   
-	void setBeatSpeed(int milliRotationsPerBeat, int ticksPerBeat, int milliBPM);
+    void setBeatSpeed(int milliRotationsPerBeat, int ticksPerBeat, int milliBPM);
 
     /**
      * Makes this LFO synchronized to the song length and sets the parameters.
@@ -45,8 +45,8 @@ public interface LFO extends XMLConfigurable, RandomSeedable {
      * @param ticksPerSong the ticks of the song
      * @param milliBPM the milli-BPM
      */
-	
-	void setSongSpeed(int milliRotationsPerSong, int ticksPerSong, int milliBPM);
+    
+    void setSongSpeed(int milliRotationsPerSong, int ticksPerSong, int milliBPM);
 
     /**
      * Makes this LFO synchronized to a tick range and sets the parameters.
@@ -56,8 +56,8 @@ public interface LFO extends XMLConfigurable, RandomSeedable {
      * @param endTick the end tick
      * @param milliBPM the milli-BPM
      */
-	
-	void setActivitySpeed(int milliRotationsPerActivity, int startTick, int endTick, int milliBPM);
+    
+    void setActivitySpeed(int milliRotationsPerActivity, int startTick, int endTick, int milliBPM);
 
     /**
      * Makes this LFO synchronized to time and sets the parameters.
@@ -66,48 +66,48 @@ public interface LFO extends XMLConfigurable, RandomSeedable {
      * @param ticksPerBeat the ticks per beat
      * @param milliBPM the milli-BPM
      */
-	
-	void setTimeSpeed(int milliRotationsPerSecond, int ticksPerBeat, int milliBPM);
+    
+    void setTimeSpeed(int milliRotationsPerSecond, int ticksPerBeat, int milliBPM);
 
-	/**
-	 * Set the starting phase (the phase to use for tick 0).
-	 *
-	 * @param microRotations the microrotations
-	 */
-	
-	void setPhase(int microRotations);	
+    /**
+     * Set the starting phase (the phase to use for tick 0).
+     *
+     * @param microRotations the microrotations
+     */
+    
+    void setPhase(int microRotations);    
 
-	/**
-	 * Sets the minimum value to return. If this value is greater than the amplitude minimum, this results
-	 * in a cut-off at the given value.
-	 *
-	 * @param minimum the value minimum
-	 */
-	
-	void setValueMinimum(int minimum);
+    /**
+     * Sets the minimum value to return. If this value is greater than the amplitude minimum, this results
+     * in a cut-off at the given value.
+     *
+     * @param minimum the value minimum
+     */
+    
+    void setValueMinimum(int minimum);
 
-	/**
-	 * Sets the maximum value to return. If this value is smaller than the amplitude maximum, this results
-	 * in a cut-off at the given value.
-	 *
-	 * @param maximum the value maximum
-	 */
+    /**
+     * Sets the maximum value to return. If this value is smaller than the amplitude maximum, this results
+     * in a cut-off at the given value.
+     *
+     * @param maximum the value maximum
+     */
 
-	void setValueMaximum(int maximum);
+    void setValueMaximum(int maximum);
 
-	/**
-	 * Sets the minimum value of the amplitude.
-	 *
-	 * @param minimum the amplitude minimum
-	 */
-	
-	void setAmplitudeMinimum(int minimum);
+    /**
+     * Sets the minimum value of the amplitude.
+     *
+     * @param minimum the amplitude minimum
+     */
+    
+    void setAmplitudeMinimum(int minimum);
 
-	/**
-	 * Sets the maximum value of the amplitude.
-	 *
-	 * @param maximum the amplitude maximum
-	 */
+    /**
+     * Sets the maximum value of the amplitude.
+     *
+     * @param maximum the amplitude maximum
+     */
 
-	void setAmplitudeMaximum(int maximum);
+    void setAmplitudeMaximum(int maximum);
 }

@@ -13,43 +13,43 @@ import com.soundhelix.misc.Structure;
  */
 
 public abstract class AbstractArrangementEngine implements ArrangementEngine {
-	/** The logger. */
-	protected final Logger logger;
-	
-	/** The structure. */
-	protected Structure structure;
-	
-	/** The random seed. */
-	protected long randomSeed;
-	
-	/**
-	 * Constructor.
-	 */
-	
-	public AbstractArrangementEngine() {
-		logger = Logger.getLogger(getClass());
-	}	
+    /** The logger. */
+    protected final Logger logger;
+    
+    /** The structure. */
+    protected Structure structure;
+    
+    /** The random seed. */
+    protected long randomSeed;
+    
+    /**
+     * Constructor.
+     */
+    
+    public AbstractArrangementEngine() {
+        logger = Logger.getLogger(getClass());
+    }    
 
-	/**
-	 * Sets the structure.
-	 * 
-	 * @param structure the structure
-	 */
-	
-	public void setStructure(Structure structure) {
-		if (this.structure != null) {
-			throw new RuntimeException("Structure already set");
-		}
-		
-		this.structure = structure;
-	}
-	
-	/**
-	 * Renders and returns an Arrangement.
-	 * 
-	 * @return the rendered arrangement
-	 */
-	
+    /**
+     * Sets the structure.
+     * 
+     * @param structure the structure
+     */
+    
+    public void setStructure(Structure structure) {
+        if (this.structure != null) {
+            throw new RuntimeException("Structure already set");
+        }
+        
+        this.structure = structure;
+    }
+    
+    /**
+     * Renders and returns an Arrangement.
+     * 
+     * @return the rendered arrangement
+     */
+    
     public abstract Arrangement render();
     
     /**

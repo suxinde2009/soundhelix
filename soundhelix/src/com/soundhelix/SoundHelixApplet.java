@@ -290,7 +290,7 @@ public class SoundHelixApplet extends JApplet implements Runnable {
         }
         
         if (parent instanceof Frame) {
-        	((Frame) parent).setTitle(title);
+            ((Frame) parent).setTitle(title);
         }
     }
     

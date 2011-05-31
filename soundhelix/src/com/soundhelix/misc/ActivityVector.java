@@ -18,7 +18,7 @@ import java.util.BitSet;
  */
 
 public class ActivityVector {
-	/** The bit set used (each bit represents a tick activity). */
+    /** The bit set used (each bit represents a tick activity). */
     private BitSet bitSet = new BitSet();
 
     /** The length of the vector in ticks. */
@@ -32,8 +32,8 @@ public class ActivityVector {
      */
     
     public void addActivity(int ticks) {
-    	bitSet.set(totalTicks, totalTicks + ticks);
-    	totalTicks += ticks;
+        bitSet.set(totalTicks, totalTicks + ticks);
+        totalTicks += ticks;
     }
 
     /**
@@ -44,8 +44,8 @@ public class ActivityVector {
      */
     
     public void addInactivity(int ticks) {
-    	bitSet.clear(totalTicks, totalTicks + ticks);
-    	totalTicks += ticks;
+        bitSet.clear(totalTicks, totalTicks + ticks);
+        totalTicks += ticks;
     }
     
     /**
@@ -58,11 +58,11 @@ public class ActivityVector {
      */
     
     public boolean isActive(int tick) {
-    	if (tick >= totalTicks) {
-    		return false;
-    	}
-    	
-    	return bitSet.get(tick);
+        if (tick >= totalTicks) {
+            return false;
+        }
+        
+        return bitSet.get(tick);
     }
     
     /**
@@ -76,24 +76,24 @@ public class ActivityVector {
      */
     
     public int getIntervalLength(int tick) {
-    	if (bitSet.get(tick)) {
-    		// bit is active; search for the next clear bit
-    		// this bit must exist, because we use a BitSet
-    		return bitSet.nextClearBit(tick) - tick;
-    	} else {
-    		// bit is inactive; search for the next set bit
-    		// if there is no set bit, return the remaining
-    		// number of ticks (the number of ticks until the
-    		// song ends)
-    		
-    		int num = bitSet.nextSetBit(tick);
-    		
-    		if (num == -1) {
-    			return totalTicks - tick;
-    		} else {
-    			return num - tick;
-    		}
-    	}
+        if (bitSet.get(tick)) {
+            // bit is active; search for the next clear bit
+            // this bit must exist, because we use a BitSet
+            return bitSet.nextClearBit(tick) - tick;
+        } else {
+            // bit is inactive; search for the next set bit
+            // if there is no set bit, return the remaining
+            // number of ticks (the number of ticks until the
+            // song ends)
+            
+            int num = bitSet.nextSetBit(tick);
+            
+            if (num == -1) {
+                return totalTicks - tick;
+            } else {
+                return num - tick;
+            }
+        }
     }
   
     /**
@@ -113,7 +113,7 @@ public class ActivityVector {
      */
     
     public int getActiveTicks() {
-    	return bitSet.cardinality();
+        return bitSet.cardinality();
     }
     
     /**
@@ -125,7 +125,7 @@ public class ActivityVector {
      */
     
     public int getFirstActiveTick() {
-    	return bitSet.nextSetBit(0);
+        return bitSet.nextSetBit(0);
     }
 
     /**
@@ -149,13 +149,13 @@ public class ActivityVector {
      */
     
     public int getFirstInactiveTick() {
-    	int tick = bitSet.nextClearBit(0);
-    	
-    	if (tick >= totalTicks) {
-    		return -1;
-    	} else {
-    		return tick;
-    	}
+        int tick = bitSet.nextClearBit(0);
+        
+        if (tick >= totalTicks) {
+            return -1;
+        } else {
+            return tick;
+        }
     }
     
     /**
@@ -169,103 +169,103 @@ public class ActivityVector {
      */
     
     public void setActivityState(int from, int till, boolean state) {
-    	if (till > totalTicks) {
-    		totalTicks = till;
-    	}
-    	
-    	bitSet.set(from, till, state);
+        if (till > totalTicks) {
+            totalTicks = till;
+        }
+        
+        bitSet.set(from, till, state);
     }
     
-	/**
-	 * Modifies the ActivityVector so that all interval changes
-	 * from inactive to active are postponed by startTicks and all
-	 * changes from active to inactive are postponed by stopTicks ticks.
-	 * startTicks and stopTicks may also be negative to prepone
-	 * instead of postpone. The start of the first interval is never
-	 * modified, whereas the end of the last interval is never postponed.
-	 * 
-	 * @param startTicks the number of ticks to prepone or postpone starting
-	 * @param stopTicks the number of ticks to prepone or postpone stopping
-	 */
-	
-	public void shiftIntervalBoundaries(int startTicks, int stopTicks) {
-		if (startTicks == 0 && stopTicks == 0) {
-			return;
-		}
+    /**
+     * Modifies the ActivityVector so that all interval changes
+     * from inactive to active are postponed by startTicks and all
+     * changes from active to inactive are postponed by stopTicks ticks.
+     * startTicks and stopTicks may also be negative to prepone
+     * instead of postpone. The start of the first interval is never
+     * modified, whereas the end of the last interval is never postponed.
+     * 
+     * @param startTicks the number of ticks to prepone or postpone starting
+     * @param stopTicks the number of ticks to prepone or postpone stopping
+     */
+    
+    public void shiftIntervalBoundaries(int startTicks, int stopTicks) {
+        if (startTicks == 0 && stopTicks == 0) {
+            return;
+        }
 
-		int tick = 0;
-		
-		while (tick < totalTicks) {
-			tick += getIntervalLength(tick);
-			
-			boolean active = isActive(tick);
-			
-			if (stopTicks < 0 && !active) {
-				setActivityState(tick + stopTicks, tick, false);
-			} else if (stopTicks > 0 && tick < totalTicks && !active) {
-				setActivityState(tick, tick + stopTicks, true);
-				tick  += stopTicks;
-			} else if (startTicks < 0 && active) {				
-				setActivityState(tick + startTicks, tick, true);
-			} else if (startTicks > 0 && active) {
-				setActivityState(tick, tick + startTicks, false);
-				tick  += startTicks;
-			}
-		}
-	}
-	
-	/**
-	 * Counts the number of activity segments, which is the number of consecutive blocks of activity in the
-	 * vector.
-	 * 
-	 * @return the number of activity segments
-	 */
-	
-	public int getSegmentCount() {
-		int segments = 0;
-		int pos = -1;
-		
-		while (true) {
-			pos = bitSet.nextSetBit(pos + 1);
-			
-			if (pos == -1) {
-				return segments;
-			}				
+        int tick = 0;
+        
+        while (tick < totalTicks) {
+            tick += getIntervalLength(tick);
+            
+            boolean active = isActive(tick);
+            
+            if (stopTicks < 0 && !active) {
+                setActivityState(tick + stopTicks, tick, false);
+            } else if (stopTicks > 0 && tick < totalTicks && !active) {
+                setActivityState(tick, tick + stopTicks, true);
+                tick  += stopTicks;
+            } else if (startTicks < 0 && active) {                
+                setActivityState(tick + startTicks, tick, true);
+            } else if (startTicks > 0 && active) {
+                setActivityState(tick, tick + startTicks, false);
+                tick  += startTicks;
+            }
+        }
+    }
+    
+    /**
+     * Counts the number of activity segments, which is the number of consecutive blocks of activity in the
+     * vector.
+     * 
+     * @return the number of activity segments
+     */
+    
+    public int getSegmentCount() {
+        int segments = 0;
+        int pos = -1;
+        
+        while (true) {
+            pos = bitSet.nextSetBit(pos + 1);
+            
+            if (pos == -1) {
+                return segments;
+            }                
 
-			segments++;
-			
-			pos = bitSet.nextClearBit(pos + 1);
+            segments++;
+            
+            pos = bitSet.nextClearBit(pos + 1);
 
-			if (pos == -1) {
-				return segments;
-			}			
-		}
-	}
-	
-	/**
-	 * Returns a string representation of the ActivityVector.
-	 *
-	 * @return a string representation
-	 */
-	
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		
-		int tick = 0;
-		
-		while (tick < totalTicks) {
-			
-			int len = getIntervalLength(tick);
-			
-			if (sb.length() > 0) {
-				sb.append(',');
-			}
-			
-			sb.append(isActive(tick) ? "1/" + len : "0/" + len);
-			
-			tick += len;
-		}
+            if (pos == -1) {
+                return segments;
+            }            
+        }
+    }
+    
+    /**
+     * Returns a string representation of the ActivityVector.
+     *
+     * @return a string representation
+     */
+    
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        
+        int tick = 0;
+        
+        while (tick < totalTicks) {
+            
+            int len = getIntervalLength(tick);
+            
+            if (sb.length() > 0) {
+                sb.append(',');
+            }
+            
+            sb.append(isActive(tick) ? "1/" + len : "0/" + len);
+            
+            tick += len;
+        }
 
-		return sb.toString();
-	}
+        return sb.toString();
+    }
 }

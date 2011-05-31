@@ -20,28 +20,28 @@ public abstract class AbstractLFO implements LFO {
     /** The random seed. */
     protected long randomSeed;
 
-	/** The minimum amplitude value. */
-	private int returnMinimum = Integer.MIN_VALUE;
-	
-	/** The maximum amplitude value. */
-	private int returnMaximum = Integer.MAX_VALUE;
+    /** The minimum amplitude value. */
+    private int returnMinimum = Integer.MIN_VALUE;
+    
+    /** The maximum amplitude value. */
+    private int returnMaximum = Integer.MAX_VALUE;
 
-	/** The minimum amplitude value. */
-	private int amplitudeMinimum;
-	
-	/** The maximum amplitude value. */
-	private int amplitudeMaximum;
-	
-	/** The number of microrotations per tick. */
-	private long microRotationsPerTick;
+    /** The minimum amplitude value. */
+    private int amplitudeMinimum;
+    
+    /** The maximum amplitude value. */
+    private int amplitudeMaximum;
+    
+    /** The number of microrotations per tick. */
+    private long microRotationsPerTick;
 
-	/** The start phase in microrotations. */
-	private long microRotationShift;
-	
-	/** True if one of the set...Speed() methods has been called. */
-	private boolean isConfigured;
-	
-	/**
+    /** The start phase in microrotations. */
+    private long microRotationShift;
+    
+    /** True if one of the set...Speed() methods has been called. */
+    private boolean isConfigured;
+    
+    /**
      * Returns the LFO's value of the given angle as a double.
      * The returned value must be between 0 and 1 (both inclusive).
      * 
@@ -52,13 +52,13 @@ public abstract class AbstractLFO implements LFO {
     
     protected abstract double getValue(double angle);
 
-	/**
-	 * Returns the LFO's value of the given tick.
-	 * 
-	 * @param tick the tick (non-negative)
-	 * 
-	 * @return the LFO's value
-	 */
+    /**
+     * Returns the LFO's value of the given tick.
+     * 
+     * @param tick the tick (non-negative)
+     * 
+     * @return the LFO's value
+     */
 
     public int getTickValue(int tick) {
         if (!isConfigured) {
@@ -70,78 +70,78 @@ public abstract class AbstractLFO implements LFO {
         int value = amplitudeMinimum + (int) (0.5d + (amplitudeMaximum - amplitudeMinimum) * getValue(angle));
         
         if (value > returnMaximum) {
-        	return returnMaximum;
+            return returnMaximum;
         } else if (value < returnMinimum) {
-        	return returnMinimum;
+            return returnMinimum;
         } else {
-        	return value;
+            return value;
         }
     }
 
-	public void setBeatSpeed(int milliRotationsPerBeat, int ticksPerBeat, int milliBPM) {
-		this.microRotationsPerTick = milliRotationsPerBeat * 1000L / ticksPerBeat; 
-		isConfigured = true;
-	}
+    public void setBeatSpeed(int milliRotationsPerBeat, int ticksPerBeat, int milliBPM) {
+        this.microRotationsPerTick = milliRotationsPerBeat * 1000L / ticksPerBeat; 
+        isConfigured = true;
+    }
 
-	public void setSongSpeed(int milliRotationsPerSong, int ticksPerSong, int milliBPM) {
-		this.microRotationsPerTick = milliRotationsPerSong * 1000L / ticksPerSong; 
-		isConfigured = true;
-	}
+    public void setSongSpeed(int milliRotationsPerSong, int ticksPerSong, int milliBPM) {
+        this.microRotationsPerTick = milliRotationsPerSong * 1000L / ticksPerSong; 
+        isConfigured = true;
+    }
 
-	public void setActivitySpeed(int milliRotationsPerActivity, int startTick, int endTick, int milliBPM) {
-		this.microRotationsPerTick = milliRotationsPerActivity * 1000L / (endTick - startTick);		
-		this.microRotationShift -= microRotationsPerTick * startTick;
-		isConfigured = true;
-	}
+    public void setActivitySpeed(int milliRotationsPerActivity, int startTick, int endTick, int milliBPM) {
+        this.microRotationsPerTick = milliRotationsPerActivity * 1000L / (endTick - startTick);        
+        this.microRotationShift -= microRotationsPerTick * startTick;
+        isConfigured = true;
+    }
 
-	public void setTimeSpeed(int milliRotationsPerSecond, int ticksPerBeat, int milliBPM) {
-		this.microRotationsPerTick = milliRotationsPerSecond * 60000000L / milliBPM / ticksPerBeat;
-		isConfigured = true;
-	}
-	
-	public void setPhase(int microRotations) {
-		this.microRotationShift = microRotations;
-	}
+    public void setTimeSpeed(int milliRotationsPerSecond, int ticksPerBeat, int milliBPM) {
+        this.microRotationsPerTick = milliRotationsPerSecond * 60000000L / milliBPM / ticksPerBeat;
+        isConfigured = true;
+    }
+    
+    public void setPhase(int microRotations) {
+        this.microRotationShift = microRotations;
+    }
 
-	/**
-	 * Sets the minimum value to return.
-	 * 
-	 * @param minimum the minimum value
-	 */
-	
-	public void setValueMinimum(int minimum) {
-		this.returnMinimum = minimum;
-	}
+    /**
+     * Sets the minimum value to return.
+     * 
+     * @param minimum the minimum value
+     */
+    
+    public void setValueMinimum(int minimum) {
+        this.returnMinimum = minimum;
+    }
 
-	/**
-	 * Sets the maximum value to return.
-	 * 
-	 * @param maximum the maximum value
-	 */
-	
-	public void setValueMaximum(int maximum) {
-		this.returnMaximum = maximum;
-	}
-	/**
-	 * Sets the amplitude minimum.
-	 * 
-	 * @param minimum the amplitude minimum
-	 */
-	
-	public void setAmplitudeMinimum(int minimum) {
-		this.amplitudeMinimum = minimum;
-	}
+    /**
+     * Sets the maximum value to return.
+     * 
+     * @param maximum the maximum value
+     */
+    
+    public void setValueMaximum(int maximum) {
+        this.returnMaximum = maximum;
+    }
+    /**
+     * Sets the amplitude minimum.
+     * 
+     * @param minimum the amplitude minimum
+     */
+    
+    public void setAmplitudeMinimum(int minimum) {
+        this.amplitudeMinimum = minimum;
+    }
 
-	/**
-	 * Sets the amplitude maximum.
-	 * 
-	 * @param maximum the amplitude maximum
-	 */
-	
-	public void setAmplitudeMaximum(int maximum) {
-		this.amplitudeMaximum = maximum;
-	}
-	
+    /**
+     * Sets the amplitude maximum.
+     * 
+     * @param maximum the amplitude maximum
+     */
+    
+    public void setAmplitudeMaximum(int maximum) {
+        this.amplitudeMaximum = maximum;
+    }
+    
     public void setRandomSeed(long randomSeed) {
         this.randomSeed = randomSeed;
     }

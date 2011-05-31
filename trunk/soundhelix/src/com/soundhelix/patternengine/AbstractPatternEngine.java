@@ -14,17 +14,17 @@ public abstract class AbstractPatternEngine implements PatternEngine, RandomSeed
     protected final Logger logger;
     
     /** The random seed. */
-	protected long randomSeed;
-	
+    protected long randomSeed;
+    
     public AbstractPatternEngine() {
-    	logger = Logger.getLogger(this.getClass());
+        logger = Logger.getLogger(this.getClass());
     }
 
-	public long getRandomSeed() {
-		return randomSeed;
-	}
+    public long getRandomSeed() {
+        return randomSeed;
+    }
 
-	public void setRandomSeed(long randomSeed) {
-		this.randomSeed = randomSeed;
-	}
+    public void setRandomSeed(long randomSeed) {
+        this.randomSeed = randomSeed;
+    }
 }

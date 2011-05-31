@@ -17,31 +17,31 @@ import com.soundhelix.misc.Arrangement;
 
 public abstract class AbstractPlayer implements Player {
     /** The logger. */
-	protected final Logger logger;
+    protected final Logger logger;
 
-	/** The random seed. */
-	protected long randomSeed;
-	
-	/** The arrangement. */
-	protected Arrangement arrangement;
-	
+    /** The random seed. */
+    protected long randomSeed;
+    
+    /** The arrangement. */
+    protected Arrangement arrangement;
+    
     public AbstractPlayer() {
-    	logger = Logger.getLogger(this.getClass());
+        logger = Logger.getLogger(this.getClass());
     }
 
     public void setRandomSeed(long randomSeed) {
-    	this.randomSeed = randomSeed;
+        this.randomSeed = randomSeed;
     }
 
     public long getRandomSeed() {
-    	return randomSeed;
+        return randomSeed;
     }
 
     public void setArrangement(Arrangement arrangement) {
-    	this.arrangement = arrangement;
+        this.arrangement = arrangement;
     }
 
     public Arrangement getArrangement() {
-    	return arrangement;
+        return arrangement;
     }
 }

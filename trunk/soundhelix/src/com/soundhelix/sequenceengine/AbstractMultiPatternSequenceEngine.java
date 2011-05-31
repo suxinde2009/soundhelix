@@ -26,32 +26,32 @@ import com.soundhelix.util.NoteUtils;
  */
 
 public abstract class AbstractMultiPatternSequenceEngine extends AbstractSequenceEngine {
-	
-	protected static final char TRANSITION = '+';
-	
-	protected static final int[] MAJOR_TABLE = new int[] {0, 4, 7};
-	protected static final int[] MINOR_TABLE = new int[] {0, 3, 7};
+    
+    protected static final char TRANSITION = '+';
+    
+    protected static final int[] MAJOR_TABLE = new int[] {0, 4, 7};
+    protected static final int[] MINOR_TABLE = new int[] {0, 3, 7};
 
-	protected Random random;
-	
-	protected boolean obeyChordSubtype;
-	
-	private Pattern[] patterns;
-	
-	public AbstractMultiPatternSequenceEngine() {
-		super();
-	}
+    protected Random random;
+    
+    protected boolean obeyChordSubtype;
+    
+    private Pattern[] patterns;
+    
+    public AbstractMultiPatternSequenceEngine() {
+        super();
+    }
 
-	public void setPatterns(Pattern[] patterns) {
-		this.patterns = patterns;
-	}
-	
-	public void setObeyChordSubtype(boolean obeyChordSubtype) {
-		this.obeyChordSubtype = obeyChordSubtype;
-	}
+    public void setPatterns(Pattern[] patterns) {
+        this.patterns = patterns;
+    }
+    
+    public void setObeyChordSubtype(boolean obeyChordSubtype) {
+        this.obeyChordSubtype = obeyChordSubtype;
+    }
 
-	public Track render(ActivityVector[] activityVectors) {
-		ActivityVector activityVector = activityVectors[0];
+    public Track render(ActivityVector[] activityVectors) {
+        ActivityVector activityVector = activityVectors[0];
 
         HarmonyEngine harmonyEngine = structure.getHarmonyEngine();        
         
@@ -60,104 +60,104 @@ public abstract class AbstractMultiPatternSequenceEngine extends AbstractSequenc
 
         int patternCount = patterns.length;
 
-		Sequence[] seqs = new Sequence[patternCount];
-		
-		for (int i = 0; i < patternCount; i++) {
-			seqs[i] = new Sequence();
-		}
+        Sequence[] seqs = new Sequence[patternCount];
+        
+        for (int i = 0; i < patternCount; i++) {
+            seqs[i] = new Sequence();
+        }
 
-		Track track = new Track(TrackType.MELODY);
-		
-       	for (int i = 0; i < patterns.length; i++) {
-    		Sequence seq = seqs[i];
-    		Pattern pattern = patterns[i];
-    		int patternLength = pattern.size();
-    		int pos = 0;
-    		int tick = 0;
+        Track track = new Track(TrackType.MELODY);
+        
+           for (int i = 0; i < patterns.length; i++) {
+            Sequence seq = seqs[i];
+            Pattern pattern = patterns[i];
+            int patternLength = pattern.size();
+            int pos = 0;
+            int tick = 0;
 
-			while (tick < ticks) {
-    			Chord chord = harmonyEngine.getChord(tick);
+            while (tick < ticks) {
+                Chord chord = harmonyEngine.getChord(tick);
 
-    			if (obeyChordSubtype) {
-    				chord = firstChord.findClosestChord(chord);
-    			}
+                if (obeyChordSubtype) {
+                    chord = firstChord.findClosestChord(chord);
+                }
 
-				Pattern.PatternEntry entry = pattern.get(pos % patternLength);
-        		int len = entry.getTicks();
+                Pattern.PatternEntry entry = pattern.get(pos % patternLength);
+                int len = entry.getTicks();
 
-        		if (activityVector.isActive(tick)) {
-        			short vel = entry.getVelocity();
+                if (activityVector.isActive(tick)) {
+                    short vel = entry.getVelocity();
 
-        			if (entry.isPause()) {
-        				// add pause
-        				seq.addPause(len);
-        			} else if (entry.isWildcard() && entry.getWildcardCharacter() == TRANSITION) {
-        				// find the tick of the next note that will
-        				// be played
+                    if (entry.isPause()) {
+                        // add pause
+                        seq.addPause(len);
+                    } else if (entry.isWildcard() && entry.getWildcardCharacter() == TRANSITION) {
+                        // find the tick of the next note that will
+                        // be played
 
-        				int p = pos + 1;
-        				int t = tick + len;
+                        int p = pos + 1;
+                        int t = tick + len;
 
-        				while (t < ticks && (!pattern.get(p % patternLength).isNote())) {
-        					t += pattern.get(p % patternLength).getTicks();
-        					p++;
-        				}
+                        while (t < ticks && (!pattern.get(p % patternLength).isNote())) {
+                            t += pattern.get(p % patternLength).getTicks();
+                            p++;
+                        }
 
-        				Chord nextChord;
+                        Chord nextChord;
 
-        				if (t < ticks && activityVector.isActive(t)) {
-        					nextChord = harmonyEngine.getChord(t);
-        				} else {
-        					// the next chord would either fall into
-        					// an inactivity interval or be at the end
-        					// of the song
-        					nextChord = null;
-        				}
+                        if (t < ticks && activityVector.isActive(t)) {
+                            nextChord = harmonyEngine.getChord(t);
+                        } else {
+                            // the next chord would either fall into
+                            // an inactivity interval or be at the end
+                            // of the song
+                            nextChord = null;
+                        }
 
-        				int pitch = NoteUtils.getTransitionPitch(chord, nextChord);
+                        int pitch = NoteUtils.getTransitionPitch(chord, nextChord);
 
                         boolean useLegato = entry.isLegato()
                                             ? pattern.isLegatoLegal(activityVector, tick + len, pos + 1) : false;
-        				seq.addNote(pitch, len, vel, useLegato);
-        			} else {
-        				// normal note
-        				int value = entry.getPitch();
+                        seq.addNote(pitch, len, vel, useLegato);
+                    } else {
+                        // normal note
+                        int value = entry.getPitch();
 
-        				if (obeyChordSubtype) {
-        					if (chord.getSubtype() == ChordSubtype.BASE_4) {
-        						value++;
-        					} else if (chord.getSubtype() == ChordSubtype.BASE_6) {
-        						value--;
-        					}
-        				}
+                        if (obeyChordSubtype) {
+                            if (chord.getSubtype() == ChordSubtype.BASE_4) {
+                                value++;
+                            } else if (chord.getSubtype() == ChordSubtype.BASE_6) {
+                                value--;
+                            }
+                        }
 
-        				// split value into octave and offset
-        				// we add 3 to avoid modulo and division issues with
-        				// negative values
+                        // split value into octave and offset
+                        // we add 3 to avoid modulo and division issues with
+                        // negative values
 
-        				int octave = value >= 0 ? value / 3 : (value - 2) / 3;
-        				int offset = ((value % 3) + 3) % 3;
+                        int octave = value >= 0 ? value / 3 : (value - 2) / 3;
+                        int offset = ((value % 3) + 3) % 3;
 
-        				boolean useLegato = entry.isLegato()
+                        boolean useLegato = entry.isLegato()
                                             ? pattern.isLegatoLegal(activityVector, tick + len, pos + 1) : false;
 
-        				if (chord.isMajor()) {
+                        if (chord.isMajor()) {
                             seq.addNote(octave * 12 + MAJOR_TABLE[offset] + chord.getPitch(), len, vel, useLegato);
-        				} else {
+                        } else {
                             seq.addNote(octave * 12 + MINOR_TABLE[offset] + chord.getPitch(), len, vel, useLegato);
-        				}
-        			}
-        		} else {
-        			// add pause
-        			seq.addPause(len);
-        		}
+                        }
+                    }
+                } else {
+                    // add pause
+                    seq.addPause(len);
+                }
 
-        		tick += len;
-        		pos++;
-        	}
-    		track.add(seq);
+                tick += len;
+                pos++;
+            }
+            track.add(seq);
         }
         
         return track;
-	}
+    }
 }

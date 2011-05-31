@@ -13,13 +13,13 @@ import com.soundhelix.misc.XMLConfigurable;
  */
 
 public interface PatternEngine extends XMLConfigurable, RandomSeedable {
-	/**
-	 * Generates a pattern.
-	 * 
-	 * @param wildcardString the string containing the wildcard characters
-	 *
-	 * @return the pattern entry
-	 */
-	
-	Pattern render(String wildcardString);
+    /**
+     * Generates a pattern.
+     * 
+     * @param wildcardString the string containing the wildcard characters
+     *
+     * @return the pattern entry
+     */
+    
+    Pattern render(String wildcardString);
 }

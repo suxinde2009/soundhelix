@@ -27,47 +27,47 @@ import com.soundhelix.util.XMLUtils;
  */
 
 public class MultiPatternSequenceEngine extends AbstractMultiPatternSequenceEngine {
-	
-	public MultiPatternSequenceEngine() {
-		super();
-	}
+    
+    public MultiPatternSequenceEngine() {
+        super();
+    }
 
-	public void configure(Node node, XPath xpath) throws XPathException {
-		random = new Random(randomSeed);
+    public void configure(Node node, XPath xpath) throws XPathException {
+        random = new Random(randomSeed);
 
-		NodeList patternsList = (NodeList) xpath.evaluate("patternEngines", node, XPathConstants.NODESET);
+        NodeList patternsList = (NodeList) xpath.evaluate("patternEngines", node, XPathConstants.NODESET);
 
-		if (patternsList.getLength() == 0) {
-			throw new RuntimeException("Need at least 1 list of patternEngines");
-		}
+        if (patternsList.getLength() == 0) {
+            throw new RuntimeException("Need at least 1 list of patternEngines");
+        }
 
-		Node patternsNode = patternsList.item(random.nextInt(patternsList.getLength()));
+        Node patternsNode = patternsList.item(random.nextInt(patternsList.getLength()));
 
-		NodeList patternList = (NodeList) xpath.evaluate("patternEngine", patternsNode, XPathConstants.NODESET);
+        NodeList patternList = (NodeList) xpath.evaluate("patternEngine", patternsNode, XPathConstants.NODESET);
 
-		if (patternList.getLength() == 0) {
-			throw new RuntimeException("Need at least 1 pattern");
-		}
+        if (patternList.getLength() == 0) {
+            throw new RuntimeException("Need at least 1 pattern");
+        }
 
-		Pattern[] patterns = new Pattern[patternList.getLength()];
+        Pattern[] patterns = new Pattern[patternList.getLength()];
 
-		for (int i = 0; i < patternList.getLength(); i++) {
-			PatternEngine patternEngine;
-			
-			try {
-				patternEngine = XMLUtils.getInstance(PatternEngine.class, patternList.item(i),
-						xpath, randomSeed, i);
-			} catch (Exception e) {
-				throw new RuntimeException("Error instantiating PatternEngine", e);
-			}
-		
-			patterns[i] = patternEngine.render("" + TRANSITION);
-		}
+        for (int i = 0; i < patternList.getLength(); i++) {
+            PatternEngine patternEngine;
+            
+            try {
+                patternEngine = XMLUtils.getInstance(PatternEngine.class, patternList.item(i),
+                        xpath, randomSeed, i);
+            } catch (Exception e) {
+                throw new RuntimeException("Error instantiating PatternEngine", e);
+            }
+        
+            patterns[i] = patternEngine.render("" + TRANSITION);
+        }
 
-		setPatterns(patterns);
+        setPatterns(patterns);
 
-		try {
-			setObeyChordSubtype(XMLUtils.parseBoolean(random, "obeyChordSubtype", node, xpath));
-		} catch (Exception e) {}
-	}
+        try {
+            setObeyChordSubtype(XMLUtils.parseBoolean(random, "obeyChordSubtype", node, xpath));
+        } catch (Exception e) {}
+    }
 }

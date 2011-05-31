@@ -18,73 +18,73 @@ import com.soundhelix.misc.Track.TrackType;
  */
 
 public abstract class AbstractFreeMultiPatternSequenceEngine extends AbstractSequenceEngine {
-	
-	/** The random generator. */
-	protected Random random;
-	
-	/** The Pattern array. */
-	private Pattern[] patterns;
-	
-	public AbstractFreeMultiPatternSequenceEngine() {
-		super();
-	}
+    
+    /** The random generator. */
+    protected Random random;
+    
+    /** The Pattern array. */
+    private Pattern[] patterns;
+    
+    public AbstractFreeMultiPatternSequenceEngine() {
+        super();
+    }
 
-	public void setPatterns(Pattern[] patterns) {
-		this.patterns = patterns;
-	}
-	
-	public Track render(ActivityVector[] activityVectors) {
-		ActivityVector activityVector = activityVectors[0];
+    public void setPatterns(Pattern[] patterns) {
+        this.patterns = patterns;
+    }
+    
+    public Track render(ActivityVector[] activityVectors) {
+        ActivityVector activityVector = activityVectors[0];
 
         int ticks = structure.getTicks();
         int patternCount = patterns.length;
         
-		Sequence[] seqs = new Sequence[patternCount];
-		
-		for (int i = 0; i < patternCount; i++) {
-			seqs[i] = new Sequence();
-		}
+        Sequence[] seqs = new Sequence[patternCount];
+        
+        for (int i = 0; i < patternCount; i++) {
+            seqs[i] = new Sequence();
+        }
 
-		Track track = new Track(TrackType.MELODY);
-		
-       	for (int i = 0; i < patterns.length; i++) {
-    		Sequence seq = seqs[i];
-    		Pattern pattern = patterns[i];
-    		int patternLength = pattern.size();
-    		int pos = 0;
-    		int tick = 0;
+        Track track = new Track(TrackType.MELODY);
+        
+           for (int i = 0; i < patterns.length; i++) {
+            Sequence seq = seqs[i];
+            Pattern pattern = patterns[i];
+            int patternLength = pattern.size();
+            int pos = 0;
+            int tick = 0;
 
-			while (tick < ticks) {
-				Pattern.PatternEntry entry = pattern.get(pos % patternLength);
-        		int len = entry.getTicks();
+            while (tick < ticks) {
+                Pattern.PatternEntry entry = pattern.get(pos % patternLength);
+                int len = entry.getTicks();
 
-        		if (activityVector.isActive(tick)) {
-        			short vel = entry.getVelocity();
+                if (activityVector.isActive(tick)) {
+                    short vel = entry.getVelocity();
 
-        			if (entry.isPause()) {
-        				// add pause
-        				seq.addPause(len);
-        			} else {
-        				// normal note
-        				int pitch = entry.getPitch();
+                    if (entry.isPause()) {
+                        // add pause
+                        seq.addPause(len);
+                    } else {
+                        // normal note
+                        int pitch = entry.getPitch();
 
-        				boolean useLegato = entry.isLegato() 
+                        boolean useLegato = entry.isLegato() 
                                             ? pattern.isLegatoLegal(activityVector, tick + len, pos + 1)
-        								    : false;
+                                            : false;
 
-       					seq.addNote(pitch, len, vel, useLegato);
-        			}
-        		} else {
-        			// add pause
-        			seq.addPause(len);
-        		}
+                           seq.addNote(pitch, len, vel, useLegato);
+                    }
+                } else {
+                    // add pause
+                    seq.addPause(len);
+                }
 
-        		tick += len;
-        		pos++;
-        	}
-    		track.add(seq);
+                tick += len;
+                pos++;
+            }
+            track.add(seq);
         }
         
         return track;
-	}
+    }
 }

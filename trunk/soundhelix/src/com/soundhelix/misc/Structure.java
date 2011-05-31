@@ -29,75 +29,75 @@ import com.soundhelix.harmonyengine.HarmonyEngine;
 
 public class Structure implements Serializable {
     /** The number of bars. */
-	private int bars;
-	
-	/** The number of beats per bar. */
-	private int beatsPerBar;
-	
-	/** The number of ticks per beat. */
-	private int ticksPerBeat;
-	
-	/** The HarmonyEngine. */
-	private HarmonyEngine harmonyEngine;
-	
-	/** The song name. */
-	private String songName;
-	
-	/** The number of ticks per bar (derived). */
-	private int ticksPerBar;
-	
-	/** The number of ticks (derived). */
-	private int ticks;
-	
-	public Structure(int bars, int beatsPerBar, int ticksPerBeat, String songName) {
-	    this.bars = bars;
-	    this.beatsPerBar = beatsPerBar;
-	    this.ticksPerBeat = ticksPerBeat;       
+    private int bars;
+    
+    /** The number of beats per bar. */
+    private int beatsPerBar;
+    
+    /** The number of ticks per beat. */
+    private int ticksPerBeat;
+    
+    /** The HarmonyEngine. */
+    private HarmonyEngine harmonyEngine;
+    
+    /** The song name. */
+    private String songName;
+    
+    /** The number of ticks per bar (derived). */
+    private int ticksPerBar;
+    
+    /** The number of ticks (derived). */
+    private int ticks;
+    
+    public Structure(int bars, int beatsPerBar, int ticksPerBeat, String songName) {
+        this.bars = bars;
+        this.beatsPerBar = beatsPerBar;
+        this.ticksPerBeat = ticksPerBeat;       
 
-	    this.ticksPerBar = beatsPerBar * ticksPerBeat;
-	    this.ticks = bars * ticksPerBar;
+        this.ticksPerBar = beatsPerBar * ticksPerBeat;
+        this.ticks = bars * ticksPerBar;
 
-	    this.songName = songName;
-	}
+        this.songName = songName;
+    }
 
-	public int getBeatsPerBar() {
-		return beatsPerBar;
-	}
+    public int getBeatsPerBar() {
+        return beatsPerBar;
+    }
 
-	public int getTicksPerBeat() {
-		return ticksPerBeat;
-	}
+    public int getTicksPerBeat() {
+        return ticksPerBeat;
+    }
 
-	public int getTicks() {
-		return ticks;
-	}
-	
-	public int getTicksPerBar() {
-		return ticksPerBar;
-	}
+    public int getTicks() {
+        return ticks;
+    }
+    
+    public int getTicksPerBar() {
+        return ticksPerBar;
+    }
 
-	public int getBars() {
-		return bars;
-	}
-	
-	public String getSongName() {
-	    return songName;
-	}
+    public int getBars() {
+        return bars;
+    }
+    
+    public String getSongName() {
+        return songName;
+    }
 
-	public void setSongName(String songName) {
-	    this.songName = songName;
-	}
+    public void setSongName(String songName) {
+        this.songName = songName;
+    }
 
-	public HarmonyEngine getHarmonyEngine() {
-		return harmonyEngine;
-	}
-	
-	public void setHarmonyEngine(HarmonyEngine harmonyEngine) {
-		if (harmonyEngine == null) {
-			throw new RuntimeException("HarmonyEngine already set");
-		}
-		
-		this.harmonyEngine = harmonyEngine;
-		harmonyEngine.setSongStructure(this);
-	}	
+    public HarmonyEngine getHarmonyEngine() {
+        return harmonyEngine;
+    }
+    
+    public void setHarmonyEngine(HarmonyEngine harmonyEngine) {
+        if (harmonyEngine == null) {
+            throw new RuntimeException("HarmonyEngine already set");
+        }
+        
+        this.harmonyEngine = harmonyEngine;
+        harmonyEngine.setSongStructure(this);
+    }    
 }

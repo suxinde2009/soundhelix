@@ -28,30 +28,30 @@ import com.soundhelix.util.XMLUtils;
 
 public class FreePatternSequenceEngine extends AbstractFreeMultiPatternSequenceEngine {
 
-	public FreePatternSequenceEngine() {
-		super();
-	}
+    public FreePatternSequenceEngine() {
+        super();
+    }
 
     public void configure(Node node, XPath xpath) throws XPathException {
-    	random = new Random(randomSeed);
-    	
-		NodeList nodeList = (NodeList) xpath.evaluate("patternEngine", node, XPathConstants.NODESET);
+        random = new Random(randomSeed);
+        
+        NodeList nodeList = (NodeList) xpath.evaluate("patternEngine", node, XPathConstants.NODESET);
 
-		if (nodeList.getLength() == 0) {
-			throw new RuntimeException("Need at least 1 patternEngine");
-		}
-		
-		PatternEngine patternEngine;
-		
-		try {
-			int i = random.nextInt(nodeList.getLength());
-			patternEngine = XMLUtils.getInstance(PatternEngine.class, nodeList.item(i),
-					xpath, randomSeed, i);
-		} catch (Exception e) {
-			throw new RuntimeException("Error instantiating PatternEngine", e);
-		}
-		
-		Pattern pattern = patternEngine.render("");
-		setPatterns(new Pattern[] {pattern});
+        if (nodeList.getLength() == 0) {
+            throw new RuntimeException("Need at least 1 patternEngine");
+        }
+        
+        PatternEngine patternEngine;
+        
+        try {
+            int i = random.nextInt(nodeList.getLength());
+            patternEngine = XMLUtils.getInstance(PatternEngine.class, nodeList.item(i),
+                    xpath, randomSeed, i);
+        } catch (Exception e) {
+            throw new RuntimeException("Error instantiating PatternEngine", e);
+        }
+        
+        Pattern pattern = patternEngine.render("");
+        setPatterns(new Pattern[] {pattern});
     }
 }

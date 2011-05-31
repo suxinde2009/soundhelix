@@ -13,19 +13,19 @@ import com.soundhelix.misc.XMLConfigurable;
 
 public interface ArrangementEngine extends XMLConfigurable, RandomSeedable {
 
-	/**
-	 * Sets the structure.
-	 * 
-	 * @param structure the structure
-	 */
-	
-	void setStructure(Structure structure);
+    /**
+     * Sets the structure.
+     * 
+     * @param structure the structure
+     */
+    
+    void setStructure(Structure structure);
 
-	/**
-	 * Renders and returns an Arrangement.
-	 * 
-	 * @return the rendered arrangement
-	 */
-	
+    /**
+     * Renders and returns an Arrangement.
+     * 
+     * @return the rendered arrangement
+     */
+    
     Arrangement render();
 }

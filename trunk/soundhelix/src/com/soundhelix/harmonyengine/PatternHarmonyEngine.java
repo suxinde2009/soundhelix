@@ -36,173 +36,173 @@ import com.soundhelix.util.XMLUtils;
  */
 
 public class PatternHarmonyEngine extends AbstractHarmonyEngine {
-	private Chord[] chords;
-	private int[] chordTicks;
-	private int[] sectionTicks;
-	
-	private String[] chordPatterns;
-	private String[][] chordRandomTables;
-	
-	/** The random generator. */
-	private Random random;
-	
-	public PatternHarmonyEngine() {
-		super();
-	}
-	
-	public Chord getChord(int tick) {
-		if (chords == null) {
-			parsePattern();
-		}
-		
-		if (tick >= 0 && tick < structure.getTicks()) {
-			return chords[tick];
-		} else {
-			return null;
-		}
-	}
+    private Chord[] chords;
+    private int[] chordTicks;
+    private int[] sectionTicks;
+    
+    private String[] chordPatterns;
+    private String[][] chordRandomTables;
+    
+    /** The random generator. */
+    private Random random;
+    
+    public PatternHarmonyEngine() {
+        super();
+    }
+    
+    public Chord getChord(int tick) {
+        if (chords == null) {
+            parsePattern();
+        }
+        
+        if (tick >= 0 && tick < structure.getTicks()) {
+            return chords[tick];
+        } else {
+            return null;
+        }
+    }
 
-	public int getChordTicks(int tick) {
-		if (chords == null) {
-			parsePattern();
-		}
+    public int getChordTicks(int tick) {
+        if (chords == null) {
+            parsePattern();
+        }
 
-		if (tick >= 0 && tick < structure.getTicks()) {
-			return chordTicks[tick];
-		} else {
-			return 0;
-		}
-	}
+        if (tick >= 0 && tick < structure.getTicks()) {
+            return chordTicks[tick];
+        } else {
+            return 0;
+        }
+    }
 
-	public int getChordSectionTicks(int tick) {
-		if (chords == null) {
-			parsePattern();
-		}
+    public int getChordSectionTicks(int tick) {
+        if (chords == null) {
+            parsePattern();
+        }
 
-		if (tick >= 0 && tick < structure.getTicks()) {
-			return sectionTicks[tick];
-		} else {
-			return 0;
-		}		
-	}
-	
-	private void parsePattern() {
+        if (tick >= 0 && tick < structure.getTicks()) {
+            return sectionTicks[tick];
+        } else {
+            return 0;
+        }        
+    }
+    
+    private void parsePattern() {
         int ticks = structure.getTicks();
         
-		chords = new Chord[ticks];
-		chordTicks = new int[ticks];
-		sectionTicks = new int[ticks];
-		
-		String pat = createPattern();
-		
-		// prepend a '+' sign, if not already present
-		
-		if (!pat.startsWith("+")) {
-			pat = "+" + pat;
-		}
-		
-		logger.debug("Using harmony pattern " + pat);
+        chords = new Chord[ticks];
+        chordTicks = new int[ticks];
+        sectionTicks = new int[ticks];
+        
+        String pat = createPattern();
+        
+        // prepend a '+' sign, if not already present
+        
+        if (!pat.startsWith("+")) {
+            pat = "+" + pat;
+        }
+        
+        logger.debug("Using harmony pattern " + pat);
 
-		String[] c = pat.split(",");
-		
-		int tick = 0;
-		int pos = 0;
-		int sTicks = 0;
-		
-		List<Integer> sectionVector = new ArrayList<Integer>();
-		
-		Chord firstChord = null;
-		Chord previousChord = null;
-		
-		while (tick < ticks) {
-			String[] p = c[pos % c.length].split("/");
+        String[] c = pat.split(",");
+        
+        int tick = 0;
+        int pos = 0;
+        int sTicks = 0;
+        
+        List<Integer> sectionVector = new ArrayList<Integer>();
+        
+        Chord firstChord = null;
+        Chord previousChord = null;
+        
+        while (tick < ticks) {
+            String[] p = c[pos % c.length].split("/");
 
-			boolean newSection = false;
-			
-			int len = (int) (Integer.parseInt(p[1]) * structure.getTicksPerBeat());
-			
-			String cho = p[0];
-			
-			if (cho.startsWith("+")) {
-				newSection = true;
-				if (sTicks > 0) {
-					sectionVector.add(sTicks);
-				}
-				cho = cho.substring(1);
-				sTicks = 0;
-			} else {
-				newSection = false;
-			}
-			
-			int pitch;
-			Chord ch;
+            boolean newSection = false;
+            
+            int len = (int) (Integer.parseInt(p[1]) * structure.getTicksPerBeat());
+            
+            String cho = p[0];
+            
+            if (cho.startsWith("+")) {
+                newSection = true;
+                if (sTicks > 0) {
+                    sectionVector.add(sTicks);
+                }
+                cho = cho.substring(1);
+                sTicks = 0;
+            } else {
+                newSection = false;
+            }
+            
+            int pitch;
+            Chord ch;
 
-			// check whether we have a major or minor chord
-			
-			if (cho.endsWith("m")) {
-				pitch = NoteUtils.getNotePitch(cho.substring(0, cho.length() - 1));
-				
-				if (pitch > 0) {
-					pitch -= 12;
-				}
-				
-				ch = new Chord(pitch, ChordType.MINOR, Chord.ChordSubtype.BASE_0);
-			} else {
-				pitch = NoteUtils.getNotePitch(cho);
-				
-				if (pitch > 0) {
-					pitch -= 12;
-				}
-				
-				ch = new Chord(pitch, ChordType.MAJOR, Chord.ChordSubtype.BASE_0);
-			}
+            // check whether we have a major or minor chord
+            
+            if (cho.endsWith("m")) {
+                pitch = NoteUtils.getNotePitch(cho.substring(0, cho.length() - 1));
+                
+                if (pitch > 0) {
+                    pitch -= 12;
+                }
+                
+                ch = new Chord(pitch, ChordType.MINOR, Chord.ChordSubtype.BASE_0);
+            } else {
+                pitch = NoteUtils.getNotePitch(cho);
+                
+                if (pitch > 0) {
+                    pitch -= 12;
+                }
+                
+                ch = new Chord(pitch, ChordType.MAJOR, Chord.ChordSubtype.BASE_0);
+            }
 
-			if (firstChord == null) {
-				firstChord = ch;
-			}
-			
-			if (newSection) {
-				ch = firstChord.findClosestChord(ch);
-			} else {
-				// previousChord is always non-null here
-				ch = firstChord.findClosestChord(ch);
-			}
-			
-			for (int j = 0; j < len && tick < ticks; j++) {
-				chordTicks[tick] = tick + len - j >= ticks ? ticks - tick : len - j;
-				chords[tick] = ch;
-				tick++;
-				sTicks++;
-			}
-			
-			previousChord = ch;
-			
-			pos++;
-		}
+            if (firstChord == null) {
+                firstChord = ch;
+            }
+            
+            if (newSection) {
+                ch = firstChord.findClosestChord(ch);
+            } else {
+                // previousChord is always non-null here
+                ch = firstChord.findClosestChord(ch);
+            }
+            
+            for (int j = 0; j < len && tick < ticks; j++) {
+                chordTicks[tick] = tick + len - j >= ticks ? ticks - tick : len - j;
+                chords[tick] = ch;
+                tick++;
+                sTicks++;
+            }
+            
+            previousChord = ch;
+            
+            pos++;
+        }
 
         mergeAdjacentChords();        
 
-		sectionVector.add(sTicks);
-		
-		logger.debug("Chord sections: " + sectionVector.size());
-		
-		tick = 0;
-		for (int section = 0; section < sectionVector.size(); section++) {
-			int len = sectionVector.get(section);
-			
-			for (int i = 0; i < len; i++) {
-				sectionTicks[tick] = len - i;
-				tick++;
-			}
-		}
-		
-		checkSanity();
-	}
+        sectionVector.add(sTicks);
+        
+        logger.debug("Chord sections: " + sectionVector.size());
+        
+        tick = 0;
+        for (int section = 0; section < sectionVector.size(); section++) {
+            int len = sectionVector.get(section);
+            
+            for (int i = 0; i < len; i++) {
+                sectionTicks[tick] = len - i;
+                tick++;
+            }
+        }
+        
+        checkSanity();
+    }
 
-	/**
-	 * Merges all adjacent equal chords into one chord.
-	 */
-	
+    /**
+     * Merges all adjacent equal chords into one chord.
+     */
+    
     private void mergeAdjacentChords() {
         int ticks = structure.getTicks();
         int tick = 0;
@@ -224,142 +224,142 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
         }
     }
 
-	public void setChordPatterns(String[] chordPatterns) {
-		if (chordPatterns == null || chordPatterns.length == 0) {
-			throw new IllegalArgumentException("Need at least 1 chord pattern");
-		}
-		
-		this.chordPatterns = chordPatterns;
-	}
-	
-	public void setChordRandomTables(String[][] chordRandomTables) {
-		if (chordRandomTables == null) {
-			throw new IllegalArgumentException("chordRandomTables must not be null");
-		}
+    public void setChordPatterns(String[] chordPatterns) {
+        if (chordPatterns == null || chordPatterns.length == 0) {
+            throw new IllegalArgumentException("Need at least 1 chord pattern");
+        }
+        
+        this.chordPatterns = chordPatterns;
+    }
+    
+    public void setChordRandomTables(String[][] chordRandomTables) {
+        if (chordRandomTables == null) {
+            throw new IllegalArgumentException("chordRandomTables must not be null");
+        }
 
-		this.chordRandomTables = chordRandomTables;
-	}
-	
-	/**
-	 * Creates a pattern that can be parsed using parsePattern().
-	 * 
-	 * @return a pattern
-	 */
-	
-	private String createPattern() {
-		StringBuilder sb = new StringBuilder(80);
-		
-		// choose a chord pattern at random
-		String[] chords = chordPatterns[random.nextInt(chordPatterns.length)].split(",");
-		
-		int count = chords.length;
-		
-		String firstChord = null;
-		String prevChord = null;
+        this.chordRandomTables = chordRandomTables;
+    }
+    
+    /**
+     * Creates a pattern that can be parsed using parsePattern().
+     * 
+     * @return a pattern
+     */
+    
+    private String createPattern() {
+        StringBuilder sb = new StringBuilder(80);
+        
+        // choose a chord pattern at random
+        String[] chords = chordPatterns[random.nextInt(chordPatterns.length)].split(",");
+        
+        int count = chords.length;
+        
+        String firstChord = null;
+        String prevChord = null;
 
-		List<String> chordList = new ArrayList<String>();
-		
-		for (int i = 0; i < count; i++) {
-			if (sb.length() > 0) {
-				sb.append(',');
-			}
-			
-			String[] spec = chords[i].split("/");
-			
-			boolean nextSection;
-			
-			if (spec[0].startsWith("+")) {
-				nextSection = true;
-				spec[0] = spec[0].substring(1);
-			} else {
-				nextSection = false;
-			}
-			
-			String chord;
-			int length = Integer.parseInt(spec[1]);
-			
-			if (spec[0].startsWith("$")) {
-				int refnum = Integer.parseInt(spec[0].substring(1));
-				
-				if (refnum < 0 || refnum >= chordList.size()) {
-					throw new RuntimeException("Invalid back reference $" + refnum);
-				}
-				
-				chord = chordList.get(refnum);
-			} else {
-				// check if we have a note or a random table number
-				
-				int pitch = NoteUtils.getNotePitch(spec[0].endsWith("m")
-								? spec[0].substring(0, spec[0].length() - 1) : spec[0]);
-				
-				if (pitch == Integer.MIN_VALUE) {
-					// we have a random chord table number
+        List<String> chordList = new ArrayList<String>();
+        
+        for (int i = 0; i < count; i++) {
+            if (sb.length() > 0) {
+                sb.append(',');
+            }
+            
+            String[] spec = chords[i].split("/");
+            
+            boolean nextSection;
+            
+            if (spec[0].startsWith("+")) {
+                nextSection = true;
+                spec[0] = spec[0].substring(1);
+            } else {
+                nextSection = false;
+            }
+            
+            String chord;
+            int length = Integer.parseInt(spec[1]);
+            
+            if (spec[0].startsWith("$")) {
+                int refnum = Integer.parseInt(spec[0].substring(1));
+                
+                if (refnum < 0 || refnum >= chordList.size()) {
+                    throw new RuntimeException("Invalid back reference $" + refnum);
+                }
+                
+                chord = chordList.get(refnum);
+            } else {
+                // check if we have a note or a random table number
+                
+                int pitch = NoteUtils.getNotePitch(spec[0].endsWith("m")
+                                ? spec[0].substring(0, spec[0].length() - 1) : spec[0]);
+                
+                if (pitch == Integer.MIN_VALUE) {
+                    // we have a random chord table number
 
-					int pos = spec[0].indexOf('!');
-					
-					int table;
-					int notrefnum;
-					
-					if (pos > 0) {
-						table = Integer.parseInt(spec[0].substring(0, pos));
-						notrefnum = Integer.parseInt(spec[0].substring(pos + 1));
-					} else {
-						table = Integer.parseInt(spec[0]);
-						notrefnum = -1;
-					}
+                    int pos = spec[0].indexOf('!');
+                    
+                    int table;
+                    int notrefnum;
+                    
+                    if (pos > 0) {
+                        table = Integer.parseInt(spec[0].substring(0, pos));
+                        notrefnum = Integer.parseInt(spec[0].substring(pos + 1));
+                    } else {
+                        table = Integer.parseInt(spec[0]);
+                        notrefnum = -1;
+                    }
 
-					int num;
-					int it = 0;
-					
-					do {
-						num = random.nextInt(chordRandomTables[table].length);
-						chord = chordRandomTables[table][num];
-						it++;
-						if (it > 1000) {
-							// try again
-							return createPattern();
-						}
-					} while(chord.equals(prevChord) || i == count - 1 && chord.equals(firstChord)
-							|| notrefnum >= 0 && chord.equals(chordList.get(notrefnum)));
-				} else {
-					// we have a note, take the note (include 'm' suffix, if present)
-					chord = spec[0];				
-				}
-			}
-				
-			sb.append(nextSection ? "+" : "").append(chord).append('/').append(length);
-			prevChord = chord;
+                    int num;
+                    int it = 0;
+                    
+                    do {
+                        num = random.nextInt(chordRandomTables[table].length);
+                        chord = chordRandomTables[table][num];
+                        it++;
+                        if (it > 1000) {
+                            // try again
+                            return createPattern();
+                        }
+                    } while(chord.equals(prevChord) || i == count - 1 && chord.equals(firstChord)
+                            || notrefnum >= 0 && chord.equals(chordList.get(notrefnum)));
+                } else {
+                    // we have a note, take the note (include 'm' suffix, if present)
+                    chord = spec[0];                
+                }
+            }
+                
+            sb.append(nextSection ? "+" : "").append(chord).append('/').append(length);
+            prevChord = chord;
 
-			if (i == 0) {
-				firstChord = chord;
-			}
+            if (i == 0) {
+                firstChord = chord;
+            }
 
-			chordList.add(chord);			
-		}
-		
-		return sb.toString();	
-	}
-	
-	public void configure(Node node, XPath xpath) throws XPathException {		
-		random = new Random(randomSeed);
+            chordList.add(chord);            
+        }
+        
+        return sb.toString();    
+    }
+    
+    public void configure(Node node, XPath xpath) throws XPathException {        
+        random = new Random(randomSeed);
 
-		NodeList nodeList = (NodeList) xpath.evaluate("chordPattern", node, XPathConstants.NODESET);
-		String[] chordPatterns = new String[nodeList.getLength()];
-		
-		for (int i = 0; i < nodeList.getLength(); i++) {
-			chordPatterns[i] = XMLUtils.parseString(random, nodeList.item(i), xpath);
-		}
+        NodeList nodeList = (NodeList) xpath.evaluate("chordPattern", node, XPathConstants.NODESET);
+        String[] chordPatterns = new String[nodeList.getLength()];
+        
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            chordPatterns[i] = XMLUtils.parseString(random, nodeList.item(i), xpath);
+        }
 
-		setChordPatterns(chordPatterns);
+        setChordPatterns(chordPatterns);
 
-		nodeList = (NodeList) xpath.evaluate("chordRandomTable", node, XPathConstants.NODESET);
-		String[][] chordRandomTables = new String[nodeList.getLength()][];
-		
-		for (int i = 0; i < nodeList.getLength(); i++) {
-			String table = XMLUtils.parseString(random, nodeList.item(i), xpath);
-			chordRandomTables[i] = table.split(",");
-		}
-		
-		setChordRandomTables(chordRandomTables);
-	}
+        nodeList = (NodeList) xpath.evaluate("chordRandomTable", node, XPathConstants.NODESET);
+        String[][] chordRandomTables = new String[nodeList.getLength()][];
+        
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            String table = XMLUtils.parseString(random, nodeList.item(i), xpath);
+            chordRandomTables[i] = table.split(",");
+        }
+        
+        setChordRandomTables(chordRandomTables);
+    }
 }

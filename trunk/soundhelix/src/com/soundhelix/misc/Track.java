@@ -25,98 +25,98 @@ import java.util.List;
  */
 
 public class Track {
-	/** The list of sequences. */
-	private List<Sequence> sequences = new ArrayList<Sequence>();
-	
-	/** The possible track types. */
-	public static enum TrackType {
-		/** The track contains melodic sequences, subject to transposition. */
-		MELODY,
-		/** The track contains fixed-pitch sequences, which must not be transposed. */
-		RHYTHM
-	}
-	
-	/** The track type. */
-	private final TrackType type;
-	
-	public Track(TrackType type) {
-		this.type = type;
-	}
+    /** The list of sequences. */
+    private List<Sequence> sequences = new ArrayList<Sequence>();
+    
+    /** The possible track types. */
+    public static enum TrackType {
+        /** The track contains melodic sequences, subject to transposition. */
+        MELODY,
+        /** The track contains fixed-pitch sequences, which must not be transposed. */
+        RHYTHM
+    }
+    
+    /** The track type. */
+    private final TrackType type;
+    
+    public Track(TrackType type) {
+        this.type = type;
+    }
 
-	/**
-	 * Adds the given sequence to this track.
-	 * 
-	 * @param sequence the sequence to add
-	 */
-	
-	public void add(Sequence sequence) {
-		sequences.add(sequence);
-	}
-	
-	/**
-	 * Returns the number of sequences this track contains.
-	 * 
-	 * @return the number of sequences
-	 */
-	
-	public int size() {
-		return sequences.size();
-	}
-	
-	/**
-	 * Returns the track's type.
-	 * 
-	 * @return the type
-	 */
-	
-	public TrackType getType() {
-		return type;
-	}
-	
-	/**
-	 * Returns the sequence with the given index.
-	 * 
-	 * @param index the index
-	 * 
-	 * @return the sequence
-	 */
-	
-	public Sequence get(int index) {
-		return sequences.get(index);
-	}
-	
-	/**
-	 * Returns an iterator that iterates over this track's sequences.
-	 * 
-	 * @return the iterator
-	 */
-	
-	public Iterator<Sequence> iterator() {
-		return sequences.iterator();
-	}
-	
-	/**
-	 * Transposes all sequences of this track up by the given number of halftones. If the number of halftones is
-	 * not zero, the track type must not be RHYTHM.
-	 * 
-	 * @param halftones the number of halftones (positive or negative)
-	 */
-	
-	public void transpose(int halftones) {
-		if (halftones == 0) {
-			// nothing to do
-			return;
-		}
-		
-		if (type == TrackType.RHYTHM) {
-			// non-zero transposition is forbidden for this type
-			throw new IllegalArgumentException("Tracks of type RHYTHM must not be transposed");
-		}
-		
-		// transpose all the sequences of this track up by the number of halftones
-		
-		for (Sequence seq : sequences) {
-			seq.transpose(halftones);
-		}
-	}
+    /**
+     * Adds the given sequence to this track.
+     * 
+     * @param sequence the sequence to add
+     */
+    
+    public void add(Sequence sequence) {
+        sequences.add(sequence);
+    }
+    
+    /**
+     * Returns the number of sequences this track contains.
+     * 
+     * @return the number of sequences
+     */
+    
+    public int size() {
+        return sequences.size();
+    }
+    
+    /**
+     * Returns the track's type.
+     * 
+     * @return the type
+     */
+    
+    public TrackType getType() {
+        return type;
+    }
+    
+    /**
+     * Returns the sequence with the given index.
+     * 
+     * @param index the index
+     * 
+     * @return the sequence
+     */
+    
+    public Sequence get(int index) {
+        return sequences.get(index);
+    }
+    
+    /**
+     * Returns an iterator that iterates over this track's sequences.
+     * 
+     * @return the iterator
+     */
+    
+    public Iterator<Sequence> iterator() {
+        return sequences.iterator();
+    }
+    
+    /**
+     * Transposes all sequences of this track up by the given number of halftones. If the number of halftones is
+     * not zero, the track type must not be RHYTHM.
+     * 
+     * @param halftones the number of halftones (positive or negative)
+     */
+    
+    public void transpose(int halftones) {
+        if (halftones == 0) {
+            // nothing to do
+            return;
+        }
+        
+        if (type == TrackType.RHYTHM) {
+            // non-zero transposition is forbidden for this type
+            throw new IllegalArgumentException("Tracks of type RHYTHM must not be transposed");
+        }
+        
+        // transpose all the sequences of this track up by the number of halftones
+        
+        for (Sequence seq : sequences) {
+            seq.transpose(halftones);
+        }
+    }
 }

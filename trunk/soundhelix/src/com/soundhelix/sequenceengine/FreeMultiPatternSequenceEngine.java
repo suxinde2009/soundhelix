@@ -27,43 +27,43 @@ import com.soundhelix.util.XMLUtils;
  */
 
 public class FreeMultiPatternSequenceEngine extends AbstractFreeMultiPatternSequenceEngine {
-	
-	public FreeMultiPatternSequenceEngine() {
-		super();
-	}
+    
+    public FreeMultiPatternSequenceEngine() {
+        super();
+    }
 
-	public void configure(Node node, XPath xpath) throws XPathException {
-    	random = new Random(randomSeed);
+    public void configure(Node node, XPath xpath) throws XPathException {
+        random = new Random(randomSeed);
 
-		NodeList patternsList = (NodeList) xpath.evaluate("patternEngines", node, XPathConstants.NODESET);
+        NodeList patternsList = (NodeList) xpath.evaluate("patternEngines", node, XPathConstants.NODESET);
 
-		if (patternsList.getLength() == 0) {
-			throw new RuntimeException("Need at least 1 list of patterns");
-		}
+        if (patternsList.getLength() == 0) {
+            throw new RuntimeException("Need at least 1 list of patterns");
+        }
 
-		Node patternsNode = patternsList.item(random.nextInt(patternsList.getLength()));
-		
-		NodeList patternList = (NodeList) xpath.evaluate("patternEngine", patternsNode, XPathConstants.NODESET);
+        Node patternsNode = patternsList.item(random.nextInt(patternsList.getLength()));
+        
+        NodeList patternList = (NodeList) xpath.evaluate("patternEngine", patternsNode, XPathConstants.NODESET);
 
-		if (patternList.getLength() == 0) {
-			throw new RuntimeException("Need at least 1 patternEngine");
-		}
+        if (patternList.getLength() == 0) {
+            throw new RuntimeException("Need at least 1 patternEngine");
+        }
 
-		Pattern[] patterns = new Pattern[patternList.getLength()];
-		
-		for (int i = 0; i < patternList.getLength(); i++) {
-			PatternEngine patternEngine;
-			
-			try {
-				patternEngine = XMLUtils.getInstance(PatternEngine.class, patternList.item(i),
-						xpath, randomSeed, i);
-			} catch (Exception e) {
-				throw new RuntimeException("Error instantiating PatternEngine", e);
-			}
-		
-			patterns[i] = patternEngine.render("");
-		}
-		
-		setPatterns(patterns);
+        Pattern[] patterns = new Pattern[patternList.getLength()];
+        
+        for (int i = 0; i < patternList.getLength(); i++) {
+            PatternEngine patternEngine;
+            
+            try {
+                patternEngine = XMLUtils.getInstance(PatternEngine.class, patternList.item(i),
+                        xpath, randomSeed, i);
+            } catch (Exception e) {
+                throw new RuntimeException("Error instantiating PatternEngine", e);
+            }
+        
+            patterns[i] = patternEngine.render("");
+        }
+        
+        setPatterns(patterns);
     }
 }

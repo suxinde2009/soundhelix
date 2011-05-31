@@ -16,9 +16,9 @@ import com.soundhelix.misc.XMLConfigurable;
 // getting the current tick, setting the current tick
 
 public interface Player extends XMLConfigurable, RandomSeedable {
-	/**
-	 * Opens all required resources for playing.
-	 */
+    /**
+     * Opens all required resources for playing.
+     */
 
     void open();
     
@@ -38,18 +38,18 @@ public interface Player extends XMLConfigurable, RandomSeedable {
     
     void setArrangement(Arrangement arrangement);
 
-	/**
-	 * Plays the arrangement last set by setArrangement(). The method will return as soon as playing has finished.
-	 * The method open() must have been called once prior to calling this method.
-	 */
+    /**
+     * Plays the arrangement last set by setArrangement(). The method will return as soon as playing has finished.
+     * The method open() must have been called once prior to calling this method.
+     */
 
     void play();
 
- 	/**
- 	 * Closes all required resources. The method play() must
- 	 * not be called after resources have been closed, unless
- 	 * open() has been called after that.
- 	 */
+     /**
+      * Closes all required resources. The method play() must
+      * not be called after resources have been closed, unless
+      * open() has been called after that.
+      */
 
     void close();
 

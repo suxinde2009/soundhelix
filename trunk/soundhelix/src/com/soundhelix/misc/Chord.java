@@ -27,26 +27,26 @@ import com.soundhelix.util.NoteUtils;
 public class Chord implements Serializable {
     /** The consistent random generator. */
     private static ConsistentRandom random;
-	
-	/** The possible chord types. */
-	public enum ChordType {
-		/** Major chord. */
-		MAJOR,
-		/** Minor chord. */
-		MINOR
-	};
+    
+    /** The possible chord types. */
+    public enum ChordType {
+        /** Major chord. */
+        MAJOR,
+        /** Minor chord. */
+        MINOR
+    };
 
-	/** The possible chord subtypes. */
-	public enum ChordSubtype {
-		/** Normal chord (no inversion). */
-		BASE_0,
-		/** First inversion chord. */
-		BASE_4,
-		/** Second inversion chord. */
-		BASE_6
-	};
+    /** The possible chord subtypes. */
+    public enum ChordSubtype {
+        /** Normal chord (no inversion). */
+        BASE_0,
+        /** First inversion chord. */
+        BASE_4,
+        /** Second inversion chord. */
+        BASE_6
+    };
 
-	/** The base pitch of the chord. */
+    /** The base pitch of the chord. */
     private final int pitch;
 
     /** The type of the chord. */
@@ -55,299 +55,299 @@ public class Chord implements Serializable {
     /** The subtype of the chord. */
     private final ChordSubtype subtype;
 
-	public Chord(int pitch, ChordType type, ChordSubtype subtype) {
-		this.pitch = pitch;
-		this.type = type;
-		this.subtype = subtype;
-	}
-	
-	/**
-	 * Returns the pitch of the chord's base note. Note that
-	 * this need not be the low note of the chord.
-	 * 
-	 * @return the pitch of the base note
-	 */
-	
-	public int getPitch() {
-		return pitch;
-	}
-	
-	/**
-	 * Returns the chord's type.
-	 * 
-	 * @return the type
-	 */
-	
-	public ChordType getType() {
-		return type;
-	}
+    public Chord(int pitch, ChordType type, ChordSubtype subtype) {
+        this.pitch = pitch;
+        this.type = type;
+        this.subtype = subtype;
+    }
+    
+    /**
+     * Returns the pitch of the chord's base note. Note that
+     * this need not be the low note of the chord.
+     * 
+     * @return the pitch of the base note
+     */
+    
+    public int getPitch() {
+        return pitch;
+    }
+    
+    /**
+     * Returns the chord's type.
+     * 
+     * @return the type
+     */
+    
+    public ChordType getType() {
+        return type;
+    }
 
-	/**
-	 * Returns the chord's subtype.
-	 * 
-	 * @return the subtype
-	 */
+    /**
+     * Returns the chord's subtype.
+     * 
+     * @return the subtype
+     */
 
-	public ChordSubtype getSubtype() {
-		return subtype;
-	}
+    public ChordSubtype getSubtype() {
+        return subtype;
+    }
 
-	/**
-	 * Returns true iff this chord is a major chord.
-	 * 
-	 * @return true iff the chord is a major chord
-	 */
-	
-	public boolean isMajor() {
-		return type == ChordType.MAJOR;
-	}
+    /**
+     * Returns true iff this chord is a major chord.
+     * 
+     * @return true iff the chord is a major chord
+     */
+    
+    public boolean isMajor() {
+        return type == ChordType.MAJOR;
+    }
 
-	/**
-	 * Returns true iff this chord is a minor chord.
-	 * 
-	 * @return true iff the chord is a minor chord
-	 */
-	
+    /**
+     * Returns true iff this chord is a minor chord.
+     * 
+     * @return true iff the chord is a minor chord
+     */
+    
 
-	public boolean isMinor() {
-		return type == ChordType.MINOR;
-	}
-	
-	/**
-	 * Implements an equality check. Two chords are equivalent iff they are based on the same pitch and have the
-	 * same chord type and subchord type.
-	 * 
-	 * @param other the other chord to compare this chord to
-	 * 
-	 * @return true if the two objects are equal, false otherwise
-	 */
-	
-	public boolean equals(Object other) {
-		if (other == null || !(other instanceof Chord)) {
-			return false;
-		}
-		
-		Chord otherChord = (Chord) other;
-		return this == otherChord
+    public boolean isMinor() {
+        return type == ChordType.MINOR;
+    }
+    
+    /**
+     * Implements an equality check. Two chords are equivalent iff they are based on the same pitch and have the
+     * same chord type and subchord type.
+     * 
+     * @param other the other chord to compare this chord to
+     * 
+     * @return true if the two objects are equal, false otherwise
+     */
+    
+    public boolean equals(Object other) {
+        if (other == null || !(other instanceof Chord)) {
+            return false;
+        }
+        
+        Chord otherChord = (Chord) other;
+        return this == otherChord
                || this.pitch == otherChord.pitch && this.type == otherChord.type && this.subtype == otherChord.subtype;
-	}
-	
-	/**
-	 * Returns a string representation of this chord.
-	 * 
-	 * @return the string represenation
-	 */
-	
-	public String toString() {
-		return NoteUtils.getNoteName(pitch).toUpperCase() + (isMinor() ? "m" : "")
-			   + (subtype == ChordSubtype.BASE_4 ? "4" : subtype == ChordSubtype.BASE_6 ? "6" : "")
-			   + "+" + getLowPitch() + "/" + getMiddlePitch() + "/" + getHighPitch();
-	}
+    }
+    
+    /**
+     * Returns a string representation of this chord.
+     * 
+     * @return the string represenation
+     */
+    
+    public String toString() {
+        return NoteUtils.getNoteName(pitch).toUpperCase() + (isMinor() ? "m" : "")
+               + (subtype == ChordSubtype.BASE_4 ? "4" : subtype == ChordSubtype.BASE_6 ? "6" : "")
+               + "+" + getLowPitch() + "/" + getMiddlePitch() + "/" + getHighPitch();
+    }
 
-	/**
-	 * Returns the name of the chord in a short form (like 'C' or 'Am').
-	 * The chord's subtype is not taken into consideration.
-	 * 
-	 * @return the short name of the chord
-	 */
-	
-	public String getShortName() {
-		return NoteUtils.getNoteName(pitch).toUpperCase() + (isMinor() ? "m" : "");
-	}
-	
-	/**
-	 * Returns a version of the given chord that is closest (i.e., most compatible)
-	 * to this chord. This method chooses the version of the chord that minimizes
-	 * the pitch distance of the middle note of the two chords. This may include
-	 * modifying the subtype and/or octave of the chord. If there is a tie between two
-	 * possible chord candidates, one of the chords is chosen randomly, but consistently.
-	 * 
-	 * @param otherChord the chord to return a close version of
-	 * 
-	 * @return a close version of the chord
-	 */
-	
-	public Chord findClosestChord(Chord otherChord) {
-		if (pitch == otherChord.getPitch() && type == otherChord.getType()) {
-			// our chord clearly is the best choice in this case, regardless
-			// of the subtype of the other chord
-			return this;
-		}
-		
-		int pitch1 = getMiddlePitch();
-		int pitch2 = otherChord.getMiddlePitch();
+    /**
+     * Returns the name of the chord in a short form (like 'C' or 'Am').
+     * The chord's subtype is not taken into consideration.
+     * 
+     * @return the short name of the chord
+     */
+    
+    public String getShortName() {
+        return NoteUtils.getNoteName(pitch).toUpperCase() + (isMinor() ? "m" : "");
+    }
+    
+    /**
+     * Returns a version of the given chord that is closest (i.e., most compatible)
+     * to this chord. This method chooses the version of the chord that minimizes
+     * the pitch distance of the middle note of the two chords. This may include
+     * modifying the subtype and/or octave of the chord. If there is a tie between two
+     * possible chord candidates, one of the chords is chosen randomly, but consistently.
+     * 
+     * @param otherChord the chord to return a close version of
+     * 
+     * @return a close version of the chord
+     */
+    
+    public Chord findClosestChord(Chord otherChord) {
+        if (pitch == otherChord.getPitch() && type == otherChord.getType()) {
+            // our chord clearly is the best choice in this case, regardless
+            // of the subtype of the other chord
+            return this;
+        }
+        
+        int pitch1 = getMiddlePitch();
+        int pitch2 = otherChord.getMiddlePitch();
 
-		if (pitch1 == pitch2) {
-			// middle pitches are equal; any modification of otherChord
-			// could only make things worse
-			return otherChord;
-		} else if (pitch2 < pitch1) {
-			Chord lastChord = otherChord;
-			
-			while (true) {				
-				Chord chord = lastChord.getHigherChord();				
-				pitch2 = chord.getMiddlePitch();
-				
-				if (pitch2 >= pitch1) {
-					// the new chord's low pitch has now reached at least pitch1
-					// the last chord's low pitch was lower than pitch1
-					
-					// check if chord or lastChord is better
-					
-					int diff1 = pitch2 - pitch1;
-					int diff2 = pitch1 - lastChord.getMiddlePitch();
-					
-					if (diff1 < diff2) {
-						return chord;
-					} else if (diff1 > diff2) {
-						return lastChord;
-					} else {						
-						// we have a tie, choose on of the chords
-						// randomly, but consistently
+        if (pitch1 == pitch2) {
+            // middle pitches are equal; any modification of otherChord
+            // could only make things worse
+            return otherChord;
+        } else if (pitch2 < pitch1) {
+            Chord lastChord = otherChord;
+            
+            while (true) {                
+                Chord chord = lastChord.getHigherChord();                
+                pitch2 = chord.getMiddlePitch();
+                
+                if (pitch2 >= pitch1) {
+                    // the new chord's low pitch has now reached at least pitch1
+                    // the last chord's low pitch was lower than pitch1
+                    
+                    // check if chord or lastChord is better
+                    
+                    int diff1 = pitch2 - pitch1;
+                    int diff2 = pitch1 - lastChord.getMiddlePitch();
+                    
+                    if (diff1 < diff2) {
+                        return chord;
+                    } else if (diff1 > diff2) {
+                        return lastChord;
+                    } else {                        
+                        // we have a tie, choose on of the chords
+                        // randomly, but consistently
 
-						if (random == null) {
-							random = new ConsistentRandom(577385L);
-						}
-						
-						if (random.getBoolean(lastChord.toString() + "#" + chord.toString())) {
-							return chord;
-						} else {
-							return lastChord;
-						}
-					}
-				}
-				
-				lastChord = chord;
-			}
-		} else {
-			Chord lastChord = otherChord;
-			
-			while (true) {
-				Chord chord = lastChord.getLowerChord();
-				pitch2 = chord.getMiddlePitch();
-				
-				if (pitch2 <= pitch1) {
-					// the new chord's low pitch has now reached at most pitch1
-					// the last chord's low pitch was higher than pitch1
-					
-					// check if chord or lastChord is better
-					
-					int diff1 = pitch1 - pitch2;
-					int diff2 = lastChord.getMiddlePitch() - pitch1;
+                        if (random == null) {
+                            random = new ConsistentRandom(577385L);
+                        }
+                        
+                        if (random.getBoolean(lastChord.toString() + "#" + chord.toString())) {
+                            return chord;
+                        } else {
+                            return lastChord;
+                        }
+                    }
+                }
+                
+                lastChord = chord;
+            }
+        } else {
+            Chord lastChord = otherChord;
+            
+            while (true) {
+                Chord chord = lastChord.getLowerChord();
+                pitch2 = chord.getMiddlePitch();
+                
+                if (pitch2 <= pitch1) {
+                    // the new chord's low pitch has now reached at most pitch1
+                    // the last chord's low pitch was higher than pitch1
+                    
+                    // check if chord or lastChord is better
+                    
+                    int diff1 = pitch1 - pitch2;
+                    int diff2 = lastChord.getMiddlePitch() - pitch1;
 
-					if (diff1 < diff2) {
-						return chord;
-					} else if (diff1 > diff2) {
-						return lastChord;
-					} else {
-						// we have a tie, choose on of the chords
-						// randomly, but consistently
-						
-						if (random == null) {
-							random = new ConsistentRandom(577385577385L);
-						}
-						
-						if (random.getBoolean(lastChord.toString() + "#" + chord.toString())) {
-							return chord;
-						} else {
-							return lastChord;
-						}
-					}
-				}
-				
-				lastChord = chord;
-			}			
-		}
-	}
+                    if (diff1 < diff2) {
+                        return chord;
+                    } else if (diff1 > diff2) {
+                        return lastChord;
+                    } else {
+                        // we have a tie, choose on of the chords
+                        // randomly, but consistently
+                        
+                        if (random == null) {
+                            random = new ConsistentRandom(577385577385L);
+                        }
+                        
+                        if (random.getBoolean(lastChord.toString() + "#" + chord.toString())) {
+                            return chord;
+                        } else {
+                            return lastChord;
+                        }
+                    }
+                }
+                
+                lastChord = chord;
+            }            
+        }
+    }
 
-	/**
-	 * Returns the pitch of the low note of the chord, respecting the chord's
-	 * subtype.
-	 * 
-	 * @return the pitch of the low note
-	 */
-	
-	public int getLowPitch() {
-		if (subtype == ChordSubtype.BASE_0) {
-			return pitch;
-		} else if (subtype == ChordSubtype.BASE_4) {
-			return isMajor() ? pitch + 4 : pitch + 3;
-		} else {
-			return pitch - 5;
-		}		
-	}
+    /**
+     * Returns the pitch of the low note of the chord, respecting the chord's
+     * subtype.
+     * 
+     * @return the pitch of the low note
+     */
+    
+    public int getLowPitch() {
+        if (subtype == ChordSubtype.BASE_0) {
+            return pitch;
+        } else if (subtype == ChordSubtype.BASE_4) {
+            return isMajor() ? pitch + 4 : pitch + 3;
+        } else {
+            return pitch - 5;
+        }        
+    }
 
-	/**
-	 * Returns the pitch of the middle note of the chord, respecting the chord's
-	 * subtype.
-	 * 
-	 * @return the pitch of the middle note
-	 */
-	
-	public int getMiddlePitch() {
-		if (subtype == ChordSubtype.BASE_6) {
-			return pitch;
-		} else if (subtype == ChordSubtype.BASE_0) {
-			return isMajor() ? pitch + 4 : pitch + 3;
-		} else {
-			return pitch + 7;
-		}		
-	}
+    /**
+     * Returns the pitch of the middle note of the chord, respecting the chord's
+     * subtype.
+     * 
+     * @return the pitch of the middle note
+     */
+    
+    public int getMiddlePitch() {
+        if (subtype == ChordSubtype.BASE_6) {
+            return pitch;
+        } else if (subtype == ChordSubtype.BASE_0) {
+            return isMajor() ? pitch + 4 : pitch + 3;
+        } else {
+            return pitch + 7;
+        }        
+    }
 
-	/**
-	 * Returns the pitch of the high note of the chord, respecting the chord's
-	 * subtype.
-	 * 
-	 * @return the pitch of the high note
-	 */
+    /**
+     * Returns the pitch of the high note of the chord, respecting the chord's
+     * subtype.
+     * 
+     * @return the pitch of the high note
+     */
 
-	public int getHighPitch() {
-		if (subtype == ChordSubtype.BASE_4) {
-			return pitch + 12;
-		} else if (subtype == ChordSubtype.BASE_6) {
-			return isMajor() ? pitch + 4 : pitch + 3;
-		} else {
-			return pitch + 7;
-		}		
-	}
-	
-	/**
-	 * Returns a new version of the chord that is one step
-	 * higher than the given chord. Effectively, this method replaces
-	 * the low note of the chord with that note transposed one
-	 * octave up. This always involves changing the subtype of the chord.
-	 * 
-	 * @return the higher chord
-	 */
-	
+    public int getHighPitch() {
+        if (subtype == ChordSubtype.BASE_4) {
+            return pitch + 12;
+        } else if (subtype == ChordSubtype.BASE_6) {
+            return isMajor() ? pitch + 4 : pitch + 3;
+        } else {
+            return pitch + 7;
+        }        
+    }
+    
+    /**
+     * Returns a new version of the chord that is one step
+     * higher than the given chord. Effectively, this method replaces
+     * the low note of the chord with that note transposed one
+     * octave up. This always involves changing the subtype of the chord.
+     * 
+     * @return the higher chord
+     */
+    
     public Chord getHigherChord() {
         if (subtype == ChordSubtype.BASE_0) {
-        	return new Chord(getPitch(), getType(), ChordSubtype.BASE_4);
+            return new Chord(getPitch(), getType(), ChordSubtype.BASE_4);
         } else if (subtype == ChordSubtype.BASE_4) {
-        	return new Chord(getPitch() + 12, getType(), ChordSubtype.BASE_6);
+            return new Chord(getPitch() + 12, getType(), ChordSubtype.BASE_6);
         } else {
-        	return new Chord(getPitch(), getType(), ChordSubtype.BASE_0);
+            return new Chord(getPitch(), getType(), ChordSubtype.BASE_0);
         }
     }
     
-	/**
-	 * Returns a new version of the chord that is one step
-	 * lower than the chord. Effectively, this method replaces
-	 * the high note of the chord with that note transposed one
-	 * octave down. This always involves changing the subtype
-	 * of the chord.
-	 * 
-	 * @return the higher chord
-	 */
+    /**
+     * Returns a new version of the chord that is one step
+     * lower than the chord. Effectively, this method replaces
+     * the high note of the chord with that note transposed one
+     * octave down. This always involves changing the subtype
+     * of the chord.
+     * 
+     * @return the higher chord
+     */
     
     public Chord getLowerChord() {
         if (subtype == ChordSubtype.BASE_0) {
-        	return new Chord(getPitch(), getType(), ChordSubtype.BASE_6);
+            return new Chord(getPitch(), getType(), ChordSubtype.BASE_6);
         } else if (subtype == ChordSubtype.BASE_4) {
-        	return new Chord(getPitch(), getType(), ChordSubtype.BASE_0);
+            return new Chord(getPitch(), getType(), ChordSubtype.BASE_0);
         } else {
-        	return new Chord(getPitch() - 12, getType(), ChordSubtype.BASE_4);
-        }    	
+            return new Chord(getPitch() - 12, getType(), ChordSubtype.BASE_4);
+        }        
     }
     
     /**
@@ -361,14 +361,14 @@ public class Chord implements Serializable {
      */
     
     public boolean containsPitch(int pitch) {
-    	pitch = ((pitch % 12) + 12) % 12;
-    	
-    	return pitch == (((getLowPitch() % 12) + 12) % 12)
-    	        || pitch == (((getMiddlePitch() % 12) + 12) % 12)
-    	        || pitch == (((getHighPitch() % 12) + 12) % 12);
+        pitch = ((pitch % 12) + 12) % 12;
+        
+        return pitch == (((getLowPitch() % 12) + 12) % 12)
+                || pitch == (((getMiddlePitch() % 12) + 12) % 12)
+                || pitch == (((getHighPitch() % 12) + 12) % 12);
     }
     
     public int hashCode() {
-    	return toString().hashCode();
+        return toString().hashCode();
     }
 }

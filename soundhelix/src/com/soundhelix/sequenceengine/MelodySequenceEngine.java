@@ -261,8 +261,7 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
 		NodeList nodeList = (NodeList) xpath.evaluate("patternEngine", node, XPathConstants.NODESET);
 
 		if (nodeList.getLength() == 0) {
-		    // use default pattern
-			return;
+		    throw new RuntimeException("Need at least one pattern engine");
 		}
 		
 		PatternEngine patternEngine;

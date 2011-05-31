@@ -13,6 +13,7 @@ import org.w3c.dom.NodeList;
 import com.soundhelix.harmonyengine.HarmonyEngine;
 import com.soundhelix.misc.ActivityVector;
 import com.soundhelix.misc.Pattern;
+import com.soundhelix.misc.Structure;
 import com.soundhelix.misc.Pattern.PatternEntry;
 import com.soundhelix.misc.Sequence;
 import com.soundhelix.misc.Track;
@@ -24,12 +25,8 @@ import com.soundhelix.util.XMLUtils;
 /**
  * Implements a sequence engine for drum machines. Drum machines normally play a certain
  * sample (e.g., a base drum or a snare) when a certain pitch is played. This class supports an
- * arbitrary number of combinations of patterns, pitches and activity groups.
- * Each pattern acts as a voice for a certain pitch. The activity group can be used to
- * group the voices together so that they are all active or all silent at the same time.
- * For example, you might group three hi-hat patterns together so that all 3 are active
- * or silent. The activity groups must be numbered starting from 0, and the used groups must be
- * "dense" (i.e., without gaps).
+ * arbitrary number of combinations of patterns, pitches and activity vectors.
+ * Each pattern acts as a voice for a certain pitch.
  *
  * @author Thomas Schürger (thomas@schuerger.com)
  */
@@ -57,24 +54,41 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
     }
 
     public Track render(ActivityVector[] activityVectors) {
-        HarmonyEngine harmonyEngine = structure.getHarmonyEngine();        
-        int ticks = structure.getTicks();
         int drumEntryCount = drumEntries.length;
 
+        Track track = new Track(TrackType.RHYTHM);
         Sequence[] seqs = new Sequence[drumEntryCount];
+
 
         for (int i = 0; i < drumEntryCount; i++) {
             seqs[i] = new Sequence();
+            track.add(seqs[i]);
         }
 
-        Track track = new Track(TrackType.RHYTHM);
+        processPatterns(activityVectors, seqs, structure);
+        processConditionalPatterns(activityVectors, seqs, structure);       
+        
+        return track;
+    }
 
-        for (int i = 0; i < drumEntryCount; i++) {
+    /**
+     * Process all non-conditional patterns.
+     * 
+     * @param activityVectors the array of activity vectors
+     * @param seqs the array of sequences
+     * @param structure the structure
+     */
+    
+	private void processPatterns(ActivityVector[] activityVectors, Sequence[] seqs, Structure structure) {
+        int ticks = structure.getTicks();
+        int drumEntryCount = drumEntries.length;
+		
+		for (int i = 0; i < drumEntryCount; i++) {
             ActivityVector activityVector = activityVectors[i];
             Sequence seq = seqs[i];
             Pattern pattern = drumEntries[i].pattern;
 
-            // the pitch is constant
+            // the base pitch is constant
             int basePitch = drumEntries[i].pitch;
 
             int patternLength = pattern.size();
@@ -105,10 +119,22 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
                 tick += len;
                 pos++;
             }
-            track.add(seq);
         }
+	}
+	
+	/**
+	 * Process all conditional patterns.
+	 * 
+     * @param activityVectors the array of activity vectors
+     * @param seqs the array of sequences
+     * @param structure the structure
+	 */
 
-        int conditionalEntryCount = conditionalEntries.length;
+	private void processConditionalPatterns(ActivityVector[] activityVectors,
+			Sequence[] seqs, Structure structure) {
+		HarmonyEngine harmonyEngine = structure.getHarmonyEngine();
+		int ticks = structure.getTicks();
+		int conditionalEntryCount = conditionalEntries.length;
 
     next:
             
@@ -186,10 +212,8 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
 
                 tick += harmonyEngine.getChordSectionTicks(tick);
             }
-        }       
-
-        return track;
-    }
+        }
+	}
     
     /**
      * Returns the activity string of the given tick. The activity string is a concatenation of '0' and '1'

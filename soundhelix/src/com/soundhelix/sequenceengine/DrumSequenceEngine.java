@@ -196,6 +196,8 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
                     }
 
                     lastMatchedTick[i] = tick;
+                    
+                    i += conditionalEntries[i].skip;
                 }
             }
 
@@ -295,7 +297,16 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
             }
             
             double probability = XMLUtils.parseDouble(random, "probability", nodeList.item(i), xpath) / 100.0d;
-
+            int skip = 0;
+            
+            try {
+                skip = XMLUtils.parseInteger(random, "skip", nodeList.item(i), xpath);            
+            } catch (Exception e) {}
+            
+            if (i + 1 + skip > patterns || i + 1 + skip < 0) {
+                throw new RuntimeException("Skip value \"" + skip + "\" would skip out of pattern range");
+            }
+            
             Node patternEngineNode = (Node) xpath.evaluate("patternEngine", nodeList.item(i), XPathConstants.NODE);
         
             PatternEngine patternEngine;
@@ -309,7 +320,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
 
             Pattern pattern = patternEngine.render("");
             
-            conditionalEntries[i] = new ConditionalEntry(pattern, condition, mode, targets, probability);
+            conditionalEntries[i] = new ConditionalEntry(pattern, condition, mode, targets, probability, skip);
         }
         
         setConditionalEntries(conditionalEntries);
@@ -331,14 +342,16 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
         private final int mode;
         private final int[] targets;
         private final double probability;
+        private final int skip;
         
         private ConditionalEntry(Pattern pattern, java.util.regex.Pattern condition, int mode, int[] targets,
-                                 double probability) {
+                                 double probability, int skip) {
             this.pattern = pattern;
             this.condition = condition;
             this.mode = mode;
             this.targets = targets;
             this.probability = probability;
+            this.skip = skip;
         }
     }
 }

@@ -7,6 +7,18 @@ Author: Thomas Schürger (thomas@schuerger.com)
 Change log
 ----------
 
+0.1.1:
+
+    - Added the constraints minSegmentLength and maxSegmentLength to the SimpleArrangementEntry, which constrain the minimum and
+      maximum activity segment lengths, respectively, of an ActivityVector (counted in chord sections). The two constraints will
+      be ignored for an activity vector if the ActivityVector never becomes active.
+  
+    - Added the counterpart constraints minPauseLength and maxPauseLength to the SimpleArrangementEngine, which constrain the
+      minimum and maximum pause lengths, respectively, between activity segments (counted in chord sections). The constraints
+      will be ignored for an ActivityVector if the ActivityVector is never active or only has one activity segment.
+
+    - Fixed bug that prevented proper random seeding when a song name was used on the command-line.
+
 
 0.1: 2011-05-22
 

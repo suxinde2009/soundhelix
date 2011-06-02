@@ -38,10 +38,16 @@ import com.soundhelix.util.XMLUtils;
  *                 also possible define that the AV may be inactive for the whole song or be active with at least n%
  *                 of the song
  * - maxActive(n): the AV must be active for at most n% of the song; granularity is at chord section level
- * - startAfterSection(n): the AV must not be active before section n+1
- * - stopBeforeSection(n): the AV must not be active after section n+1 counted from the end
+ * - startBeforeSection(n): the AV must start before section n
+ * - startAfterSection(n): the AV must start after section n
+ * - stopBeforeSection(n): the AV must stop before section n, counted from the end
+ * - stopAfterSection(n): the AV must stop after section n, counted from the end
  * - minSegmentCount(n): the AV must be active for at least n chord section segments
  * - maxSegmentCount(n): the AV must be active for at most n chord section segments
+ * - minSegmentLength(n): the minimum AV segment length must be n chord sections
+ * - maxSegmentLength(n): the maximum AV segment length must be n chord sections
+ * - minPauseLength(n): the minimum AV pause length must be n chord sections
+ * - maxPauseLength(n): the maximum AV pause length must be n chord sections
  *
  * Local (peep-hole) constraints can be checked during AV generation when the activity per chord section is generated.
  * Such a constraint can be a success constraint, which means that a random choice can be redone on-the-fly until the
@@ -251,6 +257,14 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
                 int firstActiveTick = av.getFirstActiveTick();
                 int lastActiveTick = av.getLastActiveTick();
                 int segmentCount = av.getSegmentCount();
+                int[] minMaxSegmentLengths = null;
+                int[] minMaxPauseLengths = null;
+                
+                if (avc.minSegmentLength > 0 || avc.maxSegmentLength < Integer.MAX_VALUE
+                        || avc.minPauseLength > 1 || avc.maxPauseLength < Integer.MAX_VALUE) {
+                    // minMaxSegmentLengths will be null if the AV is never active
+                    minMaxSegmentLengths = HarmonyEngineUtils.getMinMaxSegmentLengths(structure, av);
+                }
 
                 if (active < avc.minActive && (!avc.allowInactive || active > 0) || active > avc.maxActive
                         || avc.startAfterSection + 1 >= chordSections || avc.stopBeforeSection + 1 >= chordSections
@@ -258,7 +272,9 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
                         || avc.stopAfterSection > 0 && lastActiveTick >= 0 && lastActiveTick < chordSectionStartTicks.get(chordSections - avc.stopAfterSection)
                         || avc.startBeforeSection < Integer.MAX_VALUE && firstActiveTick >= 0 && firstActiveTick > chordSectionStartTicks.get(avc.startBeforeSection - 1)
                         || avc.startAfterSection >= 0 && firstActiveTick >= 0 && firstActiveTick < chordSectionStartTicks.get(avc.startAfterSection + 1)
-                        || (avc.minSegmentCount >= 0 || avc.maxSegmentCount < Integer.MAX_VALUE) && (segmentCount < avc.minSegmentCount || segmentCount > avc.maxSegmentCount)) {
+                        || (avc.minSegmentCount >= 0 || avc.maxSegmentCount < Integer.MAX_VALUE) && (segmentCount < avc.minSegmentCount || segmentCount > avc.maxSegmentCount)
+                        || (minMaxSegmentLengths != null && (minMaxSegmentLengths[0] < avc.minSegmentLength || minMaxSegmentLengths[1] > avc.maxSegmentLength
+                                  || segmentCount > 1 && minMaxSegmentLengths[2] < avc.minPauseLength || minMaxSegmentLengths[3] > avc.maxPauseLength))) {
 
                     if (isDebug) {
                         String reason;
@@ -284,13 +300,20 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
                             reason = "minSegmentCount";
                         } else if (segmentCount > avc.maxSegmentCount) {
                             reason = "maxSegmentCount";
+                        } else if (minMaxSegmentLengths != null && minMaxSegmentLengths[0] < avc.minSegmentLength) {
+                            reason = "minSegmentLength";
+                        } else if (minMaxSegmentLengths != null && minMaxSegmentLengths[1] > avc.maxSegmentLength) {
+                            reason = "maxSegmentLength";
+                        } else if (minMaxSegmentLengths != null && segmentCount > 1 && minMaxSegmentLengths[2] < avc.minPauseLength) {
+                            reason = "minPauseLength";
+                        } else if (minMaxSegmentLengths != null && minMaxSegmentLengths[3] > avc.maxPauseLength) {
+                            reason = "maxPauseLength";
                         } else {
                             reason = "unknown";
                         }
 
-                        String key = avc.name + "/" + reason;
+                        String key = avc.name + "/" + reason;                        
                         Integer current = constraintFailure.get(key);
-
                         constraintFailure.put(key, current != null ? current + 1 : 1);
                     }
 
@@ -784,9 +807,30 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
                 maxSegmentCount = XMLUtils.parseInteger(random, "maxSegmentCount", nodeList.item(i), xpath);
             } catch (Exception e) {}
 
+            int minSegmentLength = 0;
+            try {
+                minSegmentLength = XMLUtils.parseInteger(random, "minSegmentLength", nodeList.item(i), xpath);
+            } catch (Exception e) {}
+
+            int maxSegmentLength = Integer.MAX_VALUE;
+            try {
+                maxSegmentLength = XMLUtils.parseInteger(random, "maxSegmentLength", nodeList.item(i), xpath);
+            } catch (Exception e) {}
+
+            int minPauseLength = 0;
+            try {
+                minPauseLength = XMLUtils.parseInteger(random, "minPauseLength", nodeList.item(i), xpath);
+            } catch (Exception e) {}
+
+            int maxPauseLength = Integer.MAX_VALUE;
+            try {
+                maxPauseLength = XMLUtils.parseInteger(random, "maxPauseLength", nodeList.item(i), xpath);
+            } catch (Exception e) {}
+
             activityVectorConfigurationHashMap.put(name, new ActivityVectorConfiguration(name, minActive, allowInactive,
                     maxActive, startShift, stopShift, startBeforeSection, startAfterSection, stopBeforeSection,
-                    stopAfterSection, minSegmentCount, maxSegmentCount));        
+                    stopAfterSection, minSegmentCount, maxSegmentCount, minSegmentLength, maxSegmentLength,
+                    minPauseLength, maxPauseLength));        
         }
                 
         setActivityVectorConfiguration(activityVectorConfigurationHashMap);
@@ -934,9 +978,17 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         private int stopAfterSection;
         private int minSegmentCount;
         private int maxSegmentCount;
+        private int minSegmentLength;
+        private int maxSegmentLength;
+        private int minPauseLength;
+        private int maxPauseLength;
         private ActivityVector activityVector;
 
-        private ActivityVectorConfiguration(String name, double minActive, boolean allowInactive, double maxActive, int startShift, int stopShift, int startBeforeSection, int startAfterSection, int stopBeforeSection, int stopAfterSection, int minSegmentCount, int maxSegmentCount) {
+        private ActivityVectorConfiguration(String name, double minActive, boolean allowInactive, double maxActive,
+                int startShift, int stopShift,
+                int startBeforeSection, int startAfterSection, int stopBeforeSection, int stopAfterSection,
+                int minSegmentCount, int maxSegmentCount,
+                int minSegmentLength, int maxSegmentLength, int minPauseLength, int maxPauseLength) {
             this.name = name;
             this.minActive = minActive;
             this.allowInactive = allowInactive;
@@ -949,6 +1001,10 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
             this.stopAfterSection = stopAfterSection;
             this.minSegmentCount = minSegmentCount;
             this.maxSegmentCount = maxSegmentCount;
+            this.minSegmentLength = minSegmentLength;
+            this.maxSegmentLength = maxSegmentLength;
+            this.minPauseLength = minPauseLength;
+            this.maxPauseLength = maxPauseLength;
         }    
     }
     

@@ -1,11 +1,12 @@
 package com.soundhelix.util;
 
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.soundhelix.harmonyengine.HarmonyEngine;
+import com.soundhelix.misc.ActivityVector;
 import com.soundhelix.misc.Chord;
 import com.soundhelix.misc.Structure;
 
@@ -129,5 +130,83 @@ public final class HarmonyEngineUtils {
         }
         
         return list;
+    }
+    
+    /**
+     * Returns the minimum and the maximum length of all activity segments of the given ActivityVector as well as the
+     * minimum and maximum length of all pauses between activity segments, all counted in chord sections. Returns null
+     * if the ActivityVector never becomes active. If the ActivityVector only has one activity segment, then there is
+     * no pause, and therefore the minimum and maximum pause length will be 0.
+     * 
+     * @param structure the structure
+     * @param av the ActivityVector
+     *
+     * @return a 4-element int array containing the minimum and the maximum segment length and the minimum and maximum pause length (in this order) or null
+     */
+    
+    public static int[] getMinMaxSegmentLengths(Structure structure, ActivityVector av) {
+        HarmonyEngine harmonyEngine = structure.getHarmonyEngine();
+        int ticks = structure.getTicks();
+        boolean isActive = false;
+        
+        int segmentLength = 0;
+        int minSegmentLength = Integer.MAX_VALUE;
+        int maxSegmentLength = 0;
+
+        int pauseLength = 0;
+        int minPauseLength = Integer.MAX_VALUE;
+        int maxPauseLength = 0;
+
+        for (int tick = 0; tick < ticks; tick += harmonyEngine.getChordSectionTicks(tick)) {
+            if (!isActive) {
+                if (av.isActive(tick)) {
+                    isActive = true;
+
+                    if (pauseLength > 0 && pauseLength < minPauseLength) {
+                        minPauseLength = pauseLength;
+                    }
+                    
+                    if (pauseLength > maxPauseLength) {
+                        maxPauseLength = pauseLength;
+                    }
+                    
+                    segmentLength = 1;
+                } else if (segmentLength > 0) {
+                    pauseLength++;
+                }
+            } else {
+                if (!av.isActive(tick)) {
+                    isActive = false;
+                    
+                    if (segmentLength < minSegmentLength) {
+                        minSegmentLength = segmentLength;
+                    }
+                    
+                    if (segmentLength > maxSegmentLength) {
+                        maxSegmentLength = segmentLength;
+                    }
+                    
+                    pauseLength = 1;                    
+                } else {
+                    segmentLength++;
+                }
+            }
+        }
+        
+        if (isActive) {
+            if (segmentLength < minSegmentLength) {
+                minSegmentLength = segmentLength;
+            }
+            
+            if (segmentLength > maxSegmentLength) {
+                maxSegmentLength = segmentLength;
+            }
+        }
+        
+        if (maxSegmentLength == 0) {
+            return null;
+        } else {
+            return new int [] {minSegmentLength, maxSegmentLength, minPauseLength < Integer.MAX_VALUE ? minPauseLength : 0, maxPauseLength};
+        }
     }
 }

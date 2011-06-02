@@ -147,12 +147,12 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
         // start with the second chord section
         int tick = harmonyEngine.getChordSectionTicks(0);
 
-        String previousActivity = getActivityString(tick - 1, activityVectors);
+        // get the activity string of the first chord section
+        String previousActivity = getActivityString(0, activityVectors);
 
         while (tick < ticks) {
             String activity = getActivityString(tick, activityVectors);
             String totalActivity = previousActivity + activity; 
-            previousActivity = activity;
 
             for (int i = 0; i < conditionalEntryCount; i++) {
                 Pattern pattern = conditionalEntries[i].pattern;
@@ -200,6 +200,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
             }
 
             tick += harmonyEngine.getChordSectionTicks(tick);
+            previousActivity = activity;
         }
     }
     
@@ -312,49 +313,6 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
         }
         
         setConditionalEntries(conditionalEntries);
-    }
-    
-    /**
-     * Matches a string representing the current activity state with the given pattern.
-     * The activity state string must consist only of the digits 0 and 1, the pattern must consist of
-     * the same digits plus a minus character.
-     * 
-     * @param value the value string
-     * @param pattern the pattern string
-     * 
-     * @return true if the value matches the pattern, false otherwise
-     */
-    
-    private boolean matchesPattern(String value, String pattern) {
-        if (value == null || pattern == null) {
-            return false;
-        }
-        
-        int len = pattern.length();
-        
-        if (len != value.length()) {
-            throw new RuntimeException("The activity value \"" + value + "\" is not compatible with the pattern \""
-                                       + pattern + "\"");
-        }
-        
-        for (int i = 0; i < len; i++) {
-            char c = pattern.charAt(i);
-            switch (c) {
-                case '0':
-                case '1':
-                    if (value.charAt(i) != c) {
-                        return false;
-                    }
-                    break;
-                case '-':
-                    // acts as a wildcard
-                    break;
-                default:
-                    throw new RuntimeException("Invalid pattern character \"" + c + "\" in pattern \"" + pattern + "\"");
-            }
-        }
-        
-        return true;
     }
     
     private static final class DrumEntry {

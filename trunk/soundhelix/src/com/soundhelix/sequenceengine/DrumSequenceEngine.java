@@ -23,11 +23,13 @@ import com.soundhelix.util.RandomUtils;
 import com.soundhelix.util.XMLUtils;
 
 /**
- * Implements a sequence engine for drum machines. Drum machines normally play a certain
- * sample (e.g., a base drum or a snare) when a certain pitch is played. This class supports an
- * arbitrary number of combinations of patterns, pitches and activity vectors.
- * Each pattern acts as a voice for a certain pitch.
- *
+ * Implements a sequence engine for drum machines. Drum machines normally play a certain sample (e.g., a base drum or
+ * a snare) when a certain pitch is played. This class supports an arbitrary number of combinations of patterns,
+ * pitches and activity vectors. Each pattern acts as a voice for a certain pitch.
+ * 
+ * Conditional patterns allow the modification of the generated sequences when certain conditions are met, e.g., for
+ * generating fill-ins, crescendos, etc. when monitored ActivityVectors become active or inactive.
+ * 
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
@@ -138,82 +140,66 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
         int ticks = structure.getTicks();
         int conditionalEntryCount = conditionalEntries.length;
 
-    next:
-            
-        for (int i = 0; i < conditionalEntryCount; i++) {
-            int[] targets = conditionalEntries[i].targets;
-            java.util.regex.Pattern condition = conditionalEntries[i].condition;
-            int mode = conditionalEntries[i].mode;
-            double probability = conditionalEntries[i].probability;
-            Pattern pattern = conditionalEntries[i].pattern;
-            int patternTicks = pattern.getTicks();
+        // the tick where each pattern was applied last (last tick of the pattern + 1), initially 0
+        // (used to avoid overlapping application of patterns)
+        int[] lastMatchedTick = new int[conditionalEntryCount];
 
-            // start with the second chord section
-            int tick = harmonyEngine.getChordSectionTicks(0);
+        // start with the second chord section
+        int tick = harmonyEngine.getChordSectionTicks(0);
 
-            String previousActivity = getActivityString(tick - 1, activityVectors);
+        String previousActivity = getActivityString(tick - 1, activityVectors);
 
-            // the tick where the pattern was applied last (last tick of the pattern + 1)
-            int lastMatchedTick = Integer.MIN_VALUE;
+        while (tick < ticks) {
+            String activity = getActivityString(tick, activityVectors);
+            String totalActivity = previousActivity + activity; 
+            previousActivity = activity;
 
-            while (true) {
-                // jump to the next position where the condition is true and the pattern does not overlap
-                // with the pattern's previous application
+            for (int i = 0; i < conditionalEntryCount; i++) {
+                Pattern pattern = conditionalEntries[i].pattern;
+                int patternTicks = pattern.getTicks();
+                double probability = conditionalEntries[i].probability;
+                java.util.regex.Pattern condition = conditionalEntries[i].condition;
 
-                while (tick < ticks) {
-                    String activity = getActivityString(tick, activityVectors);
-                    String totalActivity = previousActivity + activity; 
+                if (tick - patternTicks >= lastMatchedTick[i] && RandomUtils.getBoolean(random, probability)
+                        && condition.matcher(totalActivity).matches()) {
+                    // all conditions met, apply pattern
+                    
+                    // jump back to where the pattern will start
+                    tick -= patternTicks;
+                    
+                    int[] targets = conditionalEntries[i].targets;
+                    int mode = conditionalEntries[i].mode;
 
-                    previousActivity = activity;
+                    logger.debug("Applying conditional pattern " + i + " with length " + patternTicks
+                            + " for targets " + Arrays.toString(targets) + " at ticks " + tick + "-"
+                            + (tick + patternTicks - 1));
 
-                    if (tick - patternTicks >= lastMatchedTick) {
-                        if (condition.matcher(totalActivity).matches()) {
-                            break;
-                        }
-                    }
+                    int len = pattern.size();
 
-                    tick += harmonyEngine.getChordSectionTicks(tick);
-                }
+                    for (int k = 0; k < len; k++) {
+                        PatternEntry entry = pattern.get(k);
 
-                if (tick >= ticks) {
-                    continue next;
-                }
+                        for (int j = 0; j < targets.length; j++) {
+                            Sequence seq = seqs[targets[j]];
+                            int basePitch = drumEntries[targets[j]].pitch;
 
-                if (tick - patternTicks >= 0) {
-                    if (RandomUtils.getBoolean(random, probability)) {                        
-                        // jump back to where the pattern will start
-                        tick -= patternTicks;
-
-                        logger.debug("Applying conditional pattern " + i + " with length " + patternTicks
-                                + " for targets " + Arrays.toString(targets) + " at ticks " + tick + "-"
-                                + (tick + patternTicks - 1));
-
-                        int len = pattern.size();
-
-                        for (int k = 0; k < len; k++) {
-                            PatternEntry entry = pattern.get(k);
-                            
-                            for (int j = 0; j < targets.length; j++) {
-                                Sequence seq = seqs[targets[j]];
-                                int basePitch = drumEntries[targets[j]].pitch;
-
-                                if (entry.isNote()) {
-                                    seq.replaceEntry(tick, new Sequence.SequenceEntry(basePitch + entry.getPitch(),
-                                            entry.getVelocity(), entry.getTicks(), entry.isLegato()));
-                                } else if (mode == MODE_REPLACE) {
-                                    seq.replaceEntry(tick, new Sequence.SequenceEntry(Integer.MIN_VALUE, (short) -1,
-                                            entry.getTicks(), entry.isLegato()));
-                                }
+                            if (entry.isNote()) {
+                                seq.replaceEntry(tick, new Sequence.SequenceEntry(basePitch + entry.getPitch(),
+                                        entry.getVelocity(), entry.getTicks(), entry.isLegato()));
+                            } else if (mode == MODE_REPLACE) {
+                                seq.replaceEntry(tick, new Sequence.SequenceEntry(Integer.MIN_VALUE, (short) -1,
+                                        entry.getTicks(), entry.isLegato()));
                             }
-                            tick += entry.getTicks();
                         }
-
-                        lastMatchedTick = tick;
+                        
+                        tick += entry.getTicks();
                     }
-                }
 
-                tick += harmonyEngine.getChordSectionTicks(tick);
+                    lastMatchedTick[i] = tick;
+                }
             }
+
+            tick += harmonyEngine.getChordSectionTicks(tick);
         }
     }
     

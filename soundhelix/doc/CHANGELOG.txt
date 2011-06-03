@@ -9,17 +9,23 @@ Change log
 
 0.1.1:
 
-    - Added the constraints minSegmentLength and maxSegmentLength to the SimpleArrangementEntry, which constrain the minimum and
-      maximum activity segment lengths, respectively, of an ActivityVector (counted in chord sections). The two constraints will
-      be ignored for an activity vector if the ActivityVector never becomes active.
-  
-    - Added the counterpart constraints minPauseLength and maxPauseLength to the SimpleArrangementEngine, which constrain the
-      minimum and maximum pause lengths, respectively, between activity segments (counted in chord sections). The constraints
-      will be ignored for an ActivityVector if the ActivityVector is never active or only has one activity segment.
+    - Added "seed" attribute which allows random seeding of a component by providing a constant 64-bit value (decimal integer
+      with sign), which can be used for all tags where a "class" attribute is used for instantiating a class. The provided
+      seed value will be used instead of deriving a seed from the parent component. Note that providing a constant seed for a
+      component will lead to a fixed seed for all its descendants.
 
-    - Added skipWhenApplied and skipWhenNotApplied tags to conditional patterns in the DrumSequenceEngine. With these two tags
-      you can define the number of conditional patterns to skip if the current pattern was applied or was not applied (even though
-      it was allowed to be applied), respectively.
+    - Added the constraints "minSegmentLength" and "maxSegmentLength" to the SimpleArrangementEntry, which constrain the
+      minimum and maximum activity segment lengths, respectively, of an ActivityVector (counted in chord sections). The two
+      constraints will be ignored for an activity vector if the ActivityVector never becomes active.
+
+    - Added the counterpart constraints "minPauseLength" and "maxPauseLength" to the SimpleArrangementEngine, which constrain
+      the minimum and maximum pause lengths, respectively, between activity segments (counted in chord sections).  The
+      constraints will be ignored for an ActivityVector if the ActivityVector is never active or only has one activity
+      segment.
+
+    - Added "skipWhenApplied" and "skipWhenNotApplied" tags to conditional patterns in the DrumSequenceEngine. With these two
+      tags you can define the number of conditional patterns to skip if the current pattern was applied or was not applied
+      (even though it was allowed to be applied), respectively. They both default to zero, which means don't skip.
 
     - Fixed bug that prevented correct random seeding when a song name was used on the command-line.
 

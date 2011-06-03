@@ -160,44 +160,50 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
                 double probability = conditionalEntries[i].probability;
                 java.util.regex.Pattern condition = conditionalEntries[i].condition;
 
-                if (tick - patternTicks >= lastMatchedTick[i] && RandomUtils.getBoolean(random, probability)
-                        && condition.matcher(totalActivity).matches()) {
-                    // all conditions met, apply pattern
-                    
-                    // jump back to where the pattern will start
-                    tick -= patternTicks;
-                    
-                    int[] targets = conditionalEntries[i].targets;
-                    int mode = conditionalEntries[i].mode;
+                if (condition.matcher(totalActivity).matches()) {
+                    if (tick - patternTicks >= lastMatchedTick[i] && RandomUtils.getBoolean(random, probability)) {
+                        // all conditions met, apply pattern
 
-                    logger.debug("Applying conditional pattern " + i + " with length " + patternTicks
-                            + " for targets " + Arrays.toString(targets) + " at ticks " + tick + "-"
-                            + (tick + patternTicks - 1));
+                        // jump back to where the pattern will start
+                        tick -= patternTicks;
 
-                    int len = pattern.size();
+                        int[] targets = conditionalEntries[i].targets;
+                        int mode = conditionalEntries[i].mode;
 
-                    for (int k = 0; k < len; k++) {
-                        PatternEntry entry = pattern.get(k);
+                        logger.debug("Applying conditional pattern " + i + " with length " + patternTicks
+                                + " for targets " + Arrays.toString(targets) + " at ticks " + tick + "-"
+                                + (tick + patternTicks - 1));
 
-                        for (int j = 0; j < targets.length; j++) {
-                            Sequence seq = seqs[targets[j]];
-                            int basePitch = drumEntries[targets[j]].pitch;
+                        int len = pattern.size();
 
-                            if (entry.isNote()) {
-                                seq.replaceEntry(tick, new Sequence.SequenceEntry(basePitch + entry.getPitch(),
-                                        entry.getVelocity(), entry.getTicks(), entry.isLegato()));
-                            } else if (mode == MODE_REPLACE) {
-                                seq.replaceEntry(tick, new Sequence.SequenceEntry(Integer.MIN_VALUE, (short) -1,
-                                        entry.getTicks(), entry.isLegato()));
+                        for (int k = 0; k < len; k++) {
+                            PatternEntry entry = pattern.get(k);
+
+                            for (int j = 0; j < targets.length; j++) {
+                                Sequence seq = seqs[targets[j]];
+                                int basePitch = drumEntries[targets[j]].pitch;
+
+                                if (entry.isNote()) {
+                                    seq.replaceEntry(tick, new Sequence.SequenceEntry(basePitch + entry.getPitch(),
+                                            entry.getVelocity(), entry.getTicks(), entry.isLegato()));
+                                } else if (mode == MODE_REPLACE) {
+                                    seq.replaceEntry(tick, new Sequence.SequenceEntry(Integer.MIN_VALUE, (short) -1,
+                                            entry.getTicks(), entry.isLegato()));
+                                }
                             }
-                        }
-                        
-                        tick += entry.getTicks();
-                    }
 
-                    lastMatchedTick[i] = tick;
-                    
-                    i += conditionalEntries[i].skip;
+                            tick += entry.getTicks();
+                        }
+
+                        lastMatchedTick[i] = tick;
+
+                        i += conditionalEntries[i].skipWhenApplied;
+                    } else {
+                        // either the pattern would have overlapped or the random generator didn't agree to apply the
+                        // pattern
+                        
+                        i += conditionalEntries[i].skipWhenNotApplied;
+                    }
                 }
             }
 
@@ -297,16 +303,29 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
             }
             
             double probability = XMLUtils.parseDouble(random, "probability", nodeList.item(i), xpath) / 100.0d;
-            int skip = 0;
+
+            int skipWhenApplied = 0;
             
             try {
-                skip = XMLUtils.parseInteger(random, "skip", nodeList.item(i), xpath);            
+                skipWhenApplied = XMLUtils.parseInteger(random, "skipWhenApplied", nodeList.item(i), xpath);            
             } catch (Exception e) {}
             
-            if (i + 1 + skip > patterns || i + 1 + skip < 0) {
-                throw new RuntimeException("Skip value \"" + skip + "\" would skip out of pattern range");
+            if (i + 1 + skipWhenApplied > patterns || i + 1 + skipWhenApplied < 0) {
+                throw new RuntimeException("Skip value \"" + skipWhenApplied
+                                           + "\" would skip out of conditional pattern range");
             }
+
+            int skipWhenNotApplied = 0;
             
+            try {
+                skipWhenNotApplied = XMLUtils.parseInteger(random, "skipWhenNotApplied", nodeList.item(i), xpath);
+            } catch (Exception e) {}
+            
+            if (i + 1 + skipWhenNotApplied > patterns || i + 1 + skipWhenNotApplied < 0) {
+                throw new RuntimeException("Skip value \"" + skipWhenNotApplied
+                                           + "\" would skip out of conditonal pattern range");
+            }
+
             Node patternEngineNode = (Node) xpath.evaluate("patternEngine", nodeList.item(i), XPathConstants.NODE);
         
             PatternEngine patternEngine;
@@ -320,7 +339,8 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
 
             Pattern pattern = patternEngine.render("");
             
-            conditionalEntries[i] = new ConditionalEntry(pattern, condition, mode, targets, probability, skip);
+            conditionalEntries[i] = new ConditionalEntry(pattern, condition, mode, targets, probability,
+                    skipWhenApplied, skipWhenNotApplied);
         }
         
         setConditionalEntries(conditionalEntries);
@@ -342,16 +362,18 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
         private final int mode;
         private final int[] targets;
         private final double probability;
-        private final int skip;
+        private final int skipWhenApplied;
+        private final int skipWhenNotApplied;
         
         private ConditionalEntry(Pattern pattern, java.util.regex.Pattern condition, int mode, int[] targets,
-                                 double probability, int skip) {
+                                 double probability, int skipWhenApplied, int skipWhenNotApplied) {
             this.pattern = pattern;
             this.condition = condition;
             this.mode = mode;
             this.targets = targets;
             this.probability = probability;
-            this.skip = skip;
+            this.skipWhenApplied = skipWhenApplied;
+            this.skipWhenNotApplied = skipWhenNotApplied;
         }
     }
 }

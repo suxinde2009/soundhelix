@@ -40,6 +40,7 @@ public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
 
     protected Random random;    
     protected boolean obeyChordSubtype;
+    protected boolean obeyChordSections;
     
     private Pattern[] patterns;
 
@@ -55,6 +56,10 @@ public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
         this.obeyChordSubtype = obeyChordSubtype;
     }
 
+    public void setObeyChordSections(boolean obeyChordSections) {
+        this.obeyChordSections = obeyChordSections;
+    }
+
     public Track render(ActivityVector[] activityVectors) {
         ActivityVector activityVector = activityVectors[0];
 
@@ -67,7 +72,13 @@ public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
 
         while (tick < ticks) {
             Chord chord = harmonyEngine.getChord(tick);
-            int chordTicks = harmonyEngine.getChordTicks(tick);
+            int chordTicks;
+            
+            if (obeyChordSections) {
+                chordTicks = Math.min(harmonyEngine.getChordTicks(tick), harmonyEngine.getChordSectionTicks(tick));
+            } else {
+                chordTicks = harmonyEngine.getChordTicks(tick);                
+            }
 
             Pattern pattern = getArpeggioPattern(chordTicks);
             int patternLength = pattern.size();
@@ -200,6 +211,10 @@ public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
             setObeyChordSubtype(XMLUtils.parseBoolean(random, "obeyChordSubtype", node, xpath));
         } catch (Exception e) {}
         
+        try {
+            setObeyChordSections(XMLUtils.parseBoolean(random, "obeyChordSections", node, xpath));
+        } catch (Exception e) {}
+
         int patternEngineCount = nodeList.getLength();
 
         Map<Integer, Boolean> patternLengthMap = new HashMap<Integer, Boolean>(patternEngineCount);

@@ -14,6 +14,9 @@ Change log
       seed value will be used instead of deriving a seed from the parent component. Note that providing a constant seed for a
       component will lead to a fixed seed for all its descendants.
 
+    - Added "obeyChordSections" tag to the ArpeggioSequenceEngine. If set to true, a chord that spans a chord section boundary
+      will lead to a pattern being chosen that ends at the boundary rather than when the chord ends. Defaults to false.
+
     - Added the constraints "minSegmentLength" and "maxSegmentLength" to the SimpleArrangementEntry, which constrain the
       minimum and maximum activity segment lengths, respectively, of an ActivityVector (counted in chord sections). The two
       constraints will be ignored for an activity vector if the ActivityVector never becomes active.

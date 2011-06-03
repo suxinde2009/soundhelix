@@ -432,8 +432,8 @@ public final class XMLUtils {
      * @param clazz the class
      * @param node the node to use for configuration
      * @param xpath an XPath instance
-     * @param randomSeed the random seed origin to use (the random seed of the parent component)
-     * @param modifier the random modifier
+     * @param parentRandomSeed the random seed origin to use (the random seed of the parent component)
+     * @param modifier the random modifier (each instance created by the parent should use a different modifier)
      * @param <T> the type
      * 
      * @return the instance
@@ -444,9 +444,8 @@ public final class XMLUtils {
      * @throws IllegalAccessException if the class cannot be instantiated
      */
     
-    public static <T> T getInstance(Class<T> clazz, Node node, XPath xpath, long randomSeed, int modifier)
-        throws InstantiationException, XPathException,
-                   IllegalAccessException, ClassNotFoundException {
+    public static <T> T getInstance(Class<T> clazz, Node node, XPath xpath, long parentRandomSeed, int modifier)
+        throws InstantiationException, XPathException, IllegalAccessException, ClassNotFoundException {
         if (node == null) {
             throw new IllegalArgumentException("Node is null");
         }
@@ -461,6 +460,22 @@ public final class XMLUtils {
             // prefix the class name with the package name of the superclass
             className = clazz.getName().substring(0, clazz.getName().lastIndexOf('.') + 1) + className;
         }
+ 
+        boolean isSeedProvided = false;
+        long providedSeed = 0;
+        
+        String seedString = (String) xpath.evaluate("attribute::seed", node, XPathConstants.STRING);
+
+        if (seedString != null && !seedString.equals("")) {
+            try {
+                providedSeed = Long.parseLong(seedString);
+                isSeedProvided = true;
+            } catch (NumberFormatException e) {
+                throw new RuntimeException("Seed \"" + seedString + "\" is not a valid number", e);
+            }
+        }
+
+        logger.debug("Seed provided: " + isSeedProvided + "  Provided seed: " + providedSeed);
         
         if (logger.isTraceEnabled()) {
             logger.trace("Instantiating class " + className);
@@ -477,14 +492,22 @@ public final class XMLUtils {
         // random-seed instance if it is random-seedable (it's important to seed before configuring)
 
         if (instance instanceof RandomSeedable) {
-            long derivedSeed = randomSeed + getLongHashCode(className)
-                                          - RANDOM_SEED_PRIME * modifier * Math.abs(modifier);
-            
-            if (logger.isTraceEnabled()) {
-                logger.trace("Base random seed: " + randomSeed + ", using " + derivedSeed);
+            if (isSeedProvided) {
+                if (logger.isTraceEnabled()) {
+                    logger.trace("Using provided random seed " + providedSeed);
+                }
+
+                ((RandomSeedable) instance).setRandomSeed(providedSeed);             
+            } else {
+                long derivedSeed = parentRandomSeed + getLongHashCode(className)
+                                                    - RANDOM_SEED_PRIME * modifier * Math.abs(modifier);
+
+                if (logger.isTraceEnabled()) {
+                    logger.trace("Base random seed: " + parentRandomSeed + ", using derived seed " + derivedSeed);
+                }
+
+                ((RandomSeedable) instance).setRandomSeed(derivedSeed);
             }
-            
-            ((RandomSeedable) instance).setRandomSeed(derivedSeed);
         }
         
         // configure instance if it is XML-configurable

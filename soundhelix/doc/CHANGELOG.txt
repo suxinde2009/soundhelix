@@ -17,7 +17,11 @@ Change log
       minimum and maximum pause lengths, respectively, between activity segments (counted in chord sections). The constraints
       will be ignored for an ActivityVector if the ActivityVector is never active or only has one activity segment.
 
-    - Fixed bug that prevented proper random seeding when a song name was used on the command-line.
+    - Added skipWhenApplied and skipWhenNotApplied tags to conditional patterns in the DrumSequenceEngine. With these two tags
+      you can define the number of conditional patterns to skip if the current pattern was applied or was not applied (even though
+      it was allowed to be applied), respectively.
+
+    - Fixed bug that prevented correct random seeding when a song name was used on the command-line.
 
 
 0.1: 2011-05-22

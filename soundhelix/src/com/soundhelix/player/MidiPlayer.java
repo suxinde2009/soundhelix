@@ -357,16 +357,16 @@ public class MidiPlayer extends AbstractPlayer {
         if (!opened) {
             throw new IllegalStateException("Must call open() first");
         }
-            
+
         try {
-             initializeControllerLFOs(arrangement);
-             muteAllChannels();
+            initializeControllerLFOs(arrangement);
+            muteAllChannels();
             setChannelPrograms();            
 
-               Structure structure = arrangement.getStructure();
-               int ticksPerBeat = structure.getTicksPerBeat();
-               int ticks = structure.getTicks();
-               
+            Structure structure = arrangement.getStructure();
+            int ticksPerBeat = structure.getTicksPerBeat();
+            int ticks = structure.getTicks();
+
             // when clock synchronization is used, we must make sure that
             // the ticks per beat divide CLOCK_SYNCHRONIZATION_TICKS_PER_BEAT
             
@@ -386,7 +386,7 @@ public class MidiPlayer extends AbstractPlayer {
             }
             
             if (useClockSynchronization) {
-                sendShortMessageToClockSynchronized(ShortMessage.START);
+                sendMidiMessageToClockSynchronized(ShortMessage.START);
             }
 
             long referenceTime = System.nanoTime();
@@ -438,7 +438,7 @@ public class MidiPlayer extends AbstractPlayer {
                 
                 if (referenceTime >= timingTickReferenceTime) {
                        if (useClockSynchronization) {
-                           sendShortMessageToClockSynchronized(ShortMessage.TIMING_CLOCK);
+                           sendMidiMessageToClockSynchronized(ShortMessage.TIMING_CLOCK);
                        }
                     timingTickReferenceTime += getTimingTickNanos(clockTimingsPerTick, ticksPerBeat);
                 }
@@ -466,7 +466,7 @@ public class MidiPlayer extends AbstractPlayer {
             }
             
             if (useClockSynchronization) {
-                sendShortMessageToClockSynchronized(ShortMessage.STOP);
+                sendMidiMessageToClockSynchronized(ShortMessage.STOP);
             }
         } catch (Exception e) {
             throw new RuntimeException("Playback error", e);
@@ -485,8 +485,6 @@ public class MidiPlayer extends AbstractPlayer {
     
     private void muteActiveChannels(Arrangement arrangement, List<int[]> posList, List<int[]> pitchList)
         throws InvalidMidiDataException {
-        ShortMessage sm = new ShortMessage();
-
         int k = 0;
         
         for (ArrangementEntry entry : arrangement) {
@@ -508,9 +506,7 @@ public class MidiPlayer extends AbstractPlayer {
                 SequenceEntry prevse = s.get(p[j] - 1);
 
                 if (prevse.isNote()) {
-                    sm.setMessage(ShortMessage.NOTE_OFF, channel.channel,
-                            pitch[j], 0);
-                    channel.device.receiver.send(sm, -1);
+                    sendMidiMessage(channel, ShortMessage.NOTE_OFF, pitch[j], 0);
                 }
             }
             
@@ -533,8 +529,6 @@ public class MidiPlayer extends AbstractPlayer {
     
     private void playTick(Arrangement arrangement, int tick, List<int[]> tickList, List<int[]> posList,
             List<int[]> pitchList) throws InvalidMidiDataException {
-        final ShortMessage sm = new ShortMessage();
-        
         Structure structure = arrangement.getStructure();
         int ticksPerBar = structure.getTicksPerBar();
 
@@ -581,8 +575,7 @@ public class MidiPlayer extends AbstractPlayer {
                             int pitch = pitches[j];
                             
                             if (!prevse.isLegato()) {
-                                sm.setMessage(ShortMessage.NOTE_OFF, channel.channel, pitch, 0);
-                                channel.device.receiver.send(sm, -1);
+                                sendMidiMessage(channel, ShortMessage.NOTE_OFF, pitch, 0);
                             } else  {
                                 // remember pitch for NOTE_OFF after the next NOTE_ON
                                 legatoList.add(pitch);
@@ -600,9 +593,7 @@ public class MidiPlayer extends AbstractPlayer {
 
                         if (se.isNote()) {
                             int pitch = (track.getType() == TrackType.MELODY ? transposition : 0) + se.getPitch();
-                            sm.setMessage(ShortMessage.NOTE_ON, channel.channel, pitch,
-                                          getMidiVelocity(se.getVelocity()));
-                            channel.device.receiver.send(sm, -1);
+                            sendMidiMessage(channel, ShortMessage.NOTE_ON, pitch, getMidiVelocity(se.getVelocity()));
 
                             // remove pitch if it is on the legato list (rare case)
                             // (Integer) must be used to call the remove(Object), and not remove(int) method
@@ -622,8 +613,7 @@ public class MidiPlayer extends AbstractPlayer {
             // send NOTE_OFFs for all pitches on the legato list
             
             for (int pitch : legatoList) {
-                sm.setMessage(ShortMessage.NOTE_OFF, channel.channel, pitch, 0);
-                channel.device.receiver.send(sm, -1);
+                sendMidiMessage(channel, ShortMessage.NOTE_OFF, pitch, 0);
             }
             
             k++;
@@ -688,8 +678,6 @@ public class MidiPlayer extends AbstractPlayer {
      */
     
     private void sendControllerLFOMessages(int tick) throws InvalidMidiDataException {
-        ShortMessage sm = new ShortMessage();
-        
         for (ControllerLFO clfo : controllerLFOs) {
             int value = clfo.lfo.getTickValue(tick);
             
@@ -700,35 +688,25 @@ public class MidiPlayer extends AbstractPlayer {
                 Device device = deviceMap.get(clfo.deviceName);
                 
                 if (controller.equals("pitchBend")) {
-                    sm.setMessage(ShortMessage.PITCH_BEND, clfo.channel, value % 128, value / 128);
-                    device.receiver.send(sm, -1);
+                    sendMidiMessage(device, clfo.channel, ShortMessage.PITCH_BEND, value % 128, value / 128);
                 } else if (controller.equals("modulationWheel")) {
-                    sm.setMessage(ShortMessage.CONTROL_CHANGE, clfo.channel, 1, value);
-                    device.receiver.send(sm, -1);
+                    sendMidiMessage(device, clfo.channel, ShortMessage.CONTROL_CHANGE, 1, value);
                 } else if (controller.equals("breath")) {
-                    sm.setMessage(ShortMessage.CONTROL_CHANGE, clfo.channel, 2, value);
-                    device.receiver.send(sm, -1);
+                    sendMidiMessage(device, clfo.channel, ShortMessage.CONTROL_CHANGE, 2, value);
                 } else if (controller.equals("footPedal")) {
-                    sm.setMessage(ShortMessage.CONTROL_CHANGE, clfo.channel, 4, value);
-                    device.receiver.send(sm, -1);
+                    sendMidiMessage(device, clfo.channel, ShortMessage.CONTROL_CHANGE, 4, value);
                 } else if (controller.equals("volume")) {
-                    sm.setMessage(ShortMessage.CONTROL_CHANGE, clfo.channel, 7, value);
-                    device.receiver.send(sm, -1);
+                    sendMidiMessage(device, clfo.channel, ShortMessage.CONTROL_CHANGE, 7, value);
                 } else if (controller.equals("balance")) {
-                    sm.setMessage(ShortMessage.CONTROL_CHANGE, clfo.channel, 8, value);
-                    device.receiver.send(sm, -1);
+                    sendMidiMessage(device, clfo.channel, ShortMessage.CONTROL_CHANGE, 8, value);
                 } else if (controller.equals("pan")) {
-                    sm.setMessage(ShortMessage.CONTROL_CHANGE, clfo.channel, 10, value);
-                    device.receiver.send(sm, -1);
+                    sendMidiMessage(device, clfo.channel, ShortMessage.CONTROL_CHANGE, 10, value);
                 } else if (controller.equals("expression")) {
-                    sm.setMessage(ShortMessage.CONTROL_CHANGE, clfo.channel, 11, value);
-                    device.receiver.send(sm, -1);
+                    sendMidiMessage(device, clfo.channel, ShortMessage.CONTROL_CHANGE, 11, value);
                 } else if (controller.equals("effect1")) {
-                    sm.setMessage(ShortMessage.CONTROL_CHANGE, clfo.channel, 12, value);
-                    device.receiver.send(sm, -1);
+                    sendMidiMessage(device, clfo.channel, ShortMessage.CONTROL_CHANGE, 12, value);
                 } else if (controller.equals("effect2")) {
-                    sm.setMessage(ShortMessage.CONTROL_CHANGE, clfo.channel, 13, value);
-                    device.receiver.send(sm, -1);
+                    sendMidiMessage(device, clfo.channel, ShortMessage.CONTROL_CHANGE, 13, value);
                 } else if (controller.equals("milliBPM")) {
                     setMilliBPM(value);
                 } else {
@@ -774,7 +752,7 @@ public class MidiPlayer extends AbstractPlayer {
                 }
 
                 if (useClockSynchronization) {
-                    sendShortMessageToClockSynchronized(ShortMessage.TIMING_CLOCK);
+                    sendMidiMessageToClockSynchronized(ShortMessage.TIMING_CLOCK);
                 }
 
                 lastWantedNanos = wantedNanos;
@@ -845,8 +823,6 @@ public class MidiPlayer extends AbstractPlayer {
      */
     
     private void setChannelPrograms() throws InvalidMidiDataException {
-        ShortMessage sm = new ShortMessage();
-
         // we use a Map to track whether a program has been set already
 
         Map<DeviceChannel, Boolean> map = new HashMap<DeviceChannel, Boolean>();
@@ -856,32 +832,28 @@ public class MidiPlayer extends AbstractPlayer {
             DeviceChannel dc = i.next();
 
             if (dc.program != -1 && !map.containsKey(dc)) {
-                sm.setMessage(ShortMessage.PROGRAM_CHANGE, dc.channel, dc.program, 0);
-                dc.device.receiver.send(sm, -1);
+                sendMidiMessage(dc, ShortMessage.PROGRAM_CHANGE, dc.program, 0);
                 map.put(dc, true);
             }
         }
     }
 
     /**
-     * Sends the given single-byte message to all devices that are using
-     * clock synchronization.
+     * Sends the given single-byte message to all devices that are using clock synchronization.
      * 
-     * @param message the message
+     * @param status the message
      * 
      * @throws InvalidMidiDataException in case of invalid MIDI data
      */
     
-    private void sendShortMessageToClockSynchronized(int message) throws InvalidMidiDataException {
-        ShortMessage sm = new ShortMessage();
+    private void sendMidiMessageToClockSynchronized(int status) throws InvalidMidiDataException {
         Iterator<Device> iter = deviceMap.values().iterator();
         
         while (iter.hasNext()) {
             Device device = iter.next();
             
             if (device.useClockSynchronization) {
-                sm.setMessage(message);
-                device.receiver.send(sm, -1);
+                sendMidiMessage(device, status);
             }
         }
     }
@@ -896,24 +868,24 @@ public class MidiPlayer extends AbstractPlayer {
      */
     
     public final void muteAllChannels() throws InvalidMidiDataException {
-        ShortMessage sm = new ShortMessage();
         Iterator<DeviceChannel> iter = channelMap.values().iterator();
         
         while (iter.hasNext()) {
             DeviceChannel dc = iter.next();
             
             // send ALL SOUND OFF message
-            sm.setMessage(ShortMessage.CONTROL_CHANGE, dc.channel, 120, 0);
-            dc.device.receiver.send(sm, -1);
+            sendMidiMessage(dc, ShortMessage.CONTROL_CHANGE, 120, 0);
 
             // send ALL NOTES OFF message (doesn't work on all MIDI devices)
-            //sm.setMessage(ShortMessage.CONTROL_CHANGE,dc.channel,123,0);
-            //dc.device.receiver.send(sm,-1);
+            sendMidiMessage(dc, ShortMessage.CONTROL_CHANGE, 123, 0);
 
             for (int i = 0; i < 128; i++) {
-                sm.setMessage(ShortMessage.NOTE_OFF, dc.channel, i, 0);
-                dc.device.receiver.send(sm, -1);
+                sendMidiMessage(dc, ShortMessage.NOTE_OFF, i, 0);
             }
+            
+            try {
+                Thread.sleep(460);
+            } catch (Exception e) {}
         }
     }
 
@@ -1124,6 +1096,59 @@ public class MidiPlayer extends AbstractPlayer {
         
         setControllerLFOs(controllerLFOs);
     }
+
+    /**
+     * Sends a MIDI message with the given status, data1 and data2 to the given device channel.
+     * 
+     * @param deviceChannel the device channel
+     * @param status the MIDI status
+     * @param data1 the first MIDI data
+     * @param data2 the second MIDI data
+     *
+     * @throws InvalidMidiDataException in case of invalid MIDI data
+     */
+        
+    private void sendMidiMessage(DeviceChannel deviceChannel, int status, int data1, int data2)
+        throws InvalidMidiDataException {
+        ShortMessage sm = new ShortMessage();        
+        sm.setMessage(status, deviceChannel.channel, data1, data2);
+        deviceChannel.device.receiver.send(sm, -1);
+    }
+
+    /**
+     * Sends a MIDI message with the given status, data1 and data2 to the given channel on the given device.
+     * 
+     * @param device the device
+     * @param channel the channel number (0-15)
+     * @param status the MIDI status
+     * @param data1 the first MIDI data
+     * @param data2 the second MIDI data
+     *
+     * @throws InvalidMidiDataException in case of invalid MIDI data
+     */
+
+    private void sendMidiMessage(MidiPlayer.Device device, int channel, int status, int data1, int data2)
+        throws InvalidMidiDataException {
+        ShortMessage sm = new ShortMessage();        
+        sm.setMessage(status, channel, data1, data2);
+        device.receiver.send(sm, -1);
+    }
+
+    /**
+     * Sends a MIDI message with the given status to the given device.
+     * 
+     * @param device the device
+     * @param status the MIDI status
+     *
+     * @throws InvalidMidiDataException in case of invalid MIDI data
+     */
+
+    private void sendMidiMessage(Device device, int status) throws InvalidMidiDataException {
+        ShortMessage sm = new ShortMessage();        
+        sm.setMessage(status);
+        device.receiver.send(sm, -1);
+    }
+
     
     public void abortPlay() {
         this.isAborted = true;

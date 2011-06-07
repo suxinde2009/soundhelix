@@ -475,8 +475,6 @@ public final class XMLUtils {
             }
         }
 
-        logger.debug("Seed provided: " + isSeedProvided + "  Provided seed: " + providedSeed);
-        
         if (logger.isTraceEnabled()) {
             logger.trace("Instantiating class " + className);
         }

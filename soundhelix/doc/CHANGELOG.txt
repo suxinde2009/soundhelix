@@ -28,7 +28,9 @@ Change log
 
     - Added "skipWhenApplied" and "skipWhenNotApplied" tags to conditional patterns in the DrumSequenceEngine. With these two
       tags you can define the number of conditional patterns to skip if the current pattern was applied or was not applied
-      (even though it was allowed to be applied), respectively. They both default to zero, which means don't skip.
+      (even though it was allowed to be applied), respectively. You can skip backwards by using a negative number (-1 would
+      repeat the current conditional pattern, -2 would jump to the previous one, etc.; make sure that you don't create
+      infinite loops). Both values default to zero, which means that processing continues with the next pattern.
 
     - Fixed bug that prevented correct random seeding when a song name was used on the command-line.
 

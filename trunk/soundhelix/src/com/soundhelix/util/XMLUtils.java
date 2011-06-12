@@ -427,13 +427,14 @@ public final class XMLUtils {
      * superclass is prefixed to the class name. The class must be a subclass of the given class to succeed. If the
      * class defines the interface RandomSeedable, it is random-seeded by creating a random seed based on the
      * specified random seed, the class name and the specified modifier. If the class defines the interface
-     * XMLConfigurable, it is configured by calling configure() with the node as the configuration root. 
+     * XMLConfigurable, it is configured by calling configure() with the node as the configuration root. The given
+     * salt value can be overridden by using a "seed" attribute.
      * 
      * @param clazz the class
      * @param node the node to use for configuration
      * @param xpath an XPath instance
      * @param parentRandomSeed the random seed origin to use (the random seed of the parent component)
-     * @param modifier the random modifier (each instance created by the parent should use a different modifier)
+     * @param salt the random salt (each instance created by the parent should use a different salt value)
      * @param <T> the type
      * 
      * @return the instance
@@ -444,7 +445,7 @@ public final class XMLUtils {
      * @throws IllegalAccessException if the class cannot be instantiated
      */
     
-    public static <T> T getInstance(Class<T> clazz, Node node, XPath xpath, long parentRandomSeed, int modifier)
+    public static <T> T getInstance(Class<T> clazz, Node node, XPath xpath, long parentRandomSeed, int salt)
         throws InstantiationException, XPathException, IllegalAccessException, ClassNotFoundException {
         if (node == null) {
             throw new IllegalArgumentException("Node is null");
@@ -468,15 +469,17 @@ public final class XMLUtils {
 
         if (seedString != null && !seedString.equals("")) {
             try {
-                providedSeed = Long.parseLong(seedString);
-                isSeedProvided = true;
+                if (seedString.startsWith("#")) {
+                    // take the given number as the modifier
+                    salt = Integer.parseInt(seedString.substring(1));
+                } else {
+                    // take the given number directly as the random seed
+                    providedSeed = Long.parseLong(seedString);
+                    isSeedProvided = true;
+                }
             } catch (NumberFormatException e) {
-                throw new RuntimeException("Seed \"" + seedString + "\" is not a valid number", e);
+                throw new RuntimeException("Seed \"" + seedString + "\" is invalid", e);
             }
-        }
-
-        if (logger.isTraceEnabled()) {
-            logger.trace("Instantiating class " + className);
         }
 
         T instance;
@@ -490,22 +493,21 @@ public final class XMLUtils {
         // random-seed instance if it is random-seedable (it's important to seed before configuring)
 
         if (instance instanceof RandomSeedable) {
+            long randomSeed;
+            
             if (isSeedProvided) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace("Using provided random seed " + providedSeed);
-                }
-
-                ((RandomSeedable) instance).setRandomSeed(providedSeed);             
+                randomSeed = providedSeed;
             } else {
-                long derivedSeed = parentRandomSeed + getLongHashCode(className)
-                                                    - RANDOM_SEED_PRIME * modifier * Math.abs(modifier);
-
-                if (logger.isTraceEnabled()) {
-                    logger.trace("Base random seed: " + parentRandomSeed + ", using derived seed " + derivedSeed);
-                }
-
-                ((RandomSeedable) instance).setRandomSeed(derivedSeed);
+                randomSeed = getDerivedRandomSeed(parentRandomSeed, className, salt);
             }
+
+            ((RandomSeedable) instance).setRandomSeed(randomSeed);
+
+            if (logger.isTraceEnabled()) {
+                logger.trace("Instantiated class " + className + " with random seed " + randomSeed);
+            }
+        } else {
+            logger.trace("Instantiated class " + className + " without a random seed");
         }
         
         // configure instance if it is XML-configurable
@@ -515,6 +517,21 @@ public final class XMLUtils {
         }
         
         return instance;
+    }
+    
+    /**
+     * Returns a derived random seed that is based on the parent random seed, the class name and the modifier.
+     * 
+     * @param parentRandomSeed the parent random seed
+     * @param className the class name 
+     * @param modifier the modifier
+     *
+     * @return the derived random seed
+     */
+    
+    
+    private static long getDerivedRandomSeed(long parentRandomSeed, String className, int modifier) {
+        return  parentRandomSeed + getLongHashCode(className) - RANDOM_SEED_PRIME * modifier * Math.abs(modifier);
     }
     
     /**

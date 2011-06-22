@@ -882,10 +882,6 @@ public class MidiPlayer extends AbstractPlayer {
             for (int i = 0; i < 128; i++) {
                 sendMidiMessage(dc, ShortMessage.NOTE_OFF, i, 0);
             }
-            
-            try {
-                Thread.sleep(460);
-            } catch (Exception e) {}
         }
     }
 

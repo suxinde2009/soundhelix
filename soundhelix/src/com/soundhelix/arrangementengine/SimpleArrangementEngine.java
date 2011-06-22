@@ -596,14 +596,13 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
             maxActivityVectors = getActivityVectorMaximum(vectors, 0.40, 0.2);
         }
         
-        int lastWantedActivityVectors = -1;
+        int[] wantedCounts = getWantedActivityVectorCounts(sections, maxActivityVectors);
         
         for (int section = 0; section < sections; section++) {
             int len = he.getChordSectionTicks(tick);
             
             // get the number of ActivityVectors we want active for this chord section
-            int wantedActivityVectors = getActivityVectorCount(section, sections, maxActivityVectors,
-                                                               lastWantedActivityVectors);
+            int wantedActivityVectors = wantedCounts[section];
             
             // get the number of ActivityVectors that are currently active
             int active = bitset.cardinality();
@@ -652,64 +651,73 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
             }
            
             tick += len;
-            
-            lastWantedActivityVectors = wantedActivityVectors;
         }
                 
         return activityVectors;    
     }
-    
+
     /**
-     * Returns the number of ActivityVectors that should be active during the
-     * given section. There is always a "fade-in" of ActivityVectors (as specified by startActivityCounts array)
+     * Returns an array that contains the number of activity vectors that should be active in each section.
+     * There is always a "fade-in" of ActivityVectors (as specified by startActivityCounts array)
      * for the first number of sections and a "fade-out" of ActivityVectors (as specified by stopActivityCounts array)
-     * for the last number of sections. In between, the number of ActivityVectors is
-     * chosen randomly.
+     * for the last number of sections. In between, the number of ActivityVectors is chosen randomly. Currently, there
+     * is special handling for the chord section directly before the fade-out begins. Here, we use the arithmetic mean
+     * of the previous count and the first fade-out count. If the mean is either of the two values, the value is
+     * increased until this is not the case anymore.
      * 
-     * @param section the section number (between 0 and sections-1)
      * @param sections the total number of sections
      * @param maxActivityVectors the maximum number of tracks to use
-     * @param lastCount the last count
 
-     * @return the number of tracks
+     * @return an int array containing the number of activity vectors that should be active in each chord section
      */
     
-    private int getActivityVectorCount(int section, int sections, int maxActivityVectors, int lastCount) {
-        // important: all of this must work properly when only few sections
-        // and few ActivityVectors (or even 1) are available
+    private int[] getWantedActivityVectorCounts(int sections, int maxActivityVectors) {
+        int[] counts = new int[sections];
+
+        int lastCount = -1;
         
-        int increaseTill = Math.min(maxActivityVectors, Math.min(sections / 2, startActivityCounts.length)) - 1;
-        int decreaseFrom = sections - Math.min(maxActivityVectors, Math.min(sections / 2,
-                                                                            stopActivityCounts.length + 1));
-        
-        if (section <= increaseTill) {
-            // in fade-in phase
-            return startActivityCounts[section];
-        } else if (section == decreaseFrom) {
-            int firstStop = stopActivityCounts[section - decreaseFrom];
-            int count = (lastCount + firstStop) / 2;
-            
-            while ((count == lastCount || count == firstStop) && count < maxActivityVectors) {
-                count++;
+        for (int section = 0; section < sections; section++) {        
+            // important: all of this must work properly when only few sections
+            // and few ActivityVectors (or even 1) are available
+
+            int increaseTill = Math.min(maxActivityVectors, Math.min(sections / 2, startActivityCounts.length)) - 1;
+            int decreaseFrom = sections - Math.min(maxActivityVectors, Math.min(sections / 2,
+                    stopActivityCounts.length + 1));
+
+            if (section <= increaseTill) {
+                // in fade-in phase
+                counts[section] = startActivityCounts[section];
+            } else if (section == decreaseFrom) {
+                // chord section directly before the fade-out phase
+                int firstStop = stopActivityCounts[section - decreaseFrom];
+                int count = (lastCount + firstStop) / 2;
+
+                while ((count == lastCount || count == firstStop) && count < maxActivityVectors) {
+                    count++;
+                }
+                
+                counts[section] = count;
+            } else if (section >= decreaseFrom + 1) {
+                // in fade-out phase
+                counts[section] = stopActivityCounts[section - decreaseFrom - 1];
+            } else {
+                // in between
+                int min = Math.min(maxActivityVectors, minActivityCount);
+
+                int num;
+
+                do {
+                    num = min + random.nextInt(maxActivityVectors - min + 1);
+                } while (Math.abs(num - lastCount) > maxActivityChangeCount
+                        || (num == lastCount && random.nextFloat() >= 0.1f));
+
+                counts[section] = num;
             }
-
-            return count;
-        } else if (section >= decreaseFrom + 1) {
-            // in fade-out phase
-            return stopActivityCounts[section - decreaseFrom - 1];
-        } else {
-            // in between
-            int min = Math.min(maxActivityVectors, minActivityCount);
             
-            int num;
-            
-            do {
-                num = min + random.nextInt(maxActivityVectors - min + 1);
-            } while (Math.abs(num - lastCount) > maxActivityChangeCount
-                     || (num == lastCount && random.nextFloat() >= 0.1f));
-
-            return num;
+            lastCount = counts[section];
         }
+        
+        return counts;
     }
     
     public void setArrangementEntries(ArrangementEntry[] arrangementEntries) {

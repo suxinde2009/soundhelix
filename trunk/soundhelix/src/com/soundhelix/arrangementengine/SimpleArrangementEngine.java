@@ -112,13 +112,19 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
     }
     
     public Arrangement render() {
+        // SequenceEngines have been instantiated and configured, but the
+        // Structure has not been set yet
+        for (ArrangementEntry entry : arrangementEntries) {
+            entry.sequenceEngine.setStructure(structure);
+        }
+
         Map<String, ActivityVectorConfiguration> neededActivityVectors = getNeededActivityVectors();
         
-        int tracks = arrangementEntries.length;
+        ActivityVectorConfiguration[] vectors = neededActivityVectors.values().toArray(
+                new ActivityVectorConfiguration[neededActivityVectors.size()]);
 
-        ActivityVectorConfiguration[] vectors = neededActivityVectors.values().toArray(new ActivityVectorConfiguration[neededActivityVectors.size()]);
-        
-        createConstrainedActivityVectors(structure.getTicks(), tracks, vectors);
+        // create the song activity matrix
+        createConstrainedActivityVectors(vectors);
         dumpActivityVectors(vectors);
         shiftIntervalBoundaries(neededActivityVectors);
 
@@ -126,16 +132,19 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         return arrangement;
     }
 
+    /**
+     * Returns the needed activity vectors as a map that maps from the activity vector name to its configuration.
+     * Rather than returning all activity vectors, this method only returns the activity vectors that are used within
+     * at least one SequenceEngine.
+     * 
+     * @return the map of activity vectors
+     */
+    
     private Map<String, ActivityVectorConfiguration> getNeededActivityVectors() {
         Map<String, ActivityVectorConfiguration> neededActivityVector =
                     new LinkedHashMap<String, ActivityVectorConfiguration>();
 
         for (ArrangementEntry entry : arrangementEntries) {
-            SequenceEngine sequenceEngine = entry.sequenceEngine;
-            // SequenceEngines have been instantiated and configured, but the
-            // Structure has not been set yet
-            sequenceEngine.setStructure(structure);
-            
             String[] names = entry.activityVectorNames;
             
             for (String name : names) {
@@ -148,9 +157,19 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
                 neededActivityVector.put(name, avc);
             }
         }
+        
         return neededActivityVector;
     }
 
+    /**
+     * Creates an arrangement based on the given map of needed activity vectors. This is done by rendering a track
+     * for each SequenceEngine based on the already generated activity vectors.
+     * 
+     * @param neededActivityVector the map of needed activity vectors
+     * 
+     * @return the created arrangement
+     */
+    
     private Arrangement createArrangement(Map<String, ActivityVectorConfiguration> neededActivityVector) {
         // use each SequenceEngine to render a track
         // each SequenceEngine is given the number of ActivityVectors it
@@ -160,17 +179,19 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         
         for (ArrangementEntry entry : arrangementEntries) {
             SequenceEngine sequenceEngine = entry.sequenceEngine;
-            int num = sequenceEngine.getActivityVectorCount();
+            int neededActivityVectors = sequenceEngine.getActivityVectorCount();
 
-            ActivityVector[] list = new ActivityVector[num];
             String[] names = entry.activityVectorNames;
             
-            if (names.length != num) {
-                throw new RuntimeException("Need " + num + " ActivityVector" + (num == 1 ? "" : "s")
-                        + " for instrument " + entry.instrument + ", found " + names.length);
+            if (names.length != neededActivityVectors) {
+                throw new RuntimeException("Need " + neededActivityVectors + " ActivityVector"
+                        + (neededActivityVectors == 1 ? "" : "s") + " for instrument " + entry.instrument
+                        + ", found " + names.length);
             }
-            
-            for (int k = 0; k < num; k++) {
+
+            ActivityVector[] list = new ActivityVector[neededActivityVectors];
+
+            for (int k = 0; k < neededActivityVectors; k++) {
                 list[k] = neededActivityVector.get(names[k]).activityVector;
             }
 
@@ -182,13 +203,30 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         return arrangement;
     }
 
+    /**
+     * Shifts the interval boundaries of all activity vectors where a start or stop shift has been configured.
+     *
+     * @param neededActivityVector the needed activity vectors
+     */
+    
+    
     private void shiftIntervalBoundaries(Map<String, ActivityVectorConfiguration> neededActivityVector) {
         for (ActivityVectorConfiguration avc : neededActivityVector.values()) {
             avc.activityVector.shiftIntervalBoundaries(avc.startShift, avc.stopShift);
         }
     }
 
-    private void createConstrainedActivityVectors(int ticks, int tracks, ActivityVectorConfiguration[] activityVectorConfigurations) {
+    /**
+     * Creates the constrained activity vectors, which resemble the song's activity matrix.
+     * 
+     * @param activityVectorConfigurations the activity vector configurations
+     */
+    
+    private void createConstrainedActivityVectors(ActivityVectorConfiguration[] activityVectorConfigurations) {
+        int ticks = structure.getTicks();
+        int tracks = arrangementEntries.length;        
+        int tries = 0;
+        
         List<Integer> chordSectionStartTicks = HarmonyEngineUtils.getChordSectionStartTicks(structure);
         int chordSections = chordSectionStartTicks.size();
         
@@ -199,8 +237,6 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         startActivityCounts = parseActivityCounts(startActivityCountsString, vectors);
         stopActivityCounts = parseActivityCounts(stopActivityCountsString, vectors);
         
-        int tries = 0;
-
         Map<String, Integer> constraintFailure = null;
         
         boolean isDebug = logger.isDebugEnabled();
@@ -258,7 +294,6 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
                 int lastActiveTick = av.getLastActiveTick();
                 int segmentCount = av.getSegmentCount();
                 int[] minMaxSegmentLengths = null;
-                int[] minMaxPauseLengths = null;
                 
                 if (avc.minSegmentLength > 0 || avc.maxSegmentLength < Integer.MAX_VALUE
                         || avc.minPauseLength > 1 || avc.maxPauseLength < Integer.MAX_VALUE) {
@@ -354,10 +389,9 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
             return;
         }
         
-        StringBuilder sb = new StringBuilder("Song structure\n");
+        StringBuilder sb = new StringBuilder("Song structure:\n");
         
         int ticks = structure.getTicks();
-        
         int maxLen = 0;
         
         for (ActivityVectorConfiguration avc : vectors) {
@@ -370,11 +404,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
             ActivityVector av = avc.activityVector;
 
             for (int tick = 0; tick < ticks; tick += structure.getHarmonyEngine().getChordSectionTicks(tick)) {
-                if (av.isActive(tick)) {
-                    sb.append('*');
-                } else {
-                    sb.append('-');
-                }
+                sb.append(av.isActive(tick) ? '*' : '-');
             }
             
             int activeTicks = av.getActiveTicks();
@@ -382,6 +412,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         }
 
         sb.append(String.format("%" + maxLen + "s  ", ""));
+        
         for (int tick = 0; tick < ticks; tick += structure.getHarmonyEngine().getChordSectionTicks(tick)) {
             int c = 0;
             
@@ -607,7 +638,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
                     }
                     
                     activeSections[i]++;                     
-                       activityVectors[i].addActivity(len);
+                    activityVectors[i].addActivity(len);
                 } else {
                     // check if the still missing active sections are more than what is left
                     // we only need to check this in the inactive case

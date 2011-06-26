@@ -221,9 +221,13 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
             maxActivityVectors = getActivityVectorMaximum(vectors, 0.40, 0.2);
         }
     
-        int tracks = arrangementEntries.length;        
-        logger.debug("Creating " + vectors + " ActivityVectors for " + tracks + " track" + (tracks == 1 ? "" : "s"));
-
+        int tracks = arrangementEntries.length;
+        
+        if (logger.isDebugEnabled()) {
+            logger.debug("Creating " + vectors + " ActivityVectors for " + tracks
+                    + " track" + (tracks == 1 ? "" : "s"));
+        }
+        
         startActivityCounts = parseActivityCounts(startActivityCountsString, vectors);
         stopActivityCounts = parseActivityCounts(stopActivityCountsString, vectors);
 
@@ -473,10 +477,12 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
         long end = System.nanoTime();
         
-        logger.debug("Fulfilled constraints in " + ((end - startTime) / 1000000L) + " ms. Iterations: " + iterations
-                + " (" + ((end - startTime) / iterations) + " ns/iteration), violations: " + violations
-                + ", backtrack steps: " + backtracks);
-
+        if (logger.isDebugEnabled()) {
+            logger.debug("Fulfilled constraints in " + ((end - startTime) / 1000000L) + " ms. Iterations: " + iterations
+                    + " (" + ((end - startTime) / iterations) + " ns/iteration), violations: " + violations
+                    + ", backtrack steps: " + backtracks);
+        }
+        
         convertBitSetsToActivityVectors(activityVectorConfigurations, bitSets);
     }
 

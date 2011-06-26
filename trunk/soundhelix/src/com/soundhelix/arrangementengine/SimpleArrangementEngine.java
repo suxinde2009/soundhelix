@@ -1,5 +1,6 @@
 package com.soundhelix.arrangementengine;
 
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -30,7 +31,7 @@ import com.soundhelix.util.XMLUtils;
  * ActivityVector activity can be constrained individually to enforce certain properties. All AVs are filled at
  * the same time because there is always the above-mentioned overall song constraint that defines the number of
  * active AVs for each chord section. For each chord section a choice is made to activate or deactivate AVs or to
- * leave the number of active AVs unchanged. The list of generated AVs are called an activity matrix.
+ * leave the number of active AVs unchanged. The list of generated AVs are called a song activity matrix.
  *
  * The following constraints are supported for ActivityVectors:
  * 
@@ -40,8 +41,8 @@ import com.soundhelix.util.XMLUtils;
  * - maxActive(n): the AV must be active for at most n% of the song; granularity is at chord section level
  * - startBeforeSection(n): the AV must start before section n
  * - startAfterSection(n): the AV must start after section n
- * - stopBeforeSection(n): the AV must stop before section n, counted from the end
- * - stopAfterSection(n): the AV must stop after section n, counted from the end
+ * - stopBeforeSection(n): the AV must stop before section n, counted from the end (0 is the last chord section)
+ * - stopAfterSection(n): the AV must stop after section n, counted from the end (0 is the last chord section)
  * - minSegmentCount(n): the AV must be active for at least n chord section segments
  * - maxSegmentCount(n): the AV must be active for at most n chord section segments
  * - minSegmentLength(n): the minimum AV segment length must be n chord sections
@@ -49,35 +50,21 @@ import com.soundhelix.util.XMLUtils;
  * - minPauseLength(n): the minimum AV pause length must be n chord sections
  * - maxPauseLength(n): the maximum AV pause length must be n chord sections
  *
- * Local (peep-hole) constraints can be checked during AV generation when the activity per chord section is generated.
- * Such a constraint can be a success constraint, which means that a random choice can be redone on-the-fly until the
- * constraint is not violated anymore (if that's possible) or it can be a failure constraint, which means the
- * constraint can be checked locally but can make the whole creation fail. For example, the startAfterSection
- * constraint is a local success constraint, because if an AV is randomly chosen to become active too early, this
- * random selection can be repeated until an AV is chosen that does not violate that constraint (unless such an AV
- * doesn't exist). In contrast, the stopBeforeSection constraint cannot be enforced so easily, because an AV can be
- * active in a chord section either because it becomes active (then the constraint can be made a success by choosing
- * another AV to become active instead) or because it is already active and stays active (because the number of
- * active AVs should increase).
+ * A randomized backtracking algorithm is used for finding a song activity matrix that fulfills all constraints of
+ * all ActivityVectors at the same time. It works roughly as follows: The song activity matrix is built from left to
+ * right (chord section by chord section) by making random selections about which AVs to activate or deactivate. If
+ * a constraint violation is detected, a number of different random choices at the same section is tried by reverting
+ * the previous choice and choosing another one; if all these fail, the algorithm backtracks to the previous section.
+ * To avoid the overhead of recursion, the algorithm is implemented iteratively.
  * 
- * Global constraints can only be checked after all AVs have been generated. No correction to enforce the constraints
- * are possible except for completely recreating all AVs. Currently, none of the constraints are really global.
+ * The algorithm is able to find a valid song activity matrix pretty quickly (if one exists), much faster than the
+ * simpler algorithm used in version 0.1 of SoundHelix and before.
  * 
- * The easiest (but least efficient) way to check constraints is of course to check them after the whole activity
- * matrix has been generated. However, the time to fulfill all constraints tends to grow exponentially with every 
- * constraint added. Therefore, most of the constraints are checked as early as possible.
- * 
- * The only low-cost constraint is currently the startAfterSection constraint. Using it hardly increases the
- * AV creation time at all. The minActive/maxActive constraints on the other hand are expensive for percentages larger
- * than the expected average percentage for minActive and percentages smaller than the expected average percentage for
- * maxActive. For example, if you have 20 AVs and 5 of them should active at least 60% of the time, you will need
- * quite a lot of creation iterations until these constraints are fulfilled.
+ * The algorithm scales pretty well with increasing numbers of constraints, but keep in mind that every additional
+ * constraint increases the complexity level of finding a valid song activity matrix.
  *
  * @author Thomas Schürger (thomas@schuerger.com)
  */
-
-// TODO: make ActivityVector constraint-compliance more efficient by ensuring the constraints
-// (or aborting as early as possible) during creation instead of checking afterwards
 
 public class SimpleArrangementEngine extends AbstractArrangementEngine {
     /** The random generator. */
@@ -90,7 +77,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
     private int[] stopActivityCounts = {};
     
     /** The maximum delta that activity can change in each chord section. */
-    private int maxActivityChangeCount = 3;
+    private int maxActivityChangeCount = 2;
     
     /** The minimum number of active ActivityVectors. */
     private int minActivityCount = 2;
@@ -209,172 +196,360 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
      * @param neededActivityVector the needed activity vectors
      */
     
-    
     private void shiftIntervalBoundaries(Map<String, ActivityVectorConfiguration> neededActivityVector) {
         for (ActivityVectorConfiguration avc : neededActivityVector.values()) {
             avc.activityVector.shiftIntervalBoundaries(avc.startShift, avc.stopShift);
         }
     }
 
-    /**
-     * Creates the constrained activity vectors, which resemble the song's activity matrix.
-     * 
-     * @param activityVectorConfigurations the activity vector configurations
-     */
-    
     private void createConstrainedActivityVectors(ActivityVectorConfiguration[] activityVectorConfigurations) {
-        int ticks = structure.getTicks();
-        int tracks = arrangementEntries.length;        
-        int tries = 0;
-        
-        List<Integer> chordSectionStartTicks = HarmonyEngineUtils.getChordSectionStartTicks(structure);
-        int chordSections = chordSectionStartTicks.size();
-        
+
+        int sections = HarmonyEngineUtils.getChordSectionCount(structure);
         int vectors = activityVectorConfigurations.length;
 
-        logger.debug("Creating " + vectors + " ActivityVectors for " + tracks + " tracks");
+        // convert minActive and maxActive percentages into chord section counts
+        
+        for (ActivityVectorConfiguration avc : activityVectorConfigurations) {
+            // minActive has to be rounded up to an integer number of sections, maxActive has to be rounded down
+            avc.minActiveSectionCount = (int) (sections * avc.minActive / 100d + 0.999999);
+            avc.maxActiveSectionCount = (int) (sections * avc.maxActive / 100d);
+        }
+            
+        int maxActivityVectors = Math.min(maxActivityCount, vectors);
+        
+        if (maxActivityVectors <= 0) {
+            maxActivityVectors = getActivityVectorMaximum(vectors, 0.40, 0.2);
+        }
+    
+        int tracks = arrangementEntries.length;        
+        logger.debug("Creating " + vectors + " ActivityVectors for " + tracks + " track" + (tracks == 1 ? "" : "s"));
 
         startActivityCounts = parseActivityCounts(startActivityCountsString, vectors);
         stopActivityCounts = parseActivityCounts(stopActivityCountsString, vectors);
+
+        int[] wantedCounts = getWantedActivityVectorCounts(sections, maxActivityVectors);
+
+        BitSet[] bitSets = new BitSet[sections];
+        int[] tries = new int[sections];
         
-        Map<String, Integer> constraintFailure = null;
+        // the out-degree (branch level) to use at each chord section
+        int[] sectionIterations = new int[sections];
         
-        boolean isDebug = logger.isDebugEnabled();
+        ActivityVectorState[][] allStates = new ActivityVectorState[sections][vectors];
         
-        if (isDebug) {
-            constraintFailure = new HashMap<String, Integer>();
-        }
-        
-    again:
-        while (true) {
-            // create ActivityVectors at random
-            // then check if the constraints are met for each ActivityVector
-
-            // note that the constraint startAfterSection is already taken care of in the following method
-            // (unfortunately, it's not simple to do the same for stopBeforeSection)
-
-            ActivityVector[] activityVectors;
-
-            try {
-                activityVectors = createActivityVectors(activityVectorConfigurations);
-            } catch (ConstraintException e) {
-                if (isDebug) {
-                    String name = e.getActivityVectorConfiguration() != null
-                        ? e.getActivityVectorConfiguration().name : "unknown";
-                    String key = name + "/" + e.getReason();
-                    Integer current = constraintFailure.get(key);
-
-                    constraintFailure.put(key, current != null ? current + 1 : 1);
-                }
-
-                tries++;
-
-                if (tries >= maxIterations) {
-                    if (logger.isDebugEnabled()) {
-                        for (Map.Entry<String, Integer> entry : constraintFailure.entrySet()) {
-                            logger.debug("Constraint failures for " + entry.getKey() + ": " + entry.getValue());
-                        }
-                    }
-
-                    throw new RuntimeException("Couldn't satisfy activity constraints within " + tries + " iterations");
-                } else {
-                    // we haven't reached the iteration limit yet, retry
-                    continue again;
-                }                        
-            }
-
-            for (int i = 0; i < vectors; i++) {
-                ActivityVector av = activityVectors[i];
-                ActivityVectorConfiguration avc = activityVectorConfigurations[i];
-
-                // check if one of the constraints is violated
-
-                double active = 100.0d * av.getActiveTicks() / ticks;
-                int firstActiveTick = av.getFirstActiveTick();
-                int lastActiveTick = av.getLastActiveTick();
-                int segmentCount = av.getSegmentCount();
-                int[] minMaxSegmentLengths = null;
+        for (int i = 0; i < sections; i++) {
+            bitSets[i] = new BitSet(vectors);
+            if (i == 0) {
+                // we use a large value here; the termination condition is the maximum number of total iterations
+                // anyway
+                sectionIterations[0] = 1000000;
+            } else {
+                // the algorithm terminates most quickly with a value of 2, larger values will reduce the backtracking
+                // rate and the speed until a valid solution is found
                 
-                if (avc.minSegmentLength > 0 || avc.maxSegmentLength < Integer.MAX_VALUE
-                        || avc.minPauseLength > 1 || avc.maxPauseLength < Integer.MAX_VALUE) {
-                    // minMaxSegmentLengths will be null if the AV is never active
-                    minMaxSegmentLengths = HarmonyEngineUtils.getMinMaxSegmentLengths(structure, av);
-                }
+                // with the value 1, the whole algorithm degrades to restarting the whole activity matrix from scratch
+                // every time a violation is detected (it always backtracks to section 0), which undermines the whole
+                // backtracking approach
+                sectionIterations[i] = 2;
+            }
+            
+            for (int j = 0; j < vectors; j++) {
+                allStates[i][j] = new ActivityVectorState();
+            }
+        }
 
-                if (active < avc.minActive && (!avc.allowInactive || active > 0) || active > avc.maxActive
-                        || avc.startAfterSection + 1 >= chordSections || avc.stopBeforeSection + 1 >= chordSections
-                        || avc.stopBeforeSection >= 0 && lastActiveTick >= chordSectionStartTicks.get(chordSections - 1 - avc.stopBeforeSection)
-                        || avc.stopAfterSection > 0 && lastActiveTick >= 0 && lastActiveTick < chordSectionStartTicks.get(chordSections - avc.stopAfterSection)
-                        || avc.startBeforeSection < Integer.MAX_VALUE && firstActiveTick >= 0 && firstActiveTick > chordSectionStartTicks.get(avc.startBeforeSection - 1)
-                        || avc.startAfterSection >= 0 && firstActiveTick >= 0 && firstActiveTick < chordSectionStartTicks.get(avc.startAfterSection + 1)
-                        || (avc.minSegmentCount >= 0 || avc.maxSegmentCount < Integer.MAX_VALUE) && (segmentCount < avc.minSegmentCount || segmentCount > avc.maxSegmentCount)
-                        || (minMaxSegmentLengths != null && (minMaxSegmentLengths[0] < avc.minSegmentLength || minMaxSegmentLengths[1] > avc.maxSegmentLength
-                                  || segmentCount > 1 && minMaxSegmentLengths[2] < avc.minPauseLength || minMaxSegmentLengths[3] > avc.maxPauseLength))) {
+        BitSet emptyBitSet = new BitSet(vectors);
 
-                    if (isDebug) {
-                        String reason;
+        int section = 0;
+        int remainingSections = sections - 1;
+        int iterations = 0;
+        int backtracks = 0;
+        int violations = 0;
+        
+        long startTime = System.nanoTime();
 
-                        if (active < avc.minActive && (!avc.allowInactive || active > 0)) {
-                            reason = "minActive";
-                        } else if (active > avc.maxActive) {
-                            reason = "maxActive";
-                        } else if (avc.startAfterSection + 1 >= chordSections) {
-                            reason = "startAfterSection";
-                        } else if (avc.stopBeforeSection + 1 >= chordSections) {
-                            reason = "stopBeforeSection";
-                        } else if (avc.stopBeforeSection >= 0 && lastActiveTick >= chordSectionStartTicks.get(chordSections - 1 - avc.stopBeforeSection)) {
-                            reason = "stopBeforeSection";
-                        } else if (avc.stopAfterSection > 0 && lastActiveTick >= 0 && lastActiveTick < chordSectionStartTicks.get(chordSections - avc.stopAfterSection)) {
-                            reason = "stopAfterSection";
-                        } else if (avc.startBeforeSection < Integer.MAX_VALUE && firstActiveTick >= 0 && firstActiveTick > chordSectionStartTicks.get(avc.startBeforeSection - 1)) {
-                            reason = "startBeforeSection";
-                        } else if (avc.startAfterSection >= 0 && firstActiveTick >= 0 && firstActiveTick < chordSectionStartTicks.get(avc.startAfterSection + 1)) {
-                            // should not happen as this is already checked in createActivityVectors()
-                            reason = "startAfterSection";
-                        } else if (segmentCount < avc.minSegmentCount) {
-                            reason = "minSegmentCount";
-                        } else if (segmentCount > avc.maxSegmentCount) {
-                            reason = "maxSegmentCount";
-                        } else if (minMaxSegmentLengths != null && minMaxSegmentLengths[0] < avc.minSegmentLength) {
-                            reason = "minSegmentLength";
-                        } else if (minMaxSegmentLengths != null && minMaxSegmentLengths[1] > avc.maxSegmentLength) {
-                            reason = "maxSegmentLength";
-                        } else if (minMaxSegmentLengths != null && segmentCount > 1 && minMaxSegmentLengths[2] < avc.minPauseLength) {
-                            reason = "minPauseLength";
-                        } else if (minMaxSegmentLengths != null && minMaxSegmentLengths[3] > avc.maxPauseLength) {
-                            reason = "maxPauseLength";
+    nextSection:        
+        while (section < sections) {
+            BitSet previousBitSet;
+            
+            if (section == 0) {
+                previousBitSet = emptyBitSet;
+            } else {
+                previousBitSet = bitSets[section - 1];
+            }
+            
+            int diff = wantedCounts[section] - previousBitSet.cardinality();
+            
+            while (tries[section] < sectionIterations[section]) {                
+                tries[section]++;
+                
+                copyStateFromPreviousSection(section, allStates);
+                ActivityVectorState[] states = allStates[section];
+                BitSet bitSet = (BitSet) previousBitSet.clone();
+                bitSets[section] = bitSet;
+                
+                boolean isSuccess = true;
+                int d = diff;
+                
+                if (d > 0) {
+                    do {
+                        int p = setRandomBit(bitSet, vectors);
+                        
+                        if (p >= 0) {
+                            if (states[p].activeCount > 0
+                                    && states[p].segmentLength < activityVectorConfigurations[p].minPauseLength) {
+                                isSuccess = false;
+                                break;
+                            }
+                            
+                            states[p].segments++;
+                            states[p].segmentLength = 0;
                         } else {
-                            reason = "unknown";
+                            // all bits are set already (should never happen)
+                            isSuccess = false;
+                            break;
+                        }                  
+                    } while (--d > 0);
+                } else if (d < 0) {
+                    do {
+                        int p = clearRandomBit(bitSet);
+                        
+                        if (p >= 0) {
+                            if (states[p].segmentLength < activityVectorConfigurations[p].minSegmentLength) {
+                                isSuccess = false;
+                                break;
+                            }
+                            
+                            states[p].segmentLength = 0;
+                        } else {
+                            // all bits are cleared already (should never happen)
+                            isSuccess = false;
+                            break;
                         }
+                    } while (++d < 0);
+                } else if (random.nextBoolean() && wantedCounts[section] < vectors) {
+                    // d is zero; first set then clear a random bit (likely a different bit, but it can be the same)
+                    // the previous if makes sure that we don't have the maximum number of AVs active already; in this
+                    // case we will do nothing (i.e., don't change the activity)
+                    int p = setRandomBit(bitSet, vectors);
+                    
+                    if (p >= 0) {
+                        if (states[p].activeCount > 0
+                                && states[p].segmentLength < activityVectorConfigurations[p].minPauseLength) {
+                            isSuccess = false;
+                        } else {
+                            states[p].segments++;
+                            states[p].segmentLength = 0;
 
-                        String key = avc.name + "/" + reason;                        
-                        Integer current = constraintFailure.get(key);
-                        constraintFailure.put(key, current != null ? current + 1 : 1);
+                            p = clearRandomBit(bitSet);
+
+                            if (p >= 0) {
+                                if (states[p].segmentLength < activityVectorConfigurations[p].minSegmentLength) {
+                                    isSuccess = false;
+                                }
+
+                                states[p].segmentLength = 0;
+                            } else {
+                                // all bits are cleared already (should never happen)
+                                isSuccess = false;
+                            }
+                        }
+                    } else {
+                        // all bits are set already (should never happen)
+                        isSuccess = false;
                     }
+                }
+                
+                if (isSuccess) {
+                    // update states and check constraints
 
-                    tries++;
+                    for (int i = 0; i < vectors; i++) {
+                        ActivityVectorState state = states[i];
 
-                    if (tries >= maxIterations) {
-                        if (logger.isDebugEnabled()) {
-                            for (Map.Entry<String, Integer> entry : constraintFailure.entrySet()) {
-                                logger.debug("Constraint failures for " + entry.getKey() + ": " + entry.getValue());
+                        state.segmentLength++;
+                        ActivityVectorConfiguration c =  activityVectorConfigurations[i];
+                        boolean isActive = bitSet.get(i);
+                        
+                        if (isActive) {
+                            state.activeCount++;
+                            
+                            if (!state.activeInStopInterval && remainingSections < c.stopAfterSection
+                                    && remainingSections > c.stopBeforeSection) {
+                                state.activeInStopInterval = true;
                             }
                         }
 
-                        throw new RuntimeException("Couldn't satisfy activity constraints within "
-                                + tries + " iterations");
-                    } else {
-                        // we haven't reached the iteration limit yet, retry
-                        continue again;
-                    }                        
+                        if ((!c.allowInactive || state.activeCount > 0)
+                                && state.activeCount + remainingSections < c.minActiveSectionCount) {
+                            isSuccess = false;
+                            break;
+                        }
+                        
+                        if (state.activeCount > c.maxActiveSectionCount) {
+                            isSuccess = false;
+                            break;
+                        }
+                        
+                        if (state.segments > c.maxSegmentCount) {
+                            isSuccess = false;
+                            break;
+                        }
+
+                        if (state.segments + (remainingSections + (isActive ? 0 : 1)) / 2 < c.minSegmentCount) {
+                            isSuccess = false;
+                            break;
+                        }
+
+                        if (isActive) {
+                            if (state.segmentLength > c.maxSegmentLength) {
+                                isSuccess = false;
+                                break;
+                            }
+                        
+                            if (state.segmentLength + remainingSections < c.minSegmentLength) { 
+                                isSuccess = false;
+                                break;
+                            }
+                        }
+                        
+                        if (!isActive && state.segmentLength > c.maxPauseLength) {
+                            isSuccess = false;
+                            break;
+                        }
+                        
+                        if (isActive && state.activeCount == 1 && section > c.startBeforeSection - 1) {
+                            isSuccess = false;
+                            break;
+                        }
+
+                        if (state.activeCount > 0 && section < c.startAfterSection + 1) {
+                            isSuccess = false;
+                            break;
+                        }
+
+                        if (isActive && remainingSections < c.stopBeforeSection + 1) {
+                            isSuccess = false;
+                            break;
+                        }
+                      
+                        if (state.activeCount > 0 && remainingSections < c.stopBeforeSection + 1
+                                && !state.activeInStopInterval) {
+                            isSuccess = false;
+                            break;
+                        }               
+                    }
+                }
+                
+                iterations++;
+                
+                if (isSuccess) {
+                    section++;
+                    remainingSections--;
+                    if (section < sections) {
+                        tries[section] = 0;
+                    }
+                    continue nextSection;
+                } else {
+                    violations++;
+                }
+                
+                if (iterations > maxIterations) {
+                    throw new RuntimeException("Unable to find a valid song activity matrix within "
+                            + maxIterations + " iterations");
                 }
             }
-
-            break;
+            
+            // number of tries for current section exhausted, backtrack to the previous section
+            section--;
+            remainingSections++;
+            
+            if (section < 0) {
+                // this should never happen, because we have a large number of tries for chord section 0
+                throw new RuntimeException("Creation of song failed");
+            }
+            
+            backtracks++;
         }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Needed " + (tries + 1) + " iteration" + (tries > 0 ? "s" : "") + " to satisfy constraints");
+        long end = System.nanoTime();
+        
+        logger.debug("Fulfilled constraints in " + ((end - startTime) / 1000000L) + " ms. Iterations: " + iterations
+                + " (" + ((end - startTime) / iterations) + " ns/iteration), violations: " + violations
+                + ", backtrack steps: " + backtracks);
+
+        convertBitSetsToActivityVectors(activityVectorConfigurations, bitSets);
+    }
+
+    /**
+     * Converts the BitSets into a set of ActivityVectors which have their activity set based on the BitSets.
+     * 
+     * @param activityVectorConfigurations the array of activity vector configurations
+     * @param bitSets the array of BitSets
+     */
+    
+    private void convertBitSetsToActivityVectors(
+            ActivityVectorConfiguration[] activityVectorConfigurations, BitSet[] bitSets) {
+        int vectors = activityVectorConfigurations.length;
+        
+        for (int i = 0; i < vectors; i++) {
+            activityVectorConfigurations[i].activityVector = new ActivityVector();
+        }
+
+        HarmonyEngine harmonyEngine = structure.getHarmonyEngine();
+        int section = 0;
+        int tick = 0;
+        int ticks = structure.getTicks();
+
+        while (tick < ticks) {
+            BitSet bitSet = bitSets[section];
+            int length = harmonyEngine.getChordSectionTicks(tick);
+            
+            int pos = bitSet.nextSetBit(0);
+            
+            while (pos >= 0) {
+                activityVectorConfigurations[pos].activityVector.setActivityState(tick, tick + length, true);
+                pos = bitSet.nextSetBit(pos + 1);
+            }
+
+            tick += length;
+            section++;
+        }
+    }
+    
+    /**
+     * Copies the state from the previous chord section to the current chord section state.
+     * 
+     * @param section the section number
+     * @param state the array of states
+     */
+
+    private void copyStateFromPreviousSection(int section, ActivityVectorState[][] state) {
+        ActivityVectorState[] sourceArray;
+
+        ActivityVectorState[] targetArray = state[section];
+        int len = targetArray.length;
+        
+        if (section == 0) {
+            // sourceArray is read-only, therefore we can reuse the same state instance
+            sourceArray = new ActivityVectorState[len];
+            ActivityVectorState emptyState = new ActivityVectorState();
+            
+            for (int k = 0; k < len; k++) {
+                sourceArray[k] = emptyState;
+            }
+        } else {
+            sourceArray = state[section - 1];
+        }
+        
+        while (len > 0) {
+            len--;
+            ActivityVectorState source = sourceArray[len];
+            ActivityVectorState target = targetArray[len];
+
+            target.activeCount = source.activeCount; 
+            target.segmentLength = source.segmentLength; 
+            target.segments = source.segments;
+            target.activeInStopInterval = source.activeInStopInterval;
         }
     }
 
@@ -430,27 +605,16 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
     }
     
     /**
-     * Sets one random bit in the BitSet, if this is possible (i.e.,
-     * if not all bits are set already). From the set of false bits,
-     * one is chosen at random and that bit is set to true. The method
-     * avoids setting the bit given by avoidBit, unless there is only
-     * 1 bit left that can be set to true. It also avoids to set a
-     * bit if this would violate the startAfterSection or the stopBeforeSection
-     * constraint.
-     * 
+     * Sets one random bit in the BitSet from false to true, if this is possible (i.e., if not all bits are set
+     * already). The number of the set bit is returned or -1 if all were true.
+     *
      * @param bitSet the BitSet to modify
      * @param size the size of the BitSet
-     * @param avoidBit the bit number to avoid (or -1 to skip this step)
-     * @param section the section
-     * @param sections the sections
-     * @param activityVectorConfigurations the activity vector configurations
-     * @param activeSegments the active segments
      * 
-     * @return the number of the set bit (or -1 if no clear bit existed)
+     * @return the number of the set bit (or -1 if no false bit existed)
      */
     
-    private int setRandomBit(BitSet bitSet, int size, int avoidBit, int section, int sections,
-                             ActivityVectorConfiguration[] activityVectorConfigurations, int[] activeSegments) {
+    private int setRandomBit(BitSet bitSet, int size) {
         int ones = bitSet.cardinality();
         
         if (ones >= size) {
@@ -462,63 +626,32 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         int bit;
         int pos;
         
-        int stopPos = sections - 1 - section;
-        
-        ActivityVectorConfiguration avc;
-        
-        int count = 100;
-        
-        do {
-            do {        
-                // choose random bit number
-                bit = random.nextInt(zeroes);
-            } while (zeroes > 1 && bit == avoidBit);
+        // choose random bit number
+        bit = random.nextInt(zeroes);
 
-            // set the bit'th zero bit
+        // set the bit'th zero bit
 
-            pos = bitSet.nextClearBit(0);
+        pos = bitSet.nextClearBit(0);
 
-            while (bit-- > 0) {
-                pos = bitSet.nextClearBit(pos + 1);
-            }
-            
-            avc = activityVectorConfigurations[pos];
-            
-            // retry if we are trying to set a bit which shouldn't be set yet
-            // note that this will handle the startAfterSection constraint completely, the stopBeforeSection
-            // constraint is only handled partially
-        } while (count-- > 0 && (section <= avc.startAfterSection || stopPos <= avc.stopBeforeSection));
-        
-        if (count < 0) {
-            throw new ConstraintException(null, "Couldn't set bit");
+        while (bit-- > 0) {
+            pos = bitSet.nextClearBit(pos + 1);
         }
         
         bitSet.set(pos);
-        
-        // this is the start of a new segment
-        activeSegments[pos]++;
-
-        if (activeSegments[pos] > activityVectorConfigurations[pos].maxSegmentCount) {
-            throw new ConstraintException(avc, "earlyMaxSegmentCount");
-        }
         
         return pos;    
     }
     
     /**
-     * Clears one random bit in the BitSet, if this is possible
-     * (i.e., if at least one bit is set to true). From the set
-     * of true bits, one is chosen at random and that bit is cleared.
-     * The method avoids clearing the bit given by avoidBit, unless
-     * there is only 1 bit left that can be set to false.
+     * Clears one random bit in the BitSet, if this is possible (i.e., if at least one bit is set to true). The number
+     * of the set bit is returned or -1 if all bits were false.
      * 
      * @param bitSet the BitSet to modify
-     * @param avoidBit the bit number to avoid (or -1 to skip this set)
      * 
-     * @return the number of the cleared bit (or -1 if no set bit existed)
+     * @return the number of the cleared bit (or -1 if no true bit existed)
      */
     
-    private int clearRandomBit(BitSet bitSet, int avoidBit) {
+    private int clearRandomBit(BitSet bitSet) {
         int ones = bitSet.cardinality();
         
         if (ones == 0) {
@@ -527,13 +660,10 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
         int bit;
         
-        do {
-            // choose random bit number
-            bit = random.nextInt(ones);
-        } while (ones > 1 && bit == avoidBit);
+        // choose random bit number
+        bit = random.nextInt(ones);
         
-        // skip to the bit'th one bit
-        
+        // skip to the bit'th one bit        
         int pos = bitSet.nextSetBit(0);
         
         while (bit-- > 0) {
@@ -545,117 +675,6 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         return pos;    
     }
     
-    /**
-     * Creates num ActivityVectors, where each activity interval can only
-     * start on a chord section boundary and stop one tick before the next
-     * boundary or song end. A BitSet is used to to represent which of the
-     * ActivityVectors should be active. The BitSet is changed on each new
-     * chord section by removing or adding bits randomly.
-     * 
-     * @param activityVectorConfigurations the activity vector configurations
-     *
-     * @return the array of ActivityVectors
-     */
-    
-    private ActivityVector[] createActivityVectors(ActivityVectorConfiguration[] activityVectorConfigurations) {
-        HarmonyEngine he = structure.getHarmonyEngine();
-        int sections = HarmonyEngineUtils.getChordSectionCount(structure);
-        int vectors = activityVectorConfigurations.length;
-        
-        // create empty ActivityVectors
-        
-        ActivityVector[] activityVectors = new ActivityVector[vectors];
-        int[] activeSections = new int[vectors];
-        int[] minActiveSections = new int[vectors];
-        int[] maxActiveSections = new int[vectors];
-        int[] activeSegments = new int[vectors];
-        
-        for (int i = 0; i < vectors; i++) {
-            activityVectors[i] = new ActivityVector();
-            activityVectorConfigurations[i].activityVector = activityVectors[i];
-            minActiveSections[i] = (int) (activityVectorConfigurations[i].minActive / 100.0d * sections);
-            maxActiveSections[i] = (int) (activityVectorConfigurations[i].maxActive / 100.0d * sections);
-        }
-        
-        // start with an empty BitSet
-        // the BitSet contains the number of vectors that are
-        // currently active
-        BitSet bitset = new BitSet();
-        
-        int tick = 0;
-
-        int lastAddedBit = -1;
-        int lastRemovedBit = -1;
-        
-        // the maximum number of ActivityVectors that may be active
-        // at each point in time
-
-        int maxActivityVectors = Math.min(maxActivityCount, vectors);
-        
-        if (maxActivityVectors <= 0) {
-            maxActivityVectors = getActivityVectorMaximum(vectors, 0.40, 0.2);
-        }
-        
-        int[] wantedCounts = getWantedActivityVectorCounts(sections, maxActivityVectors);
-        
-        for (int section = 0; section < sections; section++) {
-            int len = he.getChordSectionTicks(tick);
-            
-            // get the number of ActivityVectors we want active for this chord section
-            int wantedActivityVectors = wantedCounts[section];
-            
-            // get the number of ActivityVectors that are currently active
-            int active = bitset.cardinality();
-
-            // add and/or remove bits from the BitSet until tracks
-            // bits are present
-            
-            // we try not to remove a bit that was added in the previous
-            // section and not to add a bit that was removed in the previous
-            // section
-            
-            if (active < wantedActivityVectors) {
-                do {
-                    lastAddedBit = setRandomBit(bitset, vectors, lastRemovedBit, section, sections,
-                            activityVectorConfigurations, activeSegments);
-                } while (bitset.cardinality() < wantedActivityVectors);
-            } else if (active > wantedActivityVectors) {
-                do {
-                    lastRemovedBit = clearRandomBit(bitset, lastAddedBit);
-                } while (bitset.cardinality() > wantedActivityVectors);
-            }
-            
-            // check the BitSet and add activity or inactivity intervals
-            // for the current section
-            
-            for (int i = 0; i < vectors; i++) {
-                if (bitset.get(i)) {
-                    if (activeSections[i] >= maxActiveSections[i]) {
-                        throw new ConstraintException(activityVectorConfigurations[i], "earlyMaxActive");
-                    } else if (sections - 1 - section <= activityVectorConfigurations[i].stopBeforeSection) {
-                        throw new ConstraintException(activityVectorConfigurations[i], "earlyStopBeforeSection");
-                    }
-                    
-                    activeSections[i]++;                     
-                    activityVectors[i].addActivity(len);
-                } else {
-                    // check if the still missing active sections are more than what is left
-                    // we only need to check this in the inactive case
-                    
-                    if (!activityVectorConfigurations[i].allowInactive && minActiveSections[i] - activeSections[i] > sections - 1 - section) {
-                        throw new ConstraintException(activityVectorConfigurations[i], "earlyMinActive");
-                    }
-                    
-                    activityVectors[i].addInactivity(len);
-                }            
-            }
-           
-            tick += len;
-        }
-                
-        return activityVectors;    
-    }
-
     /**
      * Returns an array that contains the number of activity vectors that should be active in each section.
      * There is always a "fade-in" of ActivityVectors (as specified by startActivityCounts array)
@@ -675,15 +694,14 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         int[] counts = new int[sections];
 
         int lastCount = -1;
-        
-        for (int section = 0; section < sections; section++) {        
-            // important: all of this must work properly when only few sections
-            // and few ActivityVectors (or even 1) are available
 
-            int increaseTill = Math.min(maxActivityVectors, Math.min(sections / 2, startActivityCounts.length)) - 1;
-            int decreaseFrom = sections - Math.min(maxActivityVectors, Math.min(sections / 2,
-                    stopActivityCounts.length + 1));
+        // TODO: all of this must work properly when only few sections and few ActivityVectors (even 1) are available
 
+        int increaseTill = Math.min(sections / 2, startActivityCounts.length) - 1;
+        int decreaseFrom = sections - Math.min(sections / 2,
+                stopActivityCounts.length + 1);
+
+        for (int section = 0; section < sections; section++) {
             if (section <= increaseTill) {
                 // in fade-in phase
                 counts[section] = startActivityCounts[section];
@@ -716,7 +734,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
             
             lastCount = counts[section];
         }
-        
+
         return counts;
     }
     
@@ -735,7 +753,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
     public void configure(Node node, XPath xpath) throws XPathException {
         random = new Random(randomSeed);
 
-        int maxIterations = 100000;
+        int maxIterations = 1000000;
         
         try {
             maxIterations = XMLUtils.parseInteger(random, "maxIterations", node, xpath);
@@ -831,7 +849,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
                 stopBeforeSection = XMLUtils.parseInteger(random, "stopBeforeSection", nodeList.item(i), xpath);
             } catch (Exception e) {}
 
-            int stopAfterSection = 0;
+            int stopAfterSection = Integer.MAX_VALUE;
             try {
                 stopAfterSection = XMLUtils.parseInteger(random, "stopAfterSection", nodeList.item(i), xpath);
             } catch (Exception e) {}
@@ -1007,8 +1025,10 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
     private static final class ActivityVectorConfiguration {
         private String name;
         private double minActive;
+        private int minActiveSectionCount;
         private boolean allowInactive;
         private double maxActive;
+        private int maxActiveSectionCount;
         private int startShift;
         private int stopShift;
         private int startAfterSection;
@@ -1047,22 +1067,18 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         }    
     }
     
-    private static class ConstraintException extends RuntimeException {
-        private final ActivityVectorConfiguration avc;
-        private final String reason;
-        
-        public ConstraintException(ActivityVectorConfiguration avc, String reason) {
-            super();
-            this.avc = avc;
-            this.reason = reason;
-        }
-        
-        public String getReason() {
-            return reason;
-        }
-        
-        public ActivityVectorConfiguration getActivityVectorConfiguration() {
-            return avc;
-        }
+    /**
+     * Holds the state for an ActivityVector during building the constrained AVs.
+     */
+    
+    private static final class ActivityVectorState {
+        // the number of active chord sections to far
+        int activeCount;
+        // the number of activity segments so far
+        int segments;
+        // the length of the current segment in chord sections (if inactive this is the pause segment length)
+        int segmentLength;
+        // boolean indicating whether AV is active within the stop interval
+        boolean activeInStopInterval;
     }
 }

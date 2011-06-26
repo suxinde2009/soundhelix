@@ -381,8 +381,8 @@ public class MidiPlayer extends AbstractPlayer {
 
             if (logger.isDebugEnabled()) {
                 logger.debug("Song length: " + ticks + " ticks ("
-                             + (ticks * 60 * 1000 / (structure.getTicksPerBeat() * milliBPM)) + " seconds @ "
-                             + ((double) milliBPM / 1000) + " BPM)");
+                             + (ticks * 60000L / (structure.getTicksPerBeat() * milliBPM)) + " seconds @ "
+                             + ((double) milliBPM / 1000d) + " BPM)");
             }
             
             if (useClockSynchronization) {

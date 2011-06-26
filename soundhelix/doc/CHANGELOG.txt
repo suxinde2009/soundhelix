@@ -7,12 +7,19 @@ Author: Thomas Schürger (thomas@schuerger.com)
 Change log
 ----------
 
-0.1.1:
+0.2:
+
+    - Completely rewrote the constraint fulfillment code in the SimpleArrangementEngine. Now a randomized backtracking
+      algorithm is used to find a song activity matrix which fulfills all constraints. The time required to find a valid
+      matrix is now a fraction of what it was before, even if more restrictive constraints are used. You might need to
+      increase the maxInterations parameter up to a million or more if you used that parameter before (it now defaults to
+      1000000).
 
     - Added "seed" attribute which allows random seeding of a component by either providing a constant 64-bit value (decimal
       integer with sign) or by providing a "#", followed by a 32-bit value (decimal integer with sign). Both can be used for
       all tags where a "class" attribute is used for instantiating a class. The provided seed value will be used instead of 
-      deriving a seed from the parent component or as a random seed salt for the seed derivation scheme, respectively.
+      deriving a seed from the parent component or as a random seed salt for the seed derivation scheme, respectively. See
+      the "Random seeds" section of the documentation for details.
 
     - Added "obeyChordSections" tag to the ArpeggioSequenceEngine. If set to true, a chord that spans a chord section boundary
       will lead to a pattern being chosen that ends at the boundary rather than when the chord ends. Defaults to false.

@@ -37,6 +37,9 @@ public class RandomFragmentPatternEngine extends StringPatternEngine {
      */
     private int patternTicks = 16;
 
+    /** True if all pattern parts must be unique, false otherwise. */
+    private boolean isUniquePatternParts = true;
+    
     /**
      * The comma-separated pattern used to generate the final pattern. Equal character pairs refer to equal patterns,
      * different character pairs to different patterns. The first character defines the base pattern, the second
@@ -52,6 +55,10 @@ public class RandomFragmentPatternEngine extends StringPatternEngine {
         
         setPatternTicks(XMLUtils.parseInteger(random, "patternTicks", node, xpath));
         setPatternString(XMLUtils.parseString(random, "patternString", node, xpath));
+
+        try {
+            setUniquePatternParts(XMLUtils.parseBoolean(random, "uniquePatternParts", node, xpath));
+        } catch (Exception e) {}
 
         NodeList nodeList = (NodeList) xpath.evaluate("pattern", node, XPathConstants.NODESET);
         int patterns = nodeList.getLength();
@@ -137,7 +144,7 @@ public class RandomFragmentPatternEngine extends StringPatternEngine {
                         }
 
                         p = generateBasePattern(basePatternCharacter);                        
-                    } while(patternSet.contains(basePatternCharacter + p));
+                    } while(isUniquePatternParts && patternSet.contains(basePatternCharacter + p));
                 }
 
                 if (logger.isDebugEnabled()) {
@@ -194,58 +201,6 @@ public class RandomFragmentPatternEngine extends StringPatternEngine {
 
         return sb.toString();
     }
-    
-    /**
-     * Finds the maximum integer from the given list of ints.
-     * If the list is empty, Integer.MIN_VALUE is returned.
-     *
-     * @param list the list of ints
-     * 
-     * @return the maximum integer from the list
-     */
-    
-    private int findMaximum(PatternEntry[] list) {
-        int maximum = Integer.MIN_VALUE;
-        int num = list.length;
-        
-        for (int i = 0; i < num; i++) {
-            if (!list[i].isWildcard) {
-                maximum = Math.max(list[i].offset, maximum);
-            }
-        }
-        
-        return maximum;
-    }
-
-    /**
-     * Finds the minimum integer from the given list of ints.
-     * If the list is empty, Integer.MAX_VALUE is returned.
-     *
-     * @param list the list of ints
-     * 
-     * @return the minimum integer from the list
-     */
-
-    private int findMinimum(PatternEntry[] list) {
-        int minimum = Integer.MAX_VALUE;
-        int num = list.length;
-        
-        for (int i = 0; i < num; i++) {
-            if (!list[i].isWildcard) {
-                minimum = Math.min(list[i].offset, minimum);
-            }
-        }
-        
-        return minimum;
-    }
-
-    public void setPatternTicks(int patternTicks) {
-        this.patternTicks = patternTicks;
-    }
-    
-    public void setPatternString(String patternString) {
-        this.patternString = patternString;
-    }
 
     private static PatternEntry[] parsePatternEntryListString(Random random, String path, Node parentNode, XPath xpath) {
         String string = XMLUtils.parseString(random, path, parentNode, xpath);
@@ -270,6 +225,14 @@ public class RandomFragmentPatternEngine extends StringPatternEngine {
         return array;
     }
 
+    public void setPatternTicks(int patternTicks) {
+        this.patternTicks = patternTicks;
+    }
+    
+    public void setPatternString(String patternString) {
+        this.patternString = patternString;
+    }
+
     private static final class PatternEntry {
         /** The offset. */
         private int offset;
@@ -288,5 +251,9 @@ public class RandomFragmentPatternEngine extends StringPatternEngine {
             this.wildcard = wildcard;
             this.isWildcard = true;
         }        
+    }
+
+    public void setUniquePatternParts(boolean isUniquePatternParts) {
+        this.isUniquePatternParts = isUniquePatternParts;
     }
 }

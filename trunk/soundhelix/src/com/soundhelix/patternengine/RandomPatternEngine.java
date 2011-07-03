@@ -63,7 +63,8 @@ public class RandomPatternEngine extends StringPatternEngine {
     private int minActiveTicks = 1;
     /** The maximum number of active ticks. */
     private int maxActiveTicks = 16;
-
+    /** True if all pattern parts must be unique, false otherwise. */
+    private boolean isUniquePatternParts = true;
     
     /**
      * The correlation between pitch and velocity. If 1, the velocity depends only on the pitch and not on the random
@@ -94,7 +95,11 @@ public class RandomPatternEngine extends StringPatternEngine {
         setPitchVelocityCorrelation(XMLUtils.parseDouble(random, "pitchVelocityCorrelation", node, xpath) / 100.0d);
         setVelocityExponent(XMLUtils.parseDouble(random, "velocityExponent", node, xpath));
         setPatternString(XMLUtils.parseString(random, "patternString", node, xpath));
-
+        
+        try {
+            setUniquePatternParts(XMLUtils.parseBoolean(random, "uniquePatternParts", node, xpath));
+        } catch (Exception e) {}
+            
         super.setPatternString(generatePattern(patternString));
     }
     
@@ -151,9 +156,8 @@ public class RandomPatternEngine extends StringPatternEngine {
                             throw new RuntimeException("Could not create non-used variation of pattern");
                         }
 
-                        p = modifyPattern(basePattern, 2);
-                        
-                    } while(patternSet.contains(p));
+                        p = modifyPattern(basePattern, 2);                        
+                    } while(isUniquePatternParts && patternSet.contains(p));
                 }
 
                 if (logger.isDebugEnabled()) {
@@ -452,5 +456,9 @@ public class RandomPatternEngine extends StringPatternEngine {
             this.wildcard = wildcard;
             this.isWildcard = true;
         }        
+    }
+
+    public void setUniquePatternParts(boolean isUniquePatternParts) {
+        this.isUniquePatternParts = isUniquePatternParts;
     }
 }

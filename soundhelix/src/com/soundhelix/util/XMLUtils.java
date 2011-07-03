@@ -466,22 +466,28 @@ public final class XMLUtils {
         long providedSeed = 0;
         
         String seedString = (String) xpath.evaluate("attribute::seed", node, XPathConstants.STRING);
+        String saltString = (String) xpath.evaluate("attribute::salt", node, XPathConstants.STRING);
 
+        if (seedString != null && !seedString.equals("") && saltString != null && !saltString.equals("")) {
+            throw new RuntimeException("Only one of  the attributes \"seed\" and \"salt\" may be provided");
+        }
+             
         if (seedString != null && !seedString.equals("")) {
             try {
-                if (seedString.startsWith("#")) {
-                    // take the given number as the modifier
-                    salt = Integer.parseInt(seedString.substring(1));
-                } else {
-                    // take the given number directly as the random seed
-                    providedSeed = Long.parseLong(seedString);
-                    isSeedProvided = true;
-                }
+                // take the given number directly as the random seed
+                providedSeed = Long.parseLong(seedString);
+                isSeedProvided = true;
             } catch (NumberFormatException e) {
                 throw new RuntimeException("Seed \"" + seedString + "\" is invalid", e);
             }
+        } else if (saltString != null && !saltString.equals("")) {
+            try {
+                salt = Integer.parseInt(saltString);
+            } catch (NumberFormatException e) {
+                throw new RuntimeException("Salt \"" + saltString + "\" is invalid", e);
+            }
         }
-
+        
         T instance;
         
         try {

@@ -33,6 +33,11 @@ Change log
       constraints will be ignored for an activity vector if the activity vector is never active or only has one activity
       segment.
 
+    - Added a "uniquePatternParts" tag to the RandomPatternEngine and the RandomFragmentPatternEngine. If the value is "true",
+      the pattern parts within a pattern group a generated until they are unique. If the value is "false", the uniqueness is
+      not enforced. Defaults to true (which is what was used in the previous versions).
+
+
     - Added "skipWhenApplied" and "skipWhenNotApplied" tags to conditional patterns in the DrumSequenceEngine. With these two
       tags you can define the number of conditional patterns to skip if the current pattern was applied or was not applied
       (even though it was allowed to be applied), respectively. You can skip backwards by using a negative number (-1 would

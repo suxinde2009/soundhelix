@@ -8,7 +8,7 @@
   </structure>
   <xi:include href="../includes/Standard-HarmonyEngine.xml"/>
   <arrangementEngine class="SimpleArrangementEngine">
-    <maxIterations>2000000</maxIterations>
+    <maxIterations>1000000</maxIterations>
     <minActivityCount>3</minActivityCount>
     <maxActivityCount>8</maxActivityCount>
     <maxActivityChangeCount>2</maxActivityChangeCount>
@@ -29,6 +29,7 @@
       <minActive>10</minActive>
       <maxActive>35</maxActive>
       <maxSegmentCount>3</maxSegmentCount>
+      <minSegmentLength>2</minSegmentLength>
       <maxSegmentLength>4</maxSegmentLength>
     </activityVector>
     <activityVector name="base_and_snare">

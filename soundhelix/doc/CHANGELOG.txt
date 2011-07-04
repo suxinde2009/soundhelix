@@ -20,7 +20,7 @@ Change log
       integer with sign). Both attributes can be used for all tags where a "class" attribute is used for instantiating a class,
       but not both can be used at the same time. The provided seed value will be used instead of deriving a seed from the
       parent component or as a random seed salt for the seed derivation scheme, respectively. See the "Random seeds" section
-      of the documentation for details.
+      of the documentation for details (http://www.soundhelix.com/doc/random-seeds).
 
     - Added "obeyChordSections" tag to the ArpeggioSequenceEngine. If set to true, a chord that spans a chord section boundary
       will lead to a pattern being chosen that ends at the boundary rather than when the chord ends. Defaults to false.

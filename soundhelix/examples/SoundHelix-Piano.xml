@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
-<SoundHelix version="0.1+" xmlns:xi="http://www.w3.org/2001/XInclude">
+<SoundHelix version="0.2+" xmlns:xi="http://www.w3.org/2001/XInclude">
   <xi:include href="../includes/Standard-SongNameEngine.xml"/>
   <structure>
-     <bars><random min="80" max="160" step="16"/></bars> 
+     <bars><random min="96" max="192" step="16"/></bars> 
      <beatsPerBar>4</beatsPerBar>
      <ticksPerBeat>4</ticksPerBeat>
   </structure>
   <xi:include href="../includes/Standard-HarmonyEngine.xml"/>
   <arrangementEngine class="SimpleArrangementEngine">
-    <maxIterations>400000</maxIterations>
+    <maxIterations>2000000</maxIterations>
     <minActivityCount>3</minActivityCount>
     <maxActivityCount>8</maxActivityCount>
     <maxActivityChangeCount>2</maxActivityChangeCount>
@@ -16,8 +16,11 @@
     <stopActivityCounts><random list="2,1|3,2|4,3,2"/></stopActivityCounts>
     <activityVector name="accomp">
       <stopShift>-2</stopShift>
+      <minActive>10</minActive>
     </activityVector>
     <activityVector name="arpeggio">
+      <minActive>15</minActive>
+      <maxActive>65</maxActive>
     </activityVector>
     <activityVector name="melody">
       <startAfterSection>3</startAfterSection>
@@ -25,6 +28,8 @@
       <stopShift>-3</stopShift>
       <minActive>10</minActive>
       <maxActive>35</maxActive>
+      <maxSegmentCount>3</maxSegmentCount>
+      <maxSegmentLength>4</maxSegmentLength>
     </activityVector>
     <activityVector name="base_and_snare">
       <startAfterSection>1</startAfterSection>
@@ -39,20 +44,23 @@
     <activityVector name="hihat">
       <startAfterSection>0</startAfterSection>
       <stopBeforeSection>0</stopBeforeSection>
-      <minActive>25</minActive>
+      <minActive>40</minActive>
       <maxActive>85</maxActive>
     </activityVector>
     <activityVector name="pad">
       <minActive>10</minActive>
-	</activityVector>
+      <maxActive>70</maxActive>
+    </activityVector>
     <activityVector name="bass">
       <startAfterSection>0</startAfterSection>
       <minActive>15</minActive>
+      <maxActive>80</maxActive>
     </activityVector>
     <activityVector name="randombass">
       <startAfterSection>1</startAfterSection>
       <stopBeforeSection>0</stopBeforeSection>
       <minActive>15</minActive>
+      <maxActive>80</maxActive>
     </activityVector>
     <activityVector name="plonk"/>
     <activityVector name="chord"/>

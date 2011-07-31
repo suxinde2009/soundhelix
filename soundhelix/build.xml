@@ -104,13 +104,13 @@
         </javadoc>
     </target>
 
-	<target name="packagebin" depends="init,jar">
+	<target name="packagebin" description="build binary zip" depends="init,jar">
 		<zip destfile="${binzip}"
 		     basedir=".."
 		     includes="soundhelix/SoundHelix.jar,soundhelix/run.bat,soundhelix/run.sh,soundhelix/examples/SoundHelix-Piano.xml,soundhelix/includes/*,soundhelix/doc/*,soundhelix/lib/*,soundhelix/log4j.*"/>		     
 	</target>
 
-    <target name="packagesrc" depends="init,jar,javadoc">
+    <target name="packagesrc" description="build zip including sources and javadoc" depends="init,jar,javadoc">
 	    <zip destfile="${srczip}"
              basedir=".."
              includes="soundhelix/src/*,soundhelix/javadoc/*,soundhelix/build.xml,soundhelix/SoundHelix.jar,soundhelix/run.bat,soundhelix/run.sh,soundhelix/examples/*,soundhelix/includes/*,soundhelix/doc/*,soundhelix/lib/*,,soundhelix/log4j.*"/>

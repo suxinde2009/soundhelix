@@ -25,6 +25,9 @@ Change log
     - Added "obeyChordSections" tag to the ArpeggioSequenceEngine. If set to true, a chord that spans a chord section boundary
       will lead to a pattern being chosen that ends at the boundary rather than when the chord ends. Defaults to false.
 
+    - Added "obeyChordSections" tag to the PadSequenceEngine. If set to true, a chord that spans a chord section boundary
+      will lead to retriggering the chord at the boundary. Defaults to false.
+
     - Added the constraints "minSegmentLength" and "maxSegmentLength" to the SimpleArrangementEntry, which constrain the
       minimum and maximum activity segment lengths, respectively, of an activity vector (counted in chord sections). The two
       constraints will be ignored for an activity vector if the activity vector never becomes active.

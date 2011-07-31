@@ -41,6 +41,9 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
     /** Flag indicating whether chord subtypes should be used. */
     private boolean obeyChordSubtype = true;
     
+    /** Flag indicating whether chord sections should be obeyed. */
+    protected boolean obeyChordSections;
+
     /** The number of voices. */
     private int voiceCount = -1;
     
@@ -88,7 +91,12 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
         
         while (tick < structure.getTicks()) {
             Chord chord = firstChord.findClosestChord(ce.getChord(tick));
+            
             int len = Math.min(ce.getChordTicks(tick), activityVector.getIntervalLength(tick));
+
+            if (obeyChordSections) {
+                len = Math.min(len, ce.getChordSectionTicks(tick));
+            }
             
             if (activityVector.isActive(tick)) {
                 int shift = 0;
@@ -154,7 +162,15 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
         } catch (Exception e) {}
 
         try {
+            setObeyChordSections(XMLUtils.parseBoolean(random, "obeyChordSections", node, xpath));
+        } catch (Exception e) {}
+
+        try {
             setVelocity((short) XMLUtils.parseInteger(random, "velocity", node, xpath));
         } catch (Exception e) {}
+    }
+
+    public void setObeyChordSections(boolean obeyChordSections) {
+        this.obeyChordSections = obeyChordSections;
     }
 }

@@ -71,6 +71,7 @@
       <transposition>-12</transposition>
       <sequenceEngine class="ArpeggioSequenceEngine">
         <obeyChordSubtype>true</obeyChordSubtype>
+        <obeyChordSections>true</obeyChordSections>
         <patternEngines>
           <patternEngine class="StringPatternEngine">
             <string>0:26000,1:26000,2:26000,1:26000</string>
@@ -355,7 +356,6 @@
       </sequenceEngine>
       <activityVector>plonk</activityVector>
     </track> -->
-
   </arrangementEngine>
   
   <player class="MidiPlayer">

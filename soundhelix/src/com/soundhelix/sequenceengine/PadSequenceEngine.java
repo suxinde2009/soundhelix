@@ -29,9 +29,6 @@ import com.soundhelix.util.XMLUtils;
  */
 
 public class PadSequenceEngine extends AbstractSequenceEngine {
-    /** The number of ticks to wait before a pause. */
-    private static int postPauseTicks;
-        
     /** The major table. */
     private static final int[] MAJOR_TABLE = new int[] {0, 4, 7};
     
@@ -91,11 +88,9 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
         
         while (tick < structure.getTicks()) {
             Chord chord = firstChord.findClosestChord(ce.getChord(tick));
-            int len = ce.getChordTicks(tick);
-
+            int len = Math.min(ce.getChordTicks(tick), activityVector.getIntervalLength(tick));
+            
             if (activityVector.isActive(tick)) {
-                int activityLen = activityVector.getIntervalLength(tick);
-
                 int shift = 0;
 
                 if (obeyChordSubtype) {
@@ -116,16 +111,10 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
 
                     if (chord.isMajor()) {
                         seq.addNote(octave * 12 + MAJOR_TABLE[offset] + chord.getPitch(),
-                                Math.min(activityLen, len) - postPauseTicks, velocity);
-                        seq.addPause(len - Math.min(activityLen, len));
+                                len, velocity);
                     } else {
                         seq.addNote(octave * 12 + MINOR_TABLE[offset] + chord.getPitch(),
-                                Math.min(activityLen, len) - postPauseTicks, velocity);
-                        seq.addPause(len - Math.min(activityLen, len));
-                    }
-
-                    if (postPauseTicks > 0) {
-                        seq.addPause(postPauseTicks);
+                                len, velocity);
                     }
 
                     pos++;

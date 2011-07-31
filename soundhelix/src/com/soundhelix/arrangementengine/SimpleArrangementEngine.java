@@ -1,10 +1,7 @@
 package com.soundhelix.arrangementengine;
 
-import java.util.Arrays;
 import java.util.BitSet;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -30,8 +27,9 @@ import com.soundhelix.util.XMLUtils;
  *
  * ActivityVector activity can be constrained individually to enforce certain properties. All AVs are filled at
  * the same time because there is always the above-mentioned overall song constraint that defines the number of
- * active AVs for each chord section. For each chord section a choice is made to activate or deactivate AVs or to
- * leave the number of active AVs unchanged. The list of generated AVs are called a song activity matrix.
+ * active AVs for each chord section. For each chord section a choice is made whether to activate or deactivate AVs or
+ * to leave the number of active AVs unchanged, according to the AVs that should be active. The list of generated AVs
+ * are called a song activity matrix.
  *
  * The following constraints are supported for ActivityVectors:
  * 
@@ -93,6 +91,12 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
     
     /** The maximum number of iterations before failing. */
     private int maxIterations;
+    
+    /** The precomputed value for the wanted activity count. */
+    private int increaseTill;
+
+    /** The precomputed value for the wanted activity count. */
+    private int decreaseFrom;
     
     public SimpleArrangementEngine() {
         super();
@@ -231,7 +235,8 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         startActivityCounts = parseActivityCounts(startActivityCountsString, vectors);
         stopActivityCounts = parseActivityCounts(stopActivityCountsString, vectors);
 
-        int[] wantedCounts = getWantedActivityVectorCounts(sections, maxActivityVectors);
+        increaseTill = Math.min(sections / 2, startActivityCounts.length) - 1;
+        decreaseFrom = sections - Math.min(sections / 2, stopActivityCounts.length + 1);
 
         BitSet[] bitSets = new BitSet[sections];
         int[] tries = new int[sections];
@@ -246,7 +251,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
             if (i == 0) {
                 // we use a large value here; the termination condition is the maximum number of total iterations
                 // anyway
-                sectionIterations[0] = 1000000;
+                sectionIterations[0] = 1000000000;
             } else {
                 // the algorithm terminates most quickly with a value of 2, larger values will reduce the backtracking
                 // rate and the speed until a valid solution is found
@@ -281,8 +286,15 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
             } else {
                 previousBitSet = bitSets[section - 1];
             }
+
+            int lastWantedCount = previousBitSet.cardinality();
             
-            int diff = wantedCounts[section] - previousBitSet.cardinality();
+            // note that the wanted AV acount can be different when backtracking and returning to a section where
+            // have been before; this is a wanted behavior of the algorithm in order to increase the exploration
+            // space
+            int wantedCount = getWantedActivityVectorCount(section, sections, maxActivityVectors, lastWantedCount);
+
+            int diff = wantedCount - lastWantedCount;
             
             while (tries[section] < sectionIterations[section]) {                
                 tries[section]++;
@@ -331,7 +343,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
                             break;
                         }
                     } while (++d < 0);
-                } else if (random.nextBoolean() && wantedCounts[section] < vectors) {
+                } else if (random.nextBoolean() && wantedCount < vectors) {
                     // d is zero; first set then clear a random bit (likely a different bit, but it can be the same)
                     // the previous if makes sure that we don't have the maximum number of AVs active already; in this
                     // case we will do nothing (i.e., don't change the activity)
@@ -496,15 +508,19 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
     private void convertBitSetsToActivityVectors(
             ActivityVectorConfiguration[] activityVectorConfigurations, BitSet[] bitSets) {
         int vectors = activityVectorConfigurations.length;
-        
+        int ticks = structure.getTicks();
+
         for (int i = 0; i < vectors; i++) {
-            activityVectorConfigurations[i].activityVector = new ActivityVector();
+            ActivityVector av = new ActivityVector();
+            // make sure that the ticks of all AVs equals the song length (setActivityState() below does not
+            // ensure this, because it only sets active segments in the AV)
+            av.addInactivity(ticks);
+            activityVectorConfigurations[i].activityVector = av;
         }
 
         HarmonyEngine harmonyEngine = structure.getHarmonyEngine();
         int section = 0;
         int tick = 0;
-        int ticks = structure.getTicks();
 
         while (tick < ticks) {
             BitSet bitSet = bitSets[section];
@@ -519,6 +535,8 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
             tick += length;
             section++;
+            
+            
         }
     }
     
@@ -612,7 +630,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
     
     /**
      * Sets one random bit in the BitSet from false to true, if this is possible (i.e., if not all bits are set
-     * already). The number of the set bit is returned or -1 if all were true.
+     * already). The number of the set bit is returned or -1 if all bits were true.
      *
      * @param bitSet the BitSet to modify
      * @param size the size of the BitSet
@@ -650,7 +668,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
     
     /**
      * Clears one random bit in the BitSet, if this is possible (i.e., if at least one bit is set to true). The number
-     * of the set bit is returned or -1 if all bits were false.
+     * of the cleared bit is returned or -1 if all bits were false.
      * 
      * @param bitSet the BitSet to modify
      * 
@@ -742,6 +760,44 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         }
 
         return counts;
+    }
+    
+    private int getWantedActivityVectorCount(int section, int sections, int maxActivityVectors, int lastCount) {
+        // TODO: all of this must work properly when only few sections and few ActivityVectors (even 1) are available
+
+        int count;
+        
+        if (section <= increaseTill) {
+            // in fade-in phase
+            count = startActivityCounts[section];
+        } else if (section == decreaseFrom) {
+            // chord section directly before the fade-out phase
+            int firstStop = stopActivityCounts[section - decreaseFrom];
+            int c = (lastCount + firstStop) / 2;
+
+            while ((c == lastCount || c == firstStop) && c < maxActivityVectors) {
+                c++;
+            }
+
+            count = c;
+        } else if (section >= decreaseFrom + 1) {
+            // in fade-out phase
+            count = stopActivityCounts[section - decreaseFrom - 1];
+        } else {
+            // in between
+            int min = Math.min(maxActivityVectors, minActivityCount);
+
+            int num;
+
+            do {
+                num = min + random.nextInt(maxActivityVectors - min + 1);
+            } while (Math.abs(num - lastCount) > maxActivityChangeCount
+                    || (num == lastCount && random.nextFloat() >= 0.1f));
+
+            count = num;
+        }
+
+        return count;
     }
     
     public void setArrangementEntries(ArrangementEntry[] arrangementEntries) {

@@ -7,7 +7,7 @@ Author: Thomas Schürger (thomas@schuerger.com)
 Change log
 ----------
 
-0.2:
+0.2: 2011-07-31
 
     - Completely rewrote the constraint fulfillment code in the SimpleArrangementEngine. Now a randomized backtracking
       algorithm is used to find a song activity matrix which fulfills all constraints. The time required to find a valid

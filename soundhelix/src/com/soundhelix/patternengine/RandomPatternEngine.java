@@ -428,7 +428,8 @@ public class RandomPatternEngine extends StringPatternEngine {
         PatternEntry[] array = new PatternEntry[length];
 
         for (int i = 0; i < length; i++) {
-            if (Character.isDigit(stringArray[i].charAt(0))) {
+            char c = stringArray[i].charAt(0);
+            if (c == '-' || Character.isDigit(c)) {
                 array[i] = new PatternEntry(Integer.parseInt(stringArray[i]));
             } else {
                 array[i] = new PatternEntry(stringArray[i].charAt(0));

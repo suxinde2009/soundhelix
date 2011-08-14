@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.regex.Pattern;
 
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiDevice;
@@ -76,6 +77,9 @@ public class MidiPlayer extends AbstractPlayer {
      */
     private static final int CLOCK_SYNCHRONIZATION_TICKS_PER_BEAT = 24;
 
+    /** The (conservative) pattern for unsafe characters in filenames. */
+    private static final Pattern unsafeCharacterPattern = Pattern.compile("[^0-9a-zA-Z_\\-]");
+    
     /** The random generator. */
     private Random random;
     
@@ -96,6 +100,12 @@ public class MidiPlayer extends AbstractPlayer {
     
     /** The number of ticks to wait after playing. */
     private int afterPlayWaitTicks;
+    
+    /** The commands to execute before starting playing. */
+    private String beforePlayCommands;
+    
+    /** The commands to execute after stopping playing. */
+    private String afterPlayCommands;
     
     /** The map that maps from channel names to device channels. */
     private Map<String, DeviceChannel> channelMap;
@@ -391,6 +401,22 @@ public class MidiPlayer extends AbstractPlayer {
 
             long referenceTime = System.nanoTime();
             
+            if (beforePlayCommands != null && !beforePlayCommands.equals("")) {
+                String[] commands = StringUtils.split(beforePlayCommands, ';');
+
+                for (String command : commands) {
+                    String replacedCommand = replaceCommandPlaceholders(command);
+                    logger.debug("Running \"" + replacedCommand + "\"");
+                    Process process = Runtime.getRuntime().exec(replacedCommand);
+                    int rc = process.waitFor();
+                    
+                    if (rc != 0) {
+                        throw new RuntimeException("Command \"" + replacedCommand
+                                + "\" exited with non-zero exit code " + rc);
+                    }
+                }
+            }            
+            
             if (beforePlayWaitTicks > 0) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("Waiting " + beforePlayWaitTicks + " ticks before playing");
@@ -458,13 +484,29 @@ public class MidiPlayer extends AbstractPlayer {
             muteActiveChannels(arrangement, posList, pitchList);
         
             if (afterPlayWaitTicks > 0) {
-                   if (logger.isDebugEnabled()) {
+                if (logger.isDebugEnabled()) {
                     logger.debug("Waiting " + afterPlayWaitTicks + " ticks after playing");
                 }
 
-                   waitTicks(referenceTime, afterPlayWaitTicks, clockTimingsPerTick, structure.getTicksPerBeat());
+                waitTicks(referenceTime, afterPlayWaitTicks, clockTimingsPerTick, structure.getTicksPerBeat());
             }
             
+            if (afterPlayCommands != null && !afterPlayCommands.equals("")) {
+                String[] commands = StringUtils.split(afterPlayCommands, ';');
+
+                for (String command : commands) {
+                    String replacedCommand = replaceCommandPlaceholders(command);
+                    logger.debug("Running \"" + replacedCommand + "\"");
+                    Process process = Runtime.getRuntime().exec(replacedCommand);
+                    int rc = process.waitFor();
+                    
+                    if (rc != 0) {
+                        throw new RuntimeException("Command \"" + replacedCommand
+                                + "\" exited with non-zero exit code " + rc);
+                    }
+                }
+            }            
+
             if (useClockSynchronization) {
                 sendMidiMessageToClockSynchronized(ShortMessage.STOP);
             }
@@ -965,6 +1007,19 @@ public class MidiPlayer extends AbstractPlayer {
         return null;
     }
     
+    private String replaceCommandPlaceholders(String command) {
+        Structure structure = arrangement.getStructure();
+        
+        String songName = structure.getSongName();
+        String safeSongName = unsafeCharacterPattern.matcher(songName).replaceAll("_");
+        
+        command = command.replace("${songName}", songName);
+        command = command.replace("${safeSongName}", safeSongName);
+        command = command.replace("${randomSeed}", String.valueOf(structure.getRandomSeed()));
+
+        return command;
+    }
+    
     public final void configure(Node node, XPath xpath) throws XPathException {
         random = new Random(randomSeed);
         
@@ -979,6 +1034,9 @@ public class MidiPlayer extends AbstractPlayer {
                     nodeList.item(i), xpath);
             devices[i] = new Device(name, midiName, useClockSynchronization);
         }
+        
+        beforePlayCommands = XMLUtils.parseString(random, (Node) xpath.evaluate("beforePlayCommands", node, XPathConstants.NODE), xpath);
+        afterPlayCommands = XMLUtils.parseString(random, (Node) xpath.evaluate("afterPlayCommands", node, XPathConstants.NODE), xpath);
         
         setDevices(devices);    
         setMilliBPM((int) (1000

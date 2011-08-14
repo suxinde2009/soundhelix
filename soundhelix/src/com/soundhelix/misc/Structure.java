@@ -43,6 +43,9 @@ public class Structure implements Serializable {
     /** The song name. */
     private String songName;
     
+    /** The song's random seed. */
+    private long randomSeed;
+    
     /** The number of ticks per bar (derived). */
     private int ticksPerBar;
     
@@ -99,5 +102,13 @@ public class Structure implements Serializable {
         
         this.harmonyEngine = harmonyEngine;
         harmonyEngine.setSongStructure(this);
+    }
+
+    public long getRandomSeed() {
+        return randomSeed;
+    }
+
+    public void setRandomSeed(long randomSeed) {
+        this.randomSeed = randomSeed;
     }    
 }

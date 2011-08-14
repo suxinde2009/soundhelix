@@ -7,6 +7,17 @@ Author: Thomas Schürger (thomas@schuerger.com)
 Change log
 ----------
 
+0.3: unreleased
+
+    - Added applet parameters "url" (sets the XML document URL) and "invisible" (hides all controls and logging if set
+      to "true", which is nice for embedding the applet into a webpage).
+
+    - Added "beforePlayCommands" and "afterPlayCommands" to the MidiPlayer. This allows running external commands before
+      playing a song and after playing a song, respectively. For the former, the commands are run before waiting the
+      number of ticks configured in beforePlayWaitTicks, for the latter, the commands are run after waiting the number
+      of ticks in afterPlayWaitTicks.
+
+
 0.2: 2011-07-31
 
     - Completely rewrote the constraint fulfillment code in the SimpleArrangementEngine. Now a randomized backtracking

@@ -143,7 +143,8 @@ public final class SongUtils {
         Random random = new Random(randomSeed);
 
         Structure structure = parseStructure(random.nextLong(), structureNode, xpath, null);
-    
+        structure.setRandomSeed(randomSeed);
+        
         HarmonyEngine harmonyEngine = XMLUtils.getInstance(HarmonyEngine.class,
                     harmonyEngineNode, xpath, randomSeed, 0);
         structure.setHarmonyEngine(harmonyEngine);

@@ -42,10 +42,19 @@ import com.soundhelix.util.VersionUtils;
 /**
  * Implements a Swing-based applet for SoundHelix.
  *
+ * The following optional applet parameters are used:
+ * 
+ * - "invisible": if set to "true", the applet will be invisible (no logging, no controls); useful for embedding in websites
+ * - "url": if set, the SoundHelix XML file will be loaded from the provided URL (if relative, relative to the applet's URL)
+ * - "songName": if set, the first song generated will use the given song name for random intialization
+ *
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
 public class SoundHelixApplet extends JApplet implements Runnable {
+
+    /** The default URL used if no URL has been specified. */
+    private static final String DEFAULT_URL = "examples/SoundHelix-Piano.xml";
 
     /** The root logger. */
     private static Logger rootLogger = Logger.getRootLogger();
@@ -83,6 +92,12 @@ public class SoundHelixApplet extends JApplet implements Runnable {
     /** The player. */
     private Player player;
     
+    /** The URL of the XML file. */
+    private String urlString;
+    
+    /** Flag indicating whether the applet provides controls or is invisible. */
+    private boolean isInvisible;
+    
     /**
      * Starts the applet.
      * 
@@ -95,109 +110,123 @@ public class SoundHelixApplet extends JApplet implements Runnable {
     
     @Override
     public void start() {
-        makeResizable();
+        String invisibleParam = getParameter("invisible");        
+        isInvisible = invisibleParam != null && invisibleParam.equals("true");
 
-        desktop = getDesktop();
+        String urlParam = getParameter("url");
         
+        if (urlParam != null && !urlParam.equals("")) {
+            urlString = urlParam;
+        } else {
+            urlString = DEFAULT_URL;
+        }
+
         String songName = getParameter("songName");
         
         if (songName != null && !songName.equals("")) {
             nextSongName = songName;
         }
-                
-        setLayout(new BorderLayout());
 
-        JPanel songNamePanel = new JPanel();
-        songNamePanel.setLayout(new BorderLayout());
-        songNamePanel.add(new JLabel(" Song name: "), BorderLayout.WEST);
-        JTextField songNameTextField = new JTextField();
-        songNameTextField.setToolTipText("Enter a song name here (this will generate a new song)");
-        songNamePanel.add(songNameTextField, BorderLayout.CENTER);
-        this.songNameTextField = songNameTextField;
+        if (isInvisible) {
+            initializeLog4j();
+        } else {
+            makeResizable();
 
-        if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
-            try {
-                JPanel panel = new JPanel(new GridLayout(0, 4));
-                JButton shareButton;
-                
-                shareButton = getIconButton("http://www.soundhelix.com/applet/images/facebook-share.png",
-                        "Share the current song on Facebook (shows preview)");
-                panel.add(shareButton);
-                this.facebookShareButton = shareButton;
+            desktop = getDesktop();
 
-                shareButton = getIconButton("http://www.soundhelix.com/applet/images/twitter-share.png",
-                        "Share the current song on Twitter (shows preview)");
-                panel.add(shareButton);
-                this.twitterShareButton = shareButton;
+            setLayout(new BorderLayout());
 
-                shareButton = getIconButton("http://www.soundhelix.com/applet/images/youtube-share.png",
-                        "Visit the SoundHelix channel on YouTube");
-                panel.add(shareButton);
-                this.youTubeShareButton = shareButton;
+            JPanel songNamePanel = new JPanel();
+            songNamePanel.setLayout(new BorderLayout());
+            songNamePanel.add(new JLabel(" Song name: "), BorderLayout.WEST);
+            JTextField songNameTextField = new JTextField();
+            songNameTextField.setToolTipText("Enter a song name here (this will generate a new song)");
+            songNamePanel.add(songNameTextField, BorderLayout.CENTER);
+            this.songNameTextField = songNameTextField;
 
-                shareButton = getIconButton("http://www.soundhelix.com/applet/images/soundhelix-share.png",
-                        "Visit the SoundHelix website");
-                panel.add(shareButton);
-                this.soundHelixShareButton = shareButton;
+            if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+                try {
+                    JPanel panel = new JPanel(new GridLayout(0, 4));
+                    JButton shareButton;
 
-                songNamePanel.add(panel, BorderLayout.EAST);
-            } catch (MalformedURLException e) {}
+                    shareButton = getIconButton("http://www.soundhelix.com/applet/images/facebook-share.png",
+                    "Share the current song on Facebook (shows preview)");
+                    panel.add(shareButton);
+                    this.facebookShareButton = shareButton;
+
+                    shareButton = getIconButton("http://www.soundhelix.com/applet/images/twitter-share.png",
+                    "Share the current song on Twitter (shows preview)");
+                    panel.add(shareButton);
+                    this.twitterShareButton = shareButton;
+
+                    shareButton = getIconButton("http://www.soundhelix.com/applet/images/youtube-share.png",
+                    "Visit the SoundHelix channel on YouTube");
+                    panel.add(shareButton);
+                    this.youTubeShareButton = shareButton;
+
+                    shareButton = getIconButton("http://www.soundhelix.com/applet/images/soundhelix-share.png",
+                    "Visit the SoundHelix website");
+                    panel.add(shareButton);
+                    this.soundHelixShareButton = shareButton;
+
+                    songNamePanel.add(panel, BorderLayout.EAST);
+                } catch (MalformedURLException e) {}
+            }
+
+            add(songNamePanel, BorderLayout.NORTH);
+
+            JTextArea outputTextArea = new JTextArea();
+            Font font = new Font("Monospaced", Font.PLAIN, 11);
+            outputTextArea.setFont(font);
+            outputTextArea.setEditable(false);
+
+            add(new JScrollPane(outputTextArea), BorderLayout.CENTER);
+
+            JPanel commandPanel = new JPanel();
+            commandPanel.setLayout(new BorderLayout());
+            commandPanel.add(new JLabel(" Command: "), BorderLayout.WEST);
+            final JTextField commandTextField = new JTextField();
+            commandPanel.add(commandTextField, BorderLayout.CENTER);
+            commandTextField.setToolTipText("Enter command here (\"help\" for help)");
+            add(commandPanel, BorderLayout.SOUTH);
+
+            commandTextField.requestFocusInWindow();
+
+            songNameTextField.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    JTextField textField = (JTextField) e.getSource();
+
+                    String songName = textField.getText();
+
+                    if (!songName.equals("")) {
+                        nextSongName = songName;
+                        player.abortPlay();
+                        commandTextField.requestFocusInWindow();
+                    }                
+                }
+            });
+
+            addUrlActionListener(facebookShareButton, true);
+            addUrlActionListener(twitterShareButton, true);
+            addUrlActionListener(youTubeShareButton, false);
+            addUrlActionListener(soundHelixShareButton, false);
+
+            super.start();
+
+            remoteControl = new SwingRemoteControl(commandTextField, outputTextArea);
+            initializeLog4j();
+
+            // launch console thread with normal priority
+            Thread consoleThread = new Thread(new Runnable() {
+                public void run() {
+                    remoteControl.run();
+                }
+            }, "Console");
+
+            consoleThread.setPriority(Thread.NORM_PRIORITY);
+            consoleThread.start();
         }
-        
-        add(songNamePanel, BorderLayout.NORTH);
-               
-        JTextArea outputTextArea = new JTextArea();
-        Font font = new Font("Monospaced", Font.PLAIN, 11);
-        outputTextArea.setFont(font);
-        outputTextArea.setEditable(false);
-        
-        add(new JScrollPane(outputTextArea), BorderLayout.CENTER);
-
-        JPanel commandPanel = new JPanel();
-        commandPanel.setLayout(new BorderLayout());
-        commandPanel.add(new JLabel(" Command: "), BorderLayout.WEST);
-        final JTextField commandTextField = new JTextField();
-        commandPanel.add(commandTextField, BorderLayout.CENTER);
-        commandTextField.setToolTipText("Enter command here (\"help\" for help)");
-        add(commandPanel, BorderLayout.SOUTH);
-
-        commandTextField.requestFocusInWindow();
-
-        songNameTextField.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                JTextField textField = (JTextField) e.getSource();
-                
-                String songName = textField.getText();
-                
-                if (!songName.equals("")) {
-                    nextSongName = songName;
-                    player.abortPlay();
-                    commandTextField.requestFocusInWindow();
-                }                
-            }
-        });
- 
-        addUrlActionListener(facebookShareButton, true);
-        addUrlActionListener(twitterShareButton, true);
-        addUrlActionListener(youTubeShareButton, false);
-        addUrlActionListener(soundHelixShareButton, false);
-
-        super.start();
-
-        remoteControl = new SwingRemoteControl(commandTextField, outputTextArea);
-
-        initializeLog4j();
-
-        // launch console thread with normal priority
-        Thread consoleThread = new Thread(new Runnable() {
-            public void run() {
-                remoteControl.run();
-            }
-        }, "Console");
-        
-        consoleThread.setPriority(Thread.NORM_PRIORITY);
-        consoleThread.start();
-
+            
         // launch song generation and playing thread with high priority
         Thread playerThread = new Thread(this, "Player");
         playerThread.setPriority(Thread.MAX_PRIORITY);
@@ -372,7 +401,7 @@ public class SoundHelixApplet extends JApplet implements Runnable {
     
         for (;;) {
             try {
-                URL url = new URL(getDocumentBase(), "examples/SoundHelix-Piano.xml");
+                URL url = new URL(getDocumentBase(), urlString);
                 Player player;
                 
                 if (nextSongName != null) {
@@ -383,16 +412,22 @@ public class SoundHelixApplet extends JApplet implements Runnable {
                 }
                 
                 this.player = player;
-                
-                this.currentSongName = player.getArrangement().getStructure().getSongName();
-                songNameTextField.setText(this.currentSongName);
-                setFrameTitle("SoundHelix Song \"" + this.currentSongName + "\"");
-                
-                player.open();
-                remoteControl.setPlayer(player);
-                player.play();
-                remoteControl.setPlayer(null);
-                player.close();
+
+                if (isInvisible) {
+                    player.open();
+                    player.play();
+                    player.close();
+                } else {
+                    this.currentSongName = player.getArrangement().getStructure().getSongName();
+                    songNameTextField.setText(this.currentSongName);
+                    setFrameTitle("SoundHelix Song \"" + this.currentSongName + "\"");
+
+                    player.open();
+                    remoteControl.setPlayer(player);
+                    player.play();
+                    remoteControl.setPlayer(null);
+                    player.close();
+                }
             } catch (Exception e) {
                 logger.debug("Exception occurred", e);
                 
@@ -408,10 +443,17 @@ public class SoundHelixApplet extends JApplet implements Runnable {
      */
     
     private void initializeLog4j() {
-        Layout layout = new PatternLayout("%d{ISO8601} %-5p [%t] %c{1}: %m%n");
-        Appender consoleAppender = new TextRemoteControlAppender(layout, remoteControl);
-        rootLogger.addAppender(consoleAppender);
-        rootLogger.setLevel(Level.DEBUG);
+        if (isInvisible) {
+            // use the default appender; if used in a webbrowser, this won't be visible; it might be visible if an
+            // applet viewer is used
+            rootLogger.setLevel(Level.DEBUG);
+        } else {
+            Layout layout = new PatternLayout("%d{ISO8601} %-5p [%t] %c{1}: %m%n");
+            Appender consoleAppender = new TextRemoteControlAppender(layout, remoteControl);
+            rootLogger.removeAllAppenders();
+            rootLogger.addAppender(consoleAppender);
+            rootLogger.setLevel(Level.DEBUG);
+        }
     }
     
     /**

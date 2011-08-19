@@ -227,21 +227,15 @@ public class RandomSequenceEngine extends AbstractMultiPatternSequenceEngine {
                     double v = pitchDiff == 0 ? 0.5 : ((1.0d - pitchVelocityCorrelation) * random.nextDouble()
                                + pitchVelocityCorrelation * (pitch - minPitch) / pitchDiff);
 
-                    int volume;
-
-                    if (velocityExponent >= 0.0d) {
-                        volume = (int) RandomUtils.getPowerDouble(v, minVelocity, maxVelocity, velocityExponent);
-                    } else {
-                        volume = (int) RandomUtils.getPowerDouble(v, maxVelocity, minVelocity, -velocityExponent);
-                    }
+                    int velocity = (int) RandomUtils.getPowerDouble(v, minVelocity, maxVelocity, velocityExponent);
 
                     boolean isLegato = nextIsNote && (i + length < patternTicks)
                                        && random.nextDouble() < legatoProbability;
 
                     if (isLegato) {
-                        sb.append(pitch).append("~/").append(length).append(':').append(volume);
+                        sb.append(pitch).append("~/").append(length).append(':').append(velocity);
                     } else {
-                        sb.append(pitch).append("/").append(length).append(':').append(volume);               
+                        sb.append(pitch).append("/").append(length).append(':').append(velocity);               
                     }
                     
                     activeTicks += length;

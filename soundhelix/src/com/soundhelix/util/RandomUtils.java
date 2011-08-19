@@ -121,34 +121,44 @@ public final class RandomUtils {
     }
     
     /**
-     * Returns a random double with a power distribution of the given order between min (inclusive) and max (exclusive).
+     * Returns a random double with a power distribution of the given exponent between min (inclusive) and max
+     * (exclusive). A negative exponent will swap the minimum and maximum.
      * 
      * @param random the random generator
      * @param min the minimum value (inclusive)
      * @param max the maximum value (exclusive)
-     * @param order the order (1 = linear, 2 = quadratic, 3 = cubic, etc.)
+     * @param exponent the exponent (1 = linear, 2 = quadratic, 3 = cubic, -1 = reverse linear, etc.)
      * 
      * @return the random double
      */
     
-    public static double getPowerDouble(Random random, double min, double max, double order) {
-        return min + (max - min) * Math.pow(random.nextDouble(), order);
+    public static double getPowerDouble(Random random, double min, double max, double exponent) {
+        if (exponent >= 0.0d) {
+            return min + (max - min) * Math.pow(random.nextDouble(), exponent);
+        } else {
+            return min + (max - min) * Math.pow(random.nextDouble(), exponent);
+        }
     }
 
     /**
      * Converts the given random value (between 0 and 1) into a double with a power distribution
-     * of the given order between min (inclusive) and max (exclusive).
+     * of the given exponent between min (inclusive) and max (exclusive). A negative exponent will swap the minimum
+     * and maximum.
      * 
      * @param value the random value (between 0 and 1)
      * @param min the minimum value (inclusive)
      * @param max the maximum value (exclusive)
-     * @param order the order (1 = linear, 2 = quadratic, 3 = cubic, etc.)
+     * @param exponent the exponent (1 = linear, 2 = quadratic, 3 = cubic, -1 = reverse linear, etc.)
      * 
      * @return the random double
      */
     
-    public static double getPowerDouble(double value, double min, double max, double order) {
-        return min + (max - min) * Math.pow(value, order);
+    public static double getPowerDouble(double value, double min, double max, double exponent) {
+        if (exponent >= 0.0d) {
+            return min + (max - min) * Math.pow(value, exponent);
+        } else {
+            return max + (min - max) * Math.pow(value, -exponent);
+        }
     }
 
     /**

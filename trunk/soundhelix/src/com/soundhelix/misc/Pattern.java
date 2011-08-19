@@ -1,5 +1,10 @@
 package com.soundhelix.misc;
 
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
+import com.soundhelix.misc.Pattern.PatternEntry;
+
 /**
  * Represents a pattern, which is like a repeatable Sequence, but is immutable and allows particular notes (or offsets)
  * as well as wildcards used for special purposes. Patterns can be created from pattern strings.
@@ -7,7 +12,7 @@ package com.soundhelix.misc;
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
-public class Pattern {
+public class Pattern implements Iterable<PatternEntry> {
     /** The PatternEntry array. */
     private PatternEntry[] pattern;
     
@@ -210,6 +215,29 @@ public class Pattern {
         }
         
         return false;
+    }
+    
+    public Iterator<PatternEntry> iterator() {
+        return new Iterator<PatternEntry>() {
+            private PatternEntry[] array = pattern;
+            private int pos;
+
+            public boolean hasNext() {
+                return pos < array.length;
+            }
+
+            public PatternEntry next() {
+                if (hasNext()) {
+                    return array[pos++];
+                } else {
+                    throw new NoSuchElementException();
+                }
+            }
+
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+        };
     }
     
     /**

@@ -226,13 +226,7 @@ public class RandomPatternEngine extends StringPatternEngine {
                             + (pitchDiff == 0 ? 0 : pitchVelocityCorrelation * ((isWildcard ? previousPitch : entry.offset) - minPitch)
                             / pitchDiff));
 
-                    int velocity;
-
-                    if (velocityExponent >= 0.0d) {
-                        velocity = (int) RandomUtils.getPowerDouble(v, minVelocity, maxVelocity, velocityExponent);
-                    } else {
-                        velocity = (int) RandomUtils.getPowerDouble(v, maxVelocity, minVelocity, -velocityExponent);
-                    }
+                    int velocity = (int) RandomUtils.getPowerDouble(v, minVelocity, maxVelocity, velocityExponent);
 
                     boolean isLegato = nextIsNote && (i + length < patternTicks)
                                        && random.nextDouble() < legatoProbability;

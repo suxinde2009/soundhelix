@@ -82,13 +82,7 @@ public class CrescendoPatternEngine extends StringPatternEngine {
                 }
 
                 double v = (double) pos / (totalSize - 1d);
-                int velocity;
-
-                if (velocityExponent >= 0.0d) {
-                    velocity = (int) RandomUtils.getPowerDouble(v, minVelocity, maxVelocity, velocityExponent);
-                } else {
-                    velocity = (int) RandomUtils.getPowerDouble(v, maxVelocity, minVelocity, -velocityExponent);
-                }
+                int velocity = (int) RandomUtils.getPowerDouble(v, minVelocity, maxVelocity, velocityExponent);
 
                 if (entry.isLegato()) {
                     if (entry.isWildcard()) {

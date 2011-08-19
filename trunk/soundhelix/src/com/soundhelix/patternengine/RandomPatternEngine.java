@@ -222,9 +222,9 @@ public class RandomPatternEngine extends StringPatternEngine {
                     PatternEntry entry = offsets[random.nextInt(offsets.length)];
                     boolean isWildcard = entry.isWildcard;
                     
-                    double v = pitchDiff == 0 ? 0.5 : ((1.0d - pitchVelocityCorrelation) * random.nextDouble()
-                            + pitchVelocityCorrelation * ((isWildcard ? previousPitch : entry.offset) - minPitch)
-                            / pitchDiff);
+                    double v = ((1.0d - pitchVelocityCorrelation) * random.nextDouble()
+                            + (pitchDiff == 0 ? 0 : pitchVelocityCorrelation * ((isWildcard ? previousPitch : entry.offset) - minPitch)
+                            / pitchDiff));
 
                     int volume;
 

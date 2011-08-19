@@ -9,6 +9,10 @@ Change log
 
 0.3: unreleased
 
+
+    - Added CrescendoPatternEngine. This lets you specify a pattern that is repeated while the velocity is increased
+      or decreased.
+
     - Added applet parameters "url" (sets the XML document URL) and "invisible" (hides all controls and logging if set
       to "true", which is nice for embedding the applet into a webpage).
 

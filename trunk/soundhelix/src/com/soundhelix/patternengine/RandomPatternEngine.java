@@ -226,12 +226,12 @@ public class RandomPatternEngine extends StringPatternEngine {
                             + (pitchDiff == 0 ? 0 : pitchVelocityCorrelation * ((isWildcard ? previousPitch : entry.offset) - minPitch)
                             / pitchDiff));
 
-                    int volume;
+                    int velocity;
 
                     if (velocityExponent >= 0.0d) {
-                        volume = (int) RandomUtils.getPowerDouble(v, minVelocity, maxVelocity, velocityExponent);
+                        velocity = (int) RandomUtils.getPowerDouble(v, minVelocity, maxVelocity, velocityExponent);
                     } else {
-                        volume = (int) RandomUtils.getPowerDouble(v, maxVelocity, minVelocity, -velocityExponent);
+                        velocity = (int) RandomUtils.getPowerDouble(v, maxVelocity, minVelocity, -velocityExponent);
                     }
 
                     boolean isLegato = nextIsNote && (i + length < patternTicks)
@@ -251,8 +251,8 @@ public class RandomPatternEngine extends StringPatternEngine {
                         }
                     }
                     
-                    if (volume != Short.MAX_VALUE) {
-                        sb.append(length).append(':').append(volume); 
+                    if (velocity != Short.MAX_VALUE) {
+                        sb.append(length).append(':').append(velocity); 
                     } else {
                         sb.append(length);
                     }

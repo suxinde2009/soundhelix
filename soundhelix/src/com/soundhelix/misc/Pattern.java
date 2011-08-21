@@ -32,10 +32,14 @@ public class Pattern implements Iterable<PatternEntry> {
     }
     
     public static Pattern parseString(String patternString) {
-        return parseString(patternString, "");
+        return parseString(patternString, null);
     }
 
     public static Pattern parseString(String patternString, String wildcardString) {
+        if (patternString == null) {
+            return null;
+        }
+        
         if (wildcardString == null) {
             wildcardString = "";
         }

@@ -9,17 +9,19 @@ Change log
 
 0.3: unreleased
 
+    - Added CrescendoPatternEngine. This lets you generate a pattern from repeated pattern parts while changing the
+      velocity so that a crescendo or decrescendo is created.
 
-    - Added CrescendoPatternEngine. This lets you specify a pattern that is repeated while the velocity is increased
-      or decreased.
-
-    - Added applet parameters "url" (sets the XML document URL) and "invisible" (hides all controls and logging if set
-      to "true", which is nice for embedding the applet into a webpage).
+    - Added applet parameters "url" (sets the SoundHelix XML document URL) and "invisible" (hides all controls and
+      logging if set to "true", which is nice for embedding the applet into a webpage). Please see the documentation
+      about how to use the applet in your webpage.
 
     - Added "beforePlayCommands" and "afterPlayCommands" to the MidiPlayer. This allows running external commands before
       playing a song and after playing a song, respectively. For the former, the commands are run before waiting the
       number of ticks configured in beforePlayWaitTicks, for the latter, the commands are run after waiting the number
       of ticks in afterPlayWaitTicks.
+  
+    - Fixed bug in the velocity generation of the RandomPatternEngine if the minimum and maximum pitch is the same.
 
 
 0.2: 2011-07-31

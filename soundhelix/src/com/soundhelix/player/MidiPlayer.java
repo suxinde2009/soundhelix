@@ -28,6 +28,7 @@ import com.soundhelix.misc.Sequence.SequenceEntry;
 import com.soundhelix.misc.Structure;
 import com.soundhelix.misc.Track;
 import com.soundhelix.misc.Track.TrackType;
+import com.soundhelix.util.HarmonyEngineUtils;
 import com.soundhelix.util.StringUtils;
 import com.soundhelix.util.XMLUtils;
 
@@ -575,7 +576,8 @@ public class MidiPlayer extends AbstractPlayer {
         int ticksPerBar = structure.getTicksPerBar();
 
         if ((tick % (4 * ticksPerBar)) == 0) {
-            logger.debug(String.format("Tick: %5d   Seconds: %4d   Progress: %5.1f %%", tick,
+            logger.debug(String.format("Tick: %5d   Chord section: %3d   Seconds: %4d   Progress: %5.1f %%", tick,
+                    HarmonyEngineUtils.getChordSectionNumber(arrangement.getStructure(), tick),
                     tick * 60 * 1000 / (structure.getTicksPerBeat() * milliBPM),
                     (double) tick * 100 / structure.getTicks()));
         }

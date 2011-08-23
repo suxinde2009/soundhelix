@@ -89,6 +89,39 @@ public final class HarmonyEngineUtils {
     }
     
     /**
+     * Returns the number of the chord section of the given tick (counted from 0) or -1 if the tick is negative or
+     * at or beyond the end of the song.
+     * 
+     * @param structure the structure
+     * @param tick the tick
+     *
+     * @return the chord section number (or -1)
+     */
+        
+    public static int getChordSectionNumber(Structure structure, int tick) {
+        if (tick < 0 || tick >= structure.getTicks()) {
+            return -1;
+        }
+        
+        if (tick == 0) {
+            // quick win
+            return 0;
+        }
+        
+        HarmonyEngine harmonyEngine = structure.getHarmonyEngine();
+        
+        int count = -1;
+        int t = 0;
+        
+        do {
+            t += harmonyEngine.getChordSectionTicks(t);
+            count++;
+        } while (t <= tick);
+        
+        return count;
+    }
+    
+    /**
      * Returns the number of distinct chord sections.
      * 
      * @param structure the structure

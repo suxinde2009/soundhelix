@@ -124,7 +124,19 @@ public class MidiPlayer extends AbstractPlayer {
     private boolean useClockSynchronization;
 
     /** True if playing has been aborted. */
-    private boolean isAborted;    
+    private boolean isAborted;
+    
+    /** The current tick number. */
+    private int currentTick;
+    
+    /** True if the player is currently skipping to a tick. */
+    private boolean skipEnabled;
+    
+    /** The tick that the player should skip to (only relevant if skipEnabled is true). */
+    private int skipToTick;
+    
+    /** The original milli-BPM before the skip (only relevant if skipEnabled is true). */
+    private int skipOriginalMilliBPM;
 
     public MidiPlayer() {
         super();
@@ -446,6 +458,7 @@ public class MidiPlayer extends AbstractPlayer {
                 pitchList.add(new int[size]);
             }
 
+            this.currentTick = 0;
             int currentTick = 0;
             
             long tickReferenceTime = referenceTime;
@@ -476,7 +489,14 @@ public class MidiPlayer extends AbstractPlayer {
                     }
                     playTick(arrangement, tick, tickList, posList, pitchList);
                     tickReferenceTime += getTickNanos(tick, ticksPerBeat);
-                    currentTick++;
+                    
+                    currentTick++;                    
+                    this.currentTick++;
+                    
+                    if (skipEnabled && currentTick >= skipToTick) {
+                        skipEnabled = false;
+                        setMilliBPM(skipOriginalMilliBPM);
+                    }
                 }
             }
             
@@ -1205,6 +1225,40 @@ public class MidiPlayer extends AbstractPlayer {
         device.receiver.send(sm, -1);
     }
 
+    /**
+     * Skips to the specified tick. This is done by temporarily setting the BPM to a high number until the specified
+     * tick has been reached. It is currently not possible to skip backwards in this player.
+     * 
+     * @param tick the tick
+     * 
+     * @return true if skipping was successful, false otherwise
+     */
+    
+    public boolean skipToTick(int tick) {
+        int currentTick = this.currentTick;
+        
+        if (tick == currentTick) {
+            // not an error, but nothing to do
+            return true;
+        } else if (tick < currentTick) {
+            // cannot skip backwards
+            logger.warn("Cannot skip backwards");
+            return false;
+        } else {
+            if (skipEnabled) {
+                // already skipping, update target tick
+                this.skipToTick = tick;
+            } else {
+                this.skipToTick = tick;
+                this.skipOriginalMilliBPM = this.milliBPM;
+                skipEnabled = true;
+                setMilliBPM(8000 * 1000);
+            }
+
+            return true;
+        }
+    }
+    
     
     public void abortPlay() {
         this.isAborted = true;

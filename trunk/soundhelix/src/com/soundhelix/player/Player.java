@@ -71,6 +71,20 @@ public interface Player extends XMLConfigurable, RandomSeedable {
     void setMilliBPM(int milliBPM);
     
     /**
+     * Skips to the specified tick. If this was done or triggered successfully, true is returned, otherwise false
+     * is returned. The player may not support skipping at all or may not support skipping backwards. In this case,
+     * the player must ignore the skip request and must return false. This method should return immediately, even
+     * if skipping takes a while to complete. Skipping to a different tick while in the midst of skipping to a
+     * different tick may or may not be supported by the player.
+     * 
+     * @param tick the tick to skip to
+     * 
+     * @return true if skipping was successful
+     */
+    
+    boolean skipToTick(int tick);
+    
+    /**
      * Aborts playback. Calling this method should stop the player if it is currently
      * playing an arrangement.
      */

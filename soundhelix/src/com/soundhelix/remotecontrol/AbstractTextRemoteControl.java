@@ -40,10 +40,21 @@ public abstract class AbstractTextRemoteControl implements RemoteControl {
 
                             player.setMilliBPM((int) (1000 * Double.parseDouble(line.substring(4))));
                         }
+                    } else if (line.startsWith("skip ")) {
+                        int tick = Integer.parseInt(line.substring(5));
+                        if (player != null) {
+                            boolean success = player.skipToTick(tick);
+
+                            if (success) {
+                                writeLine("Skipping to tick " + tick);
+                            } else {
+                                writeLine("Skipping failed");
+                            }
+                        }
                     } else if (line.startsWith("transposition ")) {
                         if (player != null && player instanceof MidiPlayer) {
                             writeLine("Setting transposition");
-
+                           
                             ((MidiPlayer) player).setTransposition(Integer.parseInt(line.substring(14)));
                         }
                     } else if (line.startsWith("groove ")) {
@@ -64,6 +75,7 @@ public abstract class AbstractTextRemoteControl implements RemoteControl {
                         writeLine("\nAvailable commands");
                         writeLine("------------------\n");
                         writeLine("bpm <value>             Sets the BPM. Example: \"bpm 140\"");
+                        writeLine("skip <value>            Skips to the specified tick. Example: \"skip 1000\"");
                         writeLine("transposition <value>   Sets the transposition. Example: \"transposition 70\"");
                         writeLine("groove <value>          Sets the groove. Example: \"groove 130,70\"");
                         writeLine("next                    Aborts playing and starts the next song. Example: \"next\"");

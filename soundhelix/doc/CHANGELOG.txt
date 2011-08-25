@@ -20,6 +20,8 @@ Change log
       playing a song and after playing a song, respectively. For the former, the commands are run before waiting the
       number of ticks configured in beforePlayWaitTicks, for the latter, the commands are run after waiting the number
       of ticks in afterPlayWaitTicks.
+
+    - Added "skip" command to the remote control, which lets to you skip the specified tick during playback.
   
     - Fixed bug in the velocity generation of the RandomPatternEngine if the minimum and maximum pitch is the same.
 

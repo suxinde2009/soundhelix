@@ -31,8 +31,8 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
     /** The random generator. */
     private Random random;
 
-    /** Flag indicating whether chord subtypes should be used. */
-    private boolean obeyChordSubtype = true;
+    /** Flag indicating whether chords should be normalized. */
+    private boolean isNormalizeChords;
     
     /** Flag indicating whether chord sections should be obeyed. */
     protected boolean obeyChordSections;
@@ -63,10 +63,6 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
         this.velocity = velocity;
     }
 
-    public void setObeyChordSubtype(boolean obeyChordSubtype) {
-        this.obeyChordSubtype = obeyChordSubtype;
-    }
-
     public Track render(ActivityVector[] activityVectors) {
         ActivityVector activityVector = activityVectors[0];
 
@@ -83,7 +79,7 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
         while (tick < structure.getTicks()) {
             Chord chord = harmonyEngine.getChord(tick);
             
-            if (!obeyChordSubtype) {
+            if (isNormalizeChords) {
                 chord = chord.normalize();
             }
             
@@ -133,7 +129,12 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
         setOffsets(offsets);
         
         try {
-            setObeyChordSubtype(XMLUtils.parseBoolean(random, "obeyChordSubtype", node, xpath));
+            setNormalizeChords(!XMLUtils.parseBoolean(random, "obeyChordSubtype", node, xpath));
+            logger.warn("The tag \"obeyChordSubtype\" has been deprecated. Use \"normalizeChords\" with inverted value instead.");
+      } catch (Exception e) {}
+
+        try {
+            setNormalizeChords(XMLUtils.parseBoolean(random, "normalizeChords", node, xpath));
         } catch (Exception e) {}
 
         try {
@@ -147,5 +148,9 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
 
     public void setObeyChordSections(boolean obeyChordSections) {
         this.obeyChordSections = obeyChordSections;
+    }
+
+    public void setNormalizeChords(boolean isNormalizeChords) {
+        this.isNormalizeChords = isNormalizeChords;
     }
 }

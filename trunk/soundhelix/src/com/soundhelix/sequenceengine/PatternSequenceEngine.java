@@ -42,9 +42,13 @@ public class PatternSequenceEngine extends AbstractMultiPatternSequenceEngine {
         }
         
         try {
-            setObeyChordSubtype(XMLUtils.parseBoolean(random, "obeyChordSubtype", node, xpath));
+            setNormalizeChords(!XMLUtils.parseBoolean(random, "obeyChordSubtype", node, xpath));
+            logger.warn("The tag \"obeyChordSubtype\" has been deprecated. Use \"normalizeChords\" with inverted value instead.");
         } catch (Exception e) {}
 
+        try {
+            setNormalizeChords(XMLUtils.parseBoolean(random, "normalizeChords", node, xpath));
+        } catch (Exception e) {}
         
         PatternEngine patternEngine;
         

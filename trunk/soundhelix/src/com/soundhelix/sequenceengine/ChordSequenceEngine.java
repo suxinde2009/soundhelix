@@ -25,10 +25,6 @@ public class ChordSequenceEngine extends MultiPatternSequenceEngine {
         super();
     }
 
-    public void setObeyChordSubtype(boolean obeyChordSubtype) {
-        this.obeyChordSubtype = obeyChordSubtype;
-    }
-
     public void configure(Node node, XPath xpath) throws XPathException {
         random = new Random(randomSeed);
 
@@ -47,7 +43,12 @@ public class ChordSequenceEngine extends MultiPatternSequenceEngine {
         }
         
         try {
-            setObeyChordSubtype(XMLUtils.parseBoolean(random, "obeyChordSubtype", node, xpath));
+            setNormalizeChords(!XMLUtils.parseBoolean(random, "obeyChordSubtype", node, xpath));
+            logger.warn("The tag \"obeyChordSubtype\" has been deprecated. Use \"normalizeChords\" with inverted value instead.");
+        } catch (Exception e) {}
+
+        try {
+            setNormalizeChords(XMLUtils.parseBoolean(random, "normalizeChords", node, xpath));
         } catch (Exception e) {}
 
         NodeList nodeList = (NodeList) xpath.evaluate("patternEngine", node, XPathConstants.NODESET);

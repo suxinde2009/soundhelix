@@ -30,7 +30,7 @@ public abstract class AbstractMultiPatternSequenceEngine extends AbstractSequenc
     
     protected Random random;
     
-    protected boolean obeyChordSubtype;
+    protected boolean isNormalizeChords = true;
     
     private Pattern[] patterns;
     
@@ -42,10 +42,6 @@ public abstract class AbstractMultiPatternSequenceEngine extends AbstractSequenc
         this.patterns = patterns;
     }
     
-    public void setObeyChordSubtype(boolean obeyChordSubtype) {
-        this.obeyChordSubtype = obeyChordSubtype;
-    }
-
     public Track render(ActivityVector[] activityVectors) {
         ActivityVector activityVector = activityVectors[0];
 
@@ -72,7 +68,7 @@ public abstract class AbstractMultiPatternSequenceEngine extends AbstractSequenc
             while (tick < ticks) {
                 Chord chord = harmonyEngine.getChord(tick);
 
-                if (!obeyChordSubtype) {
+                if (isNormalizeChords) {
                     chord = chord.normalize();
                 }
                 
@@ -110,10 +106,10 @@ public abstract class AbstractMultiPatternSequenceEngine extends AbstractSequenc
 
                         int pitch;
                         
-                        if (obeyChordSubtype) {
-                            pitch = NoteUtils.getTransitionPitch(chord, nextChord);
-                        } else {
+                        if (isNormalizeChords) {
                             pitch = NoteUtils.getTransitionPitch(chord.normalize(), nextChord != null ? nextChord.normalize() : null);
+                        } else {
+                            pitch = NoteUtils.getTransitionPitch(chord, nextChord);
                         }
                         
                         boolean useLegato = entry.isLegato()
@@ -140,5 +136,9 @@ public abstract class AbstractMultiPatternSequenceEngine extends AbstractSequenc
         }
         
         return track;
+    }
+
+    public void setNormalizeChords(boolean isNormalizeChords) {
+        this.isNormalizeChords = isNormalizeChords;
     }
 }

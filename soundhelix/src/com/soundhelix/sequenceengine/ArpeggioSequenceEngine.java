@@ -34,8 +34,8 @@ import com.soundhelix.util.XMLUtils;
 // TODO: allow specifying velocities in arpeggio patterns (like in the PatternSequenceEngine)
 
 public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
-    protected Random random;    
-    protected boolean obeyChordSubtype;
+    protected Random random;
+    protected boolean isNormalizeChords = true;
     protected boolean obeyChordSections;
     
     private Pattern[] patterns;
@@ -48,10 +48,6 @@ public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
         this.patterns = patterns;
     }
     
-    public void setObeyChordSubtype(boolean obeyChordSubtype) {
-        this.obeyChordSubtype = obeyChordSubtype;
-    }
-
     public void setObeyChordSections(boolean obeyChordSections) {
         this.obeyChordSections = obeyChordSections;
     }
@@ -69,7 +65,7 @@ public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
         while (tick < ticks) {
             Chord chord = harmonyEngine.getChord(tick);
             
-            if (!obeyChordSubtype) {
+            if (isNormalizeChords) {
                 chord = chord.normalize();
             }
             
@@ -190,9 +186,14 @@ public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
         }
         
         try {
-            setObeyChordSubtype(XMLUtils.parseBoolean(random, "obeyChordSubtype", node, xpath));
+            setNormalizeChords(!XMLUtils.parseBoolean(random, "obeyChordSubtype", node, xpath));
+            logger.warn("The tag \"obeyChordSubtype\" has been deprecated. Use \"normalizeChords\" with inverted value instead.");
         } catch (Exception e) {}
-        
+
+        try {
+            setNormalizeChords(XMLUtils.parseBoolean(random, "normalizeChords", node, xpath));
+        } catch (Exception e) {}
+
         try {
             setObeyChordSections(XMLUtils.parseBoolean(random, "obeyChordSections", node, xpath));
         } catch (Exception e) {}
@@ -225,4 +226,8 @@ public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
         
         setPatterns(patterns);
     }
+
+public void setNormalizeChords(boolean isNormalizeChords) {
+    this.isNormalizeChords = isNormalizeChords;
+}
 }

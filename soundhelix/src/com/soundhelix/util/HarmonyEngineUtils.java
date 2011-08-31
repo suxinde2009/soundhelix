@@ -75,7 +75,7 @@ public final class HarmonyEngineUtils {
                 sb.append(',');
             }
             
-            sb.append(chord.getShortName());
+            sb.append(chord.toString());
             sb.append('/');
             
             // the chord section might end before a chord change occurs

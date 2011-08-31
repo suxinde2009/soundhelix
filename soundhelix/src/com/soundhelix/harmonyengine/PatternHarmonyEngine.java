@@ -3,6 +3,8 @@ package com.soundhelix.harmonyengine;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -12,7 +14,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.soundhelix.misc.Chord;
-import com.soundhelix.misc.Chord.ChordType;
 import com.soundhelix.util.NoteUtils;
 import com.soundhelix.util.XMLUtils;
 
@@ -42,6 +43,11 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
     
     private String[] chordPatterns;
     private String[][] chordRandomTables;
+    
+    /** Boolean indicating whether chord distances should be minimized. */
+    private boolean isMinimizeChordDistance = true;
+    
+    private static final Pattern genericPattern = Pattern.compile("^(-?\\d+):(-?\\d+):(-?\\d+)$");
     
     /** The random generator. */
     private Random random;
@@ -137,35 +143,28 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
             int pitch;
             Chord ch;
 
-            // check whether we have a major or minor chord
+            Matcher m = genericPattern.matcher(cho);
             
-            if (cho.endsWith("m")) {
-                pitch = NoteUtils.getNotePitch(cho.substring(0, cho.length() - 1));
-                
-                if (pitch > 0) {
-                    pitch -= 12;
-                }
-                
-                ch = new Chord(pitch, ChordType.MINOR, Chord.ChordSubtype.BASE_0);
-            } else {
-                pitch = NoteUtils.getNotePitch(cho);
-                
-                if (pitch > 0) {
-                    pitch -= 12;
-                }
-                
-                ch = new Chord(pitch, ChordType.MAJOR, Chord.ChordSubtype.BASE_0);
-            }
+            if (m.matches()) {
+                int p1 = Integer.parseInt(m.group(1));
+                int p2 = Integer.parseInt(m.group(2));
+                int p3 = Integer.parseInt(m.group(3));
 
+                ch = new Chord(p1, p2, p3);
+            } else {
+                ch = Chord.getChordFromName(cho);
+                
+                if (ch == null) {
+                    throw new RuntimeException("Invalid chord name " + cho);
+                }
+            }
+                
             if (firstChord == null) {
                 firstChord = ch;
             }
             
-            if (newSection) {
-                ch = firstChord.findClosestChord(ch);
-            } else {
-                // previousChord is always non-null here
-                ch = firstChord.findClosestChord(ch);
+            if (isMinimizeChordDistance) {
+                ch = ch.findChordClosestTo(firstChord);
             }
             
             for (int j = 0; j < len && tick < ticks; j++) {
@@ -278,7 +277,11 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
             String chord;
             int length = Integer.parseInt(spec[1]);
             
-            if (spec[0].startsWith("$")) {
+            Matcher m = genericPattern.matcher(spec[0]);
+            
+            if (spec[0].indexOf(':') >= 0) {
+                chord = spec[0];
+            } else if (spec[0].startsWith("$")) {
                 int refnum = Integer.parseInt(spec[0].substring(1));
                 
                 if (refnum < 0 || refnum >= chordList.size()) {
@@ -289,8 +292,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
             } else {
                 // check if we have a note or a random table number
                 
-                int pitch = NoteUtils.getNotePitch(spec[0].endsWith("m")
-                                ? spec[0].substring(0, spec[0].length() - 1) : spec[0]);
+                int pitch = NoteUtils.getNotePitch(spec[0].substring(0, 1));
                 
                 if (pitch == Integer.MIN_VALUE) {
                     // we have a random chord table number
@@ -359,7 +361,15 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
             String table = XMLUtils.parseString(random, nodeList.item(i), xpath);
             chordRandomTables[i] = table.split(",");
         }
-        
+
+        try {
+            setMinimizeChordDistance(XMLUtils.parseBoolean(random, "minimizeChordDistance", node, xpath));
+        } catch (Exception e) {}
+
         setChordRandomTables(chordRandomTables);
+    }
+
+    public void setMinimizeChordDistance(boolean isMinimizeChordDistance) {
+        this.isMinimizeChordDistance = isMinimizeChordDistance;
     }
 }

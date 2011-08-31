@@ -12,7 +12,6 @@ import com.soundhelix.misc.ActivityVector;
 import com.soundhelix.misc.Chord;
 import com.soundhelix.misc.Sequence;
 import com.soundhelix.misc.Track;
-import com.soundhelix.misc.Chord.ChordSubtype;
 import com.soundhelix.misc.Track.TrackType;
 import com.soundhelix.util.XMLUtils;
 
@@ -29,12 +28,6 @@ import com.soundhelix.util.XMLUtils;
  */
 
 public class PadSequenceEngine extends AbstractSequenceEngine {
-    /** The major table. */
-    private static final int[] MAJOR_TABLE = new int[] {0, 4, 7};
-    
-    /** The minor table. */
-    private static final int[] MINOR_TABLE = new int[] {0, 3, 7};
-    
     /** The random generator. */
     private Random random;
 
@@ -83,47 +76,29 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
             track.add(new Sequence());
         }
 
-        HarmonyEngine ce = structure.getHarmonyEngine();
-        
-        Chord firstChord = ce.getChord(0);
+        HarmonyEngine harmonyEngine = structure.getHarmonyEngine();
         
         int tick = 0;
         
         while (tick < structure.getTicks()) {
-            Chord chord = firstChord.findClosestChord(ce.getChord(tick));
+            Chord chord = harmonyEngine.getChord(tick);
             
-            int len = Math.min(ce.getChordTicks(tick), activityVector.getIntervalLength(tick));
+            if (!obeyChordSubtype) {
+                chord = chord.normalize();
+            }
+            
+            int len = Math.min(harmonyEngine.getChordTicks(tick), activityVector.getIntervalLength(tick));
 
             if (obeyChordSections) {
-                len = Math.min(len, ce.getChordSectionTicks(tick));
+                len = Math.min(len, harmonyEngine.getChordSectionTicks(tick));
             }
             
             if (activityVector.isActive(tick)) {
-                int shift = 0;
-
-                if (obeyChordSubtype) {
-                    if (chord.getSubtype() == ChordSubtype.BASE_4) {
-                        shift = 1;
-                    } else if (chord.getSubtype() == ChordSubtype.BASE_6) {
-                        shift = -1;
-                    }
-                }
-
                 for (int i = 0; i < voiceCount; i++) {
                     Sequence seq = track.get(i);
 
-                    int pos = offsets[i] + shift;
-
-                    int octave = pos >= 0 ? pos / 3 : (pos - 2) / 3;
-                    int offset = ((pos % 3) + 3) % 3;
-
-                    if (chord.isMajor()) {
-                        seq.addNote(octave * 12 + MAJOR_TABLE[offset] + chord.getPitch(),
-                                len, velocity);
-                    } else {
-                        seq.addNote(octave * 12 + MINOR_TABLE[offset] + chord.getPitch(),
-                                len, velocity);
-                    }
+                    int pos = offsets[i];
+                    seq.addNote(chord.getPitch(pos), len, velocity);
 
                     pos++;
                 }

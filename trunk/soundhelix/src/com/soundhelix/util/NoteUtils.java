@@ -104,11 +104,11 @@ public final class NoteUtils {
     public static int getTransitionPitch(Chord chord, Chord nextChord) {
         if (nextChord == null) {
             // next chord is undefined, just return the current pitch
-            return chord.getPitch();
+            return chord.getLowPitch();
         }
         
-        int pitch1 = chord.getPitch();
-        int pitch2 = nextChord.getPitch();
+        int pitch1 = chord.getLowPitch();
+        int pitch2 = nextChord.getLowPitch();
         
         int diff = pitch2 - pitch1;
         int absdiff = Math.abs(diff);

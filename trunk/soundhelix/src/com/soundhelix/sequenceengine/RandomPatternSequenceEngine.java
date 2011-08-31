@@ -1,9 +1,9 @@
 package com.soundhelix.sequenceengine;
 
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import javax.xml.xpath.XPath;
@@ -16,7 +16,6 @@ import org.w3c.dom.NodeList;
 import com.soundhelix.harmonyengine.HarmonyEngine;
 import com.soundhelix.misc.ActivityVector;
 import com.soundhelix.misc.Chord;
-import com.soundhelix.misc.Chord.ChordSubtype;
 import com.soundhelix.misc.Pattern;
 import com.soundhelix.misc.Pattern.PatternEntry;
 import com.soundhelix.misc.Sequence;
@@ -35,9 +34,6 @@ import com.soundhelix.util.XMLUtils;
  */
 
 public class RandomPatternSequenceEngine extends AbstractSequenceEngine {    
-    private static final int[] MAJOR_TABLE = new int[] {0, 4, 7};
-    private static final int[] MINOR_TABLE = new int[] {0, 3, 7};
-
     private static String defaultPatternString = "0";
     private Pattern pattern;
     private int patternLength;
@@ -129,6 +125,7 @@ public class RandomPatternSequenceEngine extends AbstractSequenceEngine {
                 for (int i = 0; i < len;) {
                     PatternEntry entry = pattern.get(pos % patternLength);
                     Chord chord = he.getChord(tick + i);
+                    
                     int t = entry.getTicks();
                     
                     if (entry.isPause()) {
@@ -140,24 +137,7 @@ public class RandomPatternSequenceEngine extends AbstractSequenceEngine {
                             value = offsets[random.nextInt(offsets.length)];
                         } while(value == lastValue);
 
-                        if (true) {
-                            if (chord.getSubtype() == ChordSubtype.BASE_4) {
-                                value++;
-                            } else if (chord.getSubtype() == ChordSubtype.BASE_6) {
-                                value--;
-                            }
-                        }
-                        
-                        int octave = value >= 0 ? value / 3 : (value - 2) / 3;
-                        int offset = ((value % 3) + 3) % 3;
-                        
-                         if (chord.isMajor()) {
-                            list.add(new PatternEntry(octave * 12 + MAJOR_TABLE[offset] + chord.getPitch(),
-                                                      entry.getVelocity(), t, entry.isLegato()));
-                        } else {
-                            list.add(new PatternEntry(octave * 12 + MINOR_TABLE[offset] + chord.getPitch(),
-                                                      entry.getVelocity(), t, entry.isLegato()));
-                        }
+                        list.add(new PatternEntry(chord.getPitch(value), entry.getVelocity(), t, entry.isLegato()));
                         
                         lastValue = value;
                     }

@@ -122,6 +122,45 @@ public final class HarmonyEngineUtils {
     }
     
     /**
+     * Returns the first tick of the given chord section number (starting from 0) or -1 if the chord section number
+     * is negative or at or beyond the end of the song.
+     * 
+     * @param structure the structure
+     * @param chordSection the number of the chord section
+     *
+     * @return the tick (or -1)
+     */
+        
+    public static int getChordSectionTick(Structure structure, int chordSection) {
+        if (chordSection < 0 || structure.getTicks() == 0) {
+            return -1;
+        }
+        
+        if (chordSection == 0) {
+            // quick win
+            return 0;
+        }
+        
+        HarmonyEngine harmonyEngine = structure.getHarmonyEngine();
+
+        int ticks = structure.getTicks();
+        int tick = 0;
+        int count = 0;
+        
+        do {
+            tick += harmonyEngine.getChordSectionTicks(tick);
+            count++;
+        } while (count < chordSection && tick < ticks);
+        
+        if (tick >= ticks) {
+            // at or beyond the end of the song
+            return -1;
+        } else {
+            return tick;
+        }
+    }
+    
+    /**
      * Returns the number of distinct chord sections.
      * 
      * @param structure the structure

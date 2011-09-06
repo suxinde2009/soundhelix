@@ -16,7 +16,7 @@ import com.soundhelix.util.NoteUtils;
  * the chord's high pitch with the same pitch transposed one octave down. All common type chords (except for augmented
  * chords) can be normalized, which means that the chords are rotated up or down so that their low pitch equals the
  * root pitch of the chord (e.g., "C4" and "C6" are normalized to "C"), if that is not already the case. Augmented
- * chords cannot be normalized, because they don't have a unique root pitch (e.g., the chords "Caug", "Eaug6" an
+ * chords cannot be normalized, because they don't have a unique root pitch (e.g., the chords "Caug", "Eaug6" and
  * "G#aug4" are not distinguishable if you look at their pitches).
  * 
  * The low and the high pitch must not be farther apart than 11 halftones.

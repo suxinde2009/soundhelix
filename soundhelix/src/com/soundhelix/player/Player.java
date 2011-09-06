@@ -85,6 +85,15 @@ public interface Player extends XMLConfigurable, RandomSeedable {
     boolean skipToTick(int tick);
     
     /**
+     * Returns the current tick of the player. If the player is not yet playing, if it is in the warm-up
+     * phase or in the cool-down phase or playing has finished, -1 will be returned.
+     * 
+     * @return the current tick (or -1)
+     */
+    
+    int getCurrentTick();       
+    
+    /**
      * Aborts playback. Calling this method should stop the player if it is currently
      * playing an arrangement.
      */

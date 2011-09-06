@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 
 import com.soundhelix.player.MidiPlayer;
 import com.soundhelix.player.Player;
+import com.soundhelix.util.HarmonyEngineUtils;
 
 /**
  * Implements an abstract simple text-based remote control.
@@ -41,7 +42,24 @@ public abstract class AbstractTextRemoteControl implements RemoteControl {
                             player.setMilliBPM((int) (1000 * Double.parseDouble(line.substring(4))));
                         }
                     } else if (line.startsWith("skip ")) {
-                        int tick = Integer.parseInt(line.substring(5));
+                        int tick;
+                        if (line.endsWith("%")) {
+                            double percentage = Double.parseDouble(line.substring(5, line.length() - 1));
+                            tick = (int) (percentage * player.getArrangement().getStructure().getTicks() / 100d);
+                        } else if (line.substring(5).equals("+")) {
+                            tick = player.getCurrentTick();
+                            if (tick >= 0) {
+                                tick += player.getArrangement().getStructure().getHarmonyEngine().
+                                    getChordSectionTicks(tick);
+                            }
+                        } else if (line.charAt(5) == '#') {
+                            int chordSection = Integer.parseInt(line.substring(6));
+                            tick = HarmonyEngineUtils.getChordSectionTick(player.getArrangement().getStructure(),
+                                    chordSection);
+                        } else {
+                            tick = Integer.parseInt(line.substring(5));
+                        }
+                        
                         if (player != null) {
                             boolean success = player.skipToTick(tick);
 
@@ -76,6 +94,9 @@ public abstract class AbstractTextRemoteControl implements RemoteControl {
                         writeLine("------------------\n");
                         writeLine("bpm <value>             Sets the BPM. Example: \"bpm 140\"");
                         writeLine("skip <value>            Skips to the specified tick. Example: \"skip 1000\"");
+                        writeLine("skip <value>%           Skips to the specified tick percentage. Example: \"skip 50%\"");
+                        writeLine("skip #<value>           Skips to the first tick of the specified chord section. Example: \"skip #3\"");
+                        writeLine("skip +                  Skips to the first tick of the next chord section. Example: \"skip +\"");
                         writeLine("transposition <value>   Sets the transposition. Example: \"transposition 70\"");
                         writeLine("groove <value>          Sets the groove. Example: \"groove 130,70\"");
                         writeLine("next                    Aborts playing and starts the next song. Example: \"next\"");

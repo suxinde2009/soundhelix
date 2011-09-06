@@ -1374,4 +1374,8 @@ public class MidiPlayer extends AbstractPlayer {
             this.phase = phase;
         }
     }
+
+    public int getCurrentTick() {
+        return currentTick;
+    }
 }

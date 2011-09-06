@@ -10,25 +10,25 @@ Change log
 0.3: unreleased
 
     - Rewrote the internals of the chord functionality and adapted all code accordingly. Now not only major and minor chords
-	  are supported, but any 3-note chords which use 3 distinct pitches that do not span more than 11 halftones. Extended
-	  the chord syntax to add inversion support to chords and added diminished and augmented chords ("dim" and "aug",
-	  respectively, e.g., "Adim4" is a diminished A chord using first inversion, "Caug6" is an augmented C chord using second
-	  inversion). Arbitrary chords can be provided with the syntax "pitch1:pitch2:pitch3". For example, "-7:-3:3" gives you the
-	  non-standard chord using the pitches F, A and e.
+      are supported, but any 3-note chords which use 3 distinct pitches that do not span more than 11 halftones. Extended
+      the chord syntax to add inversion support to chords and added diminished and augmented chords ("dim" and "aug",
+      respectively, e.g., "Adim4" is a diminished A chord using first inversion, "Caug6" is an augmented C chord using second
+      inversion). Arbitrary chords can be provided with the syntax "pitch1:pitch2:pitch3". For example, "-7:-3:3" gives you the
+      non-standard chord using the pitches F, A and e.
 
-	- Renamed the tag "obeyChordSubtypes" (false/true) to "normalizeChords" (true/false). Normalizing a chord means converting
-	  chords with first or second inversion (e.g., "Am4" or "Am6") to their normalized counterpart ("Am"), which has the root
+    - Renamed the tag "obeyChordSubtypes" (false/true) to "normalizeChords" (true/false). Normalizing a chord means converting
+      chords with first or second inversion (e.g., "Am4" or "Am6") to their normalized counterpart ("Am"), which has the root
       note at its low pitch. Note that only minor, major and diminished chords are normalized if this is on, all other chords
-	  are unchanged. Note also that "obeyChordSubtype" can still be used, but is deprecated; "normalizeChords" has higher
-	  priority if both tags are present.
-	  
-	- Added "minimizeChordDistance" tag to the PatternHarmonyEngine. If set to true, all chords will be rotated so that
-	  their middle pitch is as close as possible to the first chord's middle pitch. This possibly involves changing the inversion
-	  type of the chords. Example: if you use "Am/4,C/4", this will effectively be converted to "Am/4,C6/4", which leaves the
-	  middle pitch at "c" for both chords. Defaults to true, as this was always done in previous versions. This can be "undone" by
-	  by setting "normalizeChords" to "true" in the SequenceEngines where you would like to only use the non-inverted versions
-	  of the chords.
-	
+      are unchanged. Note also that "obeyChordSubtype" can still be used, but is deprecated; "normalizeChords" has higher
+      priority if both tags are present.
+      
+    - Added "minimizeChordDistance" tag to the PatternHarmonyEngine. If set to true, all chords will be rotated so that
+      their middle pitch is as close as possible to the first chord's middle pitch. This possibly involves changing the inversion
+      type of the chords. Example: if you use "Am/4,C/4", this will effectively be converted to "Am/4,C6/4", which leaves the
+      middle pitch at "c" for both chords. Defaults to true, as this was always done in previous versions. This can be "undone" by
+      by setting "normalizeChords" to "true" in the SequenceEngines where you would like to only use the non-inverted versions
+      of the chords.
+    
     - Added CrescendoPatternEngine. This lets you generate a pattern from repeated pattern parts while changing the
       velocity so that a crescendo or decrescendo is created.
 
@@ -41,9 +41,10 @@ Change log
       number of ticks configured in beforePlayWaitTicks, for the latter, the commands are run after waiting the number
       of ticks in afterPlayWaitTicks.
 
-    - Added "skip" command to the remote control, which lets to you skip playing to the specified tick during playback.
-      Added skipping support to the MidiPlayer.
-	  
+    - Added "skip" command to the remote control, which lets to you skip playing to the specified tick, to the specified
+      tick percentage, to the start of the given chord section number or to the start of the next chord section during playback
+      (type "help" in the console to see the syntaxes). Added skipping support to the MidiPlayer.
+      
     - Fixed bug in the velocity generation of the RandomPatternEngine if the minimum and maximum pitch is the same.
 
 

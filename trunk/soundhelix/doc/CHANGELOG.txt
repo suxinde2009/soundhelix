@@ -16,7 +16,7 @@ Change log
       inversion). Arbitrary chords can be provided with the syntax "pitch1:pitch2:pitch3". For example, "-7:-3:3" gives you the
       non-standard chord using the pitches F, A and e.
 
-    - Renamed the tag "obeyChordSubtypes" (false/true) to "normalizeChords" (true/false). Normalizing a chord means converting
+    - Renamed the tag "obeyChordSubtype" (false/true) to "normalizeChords" (true/false). Normalizing a chord means converting
       chords with first or second inversion (e.g., "Am4" or "Am6") to their normalized counterpart ("Am"), which has the root
       note at its low pitch. Note that only minor, major and diminished chords are normalized if this is on, all other chords
       are unchanged. Note also that "obeyChordSubtype" can still be used, but is deprecated; "normalizeChords" has higher
@@ -30,7 +30,7 @@ Change log
       of the chords.
     
     - Added CrescendoPatternEngine. This lets you generate a pattern from repeated pattern parts while changing the
-      velocity so that a crescendo or decrescendo is created.
+      velocity so that a crescendo or decrescendo is created. Comes in handy for the DrumSequenceEngine.
 
     - Added applet parameters "url" (sets the SoundHelix XML document URL) and "invisible" (hides all controls and
       logging if set to "true", which is nice for embedding the applet into a webpage). Please see the documentation
@@ -41,9 +41,10 @@ Change log
       number of ticks configured in beforePlayWaitTicks, for the latter, the commands are run after waiting the number
       of ticks in afterPlayWaitTicks.
 
-    - Added "skip" command to the remote control, which lets to you skip playing to the specified tick, to the specified
-      tick percentage, to the start of the given chord section number or to the start of the next chord section during playback
-      (type "help" in the console to see the syntaxes). Added skipping support to the MidiPlayer.
+    - Added "skip" command to the remote control (usable in the console and the applet), which lets to you skip playing
+      to the specified tick, to the specified tick percentage, to the start of the given chord section number or to the
+      start of the next chord section during playback (type "help" in the console to see the syntaxes). Added skipping support
+      to the MidiPlayer.
       
     - Fixed bug in the velocity generation of the RandomPatternEngine if the minimum and maximum pitch is the same.
 

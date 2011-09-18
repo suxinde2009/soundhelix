@@ -19,12 +19,12 @@ import com.soundhelix.misc.XMLConfigurable;
  */
 
 public final class XMLUtils {
+    /** The logger. */
+    private static final Logger LOGGER = Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
+    
     /** The factor used for augmenting the random seed (56-bit prime). */
     private static final long RANDOM_SEED_PRIME = 0xFFFFFFFFFFFFC7L;
 
-    /** The logger. */
-    private static Logger logger = Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
-    
     /**
      * Empty private constructor.
      */
@@ -509,11 +509,11 @@ public final class XMLUtils {
 
             ((RandomSeedable) instance).setRandomSeed(randomSeed);
 
-            if (logger.isTraceEnabled()) {
-                logger.trace("Instantiated class " + className + " with random seed " + randomSeed);
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace("Instantiated class " + className + " with random seed " + randomSeed);
             }
         } else {
-            logger.trace("Instantiated class " + className + " without a random seed");
+            LOGGER.trace("Instantiated class " + className + " without a random seed");
         }
         
         // configure instance if it is XML-configurable

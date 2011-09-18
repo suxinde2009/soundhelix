@@ -12,7 +12,7 @@ import com.soundhelix.constants.BuildConstants;
 
 public final class VersionUtils {
     /** The logger. */
-    private static Logger logger = Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
+    private static final Logger LOGGER = Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
     
     private VersionUtils() {}
 
@@ -21,7 +21,7 @@ public final class VersionUtils {
      */
     
     public static void logVersion() {
-        logger.info("SoundHelix " + BuildConstants.VERSION + " (r" + BuildConstants.REVISION + "), built on "
+        LOGGER.info("SoundHelix " + BuildConstants.VERSION + " (r" + BuildConstants.REVISION + "), built on "
                 + BuildConstants.BUILD_DATE + " *** http://www.soundhelix.com");
     }
   

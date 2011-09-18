@@ -2,6 +2,7 @@ package com.soundhelix.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Random;
 
@@ -33,6 +34,8 @@ import com.soundhelix.player.Player;
 import com.soundhelix.songnameengine.SongNameEngine;
 
 /**
+ * Provides static convenience methods for creating a song.
+ * 
  * @author Thomas Schuerger
  */
 
@@ -81,6 +84,40 @@ public final class SongUtils {
         
         return player;
     }   
+    
+    /**
+     * Parses the XML file provided by the given input stream, creates an arrangement and a player and configures
+     * the player to use this arrangement.
+     * 
+     * @param inputStream the input stream
+     * @param systemId the system ID specifying the source of the input stream
+     * @param randomSeed the random seed
+     * 
+     * @return the player
+     * 
+     * @throws Exception in case of a problem
+     */
+    
+    public static Player generateSong(InputStream inputStream, String systemId, long randomSeed) throws Exception {
+        Document doc = parseDocument(inputStream, systemId);
+        
+        XPath xpath = XPathFactory.newInstance().newXPath();
+        Node rootNode = (Node) xpath.evaluate("/*", doc, XPathConstants.NODE);        
+        checkVersion(rootNode, xpath);
+            
+        Node songNameEngineNode = (Node) xpath.evaluate("songNameEngine", rootNode, XPathConstants.NODE);
+        SongNameEngine songNameEngine = XMLUtils.getInstance(SongNameEngine.class,
+                songNameEngineNode, xpath, randomSeed, -1);
+        
+        String songName = songNameEngine.createSongName();
+        logger.info("Song name: \"" + songName + "\"");        
+        Player player = generateSong(doc, getSongRandomSeed(songName));
+        
+        // store the song name
+        player.getArrangement().getStructure().setSongName(songName);
+        
+        return player;
+    }   
 
     /**
      * Parses the XML file provided by the given input stream, creates an arrangement and a player and configures
@@ -96,6 +133,35 @@ public final class SongUtils {
     
     public static Player generateSong(URL url, String songName) throws Exception {
         Document doc = parseDocument(url);
+
+        XPath xpath = XPathFactory.newInstance().newXPath();
+        Node rootNode = (Node) xpath.evaluate("/*", doc, XPathConstants.NODE);        
+        checkVersion(rootNode, xpath);
+        
+        logger.info("Song name: \"" + songName + "\"");        
+        Player player = generateSong(doc, getSongRandomSeed(songName));
+
+        // store the song name
+        player.getArrangement().getStructure().setSongName(songName);
+
+        return player;
+    }
+
+    /**
+     * Parses the XML file provided by the given input stream, creates an arrangement and a player and configures
+     * the player to use this arrangement.
+     * 
+     * @param inputStream the input stream
+     * @param systemId the system ID specifying the source of the input stream
+     * @param songName the song name
+     * 
+     * @return the player
+     * 
+     * @throws Exception in case of a problem
+     */
+    
+    public static Player generateSong(InputStream inputStream, String systemId, String songName) throws Exception {
+        Document doc = parseDocument(inputStream, systemId);
 
         XPath xpath = XPathFactory.newInstance().newXPath();
         Node rootNode = (Node) xpath.evaluate("/*", doc, XPathConstants.NODE);        
@@ -180,8 +246,27 @@ public final class SongUtils {
      */
     
     private static Document parseDocument(URL url) throws ParserConfigurationException, SAXException, IOException {
-
         logger.debug("Loading XML data from URL \"" + url + "\"");
+        return parseDocument(url.openStream(), url.toExternalForm());
+    }
+
+    /**
+     * Parses the XML document provided by the input stream. The system ID is used as the base URL of the
+     * document, so relative URLs referenced in the XML document (e.g., for XInclude inclusion), will use the document
+     * URL as the base.
+     * 
+     * @param inputStream the input stream
+     * @param systemId the system ID of the XML content
+     * 
+     * @return the parsed document
+     * 
+     * @throws ParserConfigurationException in case of a parsing exception
+     * @throws SAXException if a SAX exception occurs
+     * @throws IOException in case of an I/O problem
+     */
+
+    private static Document parseDocument(InputStream inputStream, String systemId) throws ParserConfigurationException,
+        SAXException, IOException {
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         
@@ -192,7 +277,7 @@ public final class SongUtils {
         DocumentBuilder builder = dbf.newDocumentBuilder();
         Document doc;
         
-        doc = builder.parse(url.openStream(), url.toExternalForm());
+        doc = builder.parse(inputStream, systemId);
         
         if (ENABLE_SCHEMA_VALIDATION) {
             // create a SchemaFactory capable of understanding WXS schemas

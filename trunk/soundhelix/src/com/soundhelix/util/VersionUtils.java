@@ -35,15 +35,15 @@ public final class VersionUtils {
      * @return an integer determining the relative order of the two version strings
      */
     
-    public static int compareTo(String version1, String version2) {
+    public static int compareVersions(String version1, String version2) {
         int[] versionInts1 = parseVersionString(version1);
         int[] versionInts2 = parseVersionString(version2);
         
-        return compareTo(versionInts1, versionInts2);        
+        return compareVersions(versionInts1, versionInts2);        
     }
     
     /**
-     * Compares the two given version strings. Returns a negative number if the first is smaller
+     * Compares the two given version integer arrays. Returns a negative number if the first is smaller
      * than the second, a positive number of the first is greater than the second, 0 if they are equal.
      * 
      * @param versionInts1 the first version int array
@@ -52,13 +52,13 @@ public final class VersionUtils {
      * @return an integer determining the relative order of the two version int arrays
      */
     
-    public static int compareTo(int[] versionInts1, int[] versionInts2) {
-        int l1 = versionInts1.length;
-        int l2 = versionInts2.length;
+    public static int compareVersions(int[] versionInts1, int[] versionInts2) {
+        int len1 = versionInts1.length;
+        int len2 = versionInts2.length;
         
-        int count = Math.min(l1, l2);
+        int minLen = Math.min(len1, len2);
         
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < minLen; i++) {
             int diff = versionInts1[i] - versionInts2[i];
             
             if (diff != 0) {
@@ -66,9 +66,9 @@ public final class VersionUtils {
             } 
         }
         
-        if (l1 == l2) {
+        if (len1 == len2) {
             return 0;
-        } else if (l1 < l2) {
+        } else if (len1 < len2) {
             return -1;
         } else {
             return 1;
@@ -76,8 +76,7 @@ public final class VersionUtils {
     }
 
     /**
-     * Splits the given string into version integers and returns them
-     * as an int array.
+     * Splits the given string into version integers and returns them as an int array.
      * 
      * @param string the string to parse
      * 

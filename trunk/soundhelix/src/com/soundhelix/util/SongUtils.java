@@ -41,7 +41,7 @@ import com.soundhelix.songnameengine.SongNameEngine;
 
 public final class SongUtils {
     /** The logger. */
-    private static Logger logger = Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
+    private static final Logger LOGGER = Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
 
     /** Flag indicating whether the XML files should be validated against an XSD schema. */
     private static final boolean ENABLE_SCHEMA_VALIDATION = false;
@@ -76,7 +76,7 @@ public final class SongUtils {
                 songNameEngineNode, xpath, randomSeed, -1);
         
         String songName = songNameEngine.createSongName();
-        logger.info("Song name: \"" + songName + "\"");        
+        LOGGER.info("Song name: \"" + songName + "\"");        
         Player player = generateSong(doc, getSongRandomSeed(songName));
         
         // store the song name
@@ -110,7 +110,7 @@ public final class SongUtils {
                 songNameEngineNode, xpath, randomSeed, -1);
         
         String songName = songNameEngine.createSongName();
-        logger.info("Song name: \"" + songName + "\"");        
+        LOGGER.info("Song name: \"" + songName + "\"");        
         Player player = generateSong(doc, getSongRandomSeed(songName));
         
         // store the song name
@@ -138,7 +138,7 @@ public final class SongUtils {
         Node rootNode = (Node) xpath.evaluate("/*", doc, XPathConstants.NODE);        
         checkVersion(rootNode, xpath);
         
-        logger.info("Song name: \"" + songName + "\"");        
+        LOGGER.info("Song name: \"" + songName + "\"");        
         Player player = generateSong(doc, getSongRandomSeed(songName));
 
         // store the song name
@@ -167,7 +167,7 @@ public final class SongUtils {
         Node rootNode = (Node) xpath.evaluate("/*", doc, XPathConstants.NODE);        
         checkVersion(rootNode, xpath);
         
-        logger.info("Song name: \"" + songName + "\"");        
+        LOGGER.info("Song name: \"" + songName + "\"");        
         Player player = generateSong(doc, getSongRandomSeed(songName));
 
         // store the song name
@@ -194,7 +194,7 @@ public final class SongUtils {
     private static Player generateSong(Document doc, long randomSeed)
         throws InstantiationException, XPathException, IllegalAccessException, ClassNotFoundException {
 
-        logger.debug("Rendering new song with random seed " + randomSeed);
+        LOGGER.debug("Rendering new song with random seed " + randomSeed);
         
         XPath xpath = XPathFactory.newInstance().newXPath();
 
@@ -222,8 +222,8 @@ public final class SongUtils {
         Arrangement arrangement = arrangementEngine.render();
         long time = System.nanoTime() - startTime;
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Rendering took " + (time / 1000000) + " ms");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Rendering took " + (time / 1000000) + " ms");
         }
         
         Player player = XMLUtils.getInstance(Player.class, playerNode, xpath, randomSeed, 2);
@@ -246,7 +246,7 @@ public final class SongUtils {
      */
     
     private static Document parseDocument(URL url) throws ParserConfigurationException, SAXException, IOException {
-        logger.debug("Loading XML data from URL \"" + url + "\"");
+        LOGGER.debug("Loading XML data from URL \"" + url + "\"");
         return parseDocument(url.openStream(), url.toExternalForm());
     }
 

@@ -16,7 +16,7 @@ import com.soundhelix.util.HarmonyEngineUtils;
 
 public abstract class AbstractTextRemoteControl implements RemoteControl {
     /** The logger. */
-    private static Logger logger = Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
+    private static final Logger LOGGER = Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
 
     /** The player. */
     private Player player;
@@ -111,7 +111,7 @@ public abstract class AbstractTextRemoteControl implements RemoteControl {
                     Thread.sleep(100);
                 }
             } catch (Exception e) {
-                logger.error("Exception in console thread", e);
+                LOGGER.error("Exception in console thread", e);
             }
         }
     }

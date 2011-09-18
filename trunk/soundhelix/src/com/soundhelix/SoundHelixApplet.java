@@ -57,10 +57,10 @@ public class SoundHelixApplet extends JApplet implements Runnable {
     private static final String DEFAULT_URL = "examples/SoundHelix-Piano.xml";
 
     /** The root logger. */
-    private static Logger rootLogger = Logger.getRootLogger();
+    private static final Logger ROOT_LOGGER = Logger.getRootLogger();
     
     /** The logger. */
-    private static Logger logger = Logger.getLogger(SoundHelixApplet.class);
+    private static final Logger LOGGER = Logger.getLogger(SoundHelixApplet.class);
 
     /** The desktop. */
     private Desktop desktop;
@@ -260,7 +260,7 @@ public class SoundHelixApplet extends JApplet implements Runnable {
                             
                             desktop.browse(new URI(url));
                         } catch (Exception e2) {
-                            logger.error("Exception", e2);
+                            LOGGER.error("Exception", e2);
                         }
                     }
                 }
@@ -429,7 +429,7 @@ public class SoundHelixApplet extends JApplet implements Runnable {
                     player.close();
                 }
             } catch (Exception e) {
-                logger.debug("Exception occurred", e);
+                LOGGER.debug("Exception occurred", e);
                 
                 try {
                     Thread.sleep(3000);
@@ -446,13 +446,13 @@ public class SoundHelixApplet extends JApplet implements Runnable {
         if (isInvisible) {
             // use the default appender; if used in a webbrowser, this won't be visible; it might be visible if an
             // applet viewer is used
-            rootLogger.setLevel(Level.DEBUG);
+            ROOT_LOGGER.setLevel(Level.DEBUG);
         } else {
             Layout layout = new PatternLayout("%d{ISO8601} %-5p [%t] %c{1}: %m%n");
             Appender consoleAppender = new TextRemoteControlAppender(layout, remoteControl);
-            rootLogger.removeAllAppenders();
-            rootLogger.addAppender(consoleAppender);
-            rootLogger.setLevel(Level.DEBUG);
+            ROOT_LOGGER.removeAllAppenders();
+            ROOT_LOGGER.addAppender(consoleAppender);
+            ROOT_LOGGER.setLevel(Level.DEBUG);
         }
     }
     

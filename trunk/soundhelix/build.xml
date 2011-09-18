@@ -62,7 +62,7 @@
 	
     <target name="compile" depends="init,-createBuildConstants" description="compile the source">
         <mkdir dir="${build}"/>
-        <javac encoding="UTF-8" classpath="${classpath}" destdir="${build}" debug="yes" target="1.5">
+        <javac encoding="UTF-8" classpath="${classpath}" destdir="${build}" debug="yes" target="1.6">
             <src path="${tmpsrc}"/>
             <src path="${src}"/>
             <include name="**/*.java"/>

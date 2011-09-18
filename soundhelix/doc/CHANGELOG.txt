@@ -23,18 +23,18 @@ Change log
       priority if both tags are present.
       
     - Added "minimizeChordDistance" tag to the PatternHarmonyEngine. If set to true, all chords will be rotated so that
-      their middle pitch is as close as possible to the first chord's middle pitch. This possibly involves changing the inversion
-      type of the chords. Example: if you use "Am/4,C/4", this will effectively be converted to "Am/4,C6/4", which leaves the
-      middle pitch at "c" for both chords. Defaults to true, as this was always done in previous versions. This can be "undone" by
-      by setting "normalizeChords" to "true" in the SequenceEngines where you would like to only use the non-inverted versions
-      of the chords.
+      their middle pitch is as close as possible to the first chord's middle pitch. This involves changing the inversion
+      type of the chords, if needed. Example: if you use "Am/4,C/4", this will effectively be converted to "Am/4,C6/4",
+      which leaves the middle pitch at "c" for both chords. Defaults to true, as this was always done in previous
+      versions. This can be "undone" by setting "normalizeChords" to "true" in the SequenceEngines where you would like
+      to only use the non-inverted versions of the chords.
     
     - Added CrescendoPatternEngine. This lets you generate a pattern from repeated pattern parts while changing the
       velocity so that a crescendo or decrescendo is created. Comes in handy for the DrumSequenceEngine.
 
     - Added applet parameters "url" (sets the SoundHelix XML document URL) and "invisible" (hides all controls and
       logging if set to "true", which is nice for embedding the applet into a webpage). Please see the documentation
-      about how to use the applet in your webpage.
+      about how to use the applet.
 
     - Added "beforePlayCommands" and "afterPlayCommands" to the MidiPlayer. This allows running external commands before
       playing a song and after playing a song, respectively. For the former, the commands are run before waiting the
@@ -43,8 +43,8 @@ Change log
 
     - Added "skip" command to the remote control (usable in the console and the applet), which lets to you skip playing
       to the specified tick, to the specified tick percentage, to the start of the given chord section number or to the
-      start of the next chord section during playback (type "help" in the console to see the syntaxes). Added skipping support
-      to the MidiPlayer.
+      start of the next chord section during playback (type "help" in the console to see the different syntaxes). Added
+      skipping support to the MidiPlayer.
       
     - Fixed bug in the velocity generation of the RandomPatternEngine if the minimum and maximum pitch is the same.
 

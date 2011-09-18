@@ -355,12 +355,12 @@ public final class SongUtils {
                 // strip off "+" character
                 version = version.substring(0, version.length() - 1);
                 
-                if (VersionUtils.compareTo(BuildConstants.VERSION, version) < 0) {
+                if (VersionUtils.compareVersions(BuildConstants.VERSION, version) < 0) {
                     throw new RuntimeException("Document requires at least version " + version
                             + ", but application version is " + BuildConstants.VERSION);
                 }        
             } else {            
-                if (VersionUtils.compareTo(BuildConstants.VERSION, version) != 0) {
+                if (VersionUtils.compareVersions(BuildConstants.VERSION, version) != 0) {
                     throw new RuntimeException("Document requires exactly version " + version
                             + ", but application version is " + BuildConstants.VERSION);
                 }

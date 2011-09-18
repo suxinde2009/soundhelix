@@ -491,7 +491,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         
         if (logger.isDebugEnabled()) {
             logger.debug("Fulfilled constraints in " + ((end - startTime) / 1000000L) + " ms. Iterations: " + iterations
-                    + " (" + ((end - startTime) / iterations) + " ns/iteration), violations: " + violations
+                    + " (" + (iterations * 1000000000L / (end - startTime)) + " iterations/s), violations: " + violations
                     + ", backtrack steps: " + backtracks);
         }
         

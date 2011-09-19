@@ -322,7 +322,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
                 }
             }
                 
-            sb.append(nextSection ? "+" : "").append(chord).append('/').append(length);
+            sb.append(nextSection ? "+" : "").append(chord).append('/').append(spec[1]);
             prevChord = chord;
 
             if (i == 0) {

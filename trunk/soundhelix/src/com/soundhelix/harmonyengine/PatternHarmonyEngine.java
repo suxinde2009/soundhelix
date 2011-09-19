@@ -47,6 +47,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
     /** Boolean indicating whether chord distances should be minimized. */
     private boolean isMinimizeChordDistance = true;
     
+    /** Pattern for arbitrary chords ("pitch1:pitch2:pitch3"). */
     private static final Pattern genericPattern = Pattern.compile("^(-?\\d+):(-?\\d+):(-?\\d+)$");
     
     /** The random generator. */
@@ -123,59 +124,51 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
         while (tick < ticks) {
             String[] p = c[pos % c.length].split("/");
 
-            boolean newSection = false;
+            int len = (int) (Double.parseDouble(p[1]) * (double) structure.getTicksPerBeat() + 0.5);
             
-            int len = (int) (Integer.parseInt(p[1]) * structure.getTicksPerBeat());
+            String chordString = p[0];
             
-            String cho = p[0];
-            
-            if (cho.startsWith("+")) {
-                newSection = true;
+            if (chordString.startsWith("+")) {
                 if (sTicks > 0) {
                     sectionVector.add(sTicks);
                 }
-                cho = cho.substring(1);
+                chordString = chordString.substring(1);
                 sTicks = 0;
-            } else {
-                newSection = false;
             }
             
-            int pitch;
-            Chord ch;
-
-            Matcher m = genericPattern.matcher(cho);
+            Matcher m = genericPattern.matcher(chordString);
+            Chord chord;
             
             if (m.matches()) {
                 int p1 = Integer.parseInt(m.group(1));
                 int p2 = Integer.parseInt(m.group(2));
                 int p3 = Integer.parseInt(m.group(3));
 
-                ch = new Chord(p1, p2, p3);
+                chord = new Chord(p1, p2, p3);
             } else {
-                ch = Chord.getChordFromName(cho);
+                chord = Chord.getChordFromName(chordString);
                 
-                if (ch == null) {
-                    throw new RuntimeException("Invalid chord name " + cho);
+                if (chord == null) {
+                    throw new RuntimeException("Invalid chord name " + chordString);
                 }
             }
                 
             if (firstChord == null) {
-                firstChord = ch;
+                firstChord = chord;
             }
             
             if (isMinimizeChordDistance) {
-                ch = ch.findChordClosestTo(firstChord);
+                chord = chord.findChordClosestTo(firstChord);
             }
             
             for (int j = 0; j < len && tick < ticks; j++) {
                 chordTicks[tick] = tick + len - j >= ticks ? ticks - tick : len - j;
-                chords[tick] = ch;
+                chords[tick] = chord;
                 tick++;
                 sTicks++;
             }
             
-            previousChord = ch;
-            
+            previousChord = chord;            
             pos++;
         }
 
@@ -275,7 +268,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
             }
             
             String chord;
-            int length = Integer.parseInt(spec[1]);
+            double length = Double.parseDouble(spec[1]);
             
             Matcher m = genericPattern.matcher(spec[0]);
             

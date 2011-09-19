@@ -124,7 +124,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
         while (tick < ticks) {
             String[] p = c[pos % c.length].split("/");
 
-            int len = (int) (Double.parseDouble(p[1]) * (double) structure.getTicksPerBeat() + 0.5);
+            int len = (int) (Double.parseDouble(p[1]) * (double) structure.getTicksPerBeat() + 0.5d);
             
             String chordString = p[0];
             

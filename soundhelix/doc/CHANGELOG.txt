@@ -16,6 +16,10 @@ Change log
       inversion). Arbitrary chords can be provided with the syntax "pitch1:pitch2:pitch3". For example, "-7:-3:3" gives you the
       non-standard chord using the pitches F, A and e.
 
+    - Chord lengths in the PatternHarmonyEngine can now be specified as fractions of beats instead of only whole beats
+      (e.g., you can now use "Am/7.5" for a chord that lasts 7.5 beats). Chord lengths are rounded to the nearest integer number
+      of ticks.  
+	  
     - Renamed the tag "obeyChordSubtype" (false/true) to "normalizeChords" (true/false). Normalizing a chord means converting
       chords with first or second inversion (e.g., "Am4" or "Am6") to their normalized counterpart ("Am"), which has the root
       note at its low pitch. Note that only minor, major and diminished chords are normalized if this is on, all other chords

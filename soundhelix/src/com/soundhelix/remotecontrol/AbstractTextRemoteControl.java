@@ -41,12 +41,12 @@ public abstract class AbstractTextRemoteControl implements RemoteControl {
 
                             player.setMilliBPM((int) (1000 * Double.parseDouble(line.substring(4))));
                         }
-                    } else if (line.startsWith("skip ")) {
+                    } else if (line.startsWith("skip ") || line.equals("+")) {
                         int tick;
                         if (line.endsWith("%")) {
                             double percentage = Double.parseDouble(line.substring(5, line.length() - 1));
                             tick = (int) (percentage * player.getArrangement().getStructure().getTicks() / 100d);
-                        } else if (line.substring(5).equals("+")) {
+                        } else if (line.equals("+") || line.substring(5).equals("+")) {
                             tick = player.getCurrentTick();
                             if (tick >= 0) {
                                 tick += player.getArrangement().getStructure().getHarmonyEngine().
@@ -96,7 +96,7 @@ public abstract class AbstractTextRemoteControl implements RemoteControl {
                         writeLine("skip <value>            Skips to the specified tick. Example: \"skip 1000\"");
                         writeLine("skip <value>%           Skips to the specified tick percentage. Example: \"skip 50%\"");
                         writeLine("skip #<value>           Skips to the first tick of the specified chord section. Example: \"skip #3\"");
-                        writeLine("skip +                  Skips to the first tick of the next chord section. Example: \"skip +\"");
+                        writeLine("skip +                  Skips to the first tick of the next chord section. Example: \"skip +\". Short form: \"+\"");
                         writeLine("transposition <value>   Sets the transposition. Example: \"transposition 70\"");
                         writeLine("groove <value>          Sets the groove. Example: \"groove 130,70\"");
                         writeLine("next                    Aborts playing and starts the next song. Example: \"next\"");

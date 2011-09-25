@@ -628,6 +628,8 @@ public class MidiPlayer extends AbstractPlayer {
             
             legatoList.clear();
             
+            // send all NOTE_OFFs where no legato is used and remember legato pitches
+            
             for (int j = 0; j < t.length; j++) {
 
                 if (--t[j] <= 0) {
@@ -649,6 +651,8 @@ public class MidiPlayer extends AbstractPlayer {
                 }
             }
 
+            // send all NOTE_ONs
+
             for (int j = 0; j < t.length; j++) {
                 if (t[j] <= 0) {
                     try {
@@ -658,11 +662,6 @@ public class MidiPlayer extends AbstractPlayer {
                         if (se.isNote()) {
                             int pitch = (track.getType() == TrackType.MELODY ? transposition : 0) + se.getPitch();
                             sendMidiMessage(channel, ShortMessage.NOTE_ON, pitch, getMidiVelocity(se.getVelocity()));
-
-                            // remove pitch if it is on the legato list (rare case)
-                            // (Integer) must be used to call the remove(Object), and not remove(int) method
-                            legatoList.remove((Integer) pitch);
-
                             pitches[j] = pitch;
                         }
 

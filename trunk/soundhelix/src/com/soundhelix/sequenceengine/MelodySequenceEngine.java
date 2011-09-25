@@ -82,7 +82,7 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
                     if (entry.isPause()) {
                         seq.addPause(l);
                     } else {
-                        seq.addNote(entry.getPitch(), l);
+                        seq.addNote(entry.getPitch(), l, entry.getVelocity(), entry.isLegato());
                     }
                 } else {
                     seq.addPause(l);

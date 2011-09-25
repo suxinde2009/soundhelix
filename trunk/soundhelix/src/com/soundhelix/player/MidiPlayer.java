@@ -931,6 +931,11 @@ public class MidiPlayer extends AbstractPlayer {
      */
     
     public final void muteAllChannels() throws InvalidMidiDataException {
+        if (!opened) {
+            // this method can be called externally; ignore call if not open
+            return;
+        }
+        
         Iterator<DeviceChannel> iter = channelMap.values().iterator();
         
         while (iter.hasNext()) {

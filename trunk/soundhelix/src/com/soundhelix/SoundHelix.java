@@ -223,6 +223,8 @@ public class SoundHelix implements Runnable {
         }
         
         public void run() {
+            logger.trace("Starting shutdown hook");
+            
             try {
                 // FIXME: this is a quick and dirty solution
                 
@@ -234,10 +236,14 @@ public class SoundHelix implements Runnable {
                 // so the player may be using already closed resources.
                 
                 if (player instanceof MidiPlayer) {
+                    logger.trace("Muting all MIDI channels");
                     ((MidiPlayer) player).muteAllChannels();
                 }
-            } catch (Exception e) {
+            } catch (Throwable e) {
+                logger.error("Exception during shutdoown hook", e);
             }
+
+            logger.trace("Finished shutdown hook");
         }
     }
 }

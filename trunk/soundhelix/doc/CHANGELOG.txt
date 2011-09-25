@@ -49,8 +49,13 @@ Change log
       to the specified tick, to the specified tick percentage, to the start of the given chord section number or to the
       start of the next chord section during playback (type "help" in the console to see the different syntaxes). Added
       skipping support to the MidiPlayer.
+
+    - The MelodySequenceEngine did not take velocity and legato flag into account. Fixed.
       
     - Fixed bug in the velocity generation of the RandomPatternEngine if the minimum and maximum pitch is the same.
+
+    - Fixed bug in the MidiPlayer where a NOTE_OFF for a legato pitch was skipped if the same pitch was used as in the
+      following note (e.g., "0~/4,0/4").
 
 
 0.2: 2011-07-31

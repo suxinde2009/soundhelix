@@ -36,7 +36,7 @@ public class Pattern implements Iterable<PatternEntry> {
     }
 
     public static Pattern parseString(String patternString, String wildcardString) {
-        if (patternString == null) {
+        if (patternString == null || patternString.equals("")) {
             return null;
         }
         

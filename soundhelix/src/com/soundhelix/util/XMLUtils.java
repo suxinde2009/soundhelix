@@ -345,8 +345,8 @@ public final class XMLUtils {
             try {
                 String s = (String) xpath.evaluate("attribute::list", n, XPathConstants.STRING);
 
-                if (s == null || s.equals("")) {
-                    throw new RuntimeException("Attribute \"list\" is empty");
+                if (s == null) {
+                    throw new RuntimeException("Attribute \"list\" is undefined");
                 }
 
                 String[] str = StringUtils.split(s, '|');

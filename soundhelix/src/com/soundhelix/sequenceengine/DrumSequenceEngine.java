@@ -13,12 +13,13 @@ import org.w3c.dom.NodeList;
 import com.soundhelix.harmonyengine.HarmonyEngine;
 import com.soundhelix.misc.ActivityVector;
 import com.soundhelix.misc.Pattern;
-import com.soundhelix.misc.Structure;
 import com.soundhelix.misc.Pattern.PatternEntry;
 import com.soundhelix.misc.Sequence;
+import com.soundhelix.misc.Structure;
 import com.soundhelix.misc.Track;
 import com.soundhelix.misc.Track.TrackType;
 import com.soundhelix.patternengine.PatternEngine;
+import com.soundhelix.util.HarmonyEngineUtils;
 import com.soundhelix.util.RandomUtils;
 import com.soundhelix.util.XMLUtils;
 
@@ -138,77 +139,105 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
     private void processConditionalPatterns(ActivityVector[] activityVectors, Sequence[] seqs, Structure structure) {
         HarmonyEngine harmonyEngine = structure.getHarmonyEngine();
         int ticks = structure.getTicks();
+        int chordSections = HarmonyEngineUtils.getChordSectionCount(structure);
         int conditionalEntryCount = conditionalEntries.length;
 
         // the tick where each pattern was applied last (last tick of the pattern + 1), initially 0
         // (used to avoid overlapping application of patterns)
         int[] lastMatchedTick = new int[conditionalEntryCount];
 
-        // start with the second chord section
-        int tick = harmonyEngine.getChordSectionTicks(0);
-
-        // get the activity string of the first chord section
-        String previousActivity = getActivityString(0, activityVectors);
-
+        // get all chord section activities
+        
+        String[] chordSectionActivity = new String[chordSections];
+        int tick = 0;
+        int x = 0;
+        
         while (tick < ticks) {
-            String activity = getActivityString(tick, activityVectors);
-            String totalActivity = previousActivity + activity; 
+            chordSectionActivity[x++] = getActivityString(tick, activityVectors);
+            tick += harmonyEngine.getChordSectionTicks(tick);
+        }
+        
+        // start with the second chord section
+        tick = harmonyEngine.getChordSectionTicks(0);
+        int chordSection = 1;
+        
+        while (tick < ticks) {
+            String activity = chordSectionActivity[chordSection];
 
             for (int i = 0; i < conditionalEntryCount; i++) {
                 Pattern pattern = conditionalEntries[i].pattern;
                 int patternTicks = pattern.getTicks();
                 double probability = conditionalEntries[i].probability;
-                java.util.regex.Pattern condition = conditionalEntries[i].condition;
+                java.util.regex.Pattern preCondition = conditionalEntries[i].preCondition;
+                java.util.regex.Pattern postCondition = conditionalEntries[i].postCondition;
 
-                if (condition.matcher(totalActivity).matches()) {
-                    if (tick - patternTicks >= lastMatchedTick[i] && RandomUtils.getBoolean(random, probability)) {
-                        // all conditions met, apply pattern
+                if (tick - patternTicks >= 0 && postCondition.matcher(activity).matches()) {
+                    // check if all chord section boundaries crossed by the pattern (including the current one)
+                    // fulfill the precondition
+                    
+                    int mtick = tick - patternTicks;
+                    int cs = HarmonyEngineUtils.getChordSectionNumber(structure, mtick);
+                    boolean preConditionMatched = true;
+                    
+                    while (mtick < tick && preConditionMatched) {
+                        mtick += harmonyEngine.getChordSectionTicks(mtick);
+                        if (!preCondition.matcher(chordSectionActivity[cs]).matches()) {
+                            preConditionMatched = false;
+                            break;
+                        }
+                        cs++;
+                    }
 
-                        // jump back to where the pattern will start
-                        tick -= patternTicks;
+                    if (preConditionMatched) {
+                        if (tick - patternTicks >= lastMatchedTick[i] && RandomUtils.getBoolean(random, probability)) {
+                            // all conditions met, apply pattern
 
-                        int[] targets = conditionalEntries[i].targets;
-                        int mode = conditionalEntries[i].mode;
+                            // jump back to where the pattern will start
+                            tick -= patternTicks;
 
-                        logger.debug("Applying conditional pattern " + i + " with length " + patternTicks
-                                + " for targets " + Arrays.toString(targets) + " at ticks " + tick + "-"
-                                + (tick + patternTicks - 1));
+                            int[] targets = conditionalEntries[i].targets;
+                            int mode = conditionalEntries[i].mode;
 
-                        int len = pattern.size();
+                            logger.debug("Applying conditional pattern " + i + " with length " + patternTicks
+                                    + " for targets " + Arrays.toString(targets) + " at ticks " + tick + "-"
+                                    + (tick + patternTicks - 1));
 
-                        for (int k = 0; k < len; k++) {
-                            PatternEntry entry = pattern.get(k);
+                            int len = pattern.size();
 
-                            for (int j = 0; j < targets.length; j++) {
-                                Sequence seq = seqs[targets[j]];
-                                int basePitch = drumEntries[targets[j]].pitch;
+                            for (int k = 0; k < len; k++) {
+                                PatternEntry entry = pattern.get(k);
 
-                                if (entry.isNote()) {
-                                    seq.replaceEntry(tick, new Sequence.SequenceEntry(basePitch + entry.getPitch(),
-                                            entry.getVelocity(), entry.getTicks(), entry.isLegato()));
-                                } else if (mode == MODE_REPLACE) {
-                                    seq.replaceEntry(tick, new Sequence.SequenceEntry(Integer.MIN_VALUE, (short) -1,
-                                            entry.getTicks(), entry.isLegato()));
+                                for (int j = 0; j < targets.length; j++) {
+                                    Sequence seq = seqs[targets[j]];
+                                    int basePitch = drumEntries[targets[j]].pitch;
+
+                                    if (entry.isNote()) {
+                                        seq.replaceEntry(tick, new Sequence.SequenceEntry(basePitch + entry.getPitch(),
+                                                entry.getVelocity(), entry.getTicks(), entry.isLegato()));
+                                    } else if (mode == MODE_REPLACE) {
+                                        seq.replaceEntry(tick, new Sequence.SequenceEntry(Integer.MIN_VALUE, (short) -1,
+                                                entry.getTicks(), entry.isLegato()));
+                                    }
                                 }
+
+                                tick += entry.getTicks();
                             }
 
-                            tick += entry.getTicks();
+                            lastMatchedTick[i] = tick;
+
+                            i += conditionalEntries[i].skipWhenApplied;
+                        } else {
+                            // either the pattern would have overlapped or the random generator didn't agree to apply
+                            // the pattern
+
+                            i += conditionalEntries[i].skipWhenNotApplied;
                         }
-
-                        lastMatchedTick[i] = tick;
-
-                        i += conditionalEntries[i].skipWhenApplied;
-                    } else {
-                        // either the pattern would have overlapped or the random generator didn't agree to apply the
-                        // pattern
-                        
-                        i += conditionalEntries[i].skipWhenNotApplied;
                     }
                 }
             }
 
             tick += harmonyEngine.getChordSectionTicks(tick);
-            previousActivity = activity;
+            chordSection++;
         }
     }
     
@@ -288,8 +317,11 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
             }
 
             String conditionString = XMLUtils.parseString(random, "condition", nodeList.item(i), xpath);
-            conditionString = conditionString.replaceAll(">", "").replaceAll(",", "|").replaceAll("-", ".");
-            java.util.regex.Pattern condition = java.util.regex.Pattern.compile(conditionString);
+            String[] conditions = conditionString.split(">");
+            conditions[0] = conditions[0].replaceAll(",", "|").replaceAll("-", ".");
+            conditions[1] = conditions[1].replaceAll(",", "|").replaceAll("-", ".");
+            java.util.regex.Pattern preCondition = java.util.regex.Pattern.compile(conditions[0]);
+            java.util.regex.Pattern postCondition = java.util.regex.Pattern.compile(conditions[1]);
             
             String modeString = XMLUtils.parseString(random, "mode", nodeList.item(i), xpath);
             int mode;
@@ -339,8 +371,8 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
 
             Pattern pattern = patternEngine.render("");
             
-            conditionalEntries[i] = new ConditionalEntry(pattern, condition, mode, targets, probability,
-                    skipWhenApplied, skipWhenNotApplied);
+            conditionalEntries[i] = new ConditionalEntry(pattern, preCondition, postCondition, mode, targets,
+                    probability, skipWhenApplied, skipWhenNotApplied);
         }
         
         setConditionalEntries(conditionalEntries);
@@ -358,17 +390,20 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
     
     private static final class ConditionalEntry {
         private final Pattern pattern;
-        private final java.util.regex.Pattern condition;
+        private final java.util.regex.Pattern preCondition;
+        private final java.util.regex.Pattern postCondition;
         private final int mode;
         private final int[] targets;
         private final double probability;
         private final int skipWhenApplied;
         private final int skipWhenNotApplied;
         
-        private ConditionalEntry(Pattern pattern, java.util.regex.Pattern condition, int mode, int[] targets,
+        private ConditionalEntry(Pattern pattern, java.util.regex.Pattern preCondition,
+                                 java.util.regex.Pattern postCondition, int mode, int[] targets,
                                  double probability, int skipWhenApplied, int skipWhenNotApplied) {
             this.pattern = pattern;
-            this.condition = condition;
+            this.preCondition = preCondition;
+            this.postCondition = postCondition;
             this.mode = mode;
             this.targets = targets;
             this.probability = probability;

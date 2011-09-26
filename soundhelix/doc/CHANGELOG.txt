@@ -36,6 +36,9 @@ Change log
     - Added CrescendoPatternEngine. This lets you generate a pattern from repeated pattern parts while changing the
       velocity so that a crescendo or decrescendo is created. Comes in handy for the DrumSequenceEngine.
 
+    - Improved the DrumSequenceEngine to also check the precondition of conditional patterns for all chord section boundaries
+      crossed by the pattern. 
+
     - Added applet parameters "url" (sets the SoundHelix XML document URL) and "invisible" (hides all controls and
       logging if set to "true", which is nice for embedding the applet into a webpage). Please see the documentation
       about how to use the applet.

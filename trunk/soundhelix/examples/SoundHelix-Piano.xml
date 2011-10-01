@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-<SoundHelix version="0.2+" xmlns:xi="http://www.w3.org/2001/XInclude">
+<SoundHelix version="0.3+" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <!-- Example XML file for SoundHelix. Author: Thomas Schuerger. -->
   <xi:include href="../includes/Standard-SongNameEngine.xml"/>
   <structure>
      <bars><random min="96" max="192" step="16"/></bars> 
@@ -17,10 +18,12 @@
     <activityVector name="accomp">
       <stopShift>-2</stopShift>
       <minActive>10</minActive>
+      <minSegmentLength>2</minSegmentLength>
     </activityVector>
     <activityVector name="arpeggio">
       <minActive>15</minActive>
       <maxActive>65</maxActive>
+      <minSegmentLength>2</minSegmentLength>
     </activityVector>
     <activityVector name="melody">
       <startAfterSection>3</startAfterSection>
@@ -39,6 +42,8 @@
       <stopAfterSection>3</stopAfterSection>
       <minActive>50</minActive>
       <maxActive>85</maxActive>
+      <minSegmentLength>2</minSegmentLength>
+      <maxPauseLength>5</maxPauseLength>
       <minSegmentCount>2</minSegmentCount>
       <maxSegmentCount>4</maxSegmentCount>
     </activityVector>
@@ -47,21 +52,25 @@
       <stopBeforeSection>0</stopBeforeSection>
       <minActive>40</minActive>
       <maxActive>85</maxActive>
+      <minSegmentLength>2</minSegmentLength>
     </activityVector>
     <activityVector name="pad">
       <minActive>10</minActive>
       <maxActive>70</maxActive>
+      <minSegmentLength>2</minSegmentLength>
     </activityVector>
     <activityVector name="bass">
       <startAfterSection>0</startAfterSection>
       <minActive>15</minActive>
       <maxActive>80</maxActive>
+      <minSegmentLength>2</minSegmentLength>
     </activityVector>
     <activityVector name="randombass">
       <startAfterSection>1</startAfterSection>
       <stopBeforeSection>0</stopBeforeSection>
       <minActive>15</minActive>
       <maxActive>80</maxActive>
+      <minSegmentLength>2</minSegmentLength>
     </activityVector>
     <activityVector name="plonk"/>
     <activityVector name="chord"/>
@@ -70,7 +79,7 @@
       <instrument>arpeggio</instrument>
       <transposition>-12</transposition>
       <sequenceEngine class="ArpeggioSequenceEngine">
-        <obeyChordSubtype>true</obeyChordSubtype>
+        <normalizeChords>false</normalizeChords>
         <obeyChordSections>true</obeyChordSections>
         <patternEngines>
           <patternEngine class="StringPatternEngine">
@@ -122,7 +131,7 @@
       <instrument>arpeggio</instrument>
       <transposition>-12</transposition>
       <sequenceEngine class="MultiPatternSequenceEngine">
-          <obeyChordSubtype>true</obeyChordSubtype>
+          <normalizeChords>false</normalizeChords>
         <patternEngines>
           <patternEngine class="StringPatternEngine">
             <string>-/6,4/2</string>
@@ -228,7 +237,7 @@
           <pitch>36</pitch>
           <patternEngine class="RandomFragmentPatternEngine">
             <patternTicks>16</patternTicks>
-            <patternString>A1,B1,A1,B2,A1,B1,A1,B3</patternString>
+            <patternString><random list="A1,B1,A1,B2,A1,B1,A1,B3|A1,A1,A1,B1,A1,A1,A1,B2,A1,A1,A1,B1,A1,A1,A1,B3"/></patternString>
             <pattern group="A">0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-</pattern>
             <pattern group="B">0,-,-,0,-,-,-,-,0,-,-,-,-,-,-,-|0,-,-,-,-,-,-,-,0,-,-,-,-,-,0,-|0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,0|0,-,-,-,-,-,-,-,0,-,-,-,-,-,0,0</pattern>
           </patternEngine>
@@ -265,8 +274,12 @@
           <condition>0---&gt;1---</condition>
           <mode>replace</mode>
           <probability>40</probability>
-          <patternEngine class="StringPatternEngine">
-            <string><random list="0:6,0:32,0:89,0:182,0:317,0:499,0:734,0:1024,0:1375,0:1789,0:2271,0:2822,0:3447,0:4149,0:4930,0:5793,0:6741,0:7776,0:8901,0:10119,0:11432,0:12842,0:14351,0:15962,0:17677,0:19498,0:21427,0:23467,0:25618,0:27884,0:30266,0:32767|0:1,0:6,0:16,0:32,0:56,0:89,0:130,0:182,0:243,0:317,0:402,0:499,0:610,0:734,0:872,0:1024,0:1192,0:1375,0:1574,0:1789,0:2021,0:2271,0:2537,0:2822,0:3125,0:3447,0:3788,0:4149,0:4529,0:4930,0:5351,0:5793,0:6256,0:6741,0:7247,0:7776,0:8327,0:8901,0:9499,0:10119,0:10763,0:11432,0:12124,0:12842,0:13584,0:14351,0:15144,0:15962,0:16806,0:17677,0:18574,0:19498,0:20449,0:21427,0:22433,0:23467,0:24528,0:25618,0:26737,0:27884,0:29061,0:30266,0:31502,0:32767"/></string>
+          <patternEngine class="CrescendoPatternEngine">
+            <patternTicks><random list="32|64|128"/></patternTicks>
+            <minVelocity>1</minVelocity>
+            <maxVelocity>32767</maxVelocity>
+            <velocityExponent>2</velocityExponent>
+            <pattern><random list="0/1|0/1:32767,0/1:24000"/></pattern>
           </patternEngine>
         </conditionalPattern>
         <conditionalPattern>
@@ -360,11 +373,11 @@
   
   <player class="MidiPlayer">
     <bpm><random min="120" max="140" type="normal" variance="7"/></bpm>
-    <transposition><random min="64" max="68"/></transposition>
+    <transposition><random min="65" max="69"/></transposition>
     <beforePlayWaitTicks>0</beforePlayWaitTicks>
     <afterPlayWaitTicks>16</afterPlayWaitTicks>
     <groove><random list="100|110,90|115,85|125,75,115,85"/></groove>
-    <device name="device1" clockSynchronization="true">Microsoft GS Wavetable Synth,Microsoft GS Wavetable SW Synth,Java Sound Synthesizer,Gervill</device>
+    <device name="device1" clockSynchronization="true">Microsoft GS Wavetable Synth,Microsoft GS Wavetable SW Synth,Gervill,Java Sound Synthesizer</device>
     <map instrument="arpeggio" device="device1" channel="1" program="1"/>
     <map instrument="accomp" device="device1" channel="2" program="1"/>
     <map instrument="melody" device="device1" channel="3" program="2"/>

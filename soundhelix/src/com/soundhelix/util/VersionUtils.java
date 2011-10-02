@@ -39,7 +39,7 @@ public final class VersionUtils {
         int[] versionInts1 = parseVersionString(version1);
         int[] versionInts2 = parseVersionString(version2);
         
-        return compareVersions(versionInts1, versionInts2);        
+        return compareVersions(versionInts1, versionInts2);
     }
     
     /**
@@ -76,7 +76,13 @@ public final class VersionUtils {
     }
 
     /**
-     * Splits the given string into version integers and returns them as an int array.
+     * Splits the given string into version integers and returns them as an int array. If the version string ends
+     * with "u" (meaning unreleased), the "u" is chopped off and the remaining version is used. Otherwise, an
+     * artificial ".0" is appended to the version. This will make unreleased versions (e.g., "0.3u", which is converted
+     * to "0.3") smaller than released versions (e.g., "0.3", which is converted to "0.3.0").
+     * 
+     * The returned int array should not be interpreted in any way other than feeding it into compareVersions(). This
+     * will allow for more extended version syntaxes in the future (alpha, beta, release candidates, etc.).
      * 
      * @param string the string to parse
      * 
@@ -84,6 +90,14 @@ public final class VersionUtils {
      */
     
     private static int[] parseVersionString(String string) {
+        if (string.endsWith("u")) {
+            // chop off "u"
+            string = string.substring(0, string.length() - 1);
+        } else {
+            // add artificial ".0" to the version
+            string = string + ".0";
+        }
+        
         String[] components = string.split("\\.");
         
         int count = components.length;

@@ -7,6 +7,11 @@ Author: Thomas Schürger (thomas@schuerger.com)
 Change log
 ----------
 
+0.4u: unreleased
+
+    - Added support for unreleased versions (e.g., "0.4u", which is considered to be smaller than "0.4").
+
+
 0.3: 2011-10-01
 
     - Rewrote the internals of the chord functionality and adapted all code accordingly. Now not only major and minor chords

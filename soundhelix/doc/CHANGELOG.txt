@@ -15,6 +15,9 @@ Change log
     - Added support for specifying a minimizeChordDistance attribute per chordPattern tag in the PatternHarmonyEngine. This attribute
       allows you to override the global minimizeChordDistance value if you set it.
 
+    - Corrected the legato fix from the previous release, which lead to the note being immediately cut off if the legato flag was
+      used with the same pitch (e.g., "0~/4,0/4"). This situation is now treated as if the legato flag were off.
+
 
 0.3: 2011-10-01
 

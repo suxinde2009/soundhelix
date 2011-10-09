@@ -41,7 +41,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
     private int[] chordTicks;
     private int[] sectionTicks;
     
-    private String[] chordPatterns;
+    private ChordPattern[] chordPatterns;
     private String[][] chordRandomTables;
     
     /** Boolean indicating whether chord distances should be minimized. */
@@ -100,7 +100,8 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
         chordTicks = new int[ticks];
         sectionTicks = new int[ticks];
         
-        String pat = createPattern();
+        ChordPattern chordPattern = createPattern();
+        String pat = chordPattern.chordPattern;
         
         // prepend a '+' sign, if not already present
         
@@ -156,8 +157,11 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
             if (firstChord == null) {
                 firstChord = chord;
             }
+
+            // use override for minimizeChordDistance, if provided, otherwise use global minimizeChordDistance value
             
-            if (isMinimizeChordDistance) {
+            if (chordPattern.minimizeChordDistance == 1
+                    || chordPattern.minimizeChordDistance == -1 && isMinimizeChordDistance) {
                 chord = chord.findChordClosestTo(firstChord);
             }
             
@@ -216,7 +220,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
         }
     }
 
-    public void setChordPatterns(String[] chordPatterns) {
+    public void setChordPatterns(ChordPattern[] chordPatterns) {
         if (chordPatterns == null || chordPatterns.length == 0) {
             throw new IllegalArgumentException("Need at least 1 chord pattern");
         }
@@ -238,11 +242,12 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
      * @return a pattern
      */
     
-    private String createPattern() {
-        StringBuilder sb = new StringBuilder(80);
+    private ChordPattern createPattern() {
+        StringBuilder sb = new StringBuilder();
         
         // choose a chord pattern at random
-        String[] chords = chordPatterns[random.nextInt(chordPatterns.length)].split(",");
+        ChordPattern chordPattern = chordPatterns[random.nextInt(chordPatterns.length)];
+        String[] chords = chordPattern.chordPattern.split(",");
         
         int count = chords.length;
         
@@ -332,17 +337,26 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
             chordList.add(chord);            
         }
         
-        return sb.toString();    
+        // create a new ChordPattern containing the random chord table replacement result
+        return new ChordPattern(sb.toString(), chordPattern.minimizeChordDistance);
     }
     
     public void configure(Node node, XPath xpath) throws XPathException {        
         random = new Random(randomSeed);
 
         NodeList nodeList = (NodeList) xpath.evaluate("chordPattern", node, XPathConstants.NODESET);
-        String[] chordPatterns = new String[nodeList.getLength()];
+        ChordPattern[] chordPatterns = new ChordPattern[nodeList.getLength()];
         
         for (int i = 0; i < nodeList.getLength(); i++) {
-            chordPatterns[i] = XMLUtils.parseString(random, nodeList.item(i), xpath);
+            String pattern =  XMLUtils.parseString(random, nodeList.item(i), xpath);
+            int minimizeChordDistance = -1;
+            
+            try {
+                boolean b =  XMLUtils.parseBoolean(random, "attribute::minimizeChordDistance", nodeList.item(i), xpath);
+                minimizeChordDistance = b ? 1 : 0;
+            } catch (Exception e) {}
+            
+            chordPatterns[i] = new ChordPattern(pattern, minimizeChordDistance);
         }
 
         setChordPatterns(chordPatterns);
@@ -364,5 +378,19 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 
     public void setMinimizeChordDistance(boolean isMinimizeChordDistance) {
         this.isMinimizeChordDistance = isMinimizeChordDistance;
+    }
+    
+    private class ChordPattern {
+        private String chordPattern;
+        private int minimizeChordDistance;
+        
+        public ChordPattern(String chordPattern, int minimizeChordDistance) {
+            if (minimizeChordDistance < -1 || minimizeChordDistance > 1) {
+                throw new RuntimeException("Invalid value " + minimizeChordDistance + " for minimizeChordDistance");
+            }
+            
+            this.chordPattern = chordPattern;
+            this.minimizeChordDistance = minimizeChordDistance;
+        }
     }
 }

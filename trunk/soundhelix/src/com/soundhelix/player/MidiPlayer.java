@@ -609,6 +609,7 @@ public class MidiPlayer extends AbstractPlayer {
         
         int k = 0;
         
+        // remember transposition value so that a parallel change of the global value has no effect on this tick
         int transposition = this.transposition;
         
         for (ArrangementEntry entry : arrangement) {
@@ -640,9 +641,14 @@ public class MidiPlayer extends AbstractPlayer {
                         if (prevse.isNote()) {
                             int pitch = pitches[j];
                             
-                            if (!prevse.isLegato()) {
+                            // use legato iff the previous note has the legato flag set and has a different
+                            // pitch than the current note (legato from a pitch to the same pitch is not possible)
+                            
+                            if (!prevse.isLegato() || prevse.getPitch() == s.get(p[j]).getPitch()) {
+                                // legato flag is inactive or the pitch of the previous note is the same
                                 sendMidiMessage(channel, ShortMessage.NOTE_OFF, pitch, 0);
                             } else  {
+                                // valid legato case
                                 // remember pitch for NOTE_OFF after the next NOTE_ON
                                 legatoList.add(pitch);
                             }

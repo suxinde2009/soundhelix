@@ -9,7 +9,11 @@ Change log
 
 0.4u: unreleased
 
-    - Added support for unreleased versions (e.g., "0.4u", which is considered to be smaller than "0.4").
+    - Added support for unreleased versions (e.g., "0.4u", which is considered to be smaller than "0.4", but larger than anything
+      starting with "0.3").
+
+    - Added support for specifying a minimizeChordDistance attribute per chordPattern tag in the PatternHarmonyEngine. This attribute
+      allows you to override the global minimizeChordDistance value if you set it.
 
 
 0.3: 2011-10-01

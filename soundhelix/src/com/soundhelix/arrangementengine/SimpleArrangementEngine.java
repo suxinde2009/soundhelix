@@ -589,14 +589,47 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         }
         
         StringBuilder sb = new StringBuilder("Song structure:\n");
+
+        int chordSections = HarmonyEngineUtils.getChordSectionCount(structure);
+        
+        int digits = String.valueOf(chordSections - 1).length();
+        int div = 1;
+        
+        for (int i = 1; i < digits; i++) {
+            div *= 10;
+        }
         
         int ticks = structure.getTicks();
         int maxLen = 0;
-        
+
         for (ActivityVectorConfiguration avc : vectors) {
             maxLen = Math.max(maxLen, avc.name.length());
         }
 
+        maxLen = Math.max(maxLen, "Section #".length());
+        
+        for (int d = 0; d < digits; d++) {
+            if (d == 0) {
+                sb.append(String.format("%" + maxLen + "s: ", "Section #"));
+            } else {
+                sb.append(String.format("%" + maxLen + "s  ", ""));
+            }
+            
+            int n = 0;
+            for (int tick = 0; tick < ticks; tick += structure.getHarmonyEngine().getChordSectionTicks(tick)) {
+                sb.append((n / div) % 10);
+                n++;
+            }
+            sb.append('\n');
+            div /= 10;
+        }
+
+        for (int i = 0; i < maxLen + chordSections + 9; i++) {
+            sb.append('=');
+        }
+        
+        sb.append('\n');
+        
         for (ActivityVectorConfiguration avc : vectors) {
             sb.append(String.format("%" + maxLen + "s: ", avc.name));
 
@@ -610,7 +643,13 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
             sb.append(activeTicks > 0 ? String.format(" %5.1f%%\n", 100.0d * activeTicks / ticks) : "\n");
         }
 
-        sb.append(String.format("%" + maxLen + "s  ", ""));
+        for (int i = 0; i < maxLen + chordSections + 9; i++) {
+            sb.append('=');
+        }
+        
+        sb.append('\n');
+
+        sb.append(String.format("%" + maxLen + "s: ", "# active"));
         
         for (int tick = 0; tick < ticks; tick += structure.getHarmonyEngine().getChordSectionTicks(tick)) {
             int c = 0;

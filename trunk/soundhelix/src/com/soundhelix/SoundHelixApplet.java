@@ -33,6 +33,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.spi.LoggingEvent;
 
+import com.soundhelix.player.MidiPlayer;
 import com.soundhelix.player.Player;
 import com.soundhelix.remotecontrol.AbstractTextRemoteControl;
 import com.soundhelix.remotecontrol.SwingRemoteControl;
@@ -325,7 +326,16 @@ public class SoundHelixApplet extends JApplet implements Runnable {
     
     @Override
     public void stop() {
-        // TODO Auto-generated method stub
+        try {
+            if (player != null) {
+                player.abortPlay();
+                
+                if (player instanceof MidiPlayer) {
+                    ((MidiPlayer) player).muteAllChannels();
+                }
+            }
+        } catch (Exception e) {}
+        
         super.stop();
     }
     

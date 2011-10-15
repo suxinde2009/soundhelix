@@ -120,7 +120,7 @@ public final class NoteUtils {
             // pitch difference is one tone,
             // use the halftone in between
             return (pitch1 + pitch2) / 2;
-           } else if (absdiff == 1) {
+        } else if (absdiff == 1) {
             // pitch difference is one halftone
             // use the current pitch
             return pitch1;
@@ -130,7 +130,7 @@ public final class NoteUtils {
             do {
                 pitch1++;
             } while(!isOnScale(pitch1));
-               return pitch1;
+            return pitch1;
         } else {
             // we have a pitch difference of at least 3 halftones down
             pitch1 -= Math.min(0, absdiff / 2 - 1);

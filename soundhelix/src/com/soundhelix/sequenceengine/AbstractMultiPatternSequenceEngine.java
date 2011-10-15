@@ -58,7 +58,7 @@ public abstract class AbstractMultiPatternSequenceEngine extends AbstractSequenc
 
         Track track = new Track(TrackType.MELODY);
         
-           for (int i = 0; i < patterns.length; i++) {
+        for (int i = 0; i < patterns.length; i++) {
             Sequence seq = seqs[i];
             Pattern pattern = patterns[i];
             int patternLength = pattern.size();

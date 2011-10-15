@@ -433,6 +433,10 @@ public class RandomPatternEngine extends StringPatternEngine {
         return array;
     }
 
+    public void setUniquePatternParts(boolean isUniquePatternParts) {
+        this.isUniquePatternParts = isUniquePatternParts;
+    }
+
     private static final class PatternEntry {
         /** The offset. */
         private int offset;
@@ -451,9 +455,5 @@ public class RandomPatternEngine extends StringPatternEngine {
             this.wildcard = wildcard;
             this.isWildcard = true;
         }        
-    }
-
-    public void setUniquePatternParts(boolean isUniquePatternParts) {
-        this.isUniquePatternParts = isUniquePatternParts;
     }
 }

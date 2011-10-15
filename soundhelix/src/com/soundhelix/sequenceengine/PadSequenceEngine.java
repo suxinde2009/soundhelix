@@ -35,7 +35,7 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
     private boolean isNormalizeChords;
     
     /** Flag indicating whether chord sections should be obeyed. */
-    protected boolean obeyChordSections;
+    private boolean obeyChordSections;
 
     /** The number of voices. */
     private int voiceCount = -1;
@@ -127,11 +127,11 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
         }
         
         setOffsets(offsets);
-        
+
         try {
             setNormalizeChords(!XMLUtils.parseBoolean(random, "obeyChordSubtype", node, xpath));
             logger.warn("The tag \"obeyChordSubtype\" has been deprecated. Use \"normalizeChords\" with inverted value instead.");
-      } catch (Exception e) {}
+        } catch (Exception e) {}
 
         try {
             setNormalizeChords(XMLUtils.parseBoolean(random, "normalizeChords", node, xpath));

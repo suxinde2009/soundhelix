@@ -79,7 +79,7 @@ public class MidiPlayer extends AbstractPlayer {
     private static final int CLOCK_SYNCHRONIZATION_TICKS_PER_BEAT = 24;
 
     /** The (conservative) pattern for unsafe characters in filenames. */
-    private static final Pattern unsafeCharacterPattern = Pattern.compile("[^0-9a-zA-Z_\\-]");
+    private static final Pattern UNSAFE_CHARACTER_PATTERN = Pattern.compile("[^0-9a-zA-Z_\\-]");
     
     /** The random generator. */
     private Random random;
@@ -477,9 +477,9 @@ public class MidiPlayer extends AbstractPlayer {
                 // in each iteration, at least one of the following two conditions should be true
                 
                 if (referenceTime >= timingTickReferenceTime) {
-                       if (useClockSynchronization) {
-                           sendMidiMessageToClockSynchronized(ShortMessage.TIMING_CLOCK);
-                       }
+                    if (useClockSynchronization) {
+                        sendMidiMessageToClockSynchronized(ShortMessage.TIMING_CLOCK);
+                    }
                     timingTickReferenceTime += getTimingTickNanos(clockTimingsPerTick, ticksPerBeat);
                 }
 
@@ -1043,7 +1043,7 @@ public class MidiPlayer extends AbstractPlayer {
         Structure structure = arrangement.getStructure();
         
         String songName = structure.getSongName();
-        String safeSongName = unsafeCharacterPattern.matcher(songName).replaceAll("_");
+        String safeSongName = UNSAFE_CHARACTER_PATTERN.matcher(songName).replaceAll("_");
         
         command = command.replace("${songName}", songName);
         command = command.replace("${safeSongName}", safeSongName);
@@ -1281,7 +1281,11 @@ public class MidiPlayer extends AbstractPlayer {
     public void setAfterPlayWaitTicks(int postWaitTicks) {
         this.afterPlayWaitTicks = postWaitTicks;
     }
-    
+   
+    public int getCurrentTick() {
+        return currentTick;
+    }
+
     private final class Device {
         private final String name;
         private final String midiName;
@@ -1304,12 +1308,12 @@ public class MidiPlayer extends AbstractPlayer {
         }
         
         public void open() {
-               try {
-                   midiDevice = findMidiDevice(midiName);
+            try {
+                midiDevice = findMidiDevice(midiName);
 
                 if (midiDevice == null) {
-                       throw new RuntimeException("Could not find MIDI device \"" + midiName
-                               + "\". Available devices with MIDI IN:\n" + getMidiDevices());
+                    throw new RuntimeException("Could not find MIDI device \"" + midiName
+                            + "\". Available devices with MIDI IN:\n" + getMidiDevices());
                 }
 
                 midiDevice.open();
@@ -1318,8 +1322,8 @@ public class MidiPlayer extends AbstractPlayer {
 
                 if (receiver == null) {
                     throw new RuntimeException("MIDI device \"" + midiName
-                                               + "\" does not have a Receiver. Available devices with MIDI IN:\n"
-                                               + getMidiDevices());
+                            + "\" does not have a Receiver. Available devices with MIDI IN:\n"
+                            + getMidiDevices());
                 }
             } catch (Exception e) {
                 throw new RuntimeException("Error opening MIDI device \"" + midiName + "\"", e);
@@ -1383,9 +1387,5 @@ public class MidiPlayer extends AbstractPlayer {
             this.rotationUnit = rotationUnit;
             this.phase = phase;
         }
-    }
-
-    public int getCurrentTick() {
-        return currentTick;
     }
 }

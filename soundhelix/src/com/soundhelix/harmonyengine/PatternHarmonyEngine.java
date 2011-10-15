@@ -48,7 +48,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
     private boolean isMinimizeChordDistance = true;
     
     /** Pattern for arbitrary chords ("pitch1:pitch2:pitch3"). */
-    private static final Pattern genericPattern = Pattern.compile("^(-?\\d+):(-?\\d+):(-?\\d+)$");
+    private static final Pattern GENERIC_CHORD_PATTERN = Pattern.compile("^(-?\\d+):(-?\\d+):(-?\\d+)$");
     
     /** The random generator. */
     private Random random;
@@ -137,7 +137,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
                 sTicks = 0;
             }
             
-            Matcher m = genericPattern.matcher(chordString);
+            Matcher m = GENERIC_CHORD_PATTERN.matcher(chordString);
             Chord chord;
             
             if (m.matches()) {
@@ -275,7 +275,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
             String chord;
             double length = Double.parseDouble(spec[1]);
             
-            Matcher m = genericPattern.matcher(spec[0]);
+            Matcher m = GENERIC_CHORD_PATTERN.matcher(spec[0]);
             
             if (spec[0].indexOf(':') >= 0) {
                 chord = spec[0];

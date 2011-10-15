@@ -60,20 +60,20 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
         
         int tick = 0;
         int ticks = structure.getTicks();
-        
+
         Map<String, Pattern> melodyHashMap = createMelodies();
-        
+
         while (tick < ticks) {
             int len = harmonyEngine.getChordSectionTicks(tick);
             Pattern p = melodyHashMap.get(HarmonyEngineUtils.getChordSectionString(structure, tick));
 
             int pos = 0;
             int tickEnd = tick + len;
-            
+
             while (tick < tickEnd) {
                 PatternEntry entry = p.get(pos % p.size());
                 int l = entry.getTicks();
-                
+
                 if (tick + l > tickEnd) {
                     l = tickEnd - tick;
                 }
@@ -87,10 +87,10 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
                 } else {
                     seq.addPause(l);
                 }
-                
+
                 pos++;
                 tick += l;
-             }
+            }
         }
         
         Track track = new Track(TrackType.MELODY);

@@ -86,7 +86,7 @@ public class RandomPatternSequenceEngine extends AbstractSequenceEngine {
                 
                 pos++;
                 i += l;
-             }
+            }
             
             tick += len;
         }

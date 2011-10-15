@@ -151,22 +151,22 @@ public class SoundHelixApplet extends JApplet implements Runnable {
                     JButton shareButton;
 
                     shareButton = getIconButton("http://www.soundhelix.com/applet/images/facebook-share.png",
-                    "Share the current song on Facebook (shows preview)");
+                        "Share the current song on Facebook (shows preview)");
                     panel.add(shareButton);
                     this.facebookShareButton = shareButton;
 
                     shareButton = getIconButton("http://www.soundhelix.com/applet/images/twitter-share.png",
-                    "Share the current song on Twitter (shows preview)");
+                        "Share the current song on Twitter (shows preview)");
                     panel.add(shareButton);
                     this.twitterShareButton = shareButton;
 
                     shareButton = getIconButton("http://www.soundhelix.com/applet/images/youtube-share.png",
-                    "Visit the SoundHelix channel on YouTube");
+                        "Visit the SoundHelix channel on YouTube");
                     panel.add(shareButton);
                     this.youTubeShareButton = shareButton;
 
                     shareButton = getIconButton("http://www.soundhelix.com/applet/images/soundhelix-share.png",
-                    "Visit the SoundHelix website");
+                        "Visit the SoundHelix website");
                     panel.add(shareButton);
                     this.soundHelixShareButton = shareButton;
 

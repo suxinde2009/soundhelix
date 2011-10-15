@@ -47,7 +47,7 @@ public abstract class AbstractFreeMultiPatternSequenceEngine extends AbstractSeq
 
         Track track = new Track(TrackType.MELODY);
         
-           for (int i = 0; i < patterns.length; i++) {
+        for (int i = 0; i < patterns.length; i++) {
             Sequence seq = seqs[i];
             Pattern pattern = patterns[i];
             int patternLength = pattern.size();
@@ -72,7 +72,7 @@ public abstract class AbstractFreeMultiPatternSequenceEngine extends AbstractSeq
                                             ? pattern.isLegatoLegal(activityVector, tick + len, pos + 1)
                                             : false;
 
-                           seq.addNote(pitch, len, vel, useLegato);
+                        seq.addNote(pitch, len, vel, useLegato);
                     }
                 } else {
                     // add pause

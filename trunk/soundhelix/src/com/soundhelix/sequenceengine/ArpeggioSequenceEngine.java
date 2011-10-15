@@ -137,9 +137,9 @@ public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
     private Pattern getArpeggioPattern(int len) {
         // slow implementation, but this method is only called
         // once per chord and we normally don't have a whole lot of patterns
-        
+
         // might use binary search or caching later
-        
+
         int bestIndex = -1;
         int bestIndexLen = Integer.MAX_VALUE;
         int maxIndex = -1;
@@ -166,11 +166,11 @@ public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
         }
     }
     
-   public void configure(Node node, XPath xpath) throws XPathException {
+    public void configure(Node node, XPath xpath) throws XPathException {
         Random random = new Random(randomSeed);
-        
+
         NodeList patternEnginesNodes = (NodeList) xpath.evaluate("patternEngines", node, XPathConstants.NODESET);
-        
+
         int patternEnginesCount = patternEnginesNodes.getLength();
 
         if (patternEnginesCount == 0) {
@@ -178,7 +178,7 @@ public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
         }
 
         Node patternEnginesNode = patternEnginesNodes.item(random.nextInt(patternEnginesCount));
-        
+
         NodeList nodeList = (NodeList) xpath.evaluate("patternEngine", patternEnginesNode, XPathConstants.NODESET);
 
         if (nodeList.getLength() == 0) {
@@ -220,14 +220,14 @@ public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
             if (patternLengthMap.containsKey(ticks)) {
                 throw new RuntimeException("Another pattern with " + ticks + " ticks was already provided");
             }
-            
+
             patternLengthMap.put(ticks, true);
         }
-        
+
         setPatterns(patterns);
     }
 
-public void setNormalizeChords(boolean isNormalizeChords) {
-    this.isNormalizeChords = isNormalizeChords;
-}
+    public void setNormalizeChords(boolean isNormalizeChords) {
+        this.isNormalizeChords = isNormalizeChords;
+    }
 }

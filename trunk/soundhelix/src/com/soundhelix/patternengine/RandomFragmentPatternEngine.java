@@ -168,6 +168,8 @@ public class RandomFragmentPatternEngine extends StringPatternEngine {
     /**
      * Creates and returns a random pattern.
      * 
+     * @param character the character
+     * 
      * @return the random pattern
      */
     
@@ -233,6 +235,10 @@ public class RandomFragmentPatternEngine extends StringPatternEngine {
         this.patternString = patternString;
     }
 
+    public void setUniquePatternParts(boolean isUniquePatternParts) {
+        this.isUniquePatternParts = isUniquePatternParts;
+    }
+
     private static final class PatternEntry {
         /** The offset. */
         private int offset;
@@ -251,9 +257,5 @@ public class RandomFragmentPatternEngine extends StringPatternEngine {
             this.wildcard = wildcard;
             this.isWildcard = true;
         }        
-    }
-
-    public void setUniquePatternParts(boolean isUniquePatternParts) {
-        this.isUniquePatternParts = isUniquePatternParts;
     }
 }

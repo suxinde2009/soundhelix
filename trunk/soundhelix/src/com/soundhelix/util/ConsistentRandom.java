@@ -78,6 +78,6 @@ public class ConsistentRandom {
      */
     
     public boolean getBoolean(Object seedObject) {
-           return getBoolean(seedObject.hashCode());
+        return getBoolean(seedObject.hashCode());
     }
 }

@@ -36,7 +36,7 @@ public class CFGSongNameEngine extends AbstractSongNameEngine {
     private char stringSeparator = ',';
     
     /**
-     * @see SongNameEngine.createSongName()
+     * @see SongNameEngine#createSongName()
      */
     
     public String createSongName() {

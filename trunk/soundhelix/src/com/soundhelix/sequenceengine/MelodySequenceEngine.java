@@ -27,9 +27,8 @@ import com.soundhelix.util.NoteUtils;
 import com.soundhelix.util.XMLUtils;
 
 /**
- * Implements a sequence engine that uses a randomly generated melody, played
- * with a given rhythmic pattern. For each distinct chord section, a melody
- * is generated and used for each occurrence of the chord section.
+ * Implements a sequence engine that uses a randomly generated melody, played with a given rhythmic pattern. For each
+ * distinct chord section, a melody is generated and used for each occurrence of the chord section.
  *
  * @author Thomas Schürger (thomas@schuerger.com)
  */
@@ -37,15 +36,29 @@ import com.soundhelix.util.XMLUtils;
 // TODO: add proper configurability
 
 public class MelodySequenceEngine extends AbstractSequenceEngine {
+
+    /** The probability for keeping the pitch. The real probability is 1/3 of this. */ 
+    private static final float KEEP_PITCH_PROBABILITY = 0.4f;
+
+    /** The minimum pitch to use. */
+    private static final int MAXIMUM_PITCH = 12;
+
+    /** The maximum pitch to use. */
+    private static final int MINIMUM_PITCH = -12;
+
+    /** Wildcard for pitch on chord. */
+    private static final char ON_CHORD = '#';
+
     /** Wildcard for free pitch. */
     private static final char FREE = '+';
     
     /** Wildcard for repeated pitch. */
     private static final char REPEAT = '*';
     
+    /** The input pattern for melodies. */
     private Pattern pattern;
-    private int patternLength;
     
+    /** The random generator. */
     private Random random;
     
     public MelodySequenceEngine() {
@@ -99,8 +112,7 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
     }
     
     /**
-     * Returns a random pitch which is near the given pitch and on the
-     * C/Am scale.
+     * Returns a random pitch which is near the given pitch and on the C/Am scale.
      * 
      * @param pitch the starting pitch
      * @param maxDistanceDown the maximum distance below the pitch
@@ -115,19 +127,21 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
         
         do {
             again = false;
+            
+            // 0 = up, 1 = down, 2 = keep pitch
             int r = random.nextInt(3);
             
-            if (r == 2 && random.nextFloat() > 0.4f) {
+            if (r == 2 && random.nextFloat() > KEEP_PITCH_PROBABILITY) {
                 r = random.nextInt(2);
             }
             
-            if (r == 0 || p < -12) {
+            if (r == 0 || p < MINIMUM_PITCH) {
                 // move up
                 p += random.nextInt(maxDistanceUp);
                 do {
                     p++;
                 } while (!NoteUtils.isOnScale(p));            
-            } else if (r == 1 || p > 12) {
+            } else if (r == 1 || p > MAXIMUM_PITCH) {
                 // move down
                 p -= random.nextInt(maxDistanceDown);
                 do {
@@ -142,7 +156,7 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
                     continue;
                 }
             }
-        } while (again || p < -12 || p > 12);
+        } while (again || p < MINIMUM_PITCH || p > MAXIMUM_PITCH);
 
         return p;
     }
@@ -166,19 +180,20 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
         do {
             again = false;
             p = pitch;
+            // 0 = up, 1 = down, 2 = keep pitch
             int r = random.nextInt(3);
 
-            if (r == 2 && random.nextFloat() > 0.4f) {
+            if (r == 2 && random.nextFloat() > KEEP_PITCH_PROBABILITY) {
                 r = random.nextInt(2);
             }
 
-            if (r == 0 || p < -12) {
+            if (r == 0 || p < MINIMUM_PITCH) {
                 // move up
                 p += random.nextInt(maxDistanceUp);
                 do {
                     p++;
                 } while (!chord.containsPitch(p));            
-            } else if (r == 1 || p > 12) {
+            } else if (r == 1 || p > MAXIMUM_PITCH) {
                 // move down
                 p -= random.nextInt(maxDistanceDown);
                 do {
@@ -192,7 +207,7 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
                     again = true;
                 }
             }
-        } while (again || p < -12 || p > 12);
+        } while (again || p < MINIMUM_PITCH || p > MAXIMUM_PITCH);
 
         return p;
     }
@@ -206,6 +221,8 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
     
     private Map<String, Pattern> createMelodies() {
         HarmonyEngine he = structure.getHarmonyEngine();
+        
+        int patternLength = pattern.size();
         
         Map<String, Pattern> ht = new HashMap<String, Pattern>();
         
@@ -237,7 +254,8 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
                                && pitch != Integer.MIN_VALUE && chord.containsPitch(pitch)) {
                         // reuse the previous pitch
                         list.add(new PatternEntry(pitch, entry.getVelocity(), t, entry.isLegato()));
-                    } else {
+                    } else if (!entry.isWildcard() || entry.getWildcardCharacter() == ON_CHORD) {
+                        // TODO: only allow ON_CHORD wildcard, not normal offsets
                         pitch = getRandomPitch(chord, pitch == Integer.MIN_VALUE ? 0 : pitch, 2, 2);
                         list.add(new PatternEntry(pitch, entry.getVelocity(), t, entry.isLegato()));
                     }
@@ -268,18 +286,16 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
         
         try {
             int i = random.nextInt(nodeList.getLength());
-            patternEngine = XMLUtils.getInstance(PatternEngine.class, nodeList.item(i),
-                    xpath, randomSeed, i);
+            patternEngine = XMLUtils.getInstance(PatternEngine.class, nodeList.item(i), xpath, randomSeed, i);
         } catch (Exception e) {
             throw new RuntimeException("Error instantiating PatternEngine", e);
         }
         
-        Pattern pattern = patternEngine.render("" + FREE + REPEAT);
+        Pattern pattern = patternEngine.render("" + ON_CHORD + FREE + REPEAT);
         setPattern(pattern);
     }
     
     public void setPattern(Pattern pattern) {
         this.pattern = pattern;
-        this.patternLength = pattern.size();
     }
 }

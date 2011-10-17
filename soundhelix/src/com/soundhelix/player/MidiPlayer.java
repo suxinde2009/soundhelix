@@ -566,9 +566,8 @@ public class MidiPlayer extends AbstractPlayer {
 
             for (int j = 0; j < p.length; j++) {
                 Sequence s = track.get(j);                    
-                SequenceEntry prevse = s.get(p[j] - 1);
 
-                if (prevse.isNote()) {
+                if (p[j] > 0 && s.get(p[j] - 1).isNote()) {
                     sendMidiMessage(channel, ShortMessage.NOTE_OFF, pitch[j], 0);
                 }
             }

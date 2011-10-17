@@ -102,6 +102,31 @@ public class Sequence {
     }
 
     /**
+     * Extends the previous sequence entry (which must be note) by the given number of ticks.
+     * An IllegalStateException will be thrown if the sequence is empty or if the previous entry is not a note.
+     * 
+     * @param ticks the number of ticks
+     */
+    
+    public void extendNote(int ticks) {
+        if (ticks > 0) {
+            int size = sequence.size();
+    
+            if (size == 0) {
+                throw new IllegalStateException("Sequence must not be emtpy");
+            }
+            
+            if (lastWasPause) {
+                throw new IllegalStateException("Previous entry is not a note");
+            }
+            
+            SequenceEntry entry = sequence.get(size - 1);
+            
+            entry.ticks += ticks;
+        }
+    }
+    
+    /**
      * Returns the total number of ticks this sequence spans.
      * 
      * @see #size()

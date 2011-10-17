@@ -1,6 +1,11 @@
 package com.soundhelix.sequenceengine;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathException;
@@ -11,6 +16,7 @@ import com.soundhelix.harmonyengine.HarmonyEngine;
 import com.soundhelix.misc.ActivityVector;
 import com.soundhelix.misc.Chord;
 import com.soundhelix.misc.Sequence;
+import com.soundhelix.misc.Sequence.SequenceEntry;
 import com.soundhelix.misc.Track;
 import com.soundhelix.misc.Track.TrackType;
 import com.soundhelix.util.XMLUtils;
@@ -37,6 +43,9 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
     /** Flag indicating whether chord sections should be obeyed. */
     private boolean obeyChordSections;
 
+    /** Flag indicating whether all pitches should be retriggered for every new chord. */
+    private boolean retriggerPitches = true;
+    
     /** The number of voices. */
     private int voiceCount = -1;
     
@@ -53,6 +62,18 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
     public void setOffsets(int[] offsets) {
         if (offsets.length == 0) {
             throw new RuntimeException("Array of offsets must not be empty");
+        }
+        
+        // check uniqueness of offsets
+        
+        Set<Integer> set = new HashSet<Integer>(offsets.length);
+        
+        for (int offset : offsets) {
+            if (set.contains(offset)) {
+                throw new RuntimeException("Offsets must be unique");
+            }
+            
+            set.add(offset);
         }
         
         this.offsets = offsets;
@@ -90,13 +111,63 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
             }
             
             if (activityVector.isActive(tick)) {
-                for (int i = 0; i < voiceCount; i++) {
-                    Sequence seq = track.get(i);
+                // check the first sequence (either all voices are active or all are inactive)
+                Sequence firstSeq = track.get(0);
+                int size = firstSeq.size();
+                
+                if (retriggerPitches || size == 0 || firstSeq.get(size - 1).isPause()) {
+                    for (int i = 0; i < voiceCount; i++) {
+                        int pitch = chord.getPitch(offsets[i]);
+                        track.get(i).addNote(pitch, len, velocity);
+                    }
+                } else {
+                    // extend all sequences' notes where the previous and the current pitches match and add new notes
+                    // to the other ones
+                    
+                    // maps current pitches to sequence numbers
+                    Map<Integer, Integer> map = new HashMap<Integer, Integer>(voiceCount);
 
-                    int pos = offsets[i];
-                    seq.addNote(chord.getPitch(pos), len, velocity);
+                    // contains all sequence numbers where the pitch must change
+                    Set<Integer> set = new HashSet<Integer>(voiceCount);
 
-                    pos++;
+                    for (int i = 0; i < voiceCount; i++) {
+                        // give every current pitch a unique sequence number
+                        map.put(chord.getPitch(offsets[i]), i);
+                        set.add(i);
+                    }
+
+                    // iterate over all previous pitches; extend the ones that match the current pitches and remove
+                    // those from the set of pitches that must change
+                    
+                    for (int i = 0; i < voiceCount; i++) {
+                        Sequence seq = track.get(i);
+                        int pitch = seq.get(seq.size() - 1).getPitch();                        
+                        Integer k = map.get(pitch);
+                        
+                        if (k != null) {
+                            // pitch is also used now, extend the corresponding sequence
+                            track.get(k).extendNote(len);
+ 
+                            // remove the extended sequence number from the set
+                            set.remove(k);
+                        }
+                    }
+
+                    // from the n sequences, m have been extended, so (n-m) remain in the set and (n-m) pitches are new
+                    // now add the new (n-m) pitches to those (n-m) sequences
+                    
+                    Iterator<Integer> it = set.iterator();
+                    
+                    for (int i = 0; i < voiceCount; i++) {
+                        Sequence seq = track.get(i);
+                        SequenceEntry entry = seq.get(seq.size() - 1);
+                        int pitch = entry.getPitch();
+                        
+                        if (!map.containsKey(pitch)) {
+                            // new pitch, take the next sequence number from the set and use it to add a note
+                            track.get(it.next()).addNote(chord.getPitch(offsets[i]), len, velocity);
+                        }
+                    }
                 }
             } else {
                 for (int i = 0; i < voiceCount; i++) {
@@ -142,6 +213,10 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
         } catch (Exception e) {}
 
         try {
+            setRetriggerPitches(XMLUtils.parseBoolean(random, "retriggerPitches", node, xpath));
+        } catch (Exception e) {}
+
+        try {
             setVelocity((short) XMLUtils.parseInteger(random, "velocity", node, xpath));
         } catch (Exception e) {}
     }
@@ -152,5 +227,9 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
 
     public void setNormalizeChords(boolean isNormalizeChords) {
         this.isNormalizeChords = isNormalizeChords;
+    }
+
+    public void setRetriggerPitches(boolean retriggerPitches) {
+        this.retriggerPitches = retriggerPitches;
     }
 }

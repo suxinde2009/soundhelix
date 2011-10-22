@@ -124,48 +124,46 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
                     // extend all sequences' notes where the previous and the current pitches match and add new notes
                     // to the other ones
                     
-                    // maps current pitches to sequence numbers
+                    // maps pitches of the previous chord to their sequence number
                     Map<Integer, Integer> map = new HashMap<Integer, Integer>(voiceCount);
 
                     // contains all sequence numbers where the pitch must change
                     Set<Integer> set = new HashSet<Integer>(voiceCount);
 
-                    for (int i = 0; i < voiceCount; i++) {
-                        // give every current pitch a unique sequence number
-                        map.put(chord.getPitch(offsets[i]), i);
-                        set.add(i);
-                    }
-
-                    // iterate over all previous pitches; extend the ones that match the current pitches and remove
-                    // those from the set of pitches that must change
-                    
+                    // iterate over the pitches of the previous chord
                     for (int i = 0; i < voiceCount; i++) {
                         Sequence seq = track.get(i);
                         int pitch = seq.get(seq.size() - 1).getPitch();                        
+                        map.put(pitch, i);
+                        set.add(i);
+                    }
+
+                    // iterate over all current pitches; extend the ones that match the previous pitch and remove
+                    // those from the set of pitches that must change
+                    
+                    for (int i = 0; i < voiceCount; i++) {
+                        int pitch = chord.getPitch(offsets[i]);                        
                         Integer k = map.get(pitch);
                         
                         if (k != null) {
-                            // pitch is also used now, extend the corresponding sequence
+                            // pitch exists in previous chord, extend that note and remove from set
                             track.get(k).extendNote(len);
- 
-                            // remove the extended sequence number from the set
                             set.remove(k);
                         }
                     }
 
-                    // from the n sequences, m have been extended, so (n-m) remain in the set and (n-m) pitches are new
-                    // now add the new (n-m) pitches to those (n-m) sequences
+                    // from the n sequences, m have been extended, the remaining (n-m) pitches must be assigned
+                    // to the (n-m) non-extended sequences
                     
                     Iterator<Integer> it = set.iterator();
                     
                     for (int i = 0; i < voiceCount; i++) {
-                        Sequence seq = track.get(i);
-                        SequenceEntry entry = seq.get(seq.size() - 1);
-                        int pitch = entry.getPitch();
+                        int pitch = chord.getPitch(offsets[i]);                        
                         
                         if (!map.containsKey(pitch)) {
-                            // new pitch, take the next sequence number from the set and use it to add a note
-                            track.get(it.next()).addNote(chord.getPitch(offsets[i]), len, velocity);
+                            // the pitch was not extended
+                            // get the next sequence that was not extended and add a new note to it
+                            track.get(it.next()).addNote(pitch, len, velocity);
                         }
                     }
                 }

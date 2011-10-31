@@ -40,11 +40,17 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
     /** The probability for keeping the pitch. The real probability is 1/3 of this. */ 
     private static final float KEEP_PITCH_PROBABILITY = 0.4f;
 
+    /** The maximum pitch to use. */
+    private static final int MIN_PITCH = -3;
+
     /** The minimum pitch to use. */
-    private static final int MAXIMUM_PITCH = 12;
+    private static final int MAX_PITCH = 12;
+
+    /** The minimum pitch to use. */
+    private static final int MAX_DISTANCE_DOWN = 2;
 
     /** The maximum pitch to use. */
-    private static final int MINIMUM_PITCH = -12;
+    private static final int MAX_DISTANCE_UP = 2;
 
     /** Wildcard for pitch on chord. */
     private static final char ON_CHORD = '#';
@@ -135,13 +141,13 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
                 r = random.nextInt(2);
             }
             
-            if (r == 0 || p < MINIMUM_PITCH) {
+            if (r == 0 || p < MIN_PITCH) {
                 // move up
                 p += random.nextInt(maxDistanceUp);
                 do {
                     p++;
                 } while (!NoteUtils.isOnScale(p));            
-            } else if (r == 1 || p > MAXIMUM_PITCH) {
+            } else if (r == 1 || p > MAX_PITCH) {
                 // move down
                 p -= random.nextInt(maxDistanceDown);
                 do {
@@ -156,7 +162,7 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
                     continue;
                 }
             }
-        } while (again || p < MINIMUM_PITCH || p > MAXIMUM_PITCH);
+        } while (again || p < MIN_PITCH || p > MAX_PITCH);
 
         return p;
     }
@@ -187,13 +193,13 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
                 r = random.nextInt(2);
             }
 
-            if (r == 0 || p < MINIMUM_PITCH) {
+            if (r == 0 || p < MIN_PITCH) {
                 // move up
                 p += random.nextInt(maxDistanceUp);
                 do {
                     p++;
                 } while (!chord.containsPitch(p));            
-            } else if (r == 1 || p > MAXIMUM_PITCH) {
+            } else if (r == 1 || p > MAX_PITCH) {
                 // move down
                 p -= random.nextInt(maxDistanceDown);
                 do {
@@ -207,7 +213,7 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
                     again = true;
                 }
             }
-        } while (again || p < MINIMUM_PITCH || p > MAXIMUM_PITCH);
+        } while (again || p < MIN_PITCH || p > MAX_PITCH);
 
         return p;
     }
@@ -248,7 +254,7 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
                     if (entry.isPause()) {
                         list.add(new PatternEntry(t));
                     } else if (entry.isWildcard() && entry.getWildcardCharacter() == FREE) {
-                        pitch = getRandomPitch(pitch == Integer.MIN_VALUE ? 0 : pitch, 2, 2);
+                        pitch = getRandomPitch(pitch == Integer.MIN_VALUE ? 0 : pitch, MAX_DISTANCE_DOWN, MAX_DISTANCE_UP);
                         list.add(new PatternEntry(pitch, entry.getVelocity(), t, entry.isLegato()));
                     } else if (entry.isWildcard() && entry.getWildcardCharacter() == REPEAT
                                && pitch != Integer.MIN_VALUE && chord.containsPitch(pitch)) {
@@ -256,7 +262,7 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
                         list.add(new PatternEntry(pitch, entry.getVelocity(), t, entry.isLegato()));
                     } else if (!entry.isWildcard() || entry.getWildcardCharacter() == ON_CHORD) {
                         // TODO: only allow ON_CHORD wildcard, not normal offsets
-                        pitch = getRandomPitch(chord, pitch == Integer.MIN_VALUE ? 0 : pitch, 2, 2);
+                        pitch = getRandomPitch(chord, pitch == Integer.MIN_VALUE ? 0 : pitch, MAX_DISTANCE_DOWN, MAX_DISTANCE_UP);
                         list.add(new PatternEntry(pitch, entry.getVelocity(), t, entry.isLegato()));
                     }
                     

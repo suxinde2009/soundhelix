@@ -123,6 +123,7 @@ public class Sequence {
             SequenceEntry entry = sequence.get(size - 1);
             
             entry.ticks += ticks;
+            this.totalTicks += ticks;
         }
     }
     

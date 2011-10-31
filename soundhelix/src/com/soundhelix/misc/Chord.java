@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.soundhelix.util.ConsistentRandom;
 import com.soundhelix.util.NoteUtils;
@@ -69,6 +71,9 @@ public class Chord implements Serializable {
      * The integer that uniquely identifies the chords, including the chord's low pitch, but the octave is normalized.
      */
     private final int code;
+
+    /** Pattern for arbitrary chords ("pitch1:pitch2:pitch3"). */
+    public static final Pattern GENERIC_CHORD_PATTERN = Pattern.compile("^(-?\\d+):(-?\\d+):(-?\\d+)$");
     
     static {
         for (int i = 0; i <= 12; i++) {
@@ -189,7 +194,37 @@ public class Chord implements Serializable {
     }
     
     /**
-     * Returns a string representation of this chord.
+     * Implements an equality check. Two chords are equivalent if they are equivalent when both are normalized.
+     * 
+     * @param other the other chord to compare this chord to
+     * 
+     * @return true if the two objects are equal when they are normalized, false otherwise
+     */
+    
+    public boolean equalsNormalized(Object other) {
+        if (other == null || !(other instanceof Chord)) {
+            return false;
+        }
+        
+        // check equality without normalization first
+        
+        Chord otherChord = (Chord) other;
+
+        if (this == otherChord || this.lowPitch == otherChord.lowPitch && this.flavor == otherChord.flavor) {
+            return true;
+        }
+
+        // normalize and check
+        
+        Chord chord1 = this.normalize();
+        Chord chord2 = otherChord.normalize();
+        
+        return chord1.lowPitch == chord2.lowPitch && chord1.flavor == chord2.flavor;
+    }
+
+    /**
+     * Returns a string representation of this chord. If the chord has a canonical name, its canonical name is
+     * returned, otherwise a generic string representation is returned.
      * 
      * @return the string represenation
      */
@@ -383,6 +418,40 @@ public class Chord implements Serializable {
     }
     
     /**
+     * Parses the given chord string and returns a Chord instance that represents the chord string.
+     * 
+     * @param chordString the chord as a string 
+     *
+     * @return the Chord
+     */
+        
+    public static Chord parseChord(String chordString) {
+        if (chordString == null) {
+            return null;
+        }
+    
+        Chord chord;
+        
+        Matcher m = Chord.GENERIC_CHORD_PATTERN.matcher(chordString);
+        
+        if (m.matches()) {
+            int p1 = Integer.parseInt(m.group(1));
+            int p2 = Integer.parseInt(m.group(2));
+            int p3 = Integer.parseInt(m.group(3));
+    
+            chord = new Chord(p1, p2, p3);
+        } else {
+            chord = getChordFromName(chordString);
+            
+            if (chord == null) {
+                throw new RuntimeException("Invalid chord name " + chordString);
+            }
+        }
+        
+        return chord;        
+    }
+
+    /**
      * Looks up the chord with the given name. If the chord cannot be found, null is returned, otherwise the chord
      * is returned.
      * 
@@ -391,7 +460,7 @@ public class Chord implements Serializable {
      * @return the chord or null if the chord cannot be found
      */
     
-    public static Chord getChordFromName(String name) {
+    private static Chord getChordFromName(String name) {
         Integer codeInteger = NAME_TO_CODE_MAP.get(name);
         
         if (codeInteger != null) {
@@ -409,19 +478,5 @@ public class Chord implements Serializable {
         } else {
             return null;
         }
-    }
-    
-    /**
-     * Returns the name of the chord formed by the given 3 pitches, if such pitch combination has a canonical name.
-     * 
-     * @param pitch1 the first pitch
-     * @param pitch2 the second pitch
-     * @param pitch3 the third pitch
-     *
-     * @return the name of the chord or null if the pitch combination has no name
-     */
-    
-    public static String canonicalizeName(int pitch1, int pitch2, int pitch3) {
-        return new Chord(pitch1, pitch2, pitch3).toString();
     }
 }

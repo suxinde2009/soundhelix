@@ -3,8 +3,6 @@ package com.soundhelix.harmonyengine;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -46,9 +44,6 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
     
     /** Boolean indicating whether chord distances should be minimized. */
     private boolean isMinimizeChordDistance = true;
-    
-    /** Pattern for arbitrary chords ("pitch1:pitch2:pitch3"). */
-    private static final Pattern GENERIC_CHORD_PATTERN = Pattern.compile("^(-?\\d+):(-?\\d+):(-?\\d+)$");
     
     /** The random generator. */
     private Random random;
@@ -137,23 +132,8 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
                 sTicks = 0;
             }
             
-            Matcher m = GENERIC_CHORD_PATTERN.matcher(chordString);
-            Chord chord;
-            
-            if (m.matches()) {
-                int p1 = Integer.parseInt(m.group(1));
-                int p2 = Integer.parseInt(m.group(2));
-                int p3 = Integer.parseInt(m.group(3));
-
-                chord = new Chord(p1, p2, p3);
-            } else {
-                chord = Chord.getChordFromName(chordString);
-                
-                if (chord == null) {
-                    throw new RuntimeException("Invalid chord name " + chordString);
-                }
-            }
-                
+            Chord chord = Chord.parseChord(chordString);
+                            
             if (firstChord == null) {
                 firstChord = chord;
             }
@@ -273,9 +253,6 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
             }
             
             String chord;
-            double length = Double.parseDouble(spec[1]);
-            
-            Matcher m = GENERIC_CHORD_PATTERN.matcher(spec[0]);
             
             if (spec[0].indexOf(':') >= 0) {
                 chord = spec[0];
@@ -319,8 +296,8 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
                             // try again
                             return createPattern();
                         }
-                    } while(chord.equals(prevChord) || i == count - 1 && chord.equals(firstChord)
-                            || notrefnum >= 0 && chord.equals(chordList.get(notrefnum)));
+                    } while(Chord.parseChord(chord).equalsNormalized(Chord.parseChord(prevChord)) || i == count - 1 && chord.equals(firstChord)
+                            || notrefnum >= 0 && Chord.parseChord(chord).equalsNormalized(Chord.parseChord(chordList.get(notrefnum))));
                 } else {
                     // we have a note, take the note (include 'm' suffix, if present)
                     chord = spec[0];                

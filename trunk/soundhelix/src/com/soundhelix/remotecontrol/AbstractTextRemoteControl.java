@@ -42,31 +42,35 @@ public abstract class AbstractTextRemoteControl implements RemoteControl {
                             player.setMilliBPM((int) (1000 * Double.parseDouble(line.substring(4))));
                         }
                     } else if (line.startsWith("skip ") || line.equals("+")) {
-                        int tick;
-                        if (line.endsWith("%")) {
-                            double percentage = Double.parseDouble(line.substring(5, line.length() - 1));
-                            tick = (int) (percentage * player.getArrangement().getStructure().getTicks() / 100d);
-                        } else if (line.equals("+") || line.substring(5).equals("+")) {
-                            tick = player.getCurrentTick();
-                            if (tick >= 0) {
-                                tick += player.getArrangement().getStructure().getHarmonyEngine().
-                                    getChordSectionTicks(tick);
-                            }
-                        } else if (line.charAt(5) == '#') {
-                            int chordSection = Integer.parseInt(line.substring(6));
-                            tick = HarmonyEngineUtils.getChordSectionTick(player.getArrangement().getStructure(),
-                                    chordSection);
-                        } else {
-                            tick = Integer.parseInt(line.substring(5));
-                        }
-                        
                         if (player != null) {
-                            boolean success = player.skipToTick(tick);
-
-                            if (success) {
-                                writeLine("Skipping to tick " + tick);
+                            int tick;
+                            if (line.endsWith("%")) {
+                                double percentage = Double.parseDouble(line.substring(5, line.length() - 1));
+                                tick = (int) (percentage * player.getArrangement().getStructure().getTicks() / 100d);
+                            } else if (line.equals("+") || line.substring(5).equals("+")) {
+                                tick = player.getCurrentTick();
+                                if (tick >= 0) {
+                                    tick += player.getArrangement().getStructure().getHarmonyEngine().
+                                    getChordSectionTicks(tick);
+                                }
+                            } else if (line.charAt(5) == '#') {
+                                int chordSection = Integer.parseInt(line.substring(6));
+                                tick = HarmonyEngineUtils.getChordSectionTick(player.getArrangement().getStructure(),
+                                        chordSection);
                             } else {
-                                writeLine("Skipping failed");
+                                tick = Integer.parseInt(line.substring(5));
+                            }
+
+                            if (tick < 0 || tick >= player.getArrangement().getStructure().getTicks()) {
+                                writeLine("Invalid tick to skip to selected");
+                            } else {
+                                boolean success = player.skipToTick(tick);
+
+                                if (success) {
+                                    writeLine("Skipping to tick " + tick);
+                                } else {
+                                    writeLine("Skipping failed");
+                                }
                             }
                         }
                     } else if (line.startsWith("transposition ")) {

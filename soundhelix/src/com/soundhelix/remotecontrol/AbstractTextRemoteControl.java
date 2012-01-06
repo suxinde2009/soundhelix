@@ -67,7 +67,9 @@ public abstract class AbstractTextRemoteControl implements RemoteControl {
                                 boolean success = player.skipToTick(tick);
 
                                 if (success) {
-                                    writeLine("Skipping to tick " + tick);
+                                    writeLine("Skipping to tick " + tick + " (chord section "
+                                            + HarmonyEngineUtils.getChordSectionNumber(
+                                                    player.getArrangement().getStructure(), tick) + ")");
                                 } else {
                                     writeLine("Skipping failed");
                                 }

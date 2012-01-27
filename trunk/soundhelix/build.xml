@@ -88,6 +88,7 @@
     </target>
 
     <target name="javadoc" depends="init" description="generate javadoc">
+        <delete dir="${javadoc}"/>
         <javadoc sourcepath="${src}"
                  classpath="${classpath}"
                  defaultexcludes="yes"
@@ -97,8 +98,8 @@
                  use="true"
                  overview="src/overview.html"
                  charset="UTF-8"
-                 windowtitle="SoundHelix API">
-            <doctitle><![CDATA[<h1>SoundHelix</h1>]]></doctitle>
+                 windowtitle="SoundHelix ${version} API">
+            <doctitle><![CDATA[<h1>SoundHelix ${version}</h1>]]></doctitle>
             <link offline="true" href="http://java.sun.com/javase/6/docs/api/" packagelistLoc="C:/tmp"/>
             <link href="http://java.sun.com/javase/6/docs/api/"/>
         </javadoc>

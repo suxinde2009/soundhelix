@@ -35,7 +35,6 @@
                   </outputfilterchain>
               </redirector>
            </exec>
-
         <copy file="${constants}" tofile="${tmpconstants}" overwrite="true"/>    	
     	
     	<replaceregexp file="${tmpconstants}"
@@ -87,8 +86,11 @@
         </jar>
     </target>
 
-    <target name="javadoc" depends="init" description="generate javadoc">
+    <target name="javadoc" depends="init,-createBuildConstants" description="generate javadoc">
         <delete dir="${javadoc}"/>
+        <condition property="javadoc-version" value="${version} (r${revision})" else="${version}">
+            <matches pattern="u$$" string="${version}"/>
+        </condition>
         <javadoc sourcepath="${src}"
                  classpath="${classpath}"
                  defaultexcludes="yes"
@@ -99,7 +101,7 @@
                  overview="src/overview.html"
                  charset="UTF-8"
                  windowtitle="SoundHelix ${version} API">
-            <doctitle><![CDATA[<h1>SoundHelix ${version}</h1>]]></doctitle>
+            <doctitle><![CDATA[<h1>SoundHelix ${javadoc-version}</h1>]]></doctitle>
             <link offline="true" href="http://java.sun.com/javase/6/docs/api/" packagelistLoc="C:/tmp"/>
             <link href="http://java.sun.com/javase/6/docs/api/"/>
         </javadoc>

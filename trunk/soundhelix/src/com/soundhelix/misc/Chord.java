@@ -25,22 +25,48 @@ import com.soundhelix.util.NoteUtils;
  */
 
 public class Chord {
+    /** The number of chord flavors. */
     private static final int CHORD_FLAVORS = 12;
     
+    /** Code for the major chord. */
     private static final int MAJOR = 407;
+    
+    /** Code for the major6 chord. */
     private static final int MAJOR6 = 509;
+
+    /** Code for the major4 chord. */
     private static final int MAJOR4 = 308;
+    
+    /** Code for the minor chord. */
     private static final int MINOR = 307;
+
+    /** Code for the minor6 chord. */
     private static final int MINOR6 = 508;
+    
+    /** Code for the minor4 chord. */
     private static final int MINOR4 = 409;
+    
+    /** Code for the diminished chord. */
     private static final int DIM = 306;
+    
+    /** Code for the diminished6 chord. */
     private static final int DIM6 = 609;
+    
+    /** Code for the diminished4 chord. */
     private static final int DIM4 = 309;
+    
+    /** Code for the augmented chord. */
     private static final int AUG = 408;
-    // note that AUG6 and AUG4 are the same as AUG, this is correct
+    
+    /** Code for the augmented 6 chord (same as augmented). */
     private static final int AUG6 = 408;
+    
+    /** Code for the augmented 4 chord (same as augmented). */
     private static final int AUG4 = 408;
 
+    /** Pattern for arbitrary chords ("pitch1:pitch2:pitch3"). */
+    private static final Pattern GENERIC_CHORD_PATTERN = Pattern.compile("^(-?\\d+):(-?\\d+):(-?\\d+)$");
+    
     /** Maps from chord names to chord codes. */
     private static final Map<String, Integer> NAME_TO_CODE_MAP = new LinkedHashMap<String, Integer>(12 * CHORD_FLAVORS);
     
@@ -67,9 +93,6 @@ public class Chord {
      */
     private final int code;
 
-    /** Pattern for arbitrary chords ("pitch1:pitch2:pitch3"). */
-    public static final Pattern GENERIC_CHORD_PATTERN = Pattern.compile("^(-?\\d+):(-?\\d+):(-?\\d+)$");
-    
     static {
         for (int i = 0; i <= 12; i++) {
             NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i).toUpperCase(), i * 10000 + MAJOR);
@@ -121,7 +144,7 @@ public class Chord {
         }
 
         if (highPitch - lowPitch >= 12) {
-            throw new RuntimeException("High and low pitch are too far apart in chord " + this);
+            throw new RuntimeException("High and low pitch are more than 11 halftones apart in chord " + this);
         }
         
         flavor = (middlePitch - lowPitch) * 100 + (highPitch - lowPitch);        
@@ -309,6 +332,7 @@ public class Chord {
             case DIM4:   
                 return new Chord(highPitch - 12, highPitch - 9, highPitch - 6);
             default:
+                // already normalized or not normalizable
                 return this;
         }
     }
@@ -408,6 +432,7 @@ public class Chord {
         }
     }
     
+    @Override
     public int hashCode() {
         return toString().hashCode();
     }

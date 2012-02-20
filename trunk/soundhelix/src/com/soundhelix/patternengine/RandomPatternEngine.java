@@ -98,7 +98,8 @@ public class RandomPatternEngine extends StringPatternEngine {
         
         try {
             setUniquePatternParts(XMLUtils.parseBoolean(random, "uniquePatternParts", node, xpath));
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
             
         super.setPatternString(generatePattern(patternString));
     }

@@ -26,13 +26,16 @@ import com.soundhelix.util.NoteUtils;
 
 public abstract class AbstractMultiPatternSequenceEngine extends AbstractSequenceEngine {
     
+    /** The transition character. */
     protected static final char TRANSITION = '+';
     
     /** The random generator. */
     protected Random random;
     
+    /** The boolean indicating whether chords should be normalized. */
     protected boolean isNormalizeChords = true;
     
+    /** The array of patterns. */
     private Pattern[] patterns;
     
     public AbstractMultiPatternSequenceEngine() {
@@ -109,7 +112,8 @@ public abstract class AbstractMultiPatternSequenceEngine extends AbstractSequenc
                         int pitch;
                         
                         if (isNormalizeChords) {
-                            pitch = NoteUtils.getTransitionPitch(chord.normalize(), nextChord != null ? nextChord.normalize() : null);
+                            pitch = NoteUtils.getTransitionPitch(chord.normalize(), nextChord != null
+                                    ? nextChord.normalize() : null);
                         } else {
                             pitch = NoteUtils.getTransitionPitch(chord, nextChord);
                         }

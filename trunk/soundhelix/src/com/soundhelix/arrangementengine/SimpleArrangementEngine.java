@@ -758,8 +758,6 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
         int lastCount = -1;
 
-        // TODO: all of this must work properly when only few sections and few ActivityVectors (even 1) are available
-
         int increaseTill = Math.min(sections / 2, startActivityCounts.length) - 1;
         int decreaseFrom = sections - Math.min(sections / 2,
                 stopActivityCounts.length + 1);
@@ -802,8 +800,6 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
     }
     
     private int getWantedActivityVectorCount(int section, int sections, int maxActivityVectors, int lastCount) {
-        // TODO: all of this must work properly when only few sections and few ActivityVectors (even 1) are available
-
         int count;
         
         if (section <= increaseTill) {
@@ -910,80 +906,95 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
             
             try {
                 minActive = Double.parseDouble(XMLUtils.parseString(random, "minActive", nodeList.item(i), xpath));
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
             
             boolean allowInactive = false;
 
             try {
                 allowInactive = XMLUtils.parseBoolean(random, "minActive/attribute::allowInactive", nodeList.item(i),
                         xpath);
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
 
             double maxActive = 100.0d;
             
             try {
                 maxActive = Double.parseDouble(XMLUtils.parseString(random, "maxActive", nodeList.item(i), xpath));
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
             
             int startShift = 0;
             try {
                 startShift = XMLUtils.parseInteger(random, "startShift", nodeList.item(i), xpath);
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
             
             int stopShift = 0;
             try {
                 stopShift = XMLUtils.parseInteger(random, "stopShift", nodeList.item(i), xpath);
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
 
             int startBeforeSection = Integer.MAX_VALUE;
             try {
                 startBeforeSection = XMLUtils.parseInteger(random, "startBeforeSection", nodeList.item(i), xpath);
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
 
             int startAfterSection = -1;
             try {
                 startAfterSection = XMLUtils.parseInteger(random, "startAfterSection", nodeList.item(i), xpath);
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
 
             int stopBeforeSection = -1;
             try {
                 stopBeforeSection = XMLUtils.parseInteger(random, "stopBeforeSection", nodeList.item(i), xpath);
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
 
             int stopAfterSection = Integer.MAX_VALUE;
             try {
                 stopAfterSection = XMLUtils.parseInteger(random, "stopAfterSection", nodeList.item(i), xpath);
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
 
             int minSegmentCount = 0;
             try {
                 minSegmentCount = XMLUtils.parseInteger(random, "minSegmentCount", nodeList.item(i), xpath);
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
 
             int maxSegmentCount = Integer.MAX_VALUE;
             try {
                 maxSegmentCount = XMLUtils.parseInteger(random, "maxSegmentCount", nodeList.item(i), xpath);
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
 
             int minSegmentLength = 0;
             try {
                 minSegmentLength = XMLUtils.parseInteger(random, "minSegmentLength", nodeList.item(i), xpath);
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
 
             int maxSegmentLength = Integer.MAX_VALUE;
             try {
                 maxSegmentLength = XMLUtils.parseInteger(random, "maxSegmentLength", nodeList.item(i), xpath);
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
 
             int minPauseLength = 0;
             try {
                 minPauseLength = XMLUtils.parseInteger(random, "minPauseLength", nodeList.item(i), xpath);
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
 
             int maxPauseLength = Integer.MAX_VALUE;
             try {
                 maxPauseLength = XMLUtils.parseInteger(random, "maxPauseLength", nodeList.item(i), xpath);
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
 
             activityVectorConfigurationHashMap.put(name, new ActivityVectorConfiguration(name, minActive, allowInactive,
                     maxActive, startShift, stopShift, startBeforeSection, startAfterSection, stopBeforeSection,
@@ -1124,24 +1135,61 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
     }
 
     private static final class ActivityVectorConfiguration {
+        /** The name. */
         private String name;
+        
+        /** The minimum activity (between 0 and 1). */
         private double minActive;
+        
+        /** The minimum number of active chord sections. */
         private int minActiveSectionCount;
+        
+        /** Boolean indicating whether complete inactivity is allowed. */
         private boolean allowInactive;
+        
+        /** The maximum activity (between 0 and 1). */
         private double maxActive;
+        
+        /** The maximum number of active chord sections. */
         private int maxActiveSectionCount;
+        
+        /** The start shift in ticks. */
         private int startShift;
+        
+        /** The stop shift in ticks. */
         private int stopShift;
+        
+        /** The number of chord sections to forbid activity, counted from the start. */
         private int startAfterSection;
+        
+        /** The latest section number where the activity must start, counted from the start. */
         private int startBeforeSection;
+        
+        /** The number of chord sections to forbid activity, counted from the end. */
         private int stopBeforeSection;
+
+        /** The latest section number where the activity must stop, counted from the end. */        
         private int stopAfterSection;
+        
+        /** The minimum number of active chord sections. */
         private int minSegmentCount;
+        
+        /** The maximum number of active chord sections. */       
         private int maxSegmentCount;
+        
+        /** The minimum activity segment length, counted in chord sections. */
         private int minSegmentLength;
+        
+        /** The maximum activity segment length, counted in chord sections. */
         private int maxSegmentLength;
+        
+        /** The minimum pause segment length, counted in chord sections. */
         private int minPauseLength;
+
+        /** The maximum pause segment length, counted in chord sections. */
         private int maxPauseLength;
+        
+        /** The ActivityVector instance. */
         private ActivityVector activityVector;
 
         private ActivityVectorConfiguration(String name, double minActive, boolean allowInactive, double maxActive,
@@ -1173,13 +1221,19 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
      */
     
     private static final class ActivityVectorState {
-        // the number of active chord sections to far
-        int activeCount;
-        // the number of activity segments so far
-        int segments;
-        // the length of the current segment in chord sections (if inactive this is the pause segment length)
-        int segmentLength;
-        // boolean indicating whether AV is active within the stop interval
-        boolean activeInStopInterval;
+        /** The number of active chord sections to far. */
+        private int activeCount;
+        
+        /** The number of activity segments so far. */
+        private int segments;
+        
+        /**
+         * The length of the current segment, counted in chord sections (if inactive this is the pause segment
+         * length).
+         */
+        private int segmentLength;
+
+        /** Boolean indicating whether the activity vector is active within the stop interval. */
+        private boolean activeInStopInterval;
     }
 }

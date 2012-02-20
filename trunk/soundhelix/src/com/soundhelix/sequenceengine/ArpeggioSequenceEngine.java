@@ -196,15 +196,18 @@ public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
         try {
             setNormalizeChords(!XMLUtils.parseBoolean(random, "obeyChordSubtype", node, xpath));
             logger.warn("The tag \"obeyChordSubtype\" has been deprecated. Use \"normalizeChords\" with inverted value instead.");
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
 
         try {
             setNormalizeChords(XMLUtils.parseBoolean(random, "normalizeChords", node, xpath));
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
 
         try {
             setObeyChordSections(XMLUtils.parseBoolean(random, "obeyChordSections", node, xpath));
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
 
         int patternEngineCount = nodeList.getLength();
 

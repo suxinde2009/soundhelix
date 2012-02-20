@@ -38,7 +38,8 @@ public class SwingRemoteControl extends AbstractTextRemoteControl {
     public String readLine() {
         try {
             return  textQueue.take();
-        } catch (InterruptedException e) {}
+        } catch (InterruptedException e) {
+        }
         
         return null;
     }

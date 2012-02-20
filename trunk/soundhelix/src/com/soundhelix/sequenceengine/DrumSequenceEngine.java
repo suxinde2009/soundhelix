@@ -340,7 +340,8 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
             
             try {
                 skipWhenApplied = XMLUtils.parseInteger(random, "skipWhenApplied", nodeList.item(i), xpath);            
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
             
             if (i + 1 + skipWhenApplied > patterns || i + 1 + skipWhenApplied < 0) {
                 throw new RuntimeException("Skip value \"" + skipWhenApplied
@@ -351,7 +352,8 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
             
             try {
                 skipWhenNotApplied = XMLUtils.parseInteger(random, "skipWhenNotApplied", nodeList.item(i), xpath);
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
             
             if (i + 1 + skipWhenNotApplied > patterns || i + 1 + skipWhenNotApplied < 0) {
                 throw new RuntimeException("Skip value \"" + skipWhenNotApplied

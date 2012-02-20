@@ -45,11 +45,13 @@ public class ChordSequenceEngine extends MultiPatternSequenceEngine {
         try {
             setNormalizeChords(!XMLUtils.parseBoolean(random, "obeyChordSubtype", node, xpath));
             logger.warn("The tag \"obeyChordSubtype\" has been deprecated. Use \"normalizeChords\" with inverted value instead.");
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
 
         try {
             setNormalizeChords(XMLUtils.parseBoolean(random, "normalizeChords", node, xpath));
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
 
         NodeList nodeList = (NodeList) xpath.evaluate("patternEngine", node, XPathConstants.NODESET);
 

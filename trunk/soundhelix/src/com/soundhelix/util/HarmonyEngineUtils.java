@@ -213,7 +213,8 @@ public final class HarmonyEngineUtils {
      * @param structure the structure
      * @param av the ActivityVector
      *
-     * @return a 4-element int array containing the minimum and the maximum segment length and the minimum and maximum pause length (in this order) or null
+     * @return a 4-element int array containing the minimum and the maximum segment length and the minimum and maximum
+     *         pause length (in this order) or null
      */
     
     public static int[] getMinMaxSegmentLengths(Structure structure, ActivityVector av) {

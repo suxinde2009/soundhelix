@@ -1,5 +1,6 @@
 package com.soundhelix.player;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -187,7 +188,8 @@ public class MidiPlayer extends AbstractPlayer {
                     }
                     sb.append("MIDI device " + (++num) + ": \"" + info.getName() + "\"");
                 }
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
         }
 
         return sb.toString();
@@ -201,7 +203,8 @@ public class MidiPlayer extends AbstractPlayer {
         if (devices != null && opened) {
             try {
                 muteAllChannels();
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
             
             try {
                 for (Device device : devices) {
@@ -414,21 +417,7 @@ public class MidiPlayer extends AbstractPlayer {
 
             long referenceTime = System.nanoTime();
             
-            if (beforePlayCommands != null && !beforePlayCommands.equals("")) {
-                String[] commands = StringUtils.split(beforePlayCommands, ';');
-
-                for (String command : commands) {
-                    String replacedCommand = replaceCommandPlaceholders(command);
-                    logger.debug("Running \"" + replacedCommand + "\"");
-                    Process process = Runtime.getRuntime().exec(replacedCommand);
-                    int rc = process.waitFor();
-                    
-                    if (rc != 0) {
-                        throw new RuntimeException("Command \"" + replacedCommand
-                                + "\" exited with non-zero exit code " + rc);
-                    }
-                }
-            }            
+            runBeforePlayCommands();            
             
             if (beforePlayWaitTicks > 0) {
                 if (logger.isDebugEnabled()) {
@@ -512,27 +501,61 @@ public class MidiPlayer extends AbstractPlayer {
                 waitTicks(referenceTime, afterPlayWaitTicks, clockTimingsPerTick, structure.getTicksPerBeat());
             }
             
-            if (afterPlayCommands != null && !afterPlayCommands.equals("")) {
-                String[] commands = StringUtils.split(afterPlayCommands, ';');
-
-                for (String command : commands) {
-                    String replacedCommand = replaceCommandPlaceholders(command);
-                    logger.debug("Running \"" + replacedCommand + "\"");
-                    Process process = Runtime.getRuntime().exec(replacedCommand);
-                    int rc = process.waitFor();
-                    
-                    if (rc != 0) {
-                        throw new RuntimeException("Command \"" + replacedCommand
-                                + "\" exited with non-zero exit code " + rc);
-                    }
-                }
-            }            
+            runAfterPlayCommands();            
 
             if (useClockSynchronization) {
                 sendMidiMessageToClockSynchronized(ShortMessage.STOP);
             }
         } catch (Exception e) {
             throw new RuntimeException("Playback error", e);
+        }
+    }
+
+    /**
+     * Runs the configured before play commands (if any).
+     * 
+     * @throws IOException in case of an I/O problem
+     * @throws InterruptedException in case of an interruption
+     */
+    private void runBeforePlayCommands() throws IOException, InterruptedException {
+        if (beforePlayCommands != null && !beforePlayCommands.equals("")) {
+            String[] commands = StringUtils.split(beforePlayCommands, ';');
+
+            for (String command : commands) {
+                String replacedCommand = replaceCommandPlaceholders(command);
+                logger.debug("Running \"" + replacedCommand + "\"");
+                Process process = Runtime.getRuntime().exec(replacedCommand);
+                int rc = process.waitFor();
+                
+                if (rc != 0) {
+                    throw new RuntimeException("Command \"" + replacedCommand
+                            + "\" exited with non-zero exit code " + rc);
+                }
+            }
+        }
+    }
+
+    /**
+     * Runs the configured after play commands (if any).
+     * 
+     * @throws IOException in case of an I/O problem
+     * @throws InterruptedException in case of an interruption
+     */
+    private void runAfterPlayCommands() throws IOException, InterruptedException {
+        if (afterPlayCommands != null && !afterPlayCommands.equals("")) {
+            String[] commands = StringUtils.split(afterPlayCommands, ';');
+
+            for (String command : commands) {
+                String replacedCommand = replaceCommandPlaceholders(command);
+                logger.debug("Running \"" + replacedCommand + "\"");
+                Process process = Runtime.getRuntime().exec(replacedCommand);
+                int rc = process.waitFor();
+                
+                if (rc != 0) {
+                    throw new RuntimeException("Command \"" + replacedCommand
+                            + "\" exited with non-zero exit code " + rc);
+                }
+            }
         }
     }
 
@@ -1066,8 +1089,11 @@ public class MidiPlayer extends AbstractPlayer {
             devices[i] = new Device(name, midiName, useClockSynchronization);
         }
         
-        beforePlayCommands = XMLUtils.parseString(random, (Node) xpath.evaluate("beforePlayCommands", node, XPathConstants.NODE), xpath);
-        afterPlayCommands = XMLUtils.parseString(random, (Node) xpath.evaluate("afterPlayCommands", node, XPathConstants.NODE), xpath);
+        beforePlayCommands = XMLUtils.parseString(random, (Node) xpath.evaluate("beforePlayCommands", node,
+                XPathConstants.NODE), xpath);
+        
+        afterPlayCommands = XMLUtils.parseString(random, (Node) xpath.evaluate("afterPlayCommands", node,
+                XPathConstants.NODE), xpath);
         
         setDevices(devices);    
         setMilliBPM((int) (1000
@@ -1285,11 +1311,24 @@ public class MidiPlayer extends AbstractPlayer {
         return currentTick;
     }
 
+    /**
+     * Container for a MIDI device.
+     */
+    
     private final class Device {
+        /** The SoundHelix-internal MIDI device name. */
         private final String name;
+        
+        /** The system's MIDI device name. */
         private final String midiName;
+        
+        /** The MIDI device. */
         private MidiDevice midiDevice;
+        
+        /** The MIDI receiver. */
         private Receiver receiver;
+        
+        /** Flag for using MIDI clock synchronization. */
         private boolean useClockSynchronization;
         
         public Device(String name, String midiName, boolean useClockSynchronization) {
@@ -1305,6 +1344,10 @@ public class MidiPlayer extends AbstractPlayer {
             this.midiName = midiName;
             this.useClockSynchronization = useClockSynchronization;
         }
+        
+        /**
+         * Opens the MIDI device.
+         */
         
         public void open() {
             try {
@@ -1328,7 +1371,11 @@ public class MidiPlayer extends AbstractPlayer {
                 throw new RuntimeException("Error opening MIDI device \"" + midiName + "\"", e);
             }
         }
-        
+
+        /**
+         * Closes the MIDI device.
+         */
+
         public void close() {
             if (midiDevice != null) {
                 midiDevice.close();
@@ -1337,9 +1384,18 @@ public class MidiPlayer extends AbstractPlayer {
         }
     }
     
+    /**
+     * Container for the combination of device, channel and preselected program.
+     */
+    
     public static class DeviceChannel {
+        /** The MIDI device. */
         private final Device device;
+        
+        /** The MIDI channel. */
         private final int channel;
+        
+        /** The MIDI program. */
         private final int program;
          
         public DeviceChannel(Device device, int channel, int program) {
@@ -1348,6 +1404,7 @@ public class MidiPlayer extends AbstractPlayer {
             this.program = program;
         }
 
+        @Override
         public final boolean equals(Object object) {
             if (!(object instanceof DeviceChannel)) {
                 return false;
@@ -1359,20 +1416,42 @@ public class MidiPlayer extends AbstractPlayer {
             return device.equals(other.device) && channel == other.channel && program == other.program;
         }
 
+        @Override
         public final int hashCode() {
             return device.hashCode() * 16273 + channel * 997 + program;
         }        
     }
+
+    /**
+     * Container for LFO configuration.
+     */
     
     private static class ControllerLFO {
+        /** The LFO. */
         private LFO lfo;
+        
+        /** The device name. */
         private final String deviceName;
+
+        /** The MIDI channel. */
         private int channel;
+        
+        /** The name of the MIDI controller. */
         private String controller;
+        
+        /** The instrument. */
         private String instrument;
+        
+        /** The LFO speed in radians. */
         private double speed;
+        
+        /** The LFO rotation unit. */
         private String rotationUnit;
+        
+        /** The LFO phase in radians. */
         private double phase;
+        
+        /** The value last sent to the MIDI controller. */
         private int lastSentValue;
 
         public ControllerLFO(LFO lfo, String deviceName, int channel, String controller, String instrument,

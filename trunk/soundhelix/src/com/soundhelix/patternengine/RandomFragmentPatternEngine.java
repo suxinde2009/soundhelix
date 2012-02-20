@@ -58,7 +58,8 @@ public class RandomFragmentPatternEngine extends StringPatternEngine {
 
         try {
             setUniquePatternParts(XMLUtils.parseBoolean(random, "uniquePatternParts", node, xpath));
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
 
         NodeList nodeList = (NodeList) xpath.evaluate("pattern", node, XPathConstants.NODESET);
         int patterns = nodeList.getLength();

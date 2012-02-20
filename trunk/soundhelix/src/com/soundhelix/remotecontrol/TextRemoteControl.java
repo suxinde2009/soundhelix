@@ -1,7 +1,7 @@
 package com.soundhelix.remotecontrol;
 
 /**
- * Extension to the RemoteControl which allows terminal-style communication, e.g., allowing input of lines to the user
+ * Extension to the RemoteControl which allows terminal-style communication, e.g., allowing input of lines by the user
  * and allowing output of lines by the system.
  * 
  * @author Thomas Schuerger (thomas@schuerger.com)

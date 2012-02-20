@@ -14,7 +14,7 @@ import com.soundhelix.util.HarmonyEngineUtils;
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
-public abstract class AbstractTextRemoteControl implements RemoteControl {
+public abstract class AbstractTextRemoteControl implements TextRemoteControl {
     /** The logger. */
     private static final Logger LOGGER = Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
 
@@ -152,21 +152,4 @@ public abstract class AbstractTextRemoteControl implements RemoteControl {
     public void setPlayer(Player player) {
         this.player = player;
     }
-    
-    /**
-     * Returns the next line entered by the user. This method is allowed to block
-     * until input is available, or it can return null if there is no input. The returned string
-     * must not contain CR or CR and LF at the end.
-     *
-     * @return the user input string or null if none is available
-     */
-    public abstract String readLine();
-    
-    /**
-     * Writes a line to the output that is to made visible to the user. The string should not contain
-     *
-     * @param string the string to write
-     */
-    
-    public abstract void writeLine(String string);
 }

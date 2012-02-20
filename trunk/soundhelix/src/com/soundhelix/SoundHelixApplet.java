@@ -35,8 +35,8 @@ import org.apache.log4j.spi.LoggingEvent;
 
 import com.soundhelix.player.MidiPlayer;
 import com.soundhelix.player.Player;
-import com.soundhelix.remotecontrol.AbstractTextRemoteControl;
 import com.soundhelix.remotecontrol.SwingRemoteControl;
+import com.soundhelix.remotecontrol.TextRemoteControl;
 import com.soundhelix.util.SongUtils;
 import com.soundhelix.util.VersionUtils;
 
@@ -70,7 +70,7 @@ public class SoundHelixApplet extends JApplet implements Runnable {
     private Desktop desktop;
     
     /** The remote control. */
-    private AbstractTextRemoteControl remoteControl;
+    private TextRemoteControl remoteControl;
     
     /** The text field for the song name. */
     private JTextField songNameTextField;
@@ -478,9 +478,9 @@ public class SoundHelixApplet extends JApplet implements Runnable {
         private Layout layout;
         
         /** The remote control. */
-        private AbstractTextRemoteControl remoteControl;
+        private TextRemoteControl remoteControl;
         
-        public TextRemoteControlAppender(Layout layout, AbstractTextRemoteControl remoteControl) {
+        public TextRemoteControlAppender(Layout layout, TextRemoteControl remoteControl) {
             super();
             this.layout = layout;
             this.remoteControl = remoteControl;

@@ -66,24 +66,8 @@ public final class SongUtils {
     
     public static Player generateSong(URL url, long randomSeed) throws Exception {
         Document doc = parseDocument(url);
-        
-        XPath xpath = XPathFactory.newInstance().newXPath();
-        Node rootNode = (Node) xpath.evaluate("/*", doc, XPathConstants.NODE);        
-        checkVersion(rootNode, xpath);
-            
-        Node songNameEngineNode = (Node) xpath.evaluate("songNameEngine", rootNode, XPathConstants.NODE);
-        SongNameEngine songNameEngine = XMLUtils.getInstance(SongNameEngine.class,
-                songNameEngineNode, xpath, randomSeed, -1);
-        
-        String songName = songNameEngine.createSongName();
-        LOGGER.info("Song name: \"" + songName + "\"");        
-        Player player = generateSong(doc, getSongRandomSeed(songName));
-        
-        // store the song name
-        player.getArrangement().getStructure().setSongName(songName);
-        
-        return player;
-    }   
+        return createPlayer(doc, randomSeed);
+    }
     
     /**
      * Parses the XML file provided by the given input stream, creates an arrangement and a player and configures
@@ -99,24 +83,8 @@ public final class SongUtils {
      */
     
     public static Player generateSong(InputStream inputStream, String systemId, long randomSeed) throws Exception {
-        Document doc = parseDocument(inputStream, systemId);
-        
-        XPath xpath = XPathFactory.newInstance().newXPath();
-        Node rootNode = (Node) xpath.evaluate("/*", doc, XPathConstants.NODE);        
-        checkVersion(rootNode, xpath);
-            
-        Node songNameEngineNode = (Node) xpath.evaluate("songNameEngine", rootNode, XPathConstants.NODE);
-        SongNameEngine songNameEngine = XMLUtils.getInstance(SongNameEngine.class,
-                songNameEngineNode, xpath, randomSeed, -1);
-        
-        String songName = songNameEngine.createSongName();
-        LOGGER.info("Song name: \"" + songName + "\"");        
-        Player player = generateSong(doc, getSongRandomSeed(songName));
-        
-        // store the song name
-        player.getArrangement().getStructure().setSongName(songName);
-        
-        return player;
+        Document doc = parseDocument(inputStream, systemId);        
+        return createPlayer(doc, randomSeed);
     }   
 
     /**
@@ -133,18 +101,7 @@ public final class SongUtils {
     
     public static Player generateSong(URL url, String songName) throws Exception {
         Document doc = parseDocument(url);
-
-        XPath xpath = XPathFactory.newInstance().newXPath();
-        Node rootNode = (Node) xpath.evaluate("/*", doc, XPathConstants.NODE);        
-        checkVersion(rootNode, xpath);
-        
-        LOGGER.info("Song name: \"" + songName + "\"");        
-        Player player = generateSong(doc, getSongRandomSeed(songName));
-
-        // store the song name
-        player.getArrangement().getStructure().setSongName(songName);
-
-        return player;
+        return createPlayer(doc, songName);
     }
 
     /**
@@ -162,21 +119,59 @@ public final class SongUtils {
     
     public static Player generateSong(InputStream inputStream, String systemId, String songName) throws Exception {
         Document doc = parseDocument(inputStream, systemId);
+        return createPlayer(doc, songName);
+    }
 
+    /**
+     * Creates a SongNameEngine, generates a song and creates a Player from it.
+     * 
+     * @param doc the parsed document
+     * @param randomSeed the random seed
+     *
+     * @return the player
+     */
+    
+    private static Player createPlayer(Document doc, long randomSeed) throws XPathExpressionException,
+                            InstantiationException, XPathException, IllegalAccessException, ClassNotFoundException {
         XPath xpath = XPathFactory.newInstance().newXPath();
         Node rootNode = (Node) xpath.evaluate("/*", doc, XPathConstants.NODE);        
         checkVersion(rootNode, xpath);
-        
+
+        Node songNameEngineNode = (Node) xpath.evaluate("songNameEngine", rootNode, XPathConstants.NODE);
+        SongNameEngine songNameEngine = XMLUtils.getInstance(SongNameEngine.class,
+                songNameEngineNode, xpath, randomSeed, -1);
+
+        String songName = songNameEngine.createSongName();
         LOGGER.info("Song name: \"" + songName + "\"");        
         Player player = generateSong(doc, getSongRandomSeed(songName));
 
         // store the song name
         player.getArrangement().getStructure().setSongName(songName);
+        return player;
+    }
+    
+    /**
+     * Creates a player using the specified song name.
+     * 
+     * @param doc the parsed document
+     *
+     * @return the player
+     */
 
+    private static Player createPlayer(Document doc, String songName) throws XPathExpressionException,
+            InstantiationException, XPathException, IllegalAccessException, ClassNotFoundException {
+        checkVersion(doc);
+
+        LOGGER.info("Song name: \"" + songName + "\"");        
+        Player player = generateSong(doc, getSongRandomSeed(songName));
+
+        // store the song name
+        player.getArrangement().getStructure().setSongName(songName);
         return player;
     }
 
     /**
+     * 
      * Generates a new song based on the given document and random seed and returns the pre-configured player that
      * can be used to play the song.
      * 
@@ -333,6 +328,20 @@ public final class SongUtils {
     }
     
     /**
+     * Determines the root node and calls checkVersion().
+     * 
+     * @param doc the parsed document
+     *
+     * @throws XPathExpressionException
+     */
+    
+    private static void checkVersion(Document doc) throws XPathExpressionException {
+        XPath xpath = XPathFactory.newInstance().newXPath();
+        Node rootNode = (Node) xpath.evaluate("/*", doc, XPathConstants.NODE);        
+        checkVersion(rootNode, xpath);
+    }
+
+    /**
      * Checks if the version of the XML document is compatible with the application version. If the versions are not
      * compatible a RuntimeException will be thrown with an appropriate message. If the application version is
      * undefined ("???"), the check is skipped.
@@ -377,6 +386,6 @@ public final class SongUtils {
      */
     
     public static long getSongRandomSeed(String title) {
-        return title.trim().toLowerCase().hashCode();
+        return StringUtils.getLongHashCode(title.trim().toLowerCase());
     }
 }

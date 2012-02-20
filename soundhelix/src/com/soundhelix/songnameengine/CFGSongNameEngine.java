@@ -35,10 +35,7 @@ public class CFGSongNameEngine extends AbstractSongNameEngine {
     /** The separator. */
     private char stringSeparator = ',';
     
-    /**
-     * @see SongNameEngine#createSongName()
-     */
-    
+    @Override
     public String createSongName() {
         Random random = new Random(randomSeed);
 
@@ -54,6 +51,7 @@ public class CFGSongNameEngine extends AbstractSongNameEngine {
         return StringUtils.capitalize(songName);
     }
     
+    @Override
     public void configure(Node node, XPath xpath) throws XPathException {
         Random random = new Random(randomSeed);
         

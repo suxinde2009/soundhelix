@@ -29,10 +29,12 @@ public abstract class AbstractPlayer implements Player {
         logger = Logger.getLogger(this.getClass());
     }
 
+    @Override
     public void setRandomSeed(long randomSeed) {
         this.randomSeed = randomSeed;
     }
 
+    @Override
     public long getRandomSeed() {
         return randomSeed;
     }

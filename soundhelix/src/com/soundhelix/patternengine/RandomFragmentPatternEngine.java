@@ -204,29 +204,6 @@ public class RandomFragmentPatternEngine extends StringPatternEngine {
         return sb.toString();
     }
 
-    private static PatternEntry[] parsePatternEntryListString(Random random, String path, Node parentNode, XPath xpath) {
-        String string = XMLUtils.parseString(random, path, parentNode, xpath);
-
-        if (string == null || string.equals("")) {
-            return null;
-        }
-
-        String[] stringArray = string.split(",");
-        int length = stringArray.length;
-
-        PatternEntry[] array = new PatternEntry[length];
-
-        for (int i = 0; i < length; i++) {
-            if (Character.isDigit(stringArray[i].charAt(0))) {
-                array[i] = new PatternEntry(Integer.parseInt(stringArray[i]));
-            } else {
-                array[i] = new PatternEntry(stringArray[i].charAt(0));
-            }
-        }
-
-        return array;
-    }
-
     public void setPatternTicks(int patternTicks) {
         this.patternTicks = patternTicks;
     }
@@ -237,25 +214,5 @@ public class RandomFragmentPatternEngine extends StringPatternEngine {
 
     public void setUniquePatternParts(boolean isUniquePatternParts) {
         this.isUniquePatternParts = isUniquePatternParts;
-    }
-
-    private static final class PatternEntry {
-        /** The offset. */
-        private int offset;
-        
-        /** The wildcard character. */
-        private char wildcard;
-        
-        /** The wildcard flag. */
-        private boolean isWildcard;
-        
-        private PatternEntry(int offset) {
-            this.offset = offset;
-        }
-        
-        private PatternEntry(char wildcard) {
-            this.wildcard = wildcard;
-            this.isWildcard = true;
-        }        
     }
 }

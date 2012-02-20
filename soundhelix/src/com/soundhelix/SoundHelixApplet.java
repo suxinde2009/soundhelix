@@ -53,6 +53,9 @@ import com.soundhelix.util.VersionUtils;
  */
 
 public class SoundHelixApplet extends JApplet implements Runnable {
+    
+     /** The serial version UID. */
+    private static final long serialVersionUID = 7085988359001963796L;
 
     /** The default URL used if no URL has been specified. */
     private static final String DEFAULT_URL = "examples/SoundHelix-Piano.xml";

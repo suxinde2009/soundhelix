@@ -35,11 +35,20 @@ import com.soundhelix.util.XMLUtils;
  */
 
 public class PatternHarmonyEngine extends AbstractHarmonyEngine {
+    
+    /** The array of chords. */
     private Chord[] chords;
+    
+    /** The array of ticks per chord. */
     private int[] chordTicks;
+    
+    /** The array of chord section ticks. */
     private int[] sectionTicks;
     
+    /** The array of chord patterns. */
     private ChordPattern[] chordPatterns;
+    
+    /** The array of chord random tables. */
     private String[][] chordRandomTables;
     
     /** Boolean indicating whether chord distances should be minimized. */
@@ -52,6 +61,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
         super();
     }
     
+    @Override
     public Chord getChord(int tick) {
         if (chords == null) {
             parsePattern();
@@ -64,6 +74,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
         }
     }
 
+    @Override
     public int getChordTicks(int tick) {
         if (chords == null) {
             parsePattern();
@@ -76,6 +87,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
         }
     }
 
+    @Override
     public int getChordSectionTicks(int tick) {
         if (chords == null) {
             parsePattern();
@@ -318,6 +330,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
         return new ChordPattern(sb.toString(), chordPattern.minimizeChordDistance);
     }
     
+    @Override
     public void configure(Node node, XPath xpath) throws XPathException {        
         random = new Random(randomSeed);
 
@@ -357,8 +370,14 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
         this.isMinimizeChordDistance = isMinimizeChordDistance;
     }
     
+    /**
+     * Container for chord pattern details.
+     */
+    
     private class ChordPattern {
+        /** The chord pattern string. */
         private String chordPattern;
+        
         private int minimizeChordDistance;
         
         public ChordPattern(String chordPattern, int minimizeChordDistance) {

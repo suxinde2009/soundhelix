@@ -28,6 +28,7 @@ public abstract class AbstractMultiPatternSequenceEngine extends AbstractSequenc
     
     protected static final char TRANSITION = '+';
     
+    /** The random generator. */
     protected Random random;
     
     protected boolean isNormalizeChords = true;
@@ -42,6 +43,7 @@ public abstract class AbstractMultiPatternSequenceEngine extends AbstractSequenc
         this.patterns = patterns;
     }
     
+    @Override
     public Track render(ActivityVector[] activityVectors) {
         ActivityVector activityVector = activityVectors[0];
 

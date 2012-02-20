@@ -1,7 +1,5 @@
 package com.soundhelix.misc;
 
-import java.io.Serializable;
-
 import com.soundhelix.harmonyengine.HarmonyEngine;
 
 /**
@@ -27,7 +25,7 @@ import com.soundhelix.harmonyengine.HarmonyEngine;
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
-public class Structure implements Serializable {
+public class Structure {
     /** The number of bars. */
     private int bars;
     

@@ -18,9 +18,6 @@ import java.util.List;
  */
 
 public class Sequence {
-    /** Flag indicating if the class was tested. */
-    private static boolean tested;    
-
     /** The list of sequence entries. */
     private List<Sequence.SequenceEntry> sequence = new ArrayList<Sequence.SequenceEntry>();
 

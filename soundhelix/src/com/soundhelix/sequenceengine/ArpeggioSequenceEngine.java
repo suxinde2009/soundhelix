@@ -34,10 +34,16 @@ import com.soundhelix.util.XMLUtils;
 // TODO: allow specifying velocities in arpeggio patterns (like in the PatternSequenceEngine)
 
 public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
+    /** The random generator. */
     protected Random random;
+    
+    /** Boolean indicating if chords should be normalized. */
     protected boolean isNormalizeChords = true;
+    
+    /** Boolean indicating of chord sections should be obeyed. */
     protected boolean obeyChordSections;
     
+    /** The array of patterns. */
     private Pattern[] patterns;
 
     public ArpeggioSequenceEngine() {
@@ -52,6 +58,7 @@ public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
         this.obeyChordSections = obeyChordSections;
     }
 
+    @Override
     public Track render(ActivityVector[] activityVectors) {
         ActivityVector activityVector = activityVectors[0];
 
@@ -166,6 +173,7 @@ public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
         }
     }
     
+    @Override
     public void configure(Node node, XPath xpath) throws XPathException {
         Random random = new Random(randomSeed);
 

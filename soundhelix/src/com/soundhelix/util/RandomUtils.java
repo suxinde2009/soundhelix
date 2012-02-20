@@ -10,7 +10,8 @@ import java.util.Random;
  */
 
 public final class RandomUtils {
-    private RandomUtils() {}
+    private RandomUtils() {
+    }
     
     /**
      * Returns a random integer uniformly distributed within min

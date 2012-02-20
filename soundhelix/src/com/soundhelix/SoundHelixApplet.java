@@ -174,7 +174,8 @@ public class SoundHelixApplet extends JApplet implements Runnable {
                     this.soundHelixShareButton = shareButton;
 
                     songNamePanel.add(panel, BorderLayout.EAST);
-                } catch (MalformedURLException e) {}
+                } catch (MalformedURLException e) {
+                }
             }
 
             add(songNamePanel, BorderLayout.NORTH);
@@ -337,7 +338,8 @@ public class SoundHelixApplet extends JApplet implements Runnable {
                     ((MidiPlayer) player).muteAllChannels();
                 }
             }
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
         
         super.stop();
     }
@@ -446,7 +448,8 @@ public class SoundHelixApplet extends JApplet implements Runnable {
                 
                 try {
                     Thread.sleep(3000);
-                } catch (Exception e2) {}
+                } catch (Exception e2) {
+                }
             }            
         }
     }

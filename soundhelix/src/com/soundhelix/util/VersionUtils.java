@@ -14,7 +14,8 @@ public final class VersionUtils {
     /** The logger. */
     private static final Logger LOGGER = Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
     
-    private VersionUtils() {}
+    private VersionUtils() {
+    }
 
     /**
      * Logs the application version.

@@ -88,11 +88,13 @@ public class RandomSequenceEngine extends AbstractMultiPatternSequenceEngine {
         try {
             setNormalizeChords(!XMLUtils.parseBoolean(random, "obeyChordSubtype", node, xpath));
             logger.warn("The tag \"obeyChordSubtype\" has been deprecated. Use \"normalizeChords\" with inverted value instead.");
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
 
         try {
             setNormalizeChords(XMLUtils.parseBoolean(random, "normalizeChords", node, xpath));
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
 
         setPatternTicks(XMLUtils.parseInteger(random, "patternTicks", node, xpath));
         setNoteProbability(XMLUtils.parseDouble(random, "noteProbability", node, xpath) / 100.0);

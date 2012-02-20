@@ -344,7 +344,8 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
             try {
                 boolean b =  XMLUtils.parseBoolean(random, "attribute::minimizeChordDistance", nodeList.item(i), xpath);
                 minimizeChordDistance = b ? 1 : 0;
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
             
             chordPatterns[i] = new ChordPattern(pattern, minimizeChordDistance);
         }
@@ -361,7 +362,8 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 
         try {
             setMinimizeChordDistance(XMLUtils.parseBoolean(random, "minimizeChordDistance", node, xpath));
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
 
         setChordRandomTables(chordRandomTables);
     }

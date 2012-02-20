@@ -19,6 +19,10 @@ public class Pattern implements Iterable<PatternEntry> {
     /** The total number of ticks. */
     private int totalTicks;
 
+    private Pattern() {
+        
+    }
+    
     public Pattern(PatternEntry[] pattern) {
         this.pattern = pattern;
 

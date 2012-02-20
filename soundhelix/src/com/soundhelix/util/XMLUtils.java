@@ -115,7 +115,8 @@ public final class XMLUtils {
     public static int parseInteger(Random random, Node node, XPath xpath) {
         try {
             return Integer.parseInt(node.getTextContent());
-        } catch (RuntimeException e) {}
+        } catch (RuntimeException e) {
+        }
 
         Node n = getFirstElementChild(node);
     

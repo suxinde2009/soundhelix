@@ -1,7 +1,5 @@
 package com.soundhelix.harmonyengine;
 
-import java.io.Serializable;
-
 import com.soundhelix.misc.Chord;
 import com.soundhelix.misc.RandomSeedable;
 import com.soundhelix.misc.Structure;
@@ -56,7 +54,7 @@ import com.soundhelix.misc.XMLConfigurable;
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
-public interface HarmonyEngine extends XMLConfigurable, RandomSeedable, Serializable {
+public interface HarmonyEngine extends XMLConfigurable, RandomSeedable {
     
     /**
      * Sets the song structure.

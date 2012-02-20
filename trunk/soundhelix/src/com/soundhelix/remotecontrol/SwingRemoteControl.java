@@ -19,6 +19,7 @@ public class SwingRemoteControl extends AbstractTextRemoteControl {
     /** The queue for entered texts lines. */
     private BlockingQueue<String> textQueue = new LinkedBlockingQueue<String>();
     
+    @SuppressWarnings("unused")
     private SwingRemoteControl() {
     }
 

@@ -1,13 +1,11 @@
 package com.soundhelix.misc;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.soundhelix.util.ConsistentRandom;
 import com.soundhelix.util.NoteUtils;
 
 /**
@@ -26,7 +24,7 @@ import com.soundhelix.util.NoteUtils;
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
-public class Chord implements Serializable {
+public class Chord {
     private static final int CHORD_FLAVORS = 12;
     
     private static final int MAJOR = 407;
@@ -42,9 +40,6 @@ public class Chord implements Serializable {
     // note that AUG6 and AUG4 are the same as AUG, this is correct
     private static final int AUG6 = 408;
     private static final int AUG4 = 408;
-
-    /** The consistent random generator. */
-    private static ConsistentRandom random;
 
     /** Maps from chord names to chord codes. */
     private static final Map<String, Integer> NAME_TO_CODE_MAP = new LinkedHashMap<String, Integer>(12 * CHORD_FLAVORS);

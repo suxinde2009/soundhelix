@@ -33,6 +33,7 @@ public abstract class AbstractFreeMultiPatternSequenceEngine extends AbstractSeq
         this.patterns = patterns;
     }
     
+    @Override
     public Track render(ActivityVector[] activityVectors) {
         ActivityVector activityVector = activityVectors[0];
 

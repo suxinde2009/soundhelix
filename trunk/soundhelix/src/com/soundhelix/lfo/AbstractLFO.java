@@ -142,10 +142,12 @@ public abstract class AbstractLFO implements LFO {
         this.amplitudeMaximum = maximum;
     }
     
+    @Override
     public void setRandomSeed(long randomSeed) {
         this.randomSeed = randomSeed;
     }
 
+    @Override
     public long getRandomSeed() {
         return randomSeed;
     }

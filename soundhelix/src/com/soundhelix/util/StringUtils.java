@@ -11,7 +11,8 @@ import java.util.List;
  */
 
 public final class StringUtils {
-    private StringUtils() {}
+    private StringUtils() {
+    }
 
     /**
      * Returns a capitalized version of the given string. If the given string already starts with
@@ -92,5 +93,25 @@ public final class StringUtils {
         list.add(sb.toString());
 
         return list.toArray(new String[list.size()]);
+    }
+    
+    /**
+     * Version of the usual String.hashCode() method that computes a long hash code instead of an int hash code. Using
+     * a rough estimation, the String.hashCode() method wraps around after roughly 7 characters, whereas this method
+     * wraps around after roughly 13 characters.
+     * 
+     * @param string the string
+     * @return the long hash code
+     */
+    
+    public static long getLongHashCode(String string) {
+        long hash = 0;
+        int len = string.length();
+        
+        for (int i = 0; i < len; i++) {
+            hash = 31 * hash + string.charAt(i);
+        }
+        
+        return hash;
     }
 }

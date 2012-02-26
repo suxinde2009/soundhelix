@@ -38,12 +38,6 @@ import com.soundhelix.util.XMLUtils;
 
 public class MelodySequenceEngine extends AbstractSequenceEngine {
 
-    /** The minimum pitch to use. */
-    private static final int maxDistanceDown = 2;
-
-    /** The maximum pitch to use. */
-    private static final int maxDistanceUp = 2;
-
     /** Wildcard for pitch on chord. */
     private static final char ON_CHORD = '#';
 
@@ -53,9 +47,6 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
     /** Wildcard for repeated pitch. */
     private static final char REPEAT = '*';
 
-    /** The probability for keeping the pitch if possible. */ 
-    private double keepPitchProbability = 0.4d;
-
     /** The minimum pitch to use. */
     private int minPitch = -3;
 
@@ -64,6 +55,9 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
 
     /** The input pattern for melodies. */
     private Pattern pattern;
+
+    /** The pitch distances. */
+    private int[] pitchDistances = new int[] {-2, -1, 0, 1, 2};
     
     /** The random generator. */
     private Random random;
@@ -123,13 +117,11 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
      * Returns a random pitch which is near the given pitch and on the C/Am scale.
      * 
      * @param pitch the starting pitch
-     * @param maxDistanceDown the maximum distance below the pitch
-     * @param maxDistanceUp the maximum distance above the pitch
      * 
      * @return the random pitch
      */
     
-    private int getRandomPitch(int pitch, int maxDistanceDown, int maxDistanceUp) {
+    private int getRandomPitch(int pitch) {
         int p;
         boolean again;
         
@@ -139,29 +131,21 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
             again = false;
             p = pitch;
             
-            // 0 = up, 1 = down, 2 = keep pitch
-            int r;
+            int distance = pitchDistances[random.nextInt(pitchDistances.length)];
+            p += distance;
             
-            if (random.nextDouble() < keepPitchProbability) {
-                r = 2;
-            } else {
-                r = random.nextInt(2);
-            }
-                        
-            if (r == 0 || p < minPitch) {
-                // move up
-                p += random.nextInt(maxDistanceUp);
-                do {
+            if (distance > 0) {
+                // if p is not on the C/Am scale, move up until it is
+                while (!NoteUtils.isOnScale(p)) {
                     p++;
-                } while (!NoteUtils.isOnScale(p));            
-            } else if (r == 1 || p > maxPitch) {
-                // move down
-                p -= random.nextInt(maxDistanceDown);
-                do {
+                }            
+            } else if (distance < 0) {
+                // if p is not on the C/Am scale, move down until it is
+                while (!NoteUtils.isOnScale(p)) {
                     p--;
-                } while (!NoteUtils.isOnScale(p));            
+                }
             } else {
-                // don't move, but check
+                // don't move, but check if pitch is on the C/Am scale
                 if (!NoteUtils.isOnScale(p)) {
                     // pitch has to be changed, because it is invalid
                     // we must go up or down, so we'll retry                
@@ -178,18 +162,15 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
     }
 
     /**
-     * Returns a random pitch which is near the given pitch and
-     * is one of the given chords notes.
+     * Returns a random pitch which is near the given pitch and is one of the given chords notes.
      * 
      * @param chord the chord
      * @param pitch the starting pitch
-     * @param maxDistanceDown the maximum distance below the pitch
-     * @param maxDistanceUp the maximum distance above the pitch
      * 
      * @return the random pitch
      */
     
-    private int getRandomPitch(Chord chord, int pitch, int maxDistanceDown, int maxDistanceUp) {
+    private int getRandomPitch(Chord chord, int pitch) {
         int p;
         boolean again;
         
@@ -199,38 +180,29 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
             again = false;
             p = pitch;
             
-            // 0 = up, 1 = down, 2 = keep pitch
-            int r;
-
-            if (random.nextDouble() < keepPitchProbability) {
-                r = 2;
-            } else {
-                r = random.nextInt(2);
-            }
+            int distance = pitchDistances[random.nextInt(pitchDistances.length)];
+            p += distance;
             
-            if (r == 0 || p < minPitch) {
-                // move up
-                p += random.nextInt(maxDistanceUp);
-                do {
+            if (distance > 0) {
+                // if p is not a chord pitch, move up until it is
+                while (!chord.containsPitch(p)) {
                     p++;
-                } while (!chord.containsPitch(p));            
-            } else if (r == 1 || p > maxPitch) {
-                // move down
-                p -= random.nextInt(maxDistanceDown);
-                do {
+                }            
+            } else if (distance < 0) {
+                // if p is not a chord pitch, move down until it is
+                while (!chord.containsPitch(p)) {
                     p--;
-                } while (!chord.containsPitch(p));            
+                }
             } else {
-                // don't move, but check
+                // don't move, but check if pitch is a chord pitch
                 if (!chord.containsPitch(p)) {
                     // pitch has to be changed, because it is invalid
                     // we must go up or down, so we'll retry                
                     again = true;
                 }
             }
-            
         } while (--iterations > 0 && (again || p < minPitch || p > maxPitch));
-
+        
         if (iterations == 0) {
             throw new RuntimeException("Wider range between minPitch and maxPitch required");
         }
@@ -277,7 +249,7 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
                     if (entry.isPause()) {
                         list.add(new PatternEntry(t));
                     } else if (entry.isWildcard() && entry.getWildcardCharacter() == FREE) {
-                        pitch = getRandomPitch(pitch, maxDistanceDown, maxDistanceUp);
+                        pitch = getRandomPitch(pitch);
                         list.add(new PatternEntry(pitch, entry.getVelocity(), t, entry.isLegato()));
                     } else if (entry.isWildcard() && entry.getWildcardCharacter() == REPEAT
                                && previousPitch != Integer.MIN_VALUE && chord.containsPitch(pitch)) {
@@ -285,7 +257,7 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
                         list.add(new PatternEntry(pitch, entry.getVelocity(), t, entry.isLegato()));
                     } else if (!entry.isWildcard() || entry.getWildcardCharacter() == ON_CHORD) {
                         // TODO: only allow ON_CHORD wildcard, not normal offsets
-                        pitch = getRandomPitch(chord, pitch, maxDistanceDown, maxDistanceUp);
+                        pitch = getRandomPitch(chord, pitch);
                         list.add(new PatternEntry(pitch, entry.getVelocity(), t, entry.isLegato()));
                     }
                     
@@ -309,8 +281,7 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
         random = new Random(randomSeed);
         
         try {
-            setKeepPitchProbability(XMLUtils.parseDouble(random,
-                    (Node) xpath.evaluate("keepPitchProbability", node, XPathConstants.NODE), xpath) / 100.0);
+            setPitchDistances(XMLUtils.parseIntegerListString(random, "pitchDistances", node, xpath));
         } catch (Exception e) {
         }
 
@@ -353,14 +324,6 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
         this.pattern = pattern;
     }
 
-    public double getKeepPitchProbability() {
-        return keepPitchProbability;
-    }
-
-    public void setKeepPitchProbability(double keepPitchProbability) {
-        this.keepPitchProbability = keepPitchProbability;
-    }
-
     public int getMinPitch() {
         return minPitch;
     }
@@ -375,5 +338,13 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
 
     public void setMaxPitch(int maxPitch) {
         this.maxPitch = maxPitch;
+    }
+
+    public int[] getPitchDistances() {
+        return pitchDistances;
+    }
+
+    public void setPitchDistances(int[] pitchDistances) {
+        this.pitchDistances = pitchDistances;
     }
 }

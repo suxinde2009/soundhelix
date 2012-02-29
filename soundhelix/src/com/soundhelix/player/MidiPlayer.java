@@ -620,7 +620,7 @@ public class MidiPlayer extends AbstractPlayer {
         if ((tick % (4 * ticksPerBar)) == 0) {
             logger.debug(String.format("Tick: %5d   Chord section: %3d   Seconds: %4d   Progress: %5.1f %%", tick,
                     HarmonyEngineUtils.getChordSectionNumber(arrangement.getStructure(), tick),
-                    tick * 60 * 1000 / (structure.getTicksPerBeat() * milliBPM),
+                    tick * 60 * 1000 / (structure.getTicksPerBeat() * (skipEnabled ? skipOriginalMilliBPM : milliBPM)),
                     (double) tick * 100 / structure.getTicks()));
         }
 

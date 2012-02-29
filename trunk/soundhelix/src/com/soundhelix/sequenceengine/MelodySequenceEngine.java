@@ -29,22 +29,21 @@ import com.soundhelix.util.XMLUtils;
 
 /**
  * Implements a sequence engine that uses a randomly generated melody, played with a given rhythmic pattern. For each
- * distinct chord section, a melody is generated and used for each occurrence of the chord section.
+ * distinct chord section, a random number of melodies between minMelodies and maxMelodies are generated. For each
+ * occurrence of a chord section, its generated melodies are used in a round-robin fashion.
  *
  * @author Thomas Schürger (thomas@schuerger.com)
  */
 
-// TODO: add proper configurability
-
 public class MelodySequenceEngine extends AbstractSequenceEngine {
 
-    /** Wildcard for pitch on chord. */
+    /** The wildcard for pitch on chord. */
     private static final char ON_CHORD = '#';
 
-    /** Wildcard for free pitch. */
+    /** The wildcard for free pitch. */
     private static final char FREE = '+';
     
-    /** Wildcard for repeated pitch. */
+    /** The wildcard for repeated pitch. */
     private static final char REPEAT = '*';
 
     /** The minimum pitch to use. */
@@ -55,6 +54,12 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
 
     /** The input pattern for melodies. */
     private Pattern pattern;
+
+    /** The minimum number of melodies per distinct chord section. */
+    private int minMelodies = 1;
+
+    /** The maximum number of melodies per distinct chord section. */
+    private int maxMelodies = 1;
 
     /** The pitch distances. */
     private int[] pitchDistances = new int[] {-2, -1, 0, 1, 2};
@@ -76,11 +81,23 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
         int tick = 0;
         int ticks = structure.getTicks();
 
-        Map<String, Pattern> melodyHashMap = createMelodies();
+        Map<String, List<Pattern>> melodyMap = createMelodies();
+        
+        // maps chord sections to the current melody index
+        Map<String, Integer> melodyIndexMap = new HashMap<String, Integer>(melodyMap.size());
 
         while (tick < ticks) {
             int len = harmonyEngine.getChordSectionTicks(tick);
-            Pattern p = melodyHashMap.get(HarmonyEngineUtils.getChordSectionString(structure, tick));
+            String section = HarmonyEngineUtils.getChordSectionString(structure, tick);
+            List<Pattern> patternList = melodyMap.get(section);
+
+            Integer melodyIndex = melodyIndexMap.get(section);
+            
+            if (melodyIndex == null) {
+                melodyIndex = 0;
+            }
+
+            Pattern p = patternList.get(melodyIndex);
 
             int pos = 0;
             int tickEnd = tick + len;
@@ -106,6 +123,14 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
                 pos++;
                 tick += l;
             }
+            
+            melodyIndex++;
+            
+            if (melodyIndex >= patternList.size()) {
+                melodyIndex = 0;
+            }
+            
+            melodyIndexMap.put(section, melodyIndex);
         }
         
         Track track = new Track(TrackType.MELODY);
@@ -217,12 +242,16 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
      * @return a map mapping chord section strings to melody patterns
      */
     
-    private Map<String, Pattern> createMelodies() {
+    private Map<String, List<Pattern>> createMelodies() {
         HarmonyEngine he = structure.getHarmonyEngine();
         
         int patternLength = pattern.size();
         
-        Map<String, Pattern> ht = new HashMap<String, Pattern>();
+        // maps chord sections to lists of melodies
+        Map<String, List<Pattern>> melodyMap = new HashMap<String, List<Pattern>>();
+
+        // maps chord sections to the randomly chosen number of melodies
+        Map<String, Integer> sizeMap = new HashMap<String, Integer>();
         
         int ticks = structure.getTicks();
         int tick = 0;
@@ -231,8 +260,25 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
         while (tick < ticks) {
             String section = HarmonyEngineUtils.getChordSectionString(structure, tick);
             int len = he.getChordSectionTicks(tick);
+
+            List<Pattern> patternList = melodyMap.get(section);
+            int patterns;
             
-            if (!ht.containsKey(section)) {
+            if (!melodyMap.containsKey(section)) {
+                // no list exists yet, create one
+                int melodies = minMelodies + random.nextInt(maxMelodies - minMelodies + 1);
+                patternList = new ArrayList<Pattern>(melodies);
+                melodyMap.put(section, patternList);
+                sizeMap.put(section, melodies);
+                patterns = 0;
+                
+                logger.debug("Melodies for chord section " + section + ": " + melodies);
+                
+            } else {
+                patterns = patternList.size();
+            }
+            
+            if (patterns < sizeMap.get(section)) {
                 // no melody created yet; create one
                 List<PatternEntry> list = new ArrayList<PatternEntry>();                
                 
@@ -267,13 +313,13 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
                     previousPitch = pitch;
                 }
    
-                ht.put(section, new Pattern(list.toArray(new PatternEntry[list.size()])));
+                patternList.add(new Pattern(list.toArray(new PatternEntry[list.size()])));
             }
             
             tick += len;
         }
         
-        return ht;
+        return melodyMap;
     }
     
     @Override
@@ -299,6 +345,22 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
         
         if (maxPitch - minPitch < 5) {
             throw new RuntimeException("minPitch and maxPitch must be at least 5 halftones apart");
+        }
+
+        try {
+            setMinMelodies(XMLUtils.parseInteger(random, (Node) xpath.evaluate("minMelodies", node, XPathConstants.NODE),
+                    xpath));
+        } catch (Exception e) {
+        }
+
+        try {
+            setMaxMelodies(XMLUtils.parseInteger(random, (Node) xpath.evaluate("maxMelodies", node, XPathConstants.NODE),
+                    xpath));
+        } catch (Exception e) {
+        }
+
+        if (maxMelodies < minMelodies) {
+            throw new RuntimeException("maxMelodies must not be smaller than minMelodies");
         }
         
         NodeList nodeList = (NodeList) xpath.evaluate("patternEngine", node, XPathConstants.NODESET);
@@ -346,5 +408,21 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
 
     public void setPitchDistances(int[] pitchDistances) {
         this.pitchDistances = pitchDistances;
+    }
+
+    public int getMinMelodies() {
+        return minMelodies;
+    }
+
+    public void setMinMelodies(int minMelodies) {
+        this.minMelodies = minMelodies;
+    }
+
+    public int getMaxMelodies() {
+        return maxMelodies;
+    }
+
+    public void setMaxMelodies(int maxMelodies) {
+        this.maxMelodies = maxMelodies;
     }
 }

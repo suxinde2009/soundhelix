@@ -9,21 +9,35 @@ Change log
 
 0.4u: unreleased
 
-    - Added support for unreleased versions (e.g., "0.4u", which is considered to be smaller than "0.4", but larger than anything
-      starting with "0.3").
+    - Added support for unreleased versions (e.g., "0.4u", which is considered to be smaller than "0.4", but larger than
+      anything starting with "0.3").
 
-    - Added support for specifying a minimizeChordDistance attribute per chordPattern tag in the PatternHarmonyEngine. This attribute
-      allows you to override the global minimizeChordDistance value if you set it.
+	- Made the MelodySequenceEngine much more configurable. You can now specify the minimum pitch ("minPitch" tag), the
+	  maximum pitch ("maxPitch" tag) and the list of pitch distances ("pitchDistances" tag).
+	
+	- Added support for generating more than one melody per distinct chord section to the MelodySequenceEngine. You can
+	  now set a minimum ("minMelodies" tag) and a maximum ("maxMelodies" tag) number of melodies to generate per
+	  distinct chord section. The generated melodies will be used in a round-robin manner.
+	
+    - Added support for specifying a minimizeChordDistance attribute per chordPattern tag in the PatternHarmonyEngine.
+	  This attribute allows you to override the global minimizeChordDistance value if you set it.
 
-    - Added "retriggerPitches" tag to the PadSequenceEngine. If set to true, all chord pitches will be retriggered on every chord
-      change. If set to false, only the chord pitches that are not included in the previous chord are triggered, the other ones
-      are kept active. Defaults to true, because this was the behavior of version 0.3 and before.
+    - Added "retriggerPitches" tag to the PadSequenceEngine. If set to true, all chord pitches will be retriggered on
+      every chord change. If set to false, only the chord pitches that are not included in the previous chord are
+      triggered, the other ones are kept active. Defaults to true, because this was the behavior of version 0.3 and
+      before.
 
-    - Fixed bug in the PatternHarmonyEngine that treated different inversions of the same chord as different when the chord
-      pattern was built. Now different inversions of the same chord are treated as equal.
+	- Added support for providing the section number to skip to as a floating-point number. This allows you to skip to
+	  any position within a chord section (e.g., you can now use "skip #3.5" to skip into the middle of chord section
+	  3).
+	  
+    - Fixed bug in the PatternHarmonyEngine that treated different inversions of the same chord as different when the
+      chord pattern was built (relevant for the "x!y" syntax). Now different inversions of the same chord are treated as
+      equal.
 
-    - Corrected the MidiPlayer's legato fix from the previous release, which lead to the note being immediately cut off if the
-      legato flag was used with the same pitch (e.g., "0~/4,0/4"). This situation is now treated as if the legato flag were off.
+    - Corrected the MidiPlayer's legato fix from the previous release, which lead to the note being immediately cut off
+      if the legato flag was used with the same pitch (e.g., "0~/4,0/4"). This situation is now treated as if the legato
+      flag were off.
 
     - The MIDI channels are now muted if the applet is stopped and the MidiPlayer is used.
 

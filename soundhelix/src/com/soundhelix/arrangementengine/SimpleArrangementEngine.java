@@ -640,7 +640,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
             }
             
             int activeTicks = av.getActiveTicks();
-            sb.append(activeTicks > 0 ? String.format(" %5.1f%%\n", 100.0d * activeTicks / ticks) : "\n");
+            sb.append(activeTicks > 0 ? String.format(" %5.1f%%%n", 100.0d * activeTicks / ticks) : "\n");
         }
 
         for (int i = 0; i < maxLen + chordSections + 9; i++) {

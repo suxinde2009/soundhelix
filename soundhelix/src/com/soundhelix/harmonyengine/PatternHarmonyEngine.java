@@ -127,7 +127,6 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
         List<Integer> sectionVector = new ArrayList<Integer>();
         
         Chord firstChord = null;
-        Chord previousChord = null;
         
         while (tick < ticks) {
             String[] p = c[pos % c.length].split("/");
@@ -164,7 +163,6 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
                 sTicks++;
             }
             
-            previousChord = chord;            
             pos++;
         }
 
@@ -376,7 +374,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
      * Container for chord pattern details.
      */
     
-    private class ChordPattern {
+    private static class ChordPattern {
         /** The chord pattern string. */
         private String chordPattern;
         

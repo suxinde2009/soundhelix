@@ -4,6 +4,7 @@ import java.security.AccessControlException;
 
 import org.apache.log4j.Logger;
 
+import com.soundhelix.misc.Structure;
 import com.soundhelix.player.MidiPlayer;
 import com.soundhelix.player.Player;
 import com.soundhelix.util.HarmonyEngineUtils;
@@ -44,14 +45,16 @@ public abstract class AbstractTextRemoteControl implements TextRemoteControl {
                     } else if (line.startsWith("skip ") || line.equals("+")) {
                         if (player != null) {
                             int tick;
+                            Structure structure = player.getArrangement().getStructure();
+                            
                             if (line.endsWith("%")) {
                                 double percentage = Double.parseDouble(line.substring(5, line.length() - 1));
-                                tick = (int) (percentage * player.getArrangement().getStructure().getTicks() / 100d);
+                                tick = (int) (percentage * structure.getTicks() / 100d);
                             } else if (line.equals("+") || line.substring(5).equals("+")) {
                                 tick = player.getCurrentTick();
+                                
                                 if (tick >= 0) {
-                                    tick += player.getArrangement().getStructure().getHarmonyEngine().
-                                    getChordSectionTicks(tick);
+                                    tick += structure.getHarmonyEngine().getChordSectionTicks(tick);
                                 }
                             } else if (line.charAt(5) == '#') {
                                 double chordSectionDouble = Double.parseDouble(line.substring(6));
@@ -60,25 +63,27 @@ public abstract class AbstractTextRemoteControl implements TextRemoteControl {
                                 double chordSectionFraction = chordSectionDouble - Math.floor(chordSectionDouble);
                                 
                                 // use the integer part to find the start of the chord section
-                                tick = HarmonyEngineUtils.getChordSectionTick(player.getArrangement().getStructure(),
-                                        chordSection);
+                                tick = HarmonyEngineUtils.getChordSectionTick(structure, chordSection);
                                 
                                 // add the fractional part
-                                tick += (int) (player.getArrangement().getStructure().getHarmonyEngine().
-                                        getChordSectionTicks(tick) * chordSectionFraction);
+                                tick += (int) (structure.getHarmonyEngine().getChordSectionTicks(tick)
+                                        * chordSectionFraction);
                             } else {
                                 tick = Integer.parseInt(line.substring(5));
                             }
 
-                            if (tick < 0 || tick >= player.getArrangement().getStructure().getTicks()) {
+                            if (tick < 0 || tick >= structure.getTicks()) {
                                 writeLine("Invalid tick to skip to selected");
                             } else {
                                 boolean success = player.skipToTick(tick);
 
                                 if (success) {
-                                    writeLine("Skipping to tick " + tick + " (chord section "
-                                            + HarmonyEngineUtils.getChordSectionNumber(
-                                                    player.getArrangement().getStructure(), tick) + ")");
+                                    int chordSection = HarmonyEngineUtils.getChordSectionNumber(structure, tick);
+                                    int chordSectionTick = tick - HarmonyEngineUtils.getChordSectionTick(structure,
+                                            chordSection);
+                                    
+                                    writeLine("Skipping to tick " + tick + " (tick " + chordSectionTick
+                                            + " of chord section " + chordSection + ")");
                                 } else {
                                     writeLine("Skipping failed");
                                 }

@@ -49,13 +49,41 @@ public class CrescendoPatternEngine extends StringPatternEngine {
     public void configure(Node node, XPath xpath) throws XPathException {
         random = new Random(randomSeed);
         
-        setPatternTicks(XMLUtils.parseInteger(random, "patternTicks", node, xpath));
-        setMinVelocity(XMLUtils.parseInteger(random, "minVelocity", node, xpath));
-        setMaxVelocity(XMLUtils.parseInteger(random, "maxVelocity", node, xpath));
-        setVelocityExponent(XMLUtils.parseDouble(random, "velocityExponent", node, xpath));
-        setPrefixPatternString(XMLUtils.parseString(random, "prefixPattern", node, xpath));
-        setPatternString(XMLUtils.parseString(random, "pattern", node, xpath));
-        setSuffixPatternString(XMLUtils.parseString(random, "suffixPattern", node, xpath));
+        try {
+            setPatternTicks(XMLUtils.parseInteger(random, "patternTicks", node, xpath));
+        } catch (Exception e) {
+        }
+
+        try {
+            setMinVelocity(XMLUtils.parseInteger(random, "minVelocity", node, xpath));
+        } catch (Exception e) {
+        }
+
+        try {
+            setMaxVelocity(XMLUtils.parseInteger(random, "maxVelocity", node, xpath));
+        } catch (Exception e) {
+        }
+
+        try {
+            setVelocityExponent(XMLUtils.parseDouble(random, "velocityExponent", node, xpath));
+        } catch (Exception e) {
+        }
+
+        try {
+            setPrefixPatternString(XMLUtils.parseString(random, "prefixPattern", node, xpath));
+        } catch (Exception e) {
+        }
+
+        try {
+            setPatternString(XMLUtils.parseString(random, "pattern", node, xpath));
+        } catch (Exception e) {
+        }
+
+        try {
+            setSuffixPatternString(XMLUtils.parseString(random, "suffixPattern", node, xpath));
+        } catch (Exception e) {
+        }
+
         
         super.setPatternString(generatePattern(patternString));
     }

@@ -94,7 +94,7 @@ public class Chord {
     private final int code;
 
     static {
-        for (int i = 0; i <= 12; i++) {
+        for (int i = 0; i < 12; i++) {
             NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i).toUpperCase(), i * 10000 + MAJOR);
             NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i + 5).toUpperCase() + "6", i * 10000 + MAJOR6);
             NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i - 4).toUpperCase() + "4", i * 10000 + MAJOR4);

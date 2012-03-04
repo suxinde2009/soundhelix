@@ -283,7 +283,7 @@ public final class XMLUtils {
             Node node = (Node) xpath.evaluate(path, parentNode, XPathConstants.NODE);
 
             if (node == null) {
-                return null;
+                throw new RuntimeException("Path \"" + path + "\" not found within node " + parentNode.getNodeName());
             }
 
             return XMLUtils.parseString(random, node, xpath);
@@ -311,7 +311,7 @@ public final class XMLUtils {
             Node node = (Node) xpath.evaluate(path, parentNode, XPathConstants.NODE);
 
             if (node == null) {
-                return null;
+                throw new RuntimeException("Path \"" + path + "\" not found within node " + parentNode.getNodeName());
             }
 
             return StringUtils.split(XMLUtils.parseString(random, node, xpath), separatorChar);

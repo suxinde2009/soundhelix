@@ -31,7 +31,7 @@ import com.soundhelix.util.XMLUtils;
  * each chord pattern is an individual chord section. A pattern can be split into two or more chord sections by using
  * "+" signs directly before a chord/length combination (e.g., "Am/4,F/4,G/4,C/4,+Am/4,F/4,G/4,Em/4").
  *
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public class PatternHarmonyEngine extends AbstractHarmonyEngine {

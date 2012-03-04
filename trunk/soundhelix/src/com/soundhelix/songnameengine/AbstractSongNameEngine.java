@@ -1,7 +1,7 @@
 package com.soundhelix.songnameengine;
 
 /**
- * @author Thomas Schuerger
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public abstract class AbstractSongNameEngine implements SongNameEngine {

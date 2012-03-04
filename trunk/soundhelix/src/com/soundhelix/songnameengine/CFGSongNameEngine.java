@@ -19,7 +19,7 @@ import com.soundhelix.util.XMLUtils;
 /**
  * Implements a song name engine based on a context-free grammar.
  *
- * @author Thomas Schürger
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public class CFGSongNameEngine extends AbstractSongNameEngine {

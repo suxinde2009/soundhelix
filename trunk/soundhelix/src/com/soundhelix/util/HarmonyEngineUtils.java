@@ -13,7 +13,7 @@ import com.soundhelix.misc.Structure;
 /**
  * Implements some static methods for HarmonyEngine stuff.
  * 
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public final class HarmonyEngineUtils {

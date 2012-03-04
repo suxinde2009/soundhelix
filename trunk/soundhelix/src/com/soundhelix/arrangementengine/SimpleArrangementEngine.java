@@ -61,7 +61,7 @@ import com.soundhelix.util.XMLUtils;
  * The algorithm scales pretty well with increasing numbers of constraints, but keep in mind that every additional
  * constraint increases the complexity level of finding a valid song activity matrix.
  *
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public class SimpleArrangementEngine extends AbstractArrangementEngine {

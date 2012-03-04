@@ -21,7 +21,7 @@ import java.util.List;
  * MELODY, you should split these off into two different tracks and assign them to the same
  * MIDI channel for playback.
  *
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public class Track {

@@ -8,7 +8,7 @@ import com.soundhelix.misc.Chord;
 /**
  * Implements some static methods for converting notes to pitches and vice versa.
  * 
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public final class NoteUtils {

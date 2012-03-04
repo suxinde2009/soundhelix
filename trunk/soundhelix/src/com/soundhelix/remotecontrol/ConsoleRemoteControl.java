@@ -3,7 +3,7 @@ package com.soundhelix.remotecontrol;
 import java.io.Console;
 
 /**
- * @author Thomas Schuerger
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public class ConsoleRemoteControl extends AbstractTextRemoteControl {

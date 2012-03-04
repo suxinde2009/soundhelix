@@ -7,7 +7,7 @@ import java.util.List;
  * Implements some static methods for random numbers. All methods need a random generator as
  * a parameter.
  * 
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public final class StringUtils {

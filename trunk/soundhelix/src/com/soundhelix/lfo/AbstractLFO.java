@@ -1,6 +1,5 @@
 package com.soundhelix.lfo;
 
-
 /**
  * This class implements the basic methods for setting the mode and speed of the LFO as well
  * as the minimum and maximum amplitude and value to return. In addition, the LFO's starting phase can be set.
@@ -10,7 +9,7 @@ package com.soundhelix.lfo;
  * natural way and that they are consistent (same method parameters must return same results for the
  * same configuration of the same instance).
  *
- * @author Thomas Schürger
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public abstract class AbstractLFO implements LFO {

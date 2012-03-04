@@ -14,7 +14,7 @@ import com.soundhelix.misc.Track.TrackType;
  * signs. Integers play the corresponding semitone (0 is C, 1 is C#, etc.; the numbers may also be
  * negative). A minus sign is a pause.
  *
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public abstract class AbstractFreeMultiPatternSequenceEngine extends AbstractSequenceEngine {
@@ -25,10 +25,6 @@ public abstract class AbstractFreeMultiPatternSequenceEngine extends AbstractSeq
     /** The Pattern array. */
     private Pattern[] patterns;
     
-    public AbstractFreeMultiPatternSequenceEngine() {
-        super();
-    }
-
     public void setPatterns(Pattern[] patterns) {
         this.patterns = patterns;
     }

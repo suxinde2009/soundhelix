@@ -3,7 +3,7 @@ package com.soundhelix.constants;
 /**
  * Provides constants regarding the application build. These constants are filled automatically by the build process.
  * 
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public final class BuildConstants {

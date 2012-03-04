@@ -23,7 +23,7 @@ import com.soundhelix.util.XMLUtils;
  * pitch of the transition note is based on the base notes of the two chords.
  * This can be used for funky base lines.
  *
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public class MultiPatternSequenceEngine extends AbstractMultiPatternSequenceEngine {

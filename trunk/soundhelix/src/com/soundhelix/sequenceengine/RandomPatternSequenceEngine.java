@@ -30,7 +30,7 @@ import com.soundhelix.util.XMLUtils;
  * distinct chord section, a set of random notes is generated and used for
  * each occurrence of the chord section.
  * 
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public class RandomPatternSequenceEngine extends AbstractSequenceEngine {    

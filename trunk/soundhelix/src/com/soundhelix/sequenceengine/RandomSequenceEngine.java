@@ -20,7 +20,7 @@ import com.soundhelix.util.XMLUtils;
  * pitches, random note and pause lengths, random legato and random velocity, as well as the ability to repeat
  * subpatterns.
  * 
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 // FIXME: endless loops are possible in certain cases

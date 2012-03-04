@@ -17,7 +17,7 @@ import com.soundhelix.util.XMLUtils;
  * Implements pattern engine that generates a pattern by repeating a given pattern while changing the velocity of each
  * pattern entry.
  * 
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public class CrescendoPatternEngine extends StringPatternEngine {

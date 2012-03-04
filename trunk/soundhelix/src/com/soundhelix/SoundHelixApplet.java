@@ -49,7 +49,7 @@ import com.soundhelix.util.VersionUtils;
  * - "url": if set, the SoundHelix XML file will be loaded from the provided URL (if relative, relative to the applet's URL)
  * - "songName": if set, the first song generated will use the given song name for random intialization
  *
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public class SoundHelixApplet extends JApplet implements Runnable {

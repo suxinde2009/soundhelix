@@ -6,7 +6,7 @@ import com.soundhelix.misc.RandomSeedable;
 import com.soundhelix.misc.XMLConfigurable;
 
 /**
- * @author Thomas Schuerger
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public abstract class AbstractPatternEngine implements PatternEngine, RandomSeedable, XMLConfigurable {

@@ -9,7 +9,7 @@ import com.soundhelix.misc.Pattern.PatternEntry;
  * Represents a pattern, which is like a repeatable Sequence, but is immutable and allows particular notes (or offsets)
  * as well as wildcards used for special purposes. Patterns can be created from pattern strings.
  * 
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public class Pattern implements Iterable<PatternEntry> {

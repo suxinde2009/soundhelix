@@ -7,7 +7,7 @@ import com.soundhelix.constants.BuildConstants;
 /**
  * Implements some static methods for versions.
  * 
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public final class VersionUtils {

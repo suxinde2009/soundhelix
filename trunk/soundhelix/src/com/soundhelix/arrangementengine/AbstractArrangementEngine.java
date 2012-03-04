@@ -2,14 +2,13 @@ package com.soundhelix.arrangementengine;
 
 import org.apache.log4j.Logger;
 
-import com.soundhelix.misc.Arrangement;
 import com.soundhelix.misc.Structure;
 
 /**
  * Abstract implementation of an ArrangementEngine, which provides some basic
  * functionality. 
  * 
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public abstract class AbstractArrangementEngine implements ArrangementEngine {
@@ -43,15 +42,7 @@ public abstract class AbstractArrangementEngine implements ArrangementEngine {
         
         this.structure = structure;
     }
-    
-    /**
-     * Renders and returns an Arrangement.
-     * 
-     * @return the rendered arrangement
-     */
-    
-    public abstract Arrangement render();
-    
+        
     /**
      * Sets the random seed.
      * 

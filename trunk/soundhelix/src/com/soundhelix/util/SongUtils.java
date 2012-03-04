@@ -36,7 +36,7 @@ import com.soundhelix.songnameengine.SongNameEngine;
 /**
  * Provides static convenience methods for creating a song.
  * 
- * @author Thomas Schuerger
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public final class SongUtils {
@@ -49,6 +49,10 @@ public final class SongUtils {
     /** The XSD schema to use for schema validation. */
     private static final String VALIDATION_SCHEMA_FILENAME = "SoundHelix.xsd";
 
+    /**
+     * Private constructor.
+     */
+    
     private SongUtils() {
     }
     
@@ -131,8 +135,8 @@ public final class SongUtils {
      * @return the player
      */
     
-    private static Player createPlayer(Document doc, long randomSeed) throws XPathExpressionException,
-                            InstantiationException, XPathException, IllegalAccessException, ClassNotFoundException {
+    private static Player createPlayer(Document doc, long randomSeed) throws InstantiationException, XPathException,
+            IllegalAccessException, ClassNotFoundException {
         XPath xpath = XPathFactory.newInstance().newXPath();
         Node rootNode = (Node) xpath.evaluate("/*", doc, XPathConstants.NODE);        
         checkVersion(rootNode, xpath);
@@ -159,8 +163,8 @@ public final class SongUtils {
      * @return the player
      */
 
-    private static Player createPlayer(Document doc, String songName) throws XPathExpressionException,
-            InstantiationException, XPathException, IllegalAccessException, ClassNotFoundException {
+    private static Player createPlayer(Document doc, String songName) throws InstantiationException, XPathException,
+            IllegalAccessException, ClassNotFoundException {
         checkVersion(doc);
 
         LOGGER.info("Song name: \"" + songName + "\"");        

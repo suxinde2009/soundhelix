@@ -10,7 +10,7 @@ import org.w3c.dom.Node;
  * up is true, starting down from 1 otherwise. A full LFO rotation corresponds to an angle
  * of 2*Pi radians (360 degrees).
  * 
- * @author Thomas Schürger
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public class SawtoothLFO extends AbstractLFO {

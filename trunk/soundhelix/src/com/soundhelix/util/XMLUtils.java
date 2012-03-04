@@ -15,7 +15,7 @@ import com.soundhelix.misc.XMLConfigurable;
 /**
  * Implements some static methods for parsing XML data.
  * 
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public final class XMLUtils {

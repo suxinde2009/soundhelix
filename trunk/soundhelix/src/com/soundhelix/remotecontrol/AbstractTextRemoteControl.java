@@ -12,7 +12,7 @@ import com.soundhelix.util.HarmonyEngineUtils;
 /**
  * Implements an abstract simple text-based remote control.
  * 
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public abstract class AbstractTextRemoteControl implements TextRemoteControl {

@@ -9,7 +9,7 @@ import org.w3c.dom.Node;
  * Implements a low frequency oscillator (LFO) using a triangle wave. A full LFO rotation
  * corresponds to an angle of 2*Pi radians (360 degrees).
  * 
- * @author Thomas Schürger
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public class TriangleLFO extends AbstractLFO {

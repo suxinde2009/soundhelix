@@ -14,7 +14,7 @@ import com.soundhelix.misc.Pattern.PatternEntry;
 import com.soundhelix.util.XMLUtils;
 
 /**
- * @author Thomas Schuerger
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public class StringPatternEngine extends AbstractPatternEngine {

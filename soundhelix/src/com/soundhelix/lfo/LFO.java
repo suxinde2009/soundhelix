@@ -15,7 +15,7 @@ import com.soundhelix.misc.XMLConfigurable;
  * LFO implementation must be able to handle small values for their parameters and must return values
  * correctly (i.e., without returning jumpy/glitchy values).
  *
- * @author Thomas Schürger
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public interface LFO extends XMLConfigurable, RandomSeedable {

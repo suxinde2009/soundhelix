@@ -18,7 +18,7 @@ import java.util.zip.GZIPOutputStream;
  * 
  * @see Track
  *
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public class Arrangement implements Iterable<Arrangement.ArrangementEntry> {

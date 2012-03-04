@@ -7,7 +7,7 @@ package com.soundhelix.misc;
  * used to instantiate a random generator. Note that the class java.util.Random only uses the lower 48 bits of the
  * random seed, but other random generators might make use of the full 64 bits of the seed.
  *
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public interface RandomSeedable {

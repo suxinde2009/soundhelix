@@ -11,14 +11,12 @@ package com.soundhelix.sequenceengine;
  * 
  * @see Sequence
  * 
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 import org.apache.log4j.Logger;
 
-import com.soundhelix.misc.ActivityVector;
 import com.soundhelix.misc.Structure;
-import com.soundhelix.misc.Track;
 
 public abstract class AbstractSequenceEngine implements SequenceEngine {
     protected final Logger logger;
@@ -34,23 +32,6 @@ public abstract class AbstractSequenceEngine implements SequenceEngine {
         this.structure = structure;
     }
     
-    /**
-     * Renders one or more sequences (i.e., voices) as a track. The
-     * method should check the given ActivityVectors to decide when to insert
-     * notes and when to insert pauses. The method should also take care that
-     * played notes are not sustained beyond inactive intervals of the
-     * ActivityVector (however, it is not strictly forbidden to do so). The
-     * returned list must contain at least one sequence. The length of each
-     * sequence must match the length of the song. The method must take the
-     * song's HarmonyEngine into consideration.
-     * 
-     * @param activityVectors the activityVectors
-     * 
-     * @return the track
-     */
-
-    public abstract Track render(ActivityVector[] activityVectors);
-
     /**
      * Returns the required number of ActivityVectors. For most implementations,
      * this will be 1, but certain implementations, like for multi-instrument

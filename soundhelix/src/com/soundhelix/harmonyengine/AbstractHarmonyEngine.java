@@ -51,7 +51,7 @@ import com.soundhelix.misc.Structure;
  * It is very important to get the method behavior correct. The HarmonyEngine
  * can be sanity-checked using checkSanitiy().
  * 
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public abstract class AbstractHarmonyEngine implements HarmonyEngine {
@@ -74,15 +74,6 @@ public abstract class AbstractHarmonyEngine implements HarmonyEngine {
         this.structure = structure;
     }
 
-    @Override
-    public abstract Chord getChord(int tick);
-    
-    @Override
-    public abstract int getChordTicks(int tick);
-
-    @Override
-    public abstract int getChordSectionTicks(int tick);
-    
     /**
      * Dumps all chords and their lengths in ticks.
      */

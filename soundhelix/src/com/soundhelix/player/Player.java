@@ -9,7 +9,7 @@ import com.soundhelix.misc.XMLConfigurable;
  * 
  * @see Arrangement
  * 
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 // TODO: check if more methods should be available, for example,

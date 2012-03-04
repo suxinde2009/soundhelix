@@ -21,7 +21,7 @@ import com.soundhelix.util.NoteUtils;
  * 
  * The low and the high pitch must not be farther apart than 11 halftones.
  * 
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public class Chord {

@@ -31,7 +31,7 @@ import com.soundhelix.util.XMLUtils;
  * Conditional patterns allow the modification of the generated sequences when certain conditions are met, e.g., for
  * generating fill-ins, crescendos, etc. when monitored ActivityVectors become active or inactive.
  * 
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public class DrumSequenceEngine extends AbstractSequenceEngine {

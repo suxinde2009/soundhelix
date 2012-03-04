@@ -16,7 +16,7 @@ import com.soundhelix.util.XMLUtils;
 /**
  * Implements a sequence engine that plays chords using user-specified patterns.
  *
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public class ChordSequenceEngine extends MultiPatternSequenceEngine {

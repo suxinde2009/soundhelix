@@ -29,7 +29,7 @@ import com.soundhelix.util.XMLUtils;
  * 0,1,2,3,4 which would add base and middle tone with increased octave to the
  * normal chord tones.
  *
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public class PadSequenceEngine extends AbstractSequenceEngine {

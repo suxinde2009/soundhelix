@@ -64,7 +64,7 @@ import com.soundhelix.util.XMLUtils;
  * Instances of this class are not thread-safe. They must not be used in multiple threads without external
  * synchronization.
  *
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 // TODO: add possibility to map a virtual channel to several MIDI channels (do we need this)?

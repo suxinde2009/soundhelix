@@ -9,11 +9,8 @@ import com.soundhelix.misc.Arrangement;
  * 
  * @see Arrangement
  * 
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
-
-// TODO: check if more methods should be available, for example,
-// getting the current tick, setting the current tick
 
 public abstract class AbstractPlayer implements Player {
     /** The logger. */

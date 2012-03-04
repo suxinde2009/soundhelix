@@ -14,7 +14,7 @@ import java.util.BitSet;
  * 
  * @see com.soundhelix.sequenceengine.SequenceEngine
  *
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public class ActivityVector {

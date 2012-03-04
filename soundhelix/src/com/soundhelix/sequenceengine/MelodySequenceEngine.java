@@ -1,9 +1,9 @@
 package com.soundhelix.sequenceengine;
 
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import javax.xml.xpath.XPath;
@@ -24,7 +24,6 @@ import com.soundhelix.misc.Track.TrackType;
 import com.soundhelix.patternengine.PatternEngine;
 import com.soundhelix.util.HarmonyEngineUtils;
 import com.soundhelix.util.NoteUtils;
-import com.soundhelix.util.RandomUtils;
 import com.soundhelix.util.XMLUtils;
 
 /**
@@ -32,7 +31,7 @@ import com.soundhelix.util.XMLUtils;
  * distinct chord section, a random number of melodies between minMelodies and maxMelodies are generated. For each
  * occurrence of a chord section, its generated melodies are used in a round-robin fashion.
  *
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public class MelodySequenceEngine extends AbstractSequenceEngine {

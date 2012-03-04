@@ -5,7 +5,7 @@ package com.soundhelix.sequenceengine;
  * 
  * @see Sequence
  * 
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 import com.soundhelix.misc.ActivityVector;

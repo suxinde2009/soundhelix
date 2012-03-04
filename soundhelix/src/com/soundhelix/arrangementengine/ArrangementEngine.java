@@ -8,7 +8,7 @@ import com.soundhelix.misc.XMLConfigurable;
 /**
  * Interface for song arrangement generators.
  * 
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public interface ArrangementEngine extends XMLConfigurable, RandomSeedable {

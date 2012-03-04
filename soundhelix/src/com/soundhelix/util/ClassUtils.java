@@ -3,7 +3,7 @@ package com.soundhelix.util;
 /**
  * Implements some static methods for classes.
  * 
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public final class ClassUtils {

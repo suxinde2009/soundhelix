@@ -24,7 +24,7 @@ import com.soundhelix.util.VersionUtils;
  * song generator is set to a low value, the priority of the playing
  * thread is set to a high value.
  * 
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 // TODO: provide a DTD or XML Schema for the configuration file

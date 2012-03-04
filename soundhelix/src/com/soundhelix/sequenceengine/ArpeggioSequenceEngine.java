@@ -28,7 +28,7 @@ import com.soundhelix.util.XMLUtils;
  * the pattern with the largest length if the former doesn't exist. At least some patterns with lengths of powers
  * of two should be provided.
  *
- * @author Thomas Schürger (thomas@schuerger.com)
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 // TODO: allow specifying velocities in arpeggio patterns (like in the PatternSequenceEngine)

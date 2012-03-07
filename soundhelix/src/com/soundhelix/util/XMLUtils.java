@@ -21,48 +21,46 @@ import com.soundhelix.misc.XMLConfigurable;
 public final class XMLUtils {
     /** The logger. */
     private static final Logger LOGGER = Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
-    
+
     /** The factor used for augmenting the random seed (56-bit prime). */
     private static final long RANDOM_SEED_PRIME = 0xFFFFFFFFFFFFC7L;
 
     /**
-     * Empty private constructor.
+     * Private constructor.
      */
-    
+
     private XMLUtils() {
     }
-    
+
     /**
-     * Returns the first child of the given node that is an element node. If
-     * such node doesn't exist, null is returned.
+     * Returns the first child of the given node that is an element node. If such node doesn't exist, null is returned.
      * 
      * @param node the node
      * 
      * @return the first element child node
      */
-        
+
     public static Node getFirstElementChild(Node node) {
         node = node.getFirstChild();
-        
+
         while (node != null) {
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 return node;
-            }            
+            }
             node = node.getNextSibling();
         }
-        
-        return null;    
+
+        return null;
     }
 
     /**
-     * Returns the given node's next element sibling. If such node doesn't exist,
-     * null is returned.
+     * Returns the given node's next element sibling. If such node doesn't exist, null is returned.
      * 
      * @param node the node
      * 
      * @return the next sibling element node
      */
-    
+
     public static Node getNextElementSibling(Node node) {
         while (node != null) {
             node = node.getNextSibling();
@@ -70,13 +68,12 @@ public final class XMLUtils {
                 return node;
             }
         }
-        
-        return null;    
+
+        return null;
     }
 
     /**
-     * Searches for the element pointed to by path and tries to parse
-     * it as an integer.
+     * Searches for the element pointed to by path and tries to parse it as an integer.
      * 
      * @param random the random generator
      * @param path the XPath expression
@@ -85,7 +82,7 @@ public final class XMLUtils {
      * 
      * @return the integer
      */
-    
+
     public static int parseInteger(Random random, String path, Node parentNode, XPath xpath) {
         try {
             Node node = (Node) xpath.evaluate(path, parentNode, XPathConstants.NODE);
@@ -101,9 +98,8 @@ public final class XMLUtils {
     }
 
     /**
-     * Tries to parse the text content of the given node as an integer.
-     * If it is an integer, the integer is returned. Otherwise, the node
-     * is checked for valid subelements, which are then evaluated.
+     * Tries to parse the text content of the given node as an integer. If it is an integer, the integer is returned. Otherwise, the node is checked
+     * for valid subelements, which are then evaluated.
      * 
      * @param random the random generator
      * @param node the node to parse
@@ -119,7 +115,7 @@ public final class XMLUtils {
         }
 
         Node n = getFirstElementChild(node);
-    
+
         if (n.getNodeName().equals("random")) {
             try {
                 String s = (String) xpath.evaluate("attribute::list", n, XPathConstants.STRING);
@@ -138,8 +134,7 @@ public final class XMLUtils {
                         int step = 1;
 
                         try {
-                            step = Integer.parseInt((String) xpath.evaluate("attribute::step",
-                                                    n, XPathConstants.STRING));
+                            step = Integer.parseInt((String) xpath.evaluate("attribute::step", n, XPathConstants.STRING));
                         } catch (NumberFormatException e) {
                         }
 
@@ -147,16 +142,15 @@ public final class XMLUtils {
                     } else if (type.equals("normal")) {
                         double mean;
                         String meanstr = (String) xpath.evaluate("attribute::mean", n, XPathConstants.STRING);
-                        
+
                         if (meanstr != null && !meanstr.equals("")) {
                             mean = Double.parseDouble(meanstr);
                         } else {
                             // use arithmetic mean
                             mean = (min + max) / 2.0f;
                         }
-                        
-                        double variance = Double.parseDouble(
-                                          (String) xpath.evaluate("attribute::variance", n, XPathConstants.STRING));
+
+                        double variance = Double.parseDouble((String) xpath.evaluate("attribute::variance", n, XPathConstants.STRING));
 
                         return RandomUtils.getNormalInteger(random, min, max, mean, variance);
                     } else {
@@ -172,8 +166,7 @@ public final class XMLUtils {
     }
 
     /**
-     * Searches for the element pointed to by path and tries to parse
-     * it as an integer.
+     * Searches for the element pointed to by path and tries to parse it as an integer.
      * 
      * @param random the random generator
      * @param path the XPath expression
@@ -182,7 +175,7 @@ public final class XMLUtils {
      * 
      * @return the integer
      */
-    
+
     public static double parseDouble(Random random, String path, Node parentNode, XPath xpath) {
         try {
             Node node = (Node) xpath.evaluate(path, parentNode, XPathConstants.NODE);
@@ -198,9 +191,8 @@ public final class XMLUtils {
     }
 
     /**
-     * Tries to parse the text content of the given node as an integer.
-     * If it is an integer, the integer is returned. Otherwise, the node
-     * is checked for valid subelements, which are then evaluated.
+     * Tries to parse the text content of the given node as an integer. If it is an integer, the integer is returned. Otherwise, the node is checked
+     * for valid subelements, which are then evaluated.
      * 
      * @param random the random generator
      * @param node the node to parse
@@ -212,7 +204,7 @@ public final class XMLUtils {
     public static double parseDouble(Random random, Node node, XPath xpath) {
         return Double.parseDouble(node.getTextContent());
     }
-    
+
     public static boolean parseBoolean(Random random, String path, Node parentNode, XPath xpath) {
         try {
             Node node = (Node) xpath.evaluate(path, parentNode, XPathConstants.NODE);
@@ -228,9 +220,8 @@ public final class XMLUtils {
     }
 
     /**
-     * Tries to parse the text content of the given node as a boolean.
-     * If it is a boolean, the boolean. Otherwise, the node
-     * is checked for valid subelements, which are then evaluated.
+     * Tries to parse the text content of the given node as a boolean. If it is a boolean, the boolean. Otherwise, the node is checked for valid
+     * subelements, which are then evaluated.
      * 
      * @param random the random generator
      * @param node the node to parse
@@ -241,22 +232,20 @@ public final class XMLUtils {
 
     public static boolean parseBoolean(Random random, Node node, XPath xpath) {
         String content = node.getTextContent();
-        
+
         if (content != null && !content.equals("")) {
             if (content.equals("1") || content.equals("yes") || content.equals("true") || content.equals("on")) {
                 return true;
-            } else if (content.equals("0") || content.equals("no")
-                       || content.equals("false") || content.equals("off")) {
+            } else if (content.equals("0") || content.equals("no") || content.equals("false") || content.equals("off")) {
                 return false;
             }
         }
-    
+
         Node n = getFirstElementChild(node);
-    
+
         if (n.getNodeName().equals("random")) {
             try {
-                double prob = Double.parseDouble(
-                              (String) xpath.evaluate("attribute::probability", n, XPathConstants.STRING));
+                double prob = Double.parseDouble((String) xpath.evaluate("attribute::probability", n, XPathConstants.STRING));
                 return RandomUtils.getBoolean(random, prob / 100.0d);
             } catch (Exception e) {
                 throw new RuntimeException("Error parsing random attributes", e);
@@ -267,8 +256,7 @@ public final class XMLUtils {
     }
 
     /**
-     * Searches for the element pointed to by path and tries to parse
-     * it as a string.
+     * Searches for the element pointed to by path and tries to parse it as a string.
      * 
      * @param random the random generator
      * @param path the XPath expression
@@ -277,7 +265,7 @@ public final class XMLUtils {
      * 
      * @return the integer
      */
-    
+
     public static String parseString(Random random, String path, Node parentNode, XPath xpath) {
         try {
             Node node = (Node) xpath.evaluate(path, parentNode, XPathConstants.NODE);
@@ -291,10 +279,9 @@ public final class XMLUtils {
             throw new RuntimeException("Error parsing string", e);
         }
     }
-    
+
     /**
-     * Searches for the element pointed to by path and tries to parse
-     * it as a string list, split by the given separator character.
+     * Searches for the element pointed to by path and tries to parse it as a string list, split by the given separator character.
      * 
      * @param random the random generator
      * @param path the XPath expression
@@ -304,9 +291,8 @@ public final class XMLUtils {
      * 
      * @return the integer
      */
-    
-    public static String[] parseStringList(Random random, String path, Node parentNode, char separatorChar,
-            XPath xpath) {
+
+    public static String[] parseStringList(Random random, String path, Node parentNode, char separatorChar, XPath xpath) {
         try {
             Node node = (Node) xpath.evaluate(path, parentNode, XPathConstants.NODE);
 
@@ -320,7 +306,6 @@ public final class XMLUtils {
         }
     }
 
-    
     /**
      * Tries to parse the given node as a string.
      * 
@@ -335,7 +320,7 @@ public final class XMLUtils {
         if (node == null) {
             return null;
         }
-        
+
         Node n = getFirstElementChild(node);
 
         if (n == null) {
@@ -360,7 +345,7 @@ public final class XMLUtils {
             throw new RuntimeException("Invalid element " + n.getNodeName());
         }
     }
-    
+
     /**
      * Tries to parse the given node as a string.
      * 
@@ -376,7 +361,7 @@ public final class XMLUtils {
         if (node == null) {
             return null;
         }
-        
+
         Node n = getFirstElementChild(node);
 
         if (n == null) {
@@ -401,35 +386,32 @@ public final class XMLUtils {
             throw new RuntimeException("Invalid element " + n.getNodeName());
         }
     }
-    
+
     public static int[] parseIntegerListString(Random random, String path, Node parentNode, XPath xpath) {
         String string = XMLUtils.parseString(random, path, parentNode, xpath);
-        
+
         if (string == null || string.equals("")) {
             return null;
         }
 
         String[] stringArray = string.split(",");
         int length = stringArray.length;
-        
-        
+
         int[] intArray = new int[length];
-        
+
         for (int i = 0; i < length; i++) {
             intArray[i] = Integer.parseInt(stringArray[i]);
         }
-        
+
         return intArray;
     }
-    
+
     /**
-     * Tries to instantiate an object from the class defined by the node's attribute "class" by calling its nullary
-     * constructor. If the given class name is not fully qualified (i.e., contains no dot), the package of the given
-     * superclass is prefixed to the class name. The class must be a subclass of the given class to succeed. If the
-     * class defines the interface RandomSeedable, it is random-seeded by creating a random seed based on the
-     * specified random seed, the class name and the specified modifier. If the class defines the interface
-     * XMLConfigurable, it is configured by calling configure() with the node as the configuration root. The given
-     * salt value can be overridden by using a "seed" attribute.
+     * Tries to instantiate an object from the class defined by the node's attribute "class" by calling its nullary constructor. If the given class
+     * name is not fully qualified (i.e., contains no dot), the package of the given superclass is prefixed to the class name. The class must be a
+     * subclass of the given class to succeed. If the class defines the interface RandomSeedable, it is random-seeded by creating a random seed based
+     * on the specified random seed, the class name and the specified modifier. If the class defines the interface XMLConfigurable, it is configured
+     * by calling configure() with the node as the configuration root. The given salt value can be overridden by using a "seed" attribute.
      * 
      * @param clazz the class
      * @param node the node to use for configuration
@@ -445,34 +427,34 @@ public final class XMLUtils {
      * @throws ClassNotFoundException if the class cannot be found
      * @throws IllegalAccessException if the class cannot be instantiated
      */
-    
-    public static <T> T getInstance(Class<T> clazz, Node node, XPath xpath, long parentRandomSeed, int salt)
-        throws InstantiationException, XPathException, IllegalAccessException, ClassNotFoundException {
+
+    public static <T> T getInstance(Class<T> clazz, Node node, XPath xpath, long parentRandomSeed, int salt) throws InstantiationException,
+            XPathException, IllegalAccessException, ClassNotFoundException {
         if (node == null) {
             throw new IllegalArgumentException("Node is null");
         }
-        
+
         String className = (String) xpath.evaluate("attribute::class", node, XPathConstants.STRING);
 
         if (className == null) {
             throw new RuntimeException("Attribute \"class\" not defined");
         }
-        
+
         if (className.indexOf('.') < 0) {
             // prefix the class name with the package name of the superclass
             className = clazz.getName().substring(0, clazz.getName().lastIndexOf('.') + 1) + className;
         }
- 
+
         boolean isSeedProvided = false;
         long providedSeed = 0;
-        
+
         String seedString = (String) xpath.evaluate("attribute::seed", node, XPathConstants.STRING);
         String saltString = (String) xpath.evaluate("attribute::salt", node, XPathConstants.STRING);
 
         if (seedString != null && !seedString.equals("") && saltString != null && !saltString.equals("")) {
             throw new RuntimeException("Only one of  the attributes \"seed\" and \"salt\" may be provided");
         }
-             
+
         if (seedString != null && !seedString.equals("")) {
             try {
                 // take the given number directly as the random seed
@@ -488,20 +470,20 @@ public final class XMLUtils {
                 throw new RuntimeException("Salt \"" + saltString + "\" is invalid", e);
             }
         }
-        
+
         T instance;
-        
+
         try {
             instance = ClassUtils.newInstance(className, clazz);
         } catch (ClassCastException e) {
             throw new RuntimeException("Class " + className + " is not a subclass of " + clazz, e);
         }
-        
+
         // random-seed instance if it is random-seedable (it's important to seed before configuring)
 
         if (instance instanceof RandomSeedable) {
             long randomSeed;
-            
+
             if (isSeedProvided) {
                 randomSeed = providedSeed;
             } else {
@@ -516,52 +498,51 @@ public final class XMLUtils {
         } else {
             LOGGER.trace("Instantiated class " + className + " without a random seed");
         }
-        
+
         // configure instance if it is XML-configurable
 
         if (instance instanceof XMLConfigurable) {
             ((XMLConfigurable) instance).configure(node, xpath);
         }
-        
+
         return instance;
     }
-    
+
     /**
      * Returns a derived random seed that is based on the parent random seed, the class name and the modifier.
      * 
      * @param parentRandomSeed the parent random seed
-     * @param className the class name 
+     * @param className the class name
      * @param modifier the modifier
-     *
+     * 
      * @return the derived random seed
      */
-    
-    
+
     private static long getDerivedRandomSeed(long parentRandomSeed, String className, int modifier) {
-        return  parentRandomSeed + getLongHashCode(className) - RANDOM_SEED_PRIME * modifier * Math.abs(modifier);
+        return parentRandomSeed + getLongHashCode(className) - RANDOM_SEED_PRIME * modifier * Math.abs(modifier);
     }
-    
+
     /**
-     * Returns the hash code the given string as a long. This method works like String.hashCode(), but uses a long
-     * internally and returns a long as the result.
+     * Returns the hash code the given string as a long. This method works like String.hashCode(), but uses a long internally and returns a long as
+     * the result.
      * 
      * @param str the string
      * 
      * @return the hash code as a long
      */
-    
+
     private static long getLongHashCode(String str) {
         if (str == null) {
             return 0;
         }
-        
+
         long hash = 0;
         int len = str.length();
 
         for (int i = 0; i < len; i++) {
             hash = 31 * hash + str.charAt(i);
         }
-        
+
         return hash;
     }
 }

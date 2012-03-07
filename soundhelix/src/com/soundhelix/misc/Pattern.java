@@ -6,8 +6,8 @@ import java.util.NoSuchElementException;
 import com.soundhelix.misc.Pattern.PatternEntry;
 
 /**
- * Represents a pattern, which is like a repeatable Sequence, but is immutable and allows particular notes (or offsets)
- * as well as wildcards used for special purposes. Patterns can be created from pattern strings.
+ * Represents a pattern, which is like a repeatable Sequence, but is immutable and allows particular notes (or offsets) as well as wildcards used for
+ * special purposes. Patterns can be created from pattern strings.
  * 
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
@@ -15,26 +15,29 @@ import com.soundhelix.misc.Pattern.PatternEntry;
 public class Pattern implements Iterable<PatternEntry> {
     /** The PatternEntry array. */
     private PatternEntry[] pattern;
-    
+
     /** The total number of ticks. */
     private int totalTicks;
 
+    /**
+     * Private constructor.
+     */
+
     private Pattern() {
-        
     }
-    
+
     public Pattern(PatternEntry[] pattern) {
         this.pattern = pattern;
 
         int ticks = 0;
-        
+
         for (int i = 0; i < pattern.length; i++) {
             ticks += pattern[i].getTicks();
         }
-        
+
         this.totalTicks = ticks;
     }
-    
+
     public static Pattern parseString(String patternString) {
         return parseString(patternString, null);
     }
@@ -43,28 +46,28 @@ public class Pattern implements Iterable<PatternEntry> {
         if (patternString == null || patternString.equals("")) {
             return null;
         }
-        
+
         if (wildcardString == null) {
             wildcardString = "";
         }
-        
+
         PatternEntry[] pattern;
-        
+
         String[] p = patternString.split(",");
         int len = p.length;
 
         pattern = new PatternEntry[len];
-        
+
         // format: offset/ticks:velocity or offset~/ticks:velocity
-        
+
         for (int i = 0; i < len; i++) {
             String[] a = p[i].split(":");
             short v = a.length > 1 ? Short.parseShort(a[1]) : Short.MAX_VALUE;
             String[] b = a[0].split("/");
             int t = b.length > 1 ? Integer.parseInt(b[1]) : 1;
-            
+
             boolean legato = b[0].endsWith("~");
-            
+
             if (legato) {
                 // cut off legato character
                 b[0] = b[0].substring(0, b[0].length() - 1);
@@ -81,53 +84,52 @@ public class Pattern implements Iterable<PatternEntry> {
 
         return new Pattern(pattern);
     }
-    
+
     public static int getStringTicks(String patternString) {
         String[] p = patternString.split(",");
         int len = p.length;
         int ticks = 0;
-        
+
         // format: offset/ticks:velocity or offset~/ticks:velocity
-        
+
         for (int i = 0; i < len; i++) {
             String[] a = p[i].split(":");
             String[] b = a[0].split("/");
             int t = b.length > 1 ? Integer.parseInt(b[1]) : 1;
             ticks += t;
         }
-        
-        return ticks;        
+
+        return ticks;
     }
-    
+
     /**
-     * Transposes the pattern up by the given pitch (which may be negative) and returns it as a new pattern (or the
-     * original pattern if pitch is 0). Only the notes will be affected by this operation (wildcards and pauses are
-     * not affected).
+     * Transposes the pattern up by the given pitch (which may be negative) and returns it as a new pattern (or the original pattern if pitch is 0).
+     * Only the notes will be affected by this operation (wildcards and pauses are not affected).
      * 
      * @param pitch the number of halftones to transpose up (may be negative)
      * 
      * @return a new pattern that is a transposed version of this pattern
      */
-    
+
     public Pattern transpose(int pitch) {
         if (pitch == 0) {
             // nothing to do; as instances are immutable, we can just return this pattern
             return this;
         }
-        
+
         PatternEntry[] p = new PatternEntry[pattern.length];
-        
+
         for (int i = 0; i < pattern.length; i++) {
             PatternEntry entry = pattern[i];
             if (entry.isNote()) {
                 // make a modified copy of the PatternEntry
-                p[i] = new PatternEntry(entry.pitch + pitch, entry.velocity, entry.ticks, entry.legato);
+                p[i] = new PatternEntry(entry.pitch + pitch, entry.velocity, entry.ticks, entry.isLegato);
             } else {
                 // just use the original PatternEntry
                 p[i] = entry;
             }
         }
-        
+
         return new Pattern(p);
     }
 
@@ -135,7 +137,7 @@ public class Pattern implements Iterable<PatternEntry> {
      * Returns the total number of ticks this pattern spans.
      * 
      * @see #size()
-     *
+     * 
      * @return the number of ticks
      */
 
@@ -146,8 +148,7 @@ public class Pattern implements Iterable<PatternEntry> {
     /**
      * Returns the sequence entry with the given index.
      * 
-     * @param index
-     *            the index
+     * @param index the index
      * 
      * @return the sequence entry at that index
      */
@@ -157,8 +158,7 @@ public class Pattern implements Iterable<PatternEntry> {
     }
 
     /**
-     * Returns the number of pattern entries this pattern contains.
-     * Note that in general this is not the number of ticks.
+     * Returns the number of pattern entries this pattern contains. Note that in general this is not the number of ticks.
      * 
      * @return the size of the pattern
      * 
@@ -169,6 +169,7 @@ public class Pattern implements Iterable<PatternEntry> {
         return pattern.length;
     }
 
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
@@ -185,13 +186,11 @@ public class Pattern implements Iterable<PatternEntry> {
 
         return sb.append('}').toString();
     }
-    
+
     /**
-     * Checks whether it is legal to use legato at the note that ends on the given tick. The tick must
-     * be the tick on which the note would be switched off if no legato was used; the same applies to
-     * the pattern offset. Legato is legal for the tick if there is a subsequent note on the pattern
-     * that lies in the activity range of the activity vector. I.e., it is illegal to use legato on a
-     * note which ends outside of an activity interval.
+     * Checks whether it is legal to use legato at the note that ends on the given tick. The tick must be the tick on which the note would be switched
+     * off if no legato was used; the same applies to the pattern offset. Legato is legal for the tick if there is a subsequent note on the pattern
+     * that lies in the activity range of the activity vector. I.e., it is illegal to use legato on a note which ends outside of an activity interval.
      * 
      * @param activityVector the activity vector
      * @param tick the tick
@@ -199,32 +198,33 @@ public class Pattern implements Iterable<PatternEntry> {
      * 
      * @return true if legato is legal, false otherwise
      */
-    
-    public boolean isLegatoLegal(ActivityVector activityVector, int tick, int patternOffset) {    
+
+    public boolean isLegatoLegal(ActivityVector activityVector, int tick, int patternOffset) {
         if (!activityVector.isActive(tick)) {
             return false;
         }
-        
+
         // get the remaining length of the activity interval
         int activityLength = activityVector.getIntervalLength(tick);
 
         int patternLength = size();
-        
+
         int i = 0;
         while (i < activityLength) {
             PatternEntry entry = get(patternOffset % patternLength);
-        
+
             if (entry.isNote() || entry.isWildcard() && entry.getVelocity() > 0) {
                 return true;
             }
-            
+
             patternOffset++;
             i += entry.getTicks();
         }
-        
+
         return false;
     }
-    
+
+    @Override
     public Iterator<PatternEntry> iterator() {
         return new Iterator<PatternEntry>() {
             private PatternEntry[] array = pattern;
@@ -247,18 +247,29 @@ public class Pattern implements Iterable<PatternEntry> {
             }
         };
     }
-    
+
     /**
      * Represents a pattern entry.
      */
-    
+
     public static final class PatternEntry {
+        /** The pitch. */
         private int pitch;
+        
+        /** The velocity. */
         private short velocity;
+        
+        /** The number of ticks. */
         private int ticks;
+        
+        /** Flag for wildcards. */
         private boolean isWildcard;
+        
+        /** The wildcard character. */
         private char wildcardCharacter;
-        private boolean legato;
+        
+        /** Flag for legato. */
+        private boolean isLegato;
 
         public PatternEntry(int ticks) {
             this.velocity = 0;
@@ -269,7 +280,7 @@ public class Pattern implements Iterable<PatternEntry> {
             this.pitch = pitch;
             this.velocity = velocity;
             this.ticks = ticks;
-            this.legato = legato;
+            this.isLegato = legato;
         }
 
         public PatternEntry(char wildcardCharacter, short velocity, int ticks, boolean legato) {
@@ -277,13 +288,13 @@ public class Pattern implements Iterable<PatternEntry> {
             this.ticks = ticks;
             this.wildcardCharacter = wildcardCharacter;
             this.isWildcard = true;
-            this.legato = legato;
+            this.isLegato = legato;
         }
 
         public char getWildcardCharacter() {
             return wildcardCharacter;
         }
-        
+
         public int getPitch() {
             return pitch;
         }
@@ -309,15 +320,16 @@ public class Pattern implements Iterable<PatternEntry> {
         }
 
         public boolean isLegato() {
-            return legato;
+            return isLegato;
         }
-        
+
+        @Override
         public String toString() {
             if (isPause()) {
                 return "-" + (ticks > 1 ? "/" + ticks : "");
             } else {
                 return (isWildcard ? "" + wildcardCharacter : "" + pitch) + (ticks > 1 ? "/" + ticks : "")
-                       + (velocity == Short.MAX_VALUE ? "" : ":" + velocity);
+                        + (velocity == Short.MAX_VALUE ? "" : ":" + velocity);
             }
         }
     }

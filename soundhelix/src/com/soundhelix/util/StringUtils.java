@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Implements some static methods for random numbers. All methods need a random generator as
- * a parameter.
+ * Implements some static methods for random numbers. All methods need a random generator as a parameter.
  * 
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
@@ -15,20 +14,19 @@ public final class StringUtils {
     }
 
     /**
-     * Returns a capitalized version of the given string. If the given string already starts with
-     * an uppercase character, the original string is returned. Otherwise, the string with the first
-     * letter uppercased is returned.
+     * Returns a capitalized version of the given string. If the given string already starts with an uppercase character, the original string is
+     * returned. Otherwise, the string with the first letter uppercased is returned.
      * 
      * @param string the string
      * 
      * @return the capitalized string
      */
-    
+
     public static String capitalize(String string) {
         if (string == null || string.equals("") || Character.isUpperCase(string.charAt(0))) {
             return string;
         }
-        
+
         return Character.toUpperCase(string.charAt(0)) + string.substring(1);
     }
 
@@ -40,15 +38,14 @@ public final class StringUtils {
      * 
      * @return the string arrays
      */
-    
+
     public static String[] split(String string, char separatorChar) {
         return split(string, separatorChar, '\\');
     }
-    
+
     /**
-     * Splits the given string at the given separator character. The separator character can be escaped by
-     * preceding it with the given escape character. Doubling the escape character results in the escape character.
-     * Escaping any other character results in that character.
+     * Splits the given string at the given separator character. The separator character can be escaped by preceding it with the given escape
+     * character. Doubling the escape character results in the escape character. Escaping any other character results in that character.
      * 
      * @param string the string to split
      * @param separatorChar the separator character
@@ -56,7 +53,7 @@ public final class StringUtils {
      * 
      * @return the string array
      */
-    
+
     public static String[] split(String string, char separatorChar, char escapeChar) {
         List<String> list = new ArrayList<String>();
         int len = string.length();
@@ -94,24 +91,24 @@ public final class StringUtils {
 
         return list.toArray(new String[list.size()]);
     }
-    
+
     /**
-     * Version of the usual String.hashCode() method that computes a long hash code instead of an int hash code. Using
-     * a rough estimation, the String.hashCode() method wraps around after roughly 7 characters, whereas this method
-     * wraps around after roughly 13 characters.
+     * Version of the usual String.hashCode() method that computes a long hash code instead of an int hash code, using the same algorithm as the
+     * orignal method. Using a rough estimation, the String.hashCode() method wraps around after roughly 7 characters, whereas this method wraps
+     * around after roughly 13 characters.
      * 
      * @param string the string
      * @return the long hash code
      */
-    
+
     public static long getLongHashCode(String string) {
         long hash = 0;
         int len = string.length();
-        
+
         for (int i = 0; i < len; i++) {
             hash = 31 * hash + string.charAt(i);
         }
-        
+
         return hash;
     }
 }

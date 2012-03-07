@@ -53,8 +53,8 @@ import com.soundhelix.util.VersionUtils;
  */
 
 public class SoundHelixApplet extends JApplet implements Runnable {
-    
-     /** The serial version UID. */
+
+    /** The serial version UID. */
     private static final long serialVersionUID = 7085988359001963796L;
 
     /** The default URL used if no URL has been specified. */
@@ -62,16 +62,16 @@ public class SoundHelixApplet extends JApplet implements Runnable {
 
     /** The root logger. */
     private static final Logger ROOT_LOGGER = Logger.getRootLogger();
-    
+
     /** The logger. */
     private static final Logger LOGGER = Logger.getLogger(SoundHelixApplet.class);
 
     /** The desktop. */
     private Desktop desktop;
-    
+
     /** The remote control. */
     private TextRemoteControl remoteControl;
-    
+
     /** The text field for the song name. */
     private JTextField songNameTextField;
 
@@ -89,36 +89,36 @@ public class SoundHelixApplet extends JApplet implements Runnable {
 
     /** The current song name. */
     private String currentSongName;
-    
+
     /** The song name of the next song. */
     private String nextSongName;
 
     /** The player. */
     private Player player;
-    
+
     /** The URL of the XML file. */
     private String urlString;
-    
+
     /** Flag indicating whether the applet provides controls or is invisible. */
     private boolean isInvisible;
-    
+
     /**
      * Starts the applet.
      * 
      * @param args the arguments
      */
-    
+
     public static void main(String[] args) {
         new SoundHelixApplet().start();
     }
-    
+
     @Override
     public void start() {
-        String invisibleParam = getParameter("invisible");        
+        String invisibleParam = getParameter("invisible");
         isInvisible = invisibleParam != null && invisibleParam.equals("true");
 
         String urlParam = getParameter("url");
-        
+
         if (urlParam != null && !urlParam.equals("")) {
             urlString = urlParam;
         } else {
@@ -126,7 +126,7 @@ public class SoundHelixApplet extends JApplet implements Runnable {
         }
 
         String songName = getParameter("songName");
-        
+
         if (songName != null && !songName.equals("")) {
             nextSongName = songName;
         }
@@ -154,22 +154,21 @@ public class SoundHelixApplet extends JApplet implements Runnable {
                     JButton shareButton;
 
                     shareButton = getIconButton("http://www.soundhelix.com/applet/images/facebook-share.png",
-                        "Share the current song on Facebook (shows preview)");
+                            "Share the current song on Facebook (shows preview)");
                     panel.add(shareButton);
                     this.facebookShareButton = shareButton;
 
                     shareButton = getIconButton("http://www.soundhelix.com/applet/images/twitter-share.png",
-                        "Share the current song on Twitter (shows preview)");
+                            "Share the current song on Twitter (shows preview)");
                     panel.add(shareButton);
                     this.twitterShareButton = shareButton;
 
                     shareButton = getIconButton("http://www.soundhelix.com/applet/images/youtube-share.png",
-                        "Visit the SoundHelix channel on YouTube");
+                            "Visit the SoundHelix channel on YouTube");
                     panel.add(shareButton);
                     this.youTubeShareButton = shareButton;
 
-                    shareButton = getIconButton("http://www.soundhelix.com/applet/images/soundhelix-share.png",
-                        "Visit the SoundHelix website");
+                    shareButton = getIconButton("http://www.soundhelix.com/applet/images/soundhelix-share.png", "Visit the SoundHelix website");
                     panel.add(shareButton);
                     this.soundHelixShareButton = shareButton;
 
@@ -207,7 +206,7 @@ public class SoundHelixApplet extends JApplet implements Runnable {
                         nextSongName = songName;
                         player.abortPlay();
                         commandTextField.requestFocusInWindow();
-                    }                
+                    }
                 }
             });
 
@@ -231,7 +230,7 @@ public class SoundHelixApplet extends JApplet implements Runnable {
             consoleThread.setPriority(Thread.NORM_PRIORITY);
             consoleThread.start();
         }
-            
+
         // launch song generation and playing thread with high priority
         Thread playerThread = new Thread(this, "Player");
         playerThread.setPriority(Thread.MAX_PRIORITY);
@@ -244,7 +243,7 @@ public class SoundHelixApplet extends JApplet implements Runnable {
      * @param button the button
      * @param needsCurrentSongName flag indicating whether the current song name is needed
      */
-    
+
     private void addUrlActionListener(final JButton button, final boolean needsCurrentSongName) {
         if (button != null) {
             button.addActionListener(new ActionListener() {
@@ -252,17 +251,17 @@ public class SoundHelixApplet extends JApplet implements Runnable {
                     if (desktop != null && (!needsCurrentSongName || currentSongName != null)) {
                         try {
                             String url;
-                            
+
                             if (button == facebookShareButton) {
                                 url = getFacebookUrl(currentSongName);
                             } else if (button == twitterShareButton) {
                                 url = getTwitterUrl(currentSongName);
                             } else if (button == youTubeShareButton) {
-                                url = "http://www.youtube.com/SoundHelix/";                                
+                                url = "http://www.youtube.com/SoundHelix/";
                             } else {
                                 url = "http://www.soundhelix.com";
                             }
-                            
+
                             desktop.browse(new URI(url));
                         } catch (Exception e2) {
                             LOGGER.error("Exception", e2);
@@ -283,7 +282,7 @@ public class SoundHelixApplet extends JApplet implements Runnable {
      * 
      * @throws MalformedURLException if the URL is malformed
      */
-    
+
     private JButton getIconButton(String iconUrl, String toolTip) throws MalformedURLException {
         JButton shareButton;
         shareButton = new JButton(null, new ImageIcon(new URL(iconUrl)));
@@ -295,14 +294,14 @@ public class SoundHelixApplet extends JApplet implements Runnable {
     /**
      * Makes the applet frame resizable.
      */
-    
+
     private void makeResizable() {
         Component parent = this;
 
         while (parent.getParent() != null) {
             parent = parent.getParent();
         }
-        
+
         if (parent instanceof Frame) {
             if (!((Frame) parent).isResizable()) {
                 ((Frame) parent).setResizable(true);
@@ -312,44 +311,44 @@ public class SoundHelixApplet extends JApplet implements Runnable {
 
     /**
      * Sets the title of the applet frame.
-     *
+     * 
      * @param title the frame title
      */
-    
+
     private void setFrameTitle(String title) {
         Component parent = this;
 
         while (parent.getParent() != null) {
             parent = parent.getParent();
         }
-        
+
         if (parent instanceof Frame) {
             ((Frame) parent).setTitle(title);
         }
     }
-    
+
     @Override
     public void stop() {
         try {
             if (player != null) {
                 player.abortPlay();
-                
+
                 if (player instanceof MidiPlayer) {
                     ((MidiPlayer) player).muteAllChannels();
                 }
             }
         } catch (Exception e) {
         }
-        
+
         super.stop();
     }
-    
+
     /**
      * Gets the desktop, if available.
      * 
      * @return the desktop (or null)
      */
-    
+
     private Desktop getDesktop() {
         if (Desktop.isDesktopSupported()) {
             return Desktop.getDesktop();
@@ -357,7 +356,7 @@ public class SoundHelixApplet extends JApplet implements Runnable {
             return null;
         }
     }
-    
+
     /**
      * Generates and returns a Facebook URL for sharing the given song.
      * 
@@ -365,10 +364,10 @@ public class SoundHelixApplet extends JApplet implements Runnable {
      * 
      * @return the URL
      */
-    
+
     private static String getFacebookUrl(String songName) {
         return "http://www.facebook.com/sharer.php?u="
-            + encode("http://www.soundhelix.com/applet/SoundHelix-applet.jnlp?songName=" + encode(songName));
+                + encode("http://www.soundhelix.com/applet/SoundHelix-applet.jnlp?songName=" + encode(songName));
     }
 
     /**
@@ -378,22 +377,21 @@ public class SoundHelixApplet extends JApplet implements Runnable {
      * 
      * @return the URL
      */
-    
+
     private static String getTwitterUrl(String songName) {
         String url = "http://www.soundhelix.com/applet/SoundHelix-applet.jnlp?songName=" + encode(songName);
-        String text = "Check out this cool song called \"" + songName + "\"! Needs audio and a browser with "
-            + "Java 6 plugin.";
-        
+        String text = "Check out this cool song called \"" + songName + "\"! Needs audio and a browser with " + "Java 6 plugin.";
+
         // URL shortener creates URL like http://t.co/CmVMQgu
-        
+
         if (text.length() + 22 > 140) {
             text = "Check out this cool song called \"" + songName + "\"!";
-            
+
             if (text.length() + 22 > 140) {
                 text = "Check out this cool song!";
-            }            
+            }
         }
-        
+
         return "http://twitter.com/share?url=" + encode(url) + "&text=" + encode(text);
     }
 
@@ -404,28 +402,28 @@ public class SoundHelixApplet extends JApplet implements Runnable {
             return null;
         }
     }
-    
+
     /**
      * Implements the player thread functionality.
      */
-    
+
     public void run() {
         VersionUtils.logVersion();
-        
+
         Random random = new Random();
-    
+
         for (;;) {
             try {
                 URL url = new URL(getDocumentBase(), urlString);
                 Player player;
-                
+
                 if (nextSongName != null) {
                     player = SongUtils.generateSong(url, nextSongName);
                     nextSongName = null;
                 } else {
                     player = SongUtils.generateSong(url, random.nextLong());
                 }
-                
+
                 this.player = player;
 
                 if (isInvisible) {
@@ -445,19 +443,19 @@ public class SoundHelixApplet extends JApplet implements Runnable {
                 }
             } catch (Exception e) {
                 LOGGER.debug("Exception occurred", e);
-                
+
                 try {
                     Thread.sleep(3000);
                 } catch (Exception e2) {
                 }
-            }            
+            }
         }
     }
 
     /**
      * Initializes log4j.
      */
-    
+
     private void initializeLog4j() {
         if (isInvisible) {
             // use the default appender; if used in a webbrowser, this won't be visible; it might be visible if an
@@ -471,37 +469,37 @@ public class SoundHelixApplet extends JApplet implements Runnable {
             ROOT_LOGGER.setLevel(Level.DEBUG);
         }
     }
-    
+
     /**
      * Implements a log4j appender that uses the TextRemoteControl for logging.
      */
-    
+
     public static class TextRemoteControlAppender extends AppenderSkeleton {
         /** The layout. */
         private Layout layout;
-        
+
         /** The remote control. */
         private TextRemoteControl remoteControl;
-        
+
         public TextRemoteControlAppender(Layout layout, TextRemoteControl remoteControl) {
             super();
             this.layout = layout;
             this.remoteControl = remoteControl;
         }
-        
+
         public boolean requiresLayout() {
             return true;
         }
-        
+
         public void append(LoggingEvent event) {
             String message = layout.format(event);
-            
+
             if (message.endsWith("\r\n")) {
                 message = message.substring(0, message.length() - 2);
             } else if (message.endsWith("\n")) {
-                message = message.substring(0, message.length() - 1);                
+                message = message.substring(0, message.length() - 1);
             }
-            
+
             remoteControl.writeLine(message);
 
             if (layout.ignoresThrowable()) {
@@ -514,7 +512,7 @@ public class SoundHelixApplet extends JApplet implements Runnable {
                 }
             }
         }
-        
+
         public void close() {
         }
     }

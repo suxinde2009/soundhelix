@@ -17,24 +17,24 @@ import com.soundhelix.util.StringUtils;
 import com.soundhelix.util.XMLUtils;
 
 /**
- * Implements a song name engine based on a context-free grammar.
- *
+ * Implements a flexible song name engine based on a context-free grammar.
+ * 
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public class CFGSongNameEngine extends AbstractSongNameEngine {
     /** The pattern for variable replacement. */
     private static Pattern variablePattern = Pattern.compile("\\$\\{(.*?)\\}");
-    
+
     /** The variable map. */
     private Map<String, RandomStringArray> variableMap;
-    
+
     /** The start variable. */
     private String startVariable = "songName";
-    
+
     /** The separator. */
     private char stringSeparator = ',';
-    
+
     @Override
     public String createSongName() {
         Random random = new Random(randomSeed);
@@ -47,14 +47,14 @@ public class CFGSongNameEngine extends AbstractSongNameEngine {
 
         String songName = getRandomString(random, rsa);
         songName = replaceVariables(random, songName, variableMap);
-        
+
         return StringUtils.capitalize(songName);
     }
-    
+
     @Override
     public void configure(Node node, XPath xpath) throws XPathException {
         Random random = new Random(randomSeed);
-        
+
         NodeList nodeList = (NodeList) xpath.evaluate("variable", node, XPathConstants.NODESET);
         int variableCount = nodeList.getLength();
 
@@ -63,7 +63,7 @@ public class CFGSongNameEngine extends AbstractSongNameEngine {
         for (int i = 0; i < variableCount; i++) {
             String name = XMLUtils.parseString(random, "attribute::name", nodeList.item(i), xpath);
             boolean once;
-            
+
             try {
                 once = XMLUtils.parseBoolean(random, "attribute::once", nodeList.item(i), xpath);
             } catch (Exception e) {
@@ -71,23 +71,22 @@ public class CFGSongNameEngine extends AbstractSongNameEngine {
             }
 
             // TODO: merge the variable definitions instead
-            
+
             if (variableMap.containsKey(name)) {
                 throw new RuntimeException("Variable \"" + name + "\" defined more than once");
             }
-            
+
             String valueString = XMLUtils.parseString(random, nodeList.item(i), xpath);
             String[] values = StringUtils.split(valueString, stringSeparator);
-            
+
             variableMap.put(name, new RandomStringArray(values, once));
         }
-        
+
         setVariableMap(variableMap);
     }
 
     /**
-     * Recursively replaces all variables in the given string by a randomly chosen value from the corresponding variable
-     * map values.
+     * Recursively replaces all variables in the given string by a randomly chosen value from the corresponding variable map values.
      * 
      * @param random the random generator to use
      * @param string the string to perform replacements in
@@ -95,29 +94,29 @@ public class CFGSongNameEngine extends AbstractSongNameEngine {
      * 
      * @return the string with all variables replaced
      */
-     
+
     public static String replaceVariables(Random random, String string, Map<String, RandomStringArray> variableMap) {
         if (string.indexOf('$') < 0) {
             // string contains no variables, return it unchanged
             return string;
         }
-        
+
         Matcher matcher = variablePattern.matcher(string);
         StringBuffer sb = new StringBuffer();
-        
+
         while (matcher.find()) {
-            matcher.appendReplacement(sb, "");  
+            matcher.appendReplacement(sb, "");
             RandomStringArray rsa = variableMap.get(matcher.group(1));
-            
+
             if (rsa == null) {
                 throw new RuntimeException("Variable \"" + matcher.group(1) + "\" is invalid");
             }
-            
-            sb.append(getRandomString(random, rsa));  
+
+            sb.append(getRandomString(random, rsa));
         }
 
-        matcher.appendTail(sb);  
-        
+        matcher.appendTail(sb);
+
         return replaceVariables(random, sb.toString(), variableMap);
     }
 
@@ -126,36 +125,36 @@ public class CFGSongNameEngine extends AbstractSongNameEngine {
      * 
      * @param random the random generator to use
      * @param randomList the RandomList
-     *
+     * 
      * @return the random string
      */
-    
+
     private static String getRandomString(Random random, RandomStringArray randomList) {
         if (randomList.selectOnce) {
             String[] strings = randomList.strings;
             int remaining = randomList.remaining;
-            
+
             if (remaining <= 0) {
                 remaining = strings.length;
             }
-            
+
             int offset = random.nextInt(remaining);
             remaining--;
-            
+
             String value = strings[offset];
             String otherValue = strings[remaining];
-            
+
             strings[remaining] = value;
             strings[offset] = otherValue;
 
             randomList.remaining = remaining;
-            
+
             return value;
         } else {
             return randomList.strings[random.nextInt(randomList.strings.length)];
         }
     }
-    
+
     public Map<String, RandomStringArray> getVariableMap() {
         return variableMap;
     }
@@ -163,21 +162,21 @@ public class CFGSongNameEngine extends AbstractSongNameEngine {
     public void setVariableMap(Map<String, RandomStringArray> variableMap) {
         this.variableMap = variableMap;
     }
-    
+
     /**
      * Container for random string arrays.
      */
-    
+
     private static class RandomStringArray {
         /** The array of strings. */
         private String[] strings;
-        
+
         /** The number of unused strings. */
         private int remaining;
-        
+
         /** True if each string should be used only once. */
         private boolean selectOnce = true;
-        
+
         public RandomStringArray(String[] strings, boolean selectOnce) {
             this.strings = strings;
             this.selectOnce = selectOnce;

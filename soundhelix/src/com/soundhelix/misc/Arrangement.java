@@ -11,46 +11,44 @@ import java.util.List;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-
 /**
- * Represents an arrangement. An arrangement consists of pairs of Tracks and
- * instruments.
+ * Represents an arrangement. An arrangement consists of pairs of Tracks and instruments.
  * 
  * @see Track
- *
+ * 
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public class Arrangement implements Iterable<Arrangement.ArrangementEntry> {
     /** The structure. */
     private final Structure structure;
-    
+
     /** The list of arrangement entries. */
     private final List<ArrangementEntry> entryList = new ArrayList<ArrangementEntry>();
-    
+
     public Arrangement(Structure structure) {
         this.structure = structure;
     }
-    
+
     /**
      * Adds the given track and assigns the given instrument to the track.
      * 
      * @param track the track
      * @param instrument the instrument
      */
-    
+
     public void add(Track track, String instrument) {
         entryList.add(new ArrangementEntry(track, instrument));
     }
-    
+
     public Iterator<ArrangementEntry> iterator() {
         return entryList.iterator();
     }
-    
+
     public int size() {
         return entryList.size();
     }
-    
+
     public ArrangementEntry get(int index) {
         return entryList.get(index);
     }
@@ -78,7 +76,7 @@ public class Arrangement implements Iterable<Arrangement.ArrangementEntry> {
         ois.close();
         gis.close();
         fis.close();
-        
+
         return arrangement;
     }
 
@@ -90,7 +88,7 @@ public class Arrangement implements Iterable<Arrangement.ArrangementEntry> {
      * 
      * @throws IOException in case of an I/O problem
      */
-    
+
     public static void saveArrangement(Arrangement arrangement, String filename) throws IOException {
         FileOutputStream fos = new FileOutputStream(filename);
         GZIPOutputStream gos = new GZIPOutputStream(fos, 1 << 18);
@@ -100,23 +98,27 @@ public class Arrangement implements Iterable<Arrangement.ArrangementEntry> {
         gos.close();
         fos.close();
     }
-    
+
+    /**
+     * Immutable container for an arrangement entry.
+     */
+
     public static final class ArrangementEntry {
         /** The track. */
         private final Track track;
-        
+
         /** The instrument. */
         private final String instrument;
-        
+
         private ArrangementEntry(Track track, String instrument) {
             this.track = track;
             this.instrument = instrument;
         }
-        
+
         public Track getTrack() {
             return track;
         }
-        
+
         public String getInstrument() {
             return instrument;
         }

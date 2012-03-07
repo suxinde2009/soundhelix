@@ -28,10 +28,7 @@ import com.soundhelix.util.XMLUtils;
 
 public class FreeMultiPatternSequenceEngine extends AbstractFreeMultiPatternSequenceEngine {
     
-    public FreeMultiPatternSequenceEngine() {
-        super();
-    }
-
+    @Override
     public void configure(Node node, XPath xpath) throws XPathException {
         random = new Random(randomSeed);
 

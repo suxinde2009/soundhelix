@@ -14,20 +14,17 @@ import com.soundhelix.patternengine.PatternEngine;
 import com.soundhelix.util.XMLUtils;
 
 /**
- * Implements a sequence engine that repeats a set of user-specified patterns in a voice each.
- * A pattern is a string containing any number of comma-separated integers, minus and
- * plus signs. Integers play the corresponding note of the chord (0 is the base
- * note, 1 the middle note and so on; the numbers may also be negative). A minus
- * sign is a pause. A plus sign plays a transition note between the current
- * chord and the chord of the next non-transition tone that will be played. The
- * pitch of the transition note is based on the base notes of the two chords.
- * This can be used for funky base lines.
- *
+ * Implements a sequence engine that repeats a set of user-specified patterns in a voice each. A pattern is a string containing any number of
+ * comma-separated integers, minus and plus signs. Integers play the corresponding note of the chord (0 is the base note, 1 the middle note and so on;
+ * the numbers may also be negative). A minus sign is a pause. A plus sign plays a transition note between the current chord and the chord of the next
+ * non-transition tone that will be played. The pitch of the transition note is based on the base notes of the two chords. This can be used for funky
+ * base lines.
+ * 
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public class MultiPatternSequenceEngine extends AbstractMultiPatternSequenceEngine {
-    
+
     public MultiPatternSequenceEngine() {
         super();
     }
@@ -53,14 +50,13 @@ public class MultiPatternSequenceEngine extends AbstractMultiPatternSequenceEngi
 
         for (int i = 0; i < patternList.getLength(); i++) {
             PatternEngine patternEngine;
-            
+
             try {
-                patternEngine = XMLUtils.getInstance(PatternEngine.class, patternList.item(i),
-                        xpath, randomSeed, i);
+                patternEngine = XMLUtils.getInstance(PatternEngine.class, patternList.item(i), xpath, randomSeed, i);
             } catch (Exception e) {
                 throw new RuntimeException("Error instantiating PatternEngine", e);
             }
-        
+
             patterns[i] = patternEngine.render("" + TRANSITION);
         }
 

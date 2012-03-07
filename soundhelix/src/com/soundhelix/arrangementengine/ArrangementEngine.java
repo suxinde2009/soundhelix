@@ -18,7 +18,7 @@ public interface ArrangementEngine extends XMLConfigurable, RandomSeedable {
      * 
      * @param structure the structure
      */
-    
+
     void setStructure(Structure structure);
 
     /**
@@ -26,6 +26,6 @@ public interface ArrangementEngine extends XMLConfigurable, RandomSeedable {
      * 
      * @return the rendered arrangement
      */
-    
+
     Arrangement render();
 }

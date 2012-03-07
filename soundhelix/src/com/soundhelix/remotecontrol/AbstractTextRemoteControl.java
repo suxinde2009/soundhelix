@@ -21,11 +21,11 @@ public abstract class AbstractTextRemoteControl implements TextRemoteControl {
 
     /** The player. */
     private Player player;
-    
+
     /**
      * Implements the main functionality of the remote control.
      */
-    
+
     public void run() {
         boolean hasExitPermission = hasExitPermission(0);
 
@@ -35,7 +35,7 @@ public abstract class AbstractTextRemoteControl implements TextRemoteControl {
 
                 if (line != null && !line.equals("")) {
                     Player player = this.player;
-                    
+
                     if (line.startsWith("bpm ")) {
                         if (player != null) {
                             writeLine("Setting BPM");
@@ -46,28 +46,27 @@ public abstract class AbstractTextRemoteControl implements TextRemoteControl {
                         if (player != null) {
                             int tick;
                             Structure structure = player.getArrangement().getStructure();
-                            
+
                             if (line.endsWith("%")) {
                                 double percentage = Double.parseDouble(line.substring(5, line.length() - 1));
                                 tick = (int) (percentage * structure.getTicks() / 100d);
                             } else if (line.equals("+") || line.substring(5).equals("+")) {
                                 tick = player.getCurrentTick();
-                                
+
                                 if (tick >= 0) {
                                     tick += structure.getHarmonyEngine().getChordSectionTicks(tick);
                                 }
                             } else if (line.charAt(5) == '#') {
                                 double chordSectionDouble = Double.parseDouble(line.substring(6));
-                                
+
                                 int chordSection = (int) chordSectionDouble;
                                 double chordSectionFraction = chordSectionDouble - Math.floor(chordSectionDouble);
-                                
+
                                 // use the integer part to find the start of the chord section
                                 tick = HarmonyEngineUtils.getChordSectionTick(structure, chordSection);
-                                
+
                                 // add the fractional part
-                                tick += (int) (structure.getHarmonyEngine().getChordSectionTicks(tick)
-                                        * chordSectionFraction);
+                                tick += (int) (structure.getHarmonyEngine().getChordSectionTicks(tick) * chordSectionFraction);
                             } else {
                                 tick = Integer.parseInt(line.substring(5));
                             }
@@ -79,11 +78,9 @@ public abstract class AbstractTextRemoteControl implements TextRemoteControl {
 
                                 if (success) {
                                     int chordSection = HarmonyEngineUtils.getChordSectionNumber(structure, tick);
-                                    int chordSectionTick = tick - HarmonyEngineUtils.getChordSectionTick(structure,
-                                            chordSection);
-                                    
-                                    writeLine("Skipping to tick " + tick + " (tick " + chordSectionTick
-                                            + " of chord section " + chordSection + ")");
+                                    int chordSectionTick = tick - HarmonyEngineUtils.getChordSectionTick(structure, chordSection);
+
+                                    writeLine("Skipping to tick " + tick + " (tick " + chordSectionTick + " of chord section " + chordSection + ")");
                                 } else {
                                     writeLine("Skipping failed");
                                 }
@@ -92,7 +89,7 @@ public abstract class AbstractTextRemoteControl implements TextRemoteControl {
                     } else if (line.startsWith("transposition ")) {
                         if (player != null && player instanceof MidiPlayer) {
                             writeLine("Setting transposition");
-                           
+
                             ((MidiPlayer) player).setTransposition(Integer.parseInt(line.substring(14)));
                         }
                     } else if (line.startsWith("groove ")) {
@@ -137,8 +134,7 @@ public abstract class AbstractTextRemoteControl implements TextRemoteControl {
     }
 
     /**
-     * Checks if the JVM environment supports calling System.exit(). Returns true if this
-     * is the case, false otherwise.
+     * Checks if the JVM environment supports calling System.exit(). Returns true if this is the case, false otherwise.
      * 
      * @param returnCode the return code to consider
      * 

@@ -20,10 +20,10 @@ import com.soundhelix.misc.Structure;
 
 public abstract class AbstractSequenceEngine implements SequenceEngine {
     protected final Logger logger;
-    
+
     protected Structure structure;
     protected long randomSeed;
-    
+
     public AbstractSequenceEngine() {
         logger = Logger.getLogger(this.getClass());
     }
@@ -31,12 +31,10 @@ public abstract class AbstractSequenceEngine implements SequenceEngine {
     public void setStructure(Structure structure) {
         this.structure = structure;
     }
-    
+
     /**
-     * Returns the required number of ActivityVectors. For most implementations,
-     * this will be 1, but certain implementations, like for multi-instrument
-     * sequences, more than 1 might be required. Subclasses should override
-     * this.
+     * Returns the required number of ActivityVectors. For most implementations, this will be 1, but certain implementations, like for
+     * multi-instrument sequences, more than 1 might be required. Subclasses should override this.
      * 
      * @return the number of ActivityVectors
      */

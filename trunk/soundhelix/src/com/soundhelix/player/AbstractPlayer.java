@@ -18,10 +18,10 @@ public abstract class AbstractPlayer implements Player {
 
     /** The random seed. */
     protected long randomSeed;
-    
+
     /** The arrangement. */
     protected Arrangement arrangement;
-    
+
     public AbstractPlayer() {
         logger = Logger.getLogger(this.getClass());
     }

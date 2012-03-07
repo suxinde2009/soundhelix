@@ -4,6 +4,8 @@ import com.soundhelix.misc.RandomSeedable;
 import com.soundhelix.misc.XMLConfigurable;
 
 /**
+ * Interface for song name engines.
+ * 
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
@@ -13,6 +15,6 @@ public interface SongNameEngine extends RandomSeedable, XMLConfigurable {
      * 
      * @return a song name
      */
-    
+
     String createSongName();
 }

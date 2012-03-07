@@ -12,32 +12,29 @@ import com.soundhelix.misc.Track.TrackType;
 import com.soundhelix.util.NoteUtils;
 
 /**
- * Implements a sequence engine that repeats a set of user-specified patterns in a voice each.
- * A pattern is a string containing any number of comma-separated integers, minus and
- * plus signs. Integers play the corresponding note of the chord (0 is the base
- * note, 1 the middle note and so on; the numbers may also be negative). A minus
- * sign is a pause. A plus sign plays a transition note between the current
- * chord and the chord of the next non-transition tone that will be played. The
- * pitch of the transition note is based on the base notes of the two chords.
- * This can be used for funky base lines.
- *
+ * Implements a sequence engine that repeats a set of user-specified patterns in a voice each. A pattern is a string containing any number of
+ * comma-separated integers, minus and plus signs. Integers play the corresponding note of the chord (0 is the base note, 1 the middle note and so on;
+ * the numbers may also be negative). A minus sign is a pause. A plus sign plays a transition note between the current chord and the chord of the next
+ * non-transition tone that will be played. The pitch of the transition note is based on the base notes of the two chords. This can be used for funky
+ * base lines.
+ * 
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public abstract class AbstractMultiPatternSequenceEngine extends AbstractSequenceEngine {
-    
+
     /** The transition character. */
     protected static final char TRANSITION = '+';
-    
+
     /** The random generator. */
     protected Random random;
-    
+
     /** The boolean indicating whether chords should be normalized. */
     protected boolean isNormalizeChords = true;
-    
+
     /** The array of patterns. */
     private Pattern[] patterns;
-    
+
     public AbstractMultiPatternSequenceEngine() {
         super();
     }
@@ -45,24 +42,24 @@ public abstract class AbstractMultiPatternSequenceEngine extends AbstractSequenc
     public void setPatterns(Pattern[] patterns) {
         this.patterns = patterns;
     }
-    
+
     @Override
     public Track render(ActivityVector[] activityVectors) {
         ActivityVector activityVector = activityVectors[0];
 
-        HarmonyEngine harmonyEngine = structure.getHarmonyEngine();        
-        
+        HarmonyEngine harmonyEngine = structure.getHarmonyEngine();
+
         int ticks = structure.getTicks();
         int patternCount = patterns.length;
 
         Sequence[] seqs = new Sequence[patternCount];
-        
+
         for (int i = 0; i < patternCount; i++) {
             seqs[i] = new Sequence();
         }
 
         Track track = new Track(TrackType.MELODY);
-        
+
         for (int i = 0; i < patterns.length; i++) {
             Sequence seq = seqs[i];
             Pattern pattern = patterns[i];
@@ -76,7 +73,7 @@ public abstract class AbstractMultiPatternSequenceEngine extends AbstractSequenc
                 if (isNormalizeChords) {
                     chord = chord.normalize();
                 }
-                
+
                 Pattern.PatternEntry entry = pattern.get(pos % patternLength);
                 int len = entry.getTicks();
 
@@ -110,23 +107,20 @@ public abstract class AbstractMultiPatternSequenceEngine extends AbstractSequenc
                         }
 
                         int pitch;
-                        
+
                         if (isNormalizeChords) {
-                            pitch = NoteUtils.getTransitionPitch(chord.normalize(), nextChord != null
-                                    ? nextChord.normalize() : null);
+                            pitch = NoteUtils.getTransitionPitch(chord.normalize(), nextChord != null ? nextChord.normalize() : null);
                         } else {
                             pitch = NoteUtils.getTransitionPitch(chord, nextChord);
                         }
-                        
-                        boolean useLegato = entry.isLegato()
-                                            ? pattern.isLegatoLegal(activityVector, tick + len, pos + 1) : false;
+
+                        boolean useLegato = entry.isLegato() ? pattern.isLegatoLegal(activityVector, tick + len, pos + 1) : false;
                         seq.addNote(pitch, len, vel, useLegato);
                     } else {
                         // normal note
                         int value = entry.getPitch();
 
-                        boolean useLegato = entry.isLegato()
-                            ? pattern.isLegatoLegal(activityVector, tick + len, pos + 1) : false;
+                        boolean useLegato = entry.isLegato() ? pattern.isLegatoLegal(activityVector, tick + len, pos + 1) : false;
 
                         seq.addNote(chord.getPitch(value), len, vel, useLegato);
                     }
@@ -140,7 +134,7 @@ public abstract class AbstractMultiPatternSequenceEngine extends AbstractSequenc
             }
             track.add(seq);
         }
-        
+
         return track;
     }
 

@@ -7,26 +7,28 @@ package com.soundhelix.util;
  */
 
 public final class ClassUtils {
+
+    /**
+     * Private constructor.
+     */
     
     private ClassUtils() {
     }
-    
+
     /**
-     * Creates an instance of the given class name using the nullary constructor. The class is expected
-     * to be of type T.
+     * Creates an instance of the given class name using the nullary constructor. The class is expected to be of type T.
      * 
      * @param clazz the class
      * @param className the class name
      * @param <T> the expected class type
      * @return the instance
      * 
-     * @throws ClassNotFoundException 
-     * @throws InstantiationException 
-     * @throws IllegalAccessException 
+     * @throws ClassNotFoundException
+     * @throws InstantiationException
+     * @throws IllegalAccessException
      */
-    
-    public static <T> T newInstance(String className, Class<T> clazz)
-        throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+
+    public static <T> T newInstance(String className, Class<T> clazz) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         return Class.forName(className).asSubclass(clazz).newInstance();
     }
 }

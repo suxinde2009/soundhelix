@@ -9,23 +9,25 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 /**
+ * Implements a remote control bases on Swing.
+ *
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public class SwingRemoteControl extends AbstractTextRemoteControl {
     /** The output text area. */
     private JTextArea outputTextArea;
-    
+
     /** The queue for entered texts lines. */
     private BlockingQueue<String> textQueue = new LinkedBlockingQueue<String>();
-    
+
     @SuppressWarnings("unused")
     private SwingRemoteControl() {
     }
 
     public SwingRemoteControl(JTextField inputTextField, JTextArea outputTextArea) {
         this.outputTextArea = outputTextArea;
-        
+
         inputTextField.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JTextField inputTextField = (JTextField) e.getSource();
@@ -35,15 +37,17 @@ public class SwingRemoteControl extends AbstractTextRemoteControl {
         });
     }
 
+    @Override
     public String readLine() {
         try {
-            return  textQueue.take();
+            return textQueue.take();
         } catch (InterruptedException e) {
         }
-        
+
         return null;
     }
-    
+
+    @Override
     public void writeLine(String line) {
         if (line != null) {
             outputTextArea.append(line + "\n");

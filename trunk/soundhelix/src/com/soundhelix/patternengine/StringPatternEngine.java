@@ -14,51 +14,53 @@ import com.soundhelix.misc.Pattern.PatternEntry;
 import com.soundhelix.util.XMLUtils;
 
 /**
+ * Implements a PatternEngine that reads the pattern directly from a string.
+ * 
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public class StringPatternEngine extends AbstractPatternEngine {
     /** The pattern string. */
     private String patternString;
-    
+
     public Pattern render(String wildcardString) {
         return parseString(patternString, wildcardString);
     }
 
     public void configure(Node node, XPath xpath) throws XPathException {
         Random random = new Random(randomSeed);
-        
+
         NodeList nodeList = (NodeList) xpath.evaluate("string", node, XPathConstants.NODESET);
 
         if (nodeList.getLength() == 0) {
             throw new RuntimeException("Need at least 1 pattern string");
         }
-        
+
         setPatternString(XMLUtils.parseString(random, nodeList.item(random.nextInt(nodeList.getLength())), xpath));
     }
-    
+
     private static Pattern parseString(String patternString, String wildcardString) {
         if (wildcardString == null) {
             wildcardString = "";
         }
-        
+
         PatternEntry[] pattern;
-        
+
         String[] p = patternString.split(",");
         int len = p.length;
 
         pattern = new PatternEntry[len];
-        
+
         // format: offset/ticks:velocity or offset~/ticks:velocity
-        
+
         for (int i = 0; i < len; i++) {
             String[] a = p[i].split(":");
             short v = a.length > 1 ? Short.parseShort(a[1]) : Short.MAX_VALUE;
             String[] b = a[0].split("/");
             int t = b.length > 1 ? Integer.parseInt(b[1]) : 1;
-            
+
             boolean legato = b[0].endsWith("~");
-            
+
             if (legato) {
                 // cut off legato character
                 b[0] = b[0].substring(0, b[0].length() - 1);

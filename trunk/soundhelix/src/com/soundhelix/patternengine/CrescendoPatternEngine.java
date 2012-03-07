@@ -46,6 +46,7 @@ public class CrescendoPatternEngine extends StringPatternEngine {
     /** The suffix pattern string. */
     private String suffixPatternString;
 
+    @Override
     public void configure(Node node, XPath xpath) throws XPathException {
         random = new Random(randomSeed);
         

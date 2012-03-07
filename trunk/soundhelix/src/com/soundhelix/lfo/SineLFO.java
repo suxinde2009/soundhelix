@@ -13,10 +13,12 @@ import org.w3c.dom.Node;
  */
 
 public class SineLFO extends AbstractLFO {
+    @Override
     public double getValue(double angle) {
         return 0.5d + Math.sin(angle) * 0.5d;
     }
     
+    @Override
     public final void configure(Node node, XPath xpath) throws XPathException {
     }
 }

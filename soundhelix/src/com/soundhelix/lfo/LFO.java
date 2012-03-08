@@ -77,32 +77,32 @@ public interface LFO extends XMLConfigurable, RandomSeedable {
     /**
      * Sets the minimum value to return. If this value is greater than the amplitude minimum, this results in a cut-off at the given value.
      * 
-     * @param minimum the value minimum
+     * @param minValue the value minimum
      */
 
-    void setValueMinimum(int minimum);
+    void setMinValue(int minValue);
 
     /**
      * Sets the maximum value to return. If this value is smaller than the amplitude maximum, this results in a cut-off at the given value.
      * 
-     * @param maximum the value maximum
+     * @param maxValue the value maximum
      */
 
-    void setValueMaximum(int maximum);
+    void setMaxValue(int maxValue);
 
     /**
      * Sets the minimum value of the amplitude.
      * 
-     * @param minimum the amplitude minimum
+     * @param minAmplitude the minimum amplitude value
      */
 
-    void setAmplitudeMinimum(int minimum);
+    void setMinAmplitude(int minAmplitude);
 
     /**
      * Sets the maximum value of the amplitude.
      * 
-     * @param maximum the amplitude maximum
+     * @param maxAmplitude the maximum amplitude value
      */
 
-    void setAmplitudeMaximum(int maximum);
+    void setMaxAmplitude(int maxAmplitude);
 }

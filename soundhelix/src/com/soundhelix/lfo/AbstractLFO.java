@@ -18,16 +18,16 @@ public abstract class AbstractLFO implements LFO {
     protected long randomSeed;
 
     /** The minimum amplitude value. */
-    private int returnMinimum = Integer.MIN_VALUE;
+    private int minValue = Integer.MIN_VALUE;
 
     /** The maximum amplitude value. */
-    private int returnMaximum = Integer.MAX_VALUE;
+    private int maxValue = Integer.MAX_VALUE;
 
     /** The minimum amplitude value. */
-    private int amplitudeMinimum;
+    private int minAmplitude;
 
     /** The maximum amplitude value. */
-    private int amplitudeMaximum;
+    private int maxAmplitude;
 
     /** The number of microrotations per tick. */
     private long microRotationsPerTick;
@@ -48,14 +48,7 @@ public abstract class AbstractLFO implements LFO {
 
     protected abstract double getValue(double angle);
 
-    /**
-     * Returns the LFO's value of the given tick.
-     * 
-     * @param tick the tick (non-negative)
-     * 
-     * @return the LFO's value
-     */
-
+    @Override
     public int getTickValue(int tick) {
         if (!isConfigured) {
             throw new RuntimeException("LFO speed not set yet");
@@ -63,80 +56,65 @@ public abstract class AbstractLFO implements LFO {
 
         double angle = (TWO_PI / 1000000d) * ((double) tick * microRotationsPerTick + microRotationShift);
 
-        int value = amplitudeMinimum + (int) (0.5d + (amplitudeMaximum - amplitudeMinimum) * getValue(angle));
+        int value = minAmplitude + (int) (0.5d + (maxAmplitude - minAmplitude) * getValue(angle));
 
-        if (value > returnMaximum) {
-            return returnMaximum;
-        } else if (value < returnMinimum) {
-            return returnMinimum;
+        if (value > maxValue) {
+            return maxValue;
+        } else if (value < minValue) {
+            return minValue;
         } else {
             return value;
         }
     }
 
+    @Override
     public void setBeatSpeed(int milliRotationsPerBeat, int ticksPerBeat, int milliBPM) {
         this.microRotationsPerTick = milliRotationsPerBeat * 1000L / ticksPerBeat;
         isConfigured = true;
     }
 
+    @Override
     public void setSongSpeed(int milliRotationsPerSong, int ticksPerSong, int milliBPM) {
         this.microRotationsPerTick = milliRotationsPerSong * 1000L / ticksPerSong;
         isConfigured = true;
     }
 
+    @Override
     public void setActivitySpeed(int milliRotationsPerActivity, int startTick, int endTick, int milliBPM) {
         this.microRotationsPerTick = milliRotationsPerActivity * 1000L / (endTick - startTick);
         this.microRotationShift -= microRotationsPerTick * startTick;
         isConfigured = true;
     }
 
+    @Override
     public void setTimeSpeed(int milliRotationsPerSecond, int ticksPerBeat, int milliBPM) {
         this.microRotationsPerTick = milliRotationsPerSecond * 60000000L / milliBPM / ticksPerBeat;
         isConfigured = true;
     }
 
+    @Override
     public void setPhase(int microRotations) {
         this.microRotationShift = microRotations;
     }
 
-    /**
-     * Sets the minimum value to return.
-     * 
-     * @param minimum the minimum value
-     */
-
-    public void setValueMinimum(int minimum) {
-        this.returnMinimum = minimum;
+    @Override
+    public void setMinValue(int minValue) {
+        this.minValue = minValue;
     }
 
-    /**
-     * Sets the maximum value to return.
-     * 
-     * @param maximum the maximum value
-     */
-
-    public void setValueMaximum(int maximum) {
-        this.returnMaximum = maximum;
+    @Override
+    public void setMaxValue(int maxValue) {
+        this.maxValue = maxValue;
     }
 
-    /**
-     * Sets the amplitude minimum.
-     * 
-     * @param minimum the amplitude minimum
-     */
-
-    public void setAmplitudeMinimum(int minimum) {
-        this.amplitudeMinimum = minimum;
+    @Override
+    public void setMinAmplitude(int minAmplitude) {
+        this.minAmplitude = minAmplitude;
     }
 
-    /**
-     * Sets the amplitude maximum.
-     * 
-     * @param maximum the amplitude maximum
-     */
-
-    public void setAmplitudeMaximum(int maximum) {
-        this.amplitudeMaximum = maximum;
+    @Override
+    public void setMaxAmplitude(int maxAmplitude) {
+        this.maxAmplitude = maxAmplitude;
     }
 
     @Override

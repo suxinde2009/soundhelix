@@ -763,6 +763,8 @@ public class MidiPlayer extends AbstractPlayer {
                     sendMidiMessage(device, clfo.channel, ShortMessage.CONTROL_CHANGE, 12, value);
                 } else if (controller.equals("effect2")) {
                     sendMidiMessage(device, clfo.channel, ShortMessage.CONTROL_CHANGE, 13, value);
+                } else if (controller.equals("brightness")) {
+                    sendMidiMessage(device, clfo.channel, ShortMessage.CONTROL_CHANGE, 74, value);
                 } else if (controller.equals("milliBPM")) {
                     setMilliBPM(value);
                 } else {
@@ -1091,8 +1093,58 @@ public class MidiPlayer extends AbstractPlayer {
         ControllerLFO[] controllerLFOs = new ControllerLFO[entries];
 
         for (int i = 0; i < entries; i++) {
-            int minimum = XMLUtils.parseInteger(random, (Node) xpath.evaluate("minimum", nodeList.item(i), XPathConstants.NODE), xpath);
-            int maximum = XMLUtils.parseInteger(random, (Node) xpath.evaluate("maximum", nodeList.item(i), XPathConstants.NODE), xpath);
+            int minValue = Integer.MIN_VALUE;
+            int maxValue = Integer.MAX_VALUE;
+            int minAmplitude = 0;
+            int maxAmplitude = 0;
+            
+            boolean usesLegacyTags = true;
+            
+            try {
+                minAmplitude = XMLUtils.parseInteger(random, (Node) xpath.evaluate("minimum", nodeList.item(i), XPathConstants.NODE), xpath);
+                usesLegacyTags = true;
+            } catch (Exception e) {
+            }
+
+            try {
+                maxAmplitude = XMLUtils.parseInteger(random, (Node) xpath.evaluate("maximum", nodeList.item(i), XPathConstants.NODE), xpath);
+                usesLegacyTags = true;
+            } catch (Exception e) {
+            }
+            
+            if (usesLegacyTags) {
+                logger.warn("The tags \"minimum\" and \"maximum\" for LFOs have been deprecated. "
+                        + "Use \"minAmplitude\", \"maxAmplitude\", \"minValue\" and \"maxValue\" instead.");
+            }
+            
+            try {
+                minAmplitude = XMLUtils.parseInteger(random, (Node) xpath.evaluate("minAmplitude", nodeList.item(i), XPathConstants.NODE), xpath);
+            } catch (Exception e) {
+            }
+
+            try {
+                maxAmplitude = XMLUtils.parseInteger(random, (Node) xpath.evaluate("maxAmplitude", nodeList.item(i), XPathConstants.NODE), xpath);
+            } catch (Exception e) {
+            }
+
+            if (minAmplitude > maxAmplitude) {
+                throw new RuntimeException("minAmplitude must be <= maxAmplitude");
+            }
+            
+            try {
+                minValue = XMLUtils.parseInteger(random, (Node) xpath.evaluate("minValue", nodeList.item(i), XPathConstants.NODE), xpath);
+            } catch (Exception e) {
+            }
+
+            try {
+                maxValue = XMLUtils.parseInteger(random, (Node) xpath.evaluate("maxValue", nodeList.item(i), XPathConstants.NODE), xpath);
+            } catch (Exception e) {
+            }
+
+            if (minValue > maxValue) {
+                throw new RuntimeException("minValue must be <= maxValue");
+            }
+            
             double speed = XMLUtils.parseDouble(random, (Node) xpath.evaluate("speed", nodeList.item(i), XPathConstants.NODE), xpath);
 
             String controller = XMLUtils.parseString(random, (Node) xpath.evaluate("controller", nodeList.item(i), XPathConstants.NODE), xpath);
@@ -1134,8 +1186,10 @@ public class MidiPlayer extends AbstractPlayer {
                 throw new RuntimeException("Could not instantiate LFO", e);
             }
 
-            lfo.setAmplitudeMinimum(minimum);
-            lfo.setAmplitudeMaximum(maximum);
+            lfo.setMinAmplitude(minAmplitude);
+            lfo.setMaxAmplitude(maxAmplitude);
+            lfo.setMinValue(minValue);
+            lfo.setMaxValue(maxValue);
 
             controllerLFOs[i] = new ControllerLFO(lfo, device, channel, controller, instrument, speed, rotationUnit, phase);
         }

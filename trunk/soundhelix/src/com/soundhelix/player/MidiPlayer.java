@@ -755,6 +755,8 @@ public class MidiPlayer extends AbstractPlayer {
                     sendMidiMessage(device, clfo.channel, ShortMessage.CONTROL_CHANGE, 7, value);
                 } else if (controller.equals("balance")) {
                     sendMidiMessage(device, clfo.channel, ShortMessage.CONTROL_CHANGE, 8, value);
+                } else if (controller.equals("volume")) {
+                    sendMidiMessage(device, clfo.channel, ShortMessage.CONTROL_CHANGE, 9, value);
                 } else if (controller.equals("pan")) {
                     sendMidiMessage(device, clfo.channel, ShortMessage.CONTROL_CHANGE, 10, value);
                 } else if (controller.equals("expression")) {
@@ -763,6 +765,14 @@ public class MidiPlayer extends AbstractPlayer {
                     sendMidiMessage(device, clfo.channel, ShortMessage.CONTROL_CHANGE, 12, value);
                 } else if (controller.equals("effect2")) {
                     sendMidiMessage(device, clfo.channel, ShortMessage.CONTROL_CHANGE, 13, value);
+                } else if (controller.equals("variation")) {
+                    sendMidiMessage(device, clfo.channel, ShortMessage.CONTROL_CHANGE, 70, value);
+                } else if (controller.equals("timbre")) {
+                    sendMidiMessage(device, clfo.channel, ShortMessage.CONTROL_CHANGE, 71, value);
+                } else if (controller.equals("releaseTime")) {
+                    sendMidiMessage(device, clfo.channel, ShortMessage.CONTROL_CHANGE, 72, value);
+                } else if (controller.equals("attackTime")) {
+                    sendMidiMessage(device, clfo.channel, ShortMessage.CONTROL_CHANGE, 73, value);
                 } else if (controller.equals("brightness")) {
                     sendMidiMessage(device, clfo.channel, ShortMessage.CONTROL_CHANGE, 74, value);
                 } else if (controller.equals("milliBPM")) {
@@ -1098,7 +1108,7 @@ public class MidiPlayer extends AbstractPlayer {
             int minAmplitude = 0;
             int maxAmplitude = 0;
             
-            boolean usesLegacyTags = true;
+            boolean usesLegacyTags = false;
             
             try {
                 minAmplitude = XMLUtils.parseInteger(random, (Node) xpath.evaluate("minimum", nodeList.item(i), XPathConstants.NODE), xpath);
@@ -1114,7 +1124,7 @@ public class MidiPlayer extends AbstractPlayer {
             
             if (usesLegacyTags) {
                 logger.warn("The tags \"minimum\" and \"maximum\" for LFOs have been deprecated. "
-                        + "Use \"minAmplitude\", \"maxAmplitude\", \"minValue\" and \"maxValue\" instead.");
+                        + "Use \"minAmplitude\" and \"maxAmplitude\" instead.");
             }
             
             try {

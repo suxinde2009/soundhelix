@@ -29,11 +29,11 @@ public abstract class AbstractLFO implements LFO {
     /** The maximum amplitude value. */
     private int maxAmplitude;
 
-    /** The number of microrotations per tick. */
-    private long microRotationsPerTick;
+    /** The number of rotations per tick. */
+    private double rotationsPerTick;
 
-    /** The start phase in microrotations. */
-    private long microRotationShift;
+    /** The start phase in number of rotations. */
+    private double phase;
 
     /** True if one of the set...Speed() methods has been called. */
     private boolean isConfigured;
@@ -54,8 +54,7 @@ public abstract class AbstractLFO implements LFO {
             throw new RuntimeException("LFO speed not set yet");
         }
 
-        double angle = (TWO_PI / 1000000d) * ((double) tick * microRotationsPerTick + microRotationShift);
-
+        double angle = TWO_PI * ((double) tick * rotationsPerTick + phase);
         int value = minAmplitude + (int) (0.5d + (maxAmplitude - minAmplitude) * getValue(angle));
 
         if (value > maxValue) {
@@ -68,33 +67,33 @@ public abstract class AbstractLFO implements LFO {
     }
 
     @Override
-    public void setBeatSpeed(int milliRotationsPerBeat, int ticksPerBeat, int milliBPM) {
-        this.microRotationsPerTick = milliRotationsPerBeat * 1000L / ticksPerBeat;
+    public void setBeatSpeed(double rotationsPerBeat, int ticksPerBeat) {
+        this.rotationsPerTick = rotationsPerBeat / (double) ticksPerBeat;
         isConfigured = true;
     }
 
     @Override
-    public void setSongSpeed(int milliRotationsPerSong, int ticksPerSong, int milliBPM) {
-        this.microRotationsPerTick = milliRotationsPerSong * 1000L / ticksPerSong;
+    public void setSongSpeed(double rotationsPerSong, int ticksPerSong) {
+        this.rotationsPerTick = rotationsPerSong / (double) ticksPerSong;
         isConfigured = true;
     }
 
     @Override
-    public void setActivitySpeed(int milliRotationsPerActivity, int startTick, int endTick, int milliBPM) {
-        this.microRotationsPerTick = milliRotationsPerActivity * 1000L / (endTick - startTick);
-        this.microRotationShift -= microRotationsPerTick * startTick;
+    public void setActivitySpeed(double rotationsPerActivity, int startTick, int endTick) {
+        this.rotationsPerTick = rotationsPerActivity / (double) (endTick - startTick);
+        this.phase -= rotationsPerTick * (double) startTick;
         isConfigured = true;
     }
 
     @Override
-    public void setTimeSpeed(int milliRotationsPerSecond, int ticksPerBeat, int milliBPM) {
-        this.microRotationsPerTick = milliRotationsPerSecond * 60000000L / milliBPM / ticksPerBeat;
+    public void setTimeSpeed(double rotationsPerSecond, int ticksPerBeat, double bpm) {
+        this.rotationsPerTick = rotationsPerSecond * 60.0d / bpm / (double) ticksPerBeat;
         isConfigured = true;
     }
 
     @Override
-    public void setPhase(int microRotations) {
-        this.microRotationShift = microRotations;
+    public void setPhase(double phase) {
+        this.phase = phase;
     }
 
     @Override

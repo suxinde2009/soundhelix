@@ -28,51 +28,48 @@ public interface LFO extends XMLConfigurable, RandomSeedable {
     /**
      * Makes this LFO synchronized to beats and sets the parameters.
      * 
-     * @param milliRotationsPerBeat the number of millirotations per beat
-     * @param ticksPerBeat the ticks per beat
-     * @param milliBPM the milli-BPM
+     * @param rotationsPerBeat the number of rotations per beat
+     * @param ticksPerBeat the number of ticks per beat
      */
 
-    void setBeatSpeed(int milliRotationsPerBeat, int ticksPerBeat, int milliBPM);
+    void setBeatSpeed(double rotationsPerBeat, int ticksPerBeat);
 
     /**
      * Makes this LFO synchronized to the song length and sets the parameters.
      * 
-     * @param milliRotationsPerSong the number of millirotations for the whole song
+     * @param rotationsPerSong the number of rotations for the whole song
      * @param ticksPerSong the ticks of the song
-     * @param milliBPM the milli-BPM
      */
 
-    void setSongSpeed(int milliRotationsPerSong, int ticksPerSong, int milliBPM);
+    void setSongSpeed(double rotationsPerSong, int ticksPerSong);
 
     /**
      * Makes this LFO synchronized to a tick range and sets the parameters.
      * 
-     * @param milliRotationsPerActivity the number of millirotations for the tick range
+     * @param rotationsPerActivity the number of rotations for the tick range
      * @param startTick the start tick
      * @param endTick the end tick
-     * @param milliBPM the milli-BPM
      */
 
-    void setActivitySpeed(int milliRotationsPerActivity, int startTick, int endTick, int milliBPM);
+    void setActivitySpeed(double rotationsPerActivity, int startTick, int endTick);
 
     /**
      * Makes this LFO synchronized to time and sets the parameters.
      * 
-     * @param milliRotationsPerSecond the number of millirotations per second
+     * @param rotationsPerSecond the number of rotations per second
      * @param ticksPerBeat the ticks per beat
-     * @param milliBPM the milli-BPM
+     * @param bpm the BPM
      */
 
-    void setTimeSpeed(int milliRotationsPerSecond, int ticksPerBeat, int milliBPM);
+    void setTimeSpeed(double rotationsPerSecond, int ticksPerBeat, double bpm);
 
     /**
-     * Set the starting phase (the phase to use for tick 0).
+     * Set the starting phase (the phase to use for tick 0). If a phase should be set, it must be set before calling any of the set*Speed() methods.
      * 
-     * @param microRotations the microrotations
+     * @param phase the number of rotations for the initial phase
      */
 
-    void setPhase(int microRotations);
+    void setPhase(double phase);
 
     /**
      * Sets the minimum value to return. If this value is greater than the amplitude minimum, this results in a cut-off at the given value.

@@ -687,9 +687,8 @@ public class MidiPlayer extends AbstractPlayer {
 
         for (ControllerLFO clfo : controllerLFOs) {
             if (clfo.rotationUnit.equals("song")) {
-                clfo.lfo.setPhase((int) (1000000d * clfo.phase));
-                clfo.lfo.setSongSpeed((int) (1000f * clfo.speed), structure.getTicks(), milliBPM);
-
+                clfo.lfo.setPhase(clfo.phase);
+                clfo.lfo.setSongSpeed(clfo.speed, structure.getTicks());
             } else if (clfo.rotationUnit.equals("activity")) {
                 // if the instrument is inactive or not part of the song, we
                 // use the whole song as the length (this LFO is then a no-op)
@@ -710,14 +709,14 @@ public class MidiPlayer extends AbstractPlayer {
                     }
                 }
 
-                clfo.lfo.setPhase((int) (1000000d * clfo.phase));
-                clfo.lfo.setActivitySpeed((int) (1000f * clfo.speed), startTick, endTick, milliBPM);
+                clfo.lfo.setPhase(clfo.phase);
+                clfo.lfo.setActivitySpeed(clfo.speed, startTick, endTick);
             } else if (clfo.rotationUnit.equals("beat")) {
-                clfo.lfo.setPhase((int) (1000000d * clfo.phase));
-                clfo.lfo.setBeatSpeed((int) (1000f * clfo.speed), structure.getTicksPerBeat(), milliBPM);
+                clfo.lfo.setPhase(clfo.phase);
+                clfo.lfo.setBeatSpeed(clfo.speed, structure.getTicksPerBeat());
             } else if (clfo.rotationUnit.equals("second")) {
-                clfo.lfo.setPhase((int) (1000000d * clfo.phase));
-                clfo.lfo.setTimeSpeed((int) (1000f * clfo.speed), structure.getTicksPerBeat(), milliBPM);
+                clfo.lfo.setPhase(clfo.phase);
+                clfo.lfo.setTimeSpeed(clfo.speed, structure.getTicksPerBeat(), milliBPM / 1000.0d);
             } else {
                 throw new RuntimeException("Invalid rotation unit \"" + clfo.rotationUnit + "\"");
             }

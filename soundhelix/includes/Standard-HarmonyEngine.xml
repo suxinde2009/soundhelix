@@ -1,7 +1,9 @@
 <harmonyEngine class="PatternHarmonyEngine">
   <minimizeChordDistance>true</minimizeChordDistance>
-  <chordPattern>Am/4,Em4/4,-7:-3:4/4,Dm4/4,Am/4,Em4/4,Dm4/4,F/4</chordPattern>
-  <chordPattern>Am/8,C/8,Em/8,G/8</chordPattern>
+  <chordPattern minimizeChordDistance="false">Am/4,-5:-1:5/2,G/2,Dm4/4,-7:-3:4/2,F/2,Am/4,-5:-1:5/2,G/2,Dm4/4,-7:-3:4/2,Em4/2</chordPattern>
+  <chordPattern minimizeChordDistance="false">Am/4,Em4/4,-7:-3:4/4,Dm4/4,Am/4,Em4/4,Dm4/4,F/4</chordPattern> 
+  <chordPattern minimizeChordDistance="false">Am/12,F4/2,-3:0:7/2,Am/8,-5:0:2/4,G/4,+Am/12,F4/2,-3:0:7/2,Am/8,C6/4,-5:0:2/2,G/2</chordPattern>
+  <chordPattern>Am/4,F/4,Dm/4,C/2,G/2,Am/4,F/4,Dm/4,C/2,G/2</chordPattern>
   <chordPattern>0/8,1/8,1!1/8,1!1/6,1!3/2</chordPattern>
   <chordPattern>0/7,1/1,0/6,1/2,$0/7,$1/1,$2/6,2/2</chordPattern>  
   <chordPattern>0/7,1/1,0/7,1/1,$0/7,$1/1,$2/6,2/2</chordPattern>  
@@ -13,6 +15,7 @@
   <chordPattern>0/8,1/8,1/8,1/8,+$0/8,1/8,1/8,1/8</chordPattern>
   <chordPattern>0/8,1/8,0!0/8,1!1/8</chordPattern>
   <chordPattern>0/8,1/8,$0/8,1!1/8</chordPattern>
+  <chordPattern>0/8,1/4,1/2,1/2,$0/12,$2/2,$3/2</chordPattern>
   <chordPattern>0/8,1/4,1/2,1/2,$0/8,1/4,$2/2,$3/2</chordPattern>
   <chordPattern>0/4,1/4,1/4,2!1/4</chordPattern>
   <chordPattern>0/4,1/4,1/4,1/2,2!3/2</chordPattern>
@@ -22,12 +25,11 @@
   <chordPattern>0/4,1/4,1/4,1/4,0/4,1/4,1/4,2/4</chordPattern>
   <chordPattern>0/4,1/4,1/4,1/4,0/4,1/4,1/4,1/2,2/2</chordPattern>
   <chordPattern>0/4,1/4,1/2,1/2,2/4</chordPattern>
-  <chordPattern>0/2,1/2,1/2,1/2,$0/2,$1/2,$2/2,2/2,$0/2,$1/2,$2/2,$3/2,$0/2,$1/2,1/2,2/2</chordPattern>
   <chordPattern>0/4,1/4,$0/4,1/2,$1/2</chordPattern>
   <chordPattern>0/16,1/8,1/8</chordPattern>
   <chordPattern>0/8,1/8,$0/8,1!1/8</chordPattern>
   <chordPattern>0/16,1/8,1/8,+$0/16,1/8,1/4,1/4</chordPattern>
-  <chordRandomTable>Am,Am,Am,Am,Am,C,F</chordRandomTable>
+  <chordRandomTable>Am,Am,Am,Am,F</chordRandomTable>
   <chordRandomTable>C,Am,G,F,Em,Dm</chordRandomTable>
   <chordRandomTable>C,Am,G,F,Em,Dm,E</chordRandomTable>
 </harmonyEngine>

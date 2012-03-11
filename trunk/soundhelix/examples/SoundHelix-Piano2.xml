@@ -117,7 +117,7 @@
       <instrument>melody2</instrument>
       <transposition>0</transposition>
       <sequenceEngine class="MelodySequenceEngine">
-        <melodies>5,7</melodies>
+        <melodies>1,2,2</melodies>
         <minPitch>0</minPitch>
         <maxPitch>11</maxPitch>
 		<pitchDistances>-2,-2,-1,-1,-1,-1,0,0,1,1,1,1,2,2</pitchDistances>

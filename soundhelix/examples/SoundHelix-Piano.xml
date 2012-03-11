@@ -1,20 +1,27 @@
 <?xml version="1.0"?>
-<SoundHelix version="0.3+" xmlns:xi="http://www.w3.org/2001/XInclude">
-  <!-- Example XML file for SoundHelix. Author: Thomas Schuerger. -->
-  <xi:include href="../includes/Standard-SongNameEngine.xml"/>
+<!-- $Id$ -->
+<!-- Example XML file for SoundHelix. Author: Thomas Schuerger. -->
+<SoundHelix version="0.4u+" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <xi:include href="../includes/Standard-SongNameEngine.xml" />
   <structure>
-     <bars><random min="96" max="192" step="16"/></bars> 
-     <beatsPerBar>4</beatsPerBar>
-     <ticksPerBeat>4</ticksPerBeat>
+    <bars>
+      <random min="96" max="192" step="16" />
+    </bars>
+    <beatsPerBar>4</beatsPerBar>
+    <ticksPerBeat>4</ticksPerBeat>
   </structure>
-  <xi:include href="../includes/Standard-HarmonyEngine.xml"/>
+  <xi:include href="../includes/Standard-HarmonyEngine.xml" />
   <arrangementEngine class="SimpleArrangementEngine">
     <maxIterations>1000000</maxIterations>
     <minActivityCount>3</minActivityCount>
     <maxActivityCount>8</maxActivityCount>
     <maxActivityChangeCount>2</maxActivityChangeCount>
-    <startActivityCounts><random list="1,2,3,4|1,2,3,4,5"/></startActivityCounts>
-    <stopActivityCounts><random list="2,1|3,2|4,3,2"/></stopActivityCounts>
+    <startActivityCounts>
+      <random list="1,2,3,4|1,2,3,4,5" />
+    </startActivityCounts>
+    <stopActivityCounts>
+      <random list="2,1|3,2|4,3,2" />
+    </stopActivityCounts>
     <activityVector name="accomp">
       <stopShift>-2</stopShift>
       <minActive>10</minActive>
@@ -43,6 +50,7 @@
       <minActive>50</minActive>
       <maxActive>85</maxActive>
       <minSegmentLength>2</minSegmentLength>
+      <maxSegmentLength>8</maxSegmentLength>
       <maxPauseLength>5</maxPauseLength>
       <minSegmentCount>2</minSegmentCount>
       <maxSegmentCount>4</maxSegmentCount>
@@ -72,8 +80,6 @@
       <maxActive>80</maxActive>
       <minSegmentLength>2</minSegmentLength>
     </activityVector>
-    <activityVector name="plonk"/>
-    <activityVector name="chord"/>
 
     <track>
       <instrument>arpeggio</instrument>
@@ -127,56 +133,6 @@
       </sequenceEngine>
       <activityVector>arpeggio</activityVector>
     </track>
-    <!-- <track>
-      <instrument>arpeggio</instrument>
-      <transposition>-12</transposition>
-      <sequenceEngine class="MultiPatternSequenceEngine">
-          <normalizeChords>false</normalizeChords>
-        <patternEngines>
-          <patternEngine class="StringPatternEngine">
-            <string>-/6,4/2</string>
-          </patternEngine>
-          <patternEngine class="StringPatternEngine">
-            <string>-/4,3/4</string>
-          </patternEngine>
-          <patternEngine class="StringPatternEngine">
-            <string>-/2,2/6</string>
-          </patternEngine>
-          <patternEngine class="StringPatternEngine">
-            <string>0/8</string>
-          </patternEngine>
-        </patternEngines>
-        <patternEngines>
-          <patternEngine class="StringPatternEngine">
-            <string>2/8</string>
-          </patternEngine>
-          <patternEngine class="StringPatternEngine">
-            <string>-/2,0/6</string>
-          </patternEngine>
-          <patternEngine class="StringPatternEngine">
-            <string>-/4,1/4</string>
-          </patternEngine>
-          <patternEngine class="StringPatternEngine">
-            <string>-/6,0/2</string>
-          </patternEngine>
-        </patternEngines>
-        <patternEngines>
-          <patternEngine class="StringPatternEngine">
-            <string>3/8</string>
-          </patternEngine>
-          <patternEngine class="StringPatternEngine">
-            <string>-/2,1/6</string>
-          </patternEngine>
-          <patternEngine class="StringPatternEngine">
-            <string>-/4,2/4</string>
-          </patternEngine>
-          <patternEngine class="StringPatternEngine">
-            <string>-/6,0/2</string>
-          </patternEngine>
-        </patternEngines>
-      </sequenceEngine>
-      <activityVector>arpeggio</activityVector>
-    </track> -->
     <track>
       <instrument>accomp</instrument>
       <transposition>-24</transposition>
@@ -198,29 +154,26 @@
       </sequenceEngine>
       <activityVector>accomp</activityVector>
     </track>
-<!--    <track>
-      <instrument>chord</instrument>
-      <sequenceEngine class="ChordSequenceEngine">
-        <patternEngine class="StringPatternEngine">
-          <string>-,-,0,-</string>
-        </patternEngine>
-      </sequenceEngine>
-      <activityVector>chord</activityVector>
-    </track> -->
     <track>
       <instrument>melody</instrument>
       <transposition>12</transposition>
       <sequenceEngine class="MelodySequenceEngine">
-        <patternEngine class="RandomPatternEngine"> 
+        <melodies>1,2,2,3</melodies>
+        <minPitch>0</minPitch>
+        <maxPitch>11</maxPitch>
+        <pitchDistances>-2,-2,-1,-1,-1,-1,0,0,1,1,1,1,2,2</pitchDistances>
+        <patternEngine class="RandomPatternEngine">
           <patternTicks>16</patternTicks>
-          <patternString><random list="A1,A2,A1,A3,A1,A2,A1,B1"/></patternString>
+          <patternString>
+            <random list="A1,A2,A1,A3,A1,A2,A1,B1" />
+          </patternString>
           <noteProbability>75</noteProbability>
           <legatoProbability>0</legatoProbability>
           <minVelocity>32767</minVelocity>
           <maxVelocity>32767</maxVelocity>
           <minActiveTicks>7</minActiveTicks>
           <maxActiveTicks>13</maxActiveTicks>
-          <offsets>0,0,0,0,0,0,+,+</offsets>
+          <offsets>0,0,0,0,0,0,+,+,+,+,*,*</offsets>
           <noteLengths>2,2,2,3,2,2,2,1,2</noteLengths>
           <pauseLengths>2,2,2,2,1,2</pauseLengths>
           <pitchVelocityCorrelation>100</pitchVelocityCorrelation>
@@ -237,7 +190,9 @@
           <pitch>36</pitch>
           <patternEngine class="RandomFragmentPatternEngine">
             <patternTicks>16</patternTicks>
-            <patternString><random list="A1,B1,A1,B2,A1,B1,A1,B3|A1,A1,A1,B1,A1,A1,A1,B2,A1,A1,A1,B1,A1,A1,A1,B3"/></patternString>
+            <patternString>
+              <random list="A1,B1,A1,B2,A1,B1,A1,B3|A1,A1,A1,B1,A1,A1,A1,B2,A1,A1,A1,B1,A1,A1,A1,B3" />
+            </patternString>
             <pattern group="A">0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,-</pattern>
             <pattern group="B">0,-,-,0,-,-,-,-,0,-,-,-,-,-,-,-|0,-,-,-,-,-,-,-,0,-,-,-,-,-,0,-|0,-,-,-,-,-,-,-,0,-,-,-,-,-,-,0|0,-,-,-,-,-,-,-,0,-,-,-,-,-,0,0</pattern>
           </patternEngine>
@@ -275,11 +230,15 @@
           <mode>replace</mode>
           <probability>40</probability>
           <patternEngine class="CrescendoPatternEngine">
-            <patternTicks><random list="32|64|128"/></patternTicks>
+            <patternTicks>
+              <random list="32|64|128" />
+            </patternTicks>
             <minVelocity>1</minVelocity>
             <maxVelocity>32767</maxVelocity>
             <velocityExponent>2</velocityExponent>
-            <pattern><random list="0/1|0/1:32767,0/1:24000"/></pattern>
+            <pattern>
+              <random list="0/1|0/1:32767,0/1:24000" />
+            </pattern>
           </patternEngine>
         </conditionalPattern>
         <conditionalPattern>
@@ -288,122 +247,89 @@
           <mode>add</mode>
           <probability>40</probability>
           <patternEngine class="StringPatternEngine">
-            <string><random list="0,0,0,0|0,0,0,0,0,0,0,0"/></string>
+            <string>
+              <random list="0,0,0,0|0,0,0,0,0,0,0,0" />
+            </string>
           </patternEngine>
         </conditionalPattern>
       </sequenceEngine>
-      <activityVector>base_and_snare</activityVector>    
+      <activityVector>base_and_snare</activityVector>
       <activityVector>base_and_snare</activityVector>
       <activityVector>hihat</activityVector>
       <activityVector>hihat</activityVector>
     </track>
-    
+
     <track>
       <instrument>pad</instrument>
       <sequenceEngine class="PadSequenceEngine">
         <offsets>0,1,2</offsets>
-        <velocity>12000</velocity>
+        <velocity>15000</velocity>
       </sequenceEngine>
-      <activityVector>pad</activityVector>          
+      <activityVector>pad</activityVector>
     </track>
-    
+
     <track>
       <transposition>-24</transposition>
       <instrument>bass</instrument>
       <sequenceEngine class="PatternSequenceEngine">
         <patternEngine class="StringPatternEngine">
-        <string>0,-,-,-,0,-,-,0,-,-,0,-,-,-1,-,-,0,-,-,-,0,-,-,0,-,-,0,-,-,-,+,-,0,-,-,-,0,-,-,0,-,-,0,-,-,-1,-,-,0,-,-,-,0,-,-,0,-,0,-,-,0,-,+,-</string>
-        <string>0,-,-,0,-,-,0,2,0,-,-,0,-,-,-1,-,0,-,-,0,-,-,0,2,0,-,-,0,-,-,-1,-,0,-,-,0,-,-,0,2,0,-,-,0,-,-,-1,-,0,-,-,0,-,-,0,2,0,-,-,0,-,-,1,-</string>
-        <string>0,-,0,-,0,-,-,0,-,0,-,0,0,-,+,-</string> 
-        <string>0,-,-,-,0,-,-,-,0,-,-,0,-,-,+,-,0,-,-,-,0,-,-,0,-,-,0,-,-,0,+,-,0,-,-,-,0,-,-,-,0,-,-,0,-,-,+,-,0,-,-,-,0,-,-,0,-,-,0,-,0,-,+,-</string>
-        <string>-,-,0,-,-,-,0,-,-,-,0,-,-,-,0,-,-,-,0,-,-,-,0,-,-,-,0,-,-,-,+,-</string>
-        <string>0,-,-,-,0,-,-,-,0,-,-,0,-,-,0,-,0,-,-,-,0,-,-,-,0,-,-,2,-,-,+,-,0,-,-,-,0,-,-,-,0,-,-,0,-,-,0,-,0,-,-,-,0,-,-,-,0,-,-,0,-,-,+,-</string>
-        <string>0,-,-,3,-,-,0,-,1,-,-,0,-,-,3,-,0,-,-,3,-,-,0,-,1,-,-,0,-,2,1,-</string>
+          <string>0,-,-,-,0,-,-,0,-,-,0,-,-,-1,-,-,0,-,-,-,0,-,-,0,-,-,0,-,-,-,+,-,0,-,-,-,0,-,-,0,-,-,0,-,-,-1,-,-,0,-,-,-,0,-,-,0,-,0,-,-,0,-,+,-</string>
+          <string>0,-,-,0,-,-,0,2,0,-,-,0,-,-,-1,-,0,-,-,0,-,-,0,2,0,-,-,0,-,-,-1,-,0,-,-,0,-,-,0,2,0,-,-,0,-,-,-1,-,0,-,-,0,-,-,0,2,0,-,-,0,-,-,1,-</string>
+          <string>0,-,0,-,0,-,-,0,-,0,-,0,0,-,+,-</string>
+          <string>0,-,-,-,0,-,-,-,0,-,-,0,-,-,+,-,0,-,-,-,0,-,-,0,-,-,0,-,-,0,+,-,0,-,-,-,0,-,-,-,0,-,-,0,-,-,+,-,0,-,-,-,0,-,-,0,-,-,0,-,0,-,+,-</string>
+          <string>-,-,0,-,-,-,0,-,-,-,0,-,-,-,0,-,-,-,0,-,-,-,0,-,-,-,0,-,-,-,+,-</string>
+          <string>0,-,-,-,0,-,-,-,0,-,-,0,-,-,0,-,0,-,-,-,0,-,-,-,0,-,-,2,-,-,+,-,0,-,-,-,0,-,-,-,0,-,-,0,-,-,0,-,0,-,-,-,0,-,-,-,0,-,-,0,-,-,+,-</string>
+          <string>0,-,-,3,-,-,0,-,1,-,-,0,-,-,3,-,0,-,-,3,-,-,0,-,1,-,-,0,-,2,1,-</string>
         </patternEngine>
       </sequenceEngine>
       <activityVector>bass</activityVector>
     </track>
-       
+
     <track>
       <transposition>-36</transposition>
       <instrument>randombass</instrument>
       <sequenceEngine class="PatternSequenceEngine">
-          <patternEngine class="RandomPatternEngine"> 
-            <patternTicks>16</patternTicks>
-            <patternString><random list="A1,A2,A1,A3|A1,A2,A1,A3,A1,A2,A1,A4"/></patternString>
-            <noteProbability>75</noteProbability>
-            <legatoProbability>0</legatoProbability>
-            <minVelocity>32767</minVelocity>
-            <maxVelocity>32767</maxVelocity>
-            <minActiveTicks>8</minActiveTicks>
-            <maxActiveTicks>15</maxActiveTicks>
-            <offsets>0,0,0,2,3,0,0,0</offsets>
-            <noteLengths>1,2,3,2</noteLengths>
-            <pauseLengths>1,2</pauseLengths>
-            <pitchVelocityCorrelation>100</pitchVelocityCorrelation>
-            <velocityExponent>3</velocityExponent>
+        <patternEngine class="RandomPatternEngine">
+          <patternTicks>16</patternTicks>
+          <patternString>
+            <random list="A1,A2,A1,A3|A1,A2,A1,A3,A1,A2,A1,A4" />
+          </patternString>
+          <noteProbability>75</noteProbability>
+          <legatoProbability>0</legatoProbability>
+          <minVelocity>32767</minVelocity>
+          <maxVelocity>32767</maxVelocity>
+          <minActiveTicks>8</minActiveTicks>
+          <maxActiveTicks>15</maxActiveTicks>
+          <offsets>0,0,0,2,3,0,0,0</offsets>
+          <noteLengths>1,2,3,2</noteLengths>
+          <pauseLengths>1,2</pauseLengths>
+          <pitchVelocityCorrelation>100</pitchVelocityCorrelation>
+          <velocityExponent>3</velocityExponent>
         </patternEngine>
       </sequenceEngine>
       <activityVector>randombass</activityVector>
     </track>
-    
-    <!-- <track>
-      <transposition>0</transposition>
-      <instrument>plonk</instrument>
-      <sequenceEngine class="PatternSequenceEngine">         
-          <patternEngine class="RandomPatternEngine"> 
-            <patternTicks>8</patternTicks>
-            <patternString><random list="A1,A2,A1,A3|A1,A2,A1,A3,A1,A2,A1,A4"/></patternString>
-            <noteProbability>90</noteProbability>
-            <legatoProbability>0</legatoProbability>
-            <minVelocity>28000</minVelocity>
-            <maxVelocity>28000</maxVelocity>
-            <minActiveTicks>6</minActiveTicks>
-            <maxActiveTicks>8</maxActiveTicks>
-            <offsets>0,1,2,3,4,5</offsets>
-            <noteLengths>1</noteLengths>
-            <pauseLengths>1</pauseLengths>
-            <pitchVelocityCorrelation>100</pitchVelocityCorrelation>
-            <velocityExponent>3</velocityExponent>
-          </patternEngine>
-      </sequenceEngine>
-      <activityVector>plonk</activityVector>
-    </track> -->
   </arrangementEngine>
-  
+
   <player class="MidiPlayer">
-    <bpm><random min="120" max="140" type="normal" variance="7"/></bpm>
-    <transposition><random min="65" max="69"/></transposition>
+    <bpm>
+      <random min="120" max="144" type="normal" variance="7" />
+    </bpm>
+    <transposition>
+      <random min="65" max="69" />
+    </transposition>
     <beforePlayWaitTicks>0</beforePlayWaitTicks>
     <afterPlayWaitTicks>16</afterPlayWaitTicks>
-    <groove><random list="100|110,90|115,85|125,75,115,85"/></groove>
+    <groove>
+      <random list="100|110,90|115,85|125,75,115,85" />
+    </groove>
     <device name="device1" clockSynchronization="true">Microsoft GS Wavetable Synth,Microsoft GS Wavetable SW Synth,Gervill,Java Sound Synthesizer</device>
-    <map instrument="arpeggio" device="device1" channel="1" program="1"/>
-    <map instrument="accomp" device="device1" channel="2" program="1"/>
-    <map instrument="melody" device="device1" channel="3" program="2"/>
-    <map instrument="pad" device="device1" channel="4" program="92"/>
-    <map instrument="bass" device="device1" channel="5" program="40"/>
-    <map instrument="randombass" device="device1" channel="6" program="40"/>
-    <!-- <map instrument="plonk" device="device1" channel="7" program="1"/> -->
-    <map instrument="percussion" device="device1" channel="10"/>
-<!--    <map instrument="chord" device="device2" channel="1" program="1"/> -->
-<!--    <controllerLFO>
-      <lfo class="TriangleLFO"/>
-      <rotationUnit>beat</rotationUnit>
-      <speed>0.1</speed>
-      <minimum>0</minimum>
-      <maximum>16383</maximum>
-      <controller>pitchBend</controller>
-      <channel>1</channel>
-      <device>device1</device>
-    </controllerLFO> -->
-<!--    <controllerLFO>
-      <lfo class="SineLFO"/>
-      <rotationUnit>beat</rotationUnit>
-      <speed>0.02</speed>
-      <minimum>100000</minimum>
-      <maximum>150000</maximum>
-      <controller>milliBPM</controller>
-    </controllerLFO> -->
+    <map instrument="arpeggio" device="device1" channel="1" program="1" />
+    <map instrument="accomp" device="device1" channel="2" program="1" />
+    <map instrument="melody" device="device1" channel="3" program="2" />
+    <map instrument="pad" device="device1" channel="4" program="92" />
+    <map instrument="bass" device="device1" channel="5" program="40" />
+    <map instrument="randombass" device="device1" channel="6" program="40" />
+    <map instrument="percussion" device="device1" channel="10" />
   </player>
 </SoundHelix>

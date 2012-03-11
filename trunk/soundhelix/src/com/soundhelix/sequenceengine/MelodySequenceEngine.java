@@ -51,17 +51,14 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
     /** The maximum pitch to use. */
     private int maxPitch = 12;
 
-    /** The input pattern for melodies. */
-    private Pattern pattern;
-
-    /** The minimum number of melodies per distinct chord section. */
-    private int minMelodies = 1;
-
-    /** The maximum number of melodies per distinct chord section. */
-    private int maxMelodies = 1;
+    /** The number of melodies to generate per distinct chord section. */
+    private int[] melodies = {1};
 
     /** The pitch distances. */
     private int[] pitchDistances = new int[] {-2, -1, 0, 1, 2};
+
+    /** The input pattern for melodies. */
+    private Pattern pattern;
 
     /** The random generator. */
     private Random random;
@@ -264,14 +261,13 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
 
             if (!melodyMap.containsKey(section)) {
                 // no list exists yet, create one
-                int melodies = minMelodies + random.nextInt(maxMelodies - minMelodies + 1);
+                int melodies = this.melodies[random.nextInt(this.melodies.length)];
                 patternList = new ArrayList<Pattern>(melodies);
                 melodyMap.put(section, patternList);
                 sizeMap.put(section, melodies);
                 patterns = 0;
 
                 logger.debug("Melodies for chord section " + section + ": " + melodies);
-
             } else {
                 patterns = patternList.size();
             }
@@ -330,6 +326,11 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
         }
 
         try {
+            setMelodies(XMLUtils.parseIntegerListString(random, "melodies", node, xpath));
+        } catch (Exception e) {
+        }
+
+        try {
             setMinPitch(XMLUtils.parseInteger(random, (Node) xpath.evaluate("minPitch", node, XPathConstants.NODE), xpath));
         } catch (Exception e) {
         }
@@ -341,20 +342,6 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
 
         if (maxPitch - minPitch < 5) {
             throw new RuntimeException("minPitch and maxPitch must be at least 5 halftones apart");
-        }
-
-        try {
-            setMinMelodies(XMLUtils.parseInteger(random, (Node) xpath.evaluate("minMelodies", node, XPathConstants.NODE), xpath));
-        } catch (Exception e) {
-        }
-
-        try {
-            setMaxMelodies(XMLUtils.parseInteger(random, (Node) xpath.evaluate("maxMelodies", node, XPathConstants.NODE), xpath));
-        } catch (Exception e) {
-        }
-
-        if (maxMelodies < minMelodies) {
-            throw new RuntimeException("maxMelodies must not be smaller than minMelodies");
         }
 
         NodeList nodeList = (NodeList) xpath.evaluate("patternEngine", node, XPathConstants.NODESET);
@@ -404,19 +391,7 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
         this.pitchDistances = pitchDistances;
     }
 
-    public int getMinMelodies() {
-        return minMelodies;
-    }
-
-    public void setMinMelodies(int minMelodies) {
-        this.minMelodies = minMelodies;
-    }
-
-    public int getMaxMelodies() {
-        return maxMelodies;
-    }
-
-    public void setMaxMelodies(int maxMelodies) {
-        this.maxMelodies = maxMelodies;
+    public void setMelodies(int[] melodies) {
+        this.melodies = melodies;
     }
 }

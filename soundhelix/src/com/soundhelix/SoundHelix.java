@@ -71,7 +71,7 @@ public class SoundHelix implements Runnable {
         logger = Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
         VersionUtils.logVersion();
 
-        String filename = args.length >= 1 ? args[0] : "SoundHelix.xml";
+        String filename = args.length >= 1 ? args[0] : "examples/SoundHelix-Piano.xml";
         String songName = args.length == 2 ? args[1] : null;
 
         long randomSeed = 0;

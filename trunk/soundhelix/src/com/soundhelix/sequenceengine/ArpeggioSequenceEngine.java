@@ -30,8 +30,6 @@ import com.soundhelix.util.XMLUtils;
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
-// TODO: allow specifying velocities in arpeggio patterns (like in the PatternSequenceEngine)
-
 public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
     /** The random generator. */
     protected Random random;
@@ -96,7 +94,7 @@ public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
                 }
 
                 if (activityVector.isActive(tick)) {
-                    short vel = entry.getVelocity();
+                    short velocity = entry.getVelocity();
 
                     if (entry.isPause()) {
                         // add pause
@@ -107,7 +105,7 @@ public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
 
                         boolean useLegato = entry.isLegato() ? pattern.isLegatoLegal(activityVector, tick + len, pos + 1) : false;
 
-                        seq.addNote(chord.getPitch(value), len, vel, useLegato);
+                        seq.addNote(chord.getPitch(value), len, velocity, useLegato);
                     }
                 } else {
                     // add pause

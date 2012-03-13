@@ -23,9 +23,9 @@ public final class ClassUtils {
      * @param <T> the expected class type
      * @return the instance
      * 
-     * @throws ClassNotFoundException
-     * @throws InstantiationException
-     * @throws IllegalAccessException
+     * @throws ClassNotFoundException if the class could not be found
+     * @throws InstantiationException if the class could not be instantiated
+     * @throws IllegalAccessException if the class access was illegal
      */
 
     public static <T> T newInstance(String className, Class<T> clazz) throws ClassNotFoundException, InstantiationException, IllegalAccessException {

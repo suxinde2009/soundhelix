@@ -107,6 +107,18 @@
         </javadoc>
     </target>
 
+    <target name="deploycurrentjavadoc" depends="javadoc" description="deploy current javadoc">
+       <exec executable="bash">
+            <arg line="-c 'cd javadoc;tar -zcf ../javadoc.tar.gz .'"/>
+       </exec>
+       <exec executable="scp">
+            <arg line="javadoc.tar.gz soundhelix.com:"/>
+       </exec>
+       <exec executable="ssh">
+            <arg line="soundhelix.com 'cd soundhelix.com/public_html/javadoc/current &amp;&amp; \\rm -rf * &amp;&amp; tar -zxvf ~/javadoc.tar.gz &amp;&amp; find . -type f -exec chmod a+r {} \\; &amp;&amp; find . -type d -exec chmod a+rx {} \\;'"/>
+       </exec>
+    </target>
+
 	<target name="packagebin" description="build binary zip" depends="init,jar">
 		<zip destfile="${binzip}"
 		     basedir=".."

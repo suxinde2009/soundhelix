@@ -58,7 +58,6 @@ import com.soundhelix.util.XMLUtils;
  */
 
 // TODO: add possibility to map a virtual channel to several MIDI channels (do we need this)?
-// TODO: mute all MIDI channels when player is aborted by ctrl+c (how?)
 // TODO: on each tick, send all note-offs before sending note-ons (this is currently done per track, but should be done globally)
 
 public class MidiPlayer extends AbstractPlayer {

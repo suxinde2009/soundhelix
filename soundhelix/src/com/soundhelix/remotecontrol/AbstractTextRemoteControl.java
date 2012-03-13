@@ -112,8 +112,10 @@ public abstract class AbstractTextRemoteControl implements TextRemoteControl {
                         writeLine("bpm <value>             Sets the BPM. Example: \"bpm 140\"");
                         writeLine("skip <value>            Skips to the specified tick. Example: \"skip 1000\"");
                         writeLine("skip <value>%           Skips to the specified tick percentage. Example: \"skip 50.8%\"");
-                        writeLine("skip #<value>           Skips to the specified chord section. Example: \"skip #3.5\" (skips to the middle of chord section 3)");
-                        writeLine("skip +                  Skips to the first tick of the next chord section. Example: \"skip +\". Short form: \"+\"");
+                        writeLine("skip #<value>           Skips to the specified chord section. "
+                                + "Example: \"skip #3.5\" (skips to the middle of chord section 3)");
+                        writeLine("skip +                  Skips to the first tick of the next chord section. "
+                                + "Example: \"skip +\". Short form: \"+\"");
                         writeLine("transposition <value>   Sets the transposition. Example: \"transposition 70\"");
                         writeLine("groove <value>          Sets the groove pattern. Example: \"groove 130,70\"");
                         writeLine("next                    Aborts playing and starts the next song. Example: \"next\"");

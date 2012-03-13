@@ -143,8 +143,6 @@ public class RandomPatternSequenceEngine extends AbstractSequenceEngine {
                 }
 
                 sectionMap.put(section, new Pattern(list.toArray(new PatternEntry[list.size()])));
-            } else {
-                // melody already created, skip chord section
             }
 
             tick += len;

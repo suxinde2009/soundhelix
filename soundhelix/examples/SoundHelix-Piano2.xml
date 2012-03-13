@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<SoundHelix version="0.4u+" xmlns:xi="http://www.w3.org/2001/XInclude">
-  <!-- Example XML file for SoundHelix. Author: Thomas Schuerger. -->
+<!-- Example XML file for SoundHelix. Author: Thomas Schuerger. -->
+<SoundHelix version="0.4+" xmlns:xi="http://www.w3.org/2001/XInclude">
   <xi:include href="../includes/Standard-SongNameEngine.xml" />
   <structure>
     <bars>

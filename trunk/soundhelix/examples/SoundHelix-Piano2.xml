@@ -46,28 +46,17 @@
 
     <track>
       <instrument>accomp</instrument>
-      <transposition>-24</transposition>
+      <transposition>-12</transposition>
       <sequenceEngine class="MultiPatternSequenceEngine">
         <patternEngines>
           <patternEngine class="StringPatternEngine">
-            <string>-,-,-,-,5,-,-,-,-,-,-,-,5,-,-,-</string>
+            <string>-,-,-,-,2:28000,-,-,-</string>
           </patternEngine>
           <patternEngine class="StringPatternEngine">
-            <string>-,-,-,-,4,-,-,-,-,-,-,-,4,-,-,-</string>
+            <string>-,-,-,-,1:28000,-,-,-</string>
           </patternEngine>
           <patternEngine class="StringPatternEngine">
-            <string>-,-,-,-,3,-,-,-,-,-,-,-,3,-,-,-</string>
-          </patternEngine>
-        </patternEngines>
-        <patternEngines>
-          <patternEngine class="StringPatternEngine">
-            <string>-,-,5,-</string>
-          </patternEngine>
-          <patternEngine class="StringPatternEngine">
-            <string>-,-,4,-</string>
-          </patternEngine>
-          <patternEngine class="StringPatternEngine">
-            <string>-,-,3,-</string>
+            <string>-,-,-,-,0:28000,-,-,-</string>
           </patternEngine>
         </patternEngines>
       </sequenceEngine>
@@ -79,8 +68,8 @@
       <sequenceEngine class="PatternSequenceEngine">
         <patternEngine class="RandomFragmentPatternEngine">
           <patternTicks>16</patternTicks>
-          <patternString>A1,A2,A1,A3</patternString>
-          <pattern group="A">0,-,-,-,0,-,-,-|0,-,-,0,-,-,2,-|0,-,-,-,2,-,-,-|0,-,-,1,-,-,2,-</pattern>
+          <patternString>A1,A2,A1,A3,A1,A2,A1,A4</patternString>
+          <pattern group="A">0,-,-,-,0,-,-,-|0,-,-,0,-,-,2,-|0,-,-,-,2,-,-,-|0,-,-,1,-,-,2,-|0,-,-,2,-,-,-1,-</pattern>
         </patternEngine>
       </sequenceEngine>
       <activityVector>accompbass</activityVector>
@@ -89,7 +78,7 @@
       <instrument>melody</instrument>
       <transposition>12</transposition>
       <sequenceEngine class="MelodySequenceEngine">
-        <melodies>3,9</melodies>
+        <melodies>2,3,4</melodies>
         <minPitch>0</minPitch>
         <maxPitch>9</maxPitch>
 		<pitchDistances>-2,-2,-1,-1,-1,-1,0,0,1,1,1,1,2,2</pitchDistances>
@@ -105,8 +94,8 @@
           <minActiveTicks>7</minActiveTicks>
           <maxActiveTicks>13</maxActiveTicks>
           <offsets>0,0,+,+</offsets>
-          <noteLengths>2,2,2,3,2,2,2,1,2,1,1,1,1,1</noteLengths>
-          <pauseLengths>2,2,2,2,1,2,1,1,1</pauseLengths>
+          <noteLengths>2,2,2,3,2,2,2,1,2,1</noteLengths>
+          <pauseLengths>2,2,2,2,1,2</pauseLengths>
           <pitchVelocityCorrelation>100</pitchVelocityCorrelation>
           <velocityExponent>3</velocityExponent>
         </patternEngine>
@@ -117,7 +106,7 @@
       <instrument>melody2</instrument>
       <transposition>0</transposition>
       <sequenceEngine class="MelodySequenceEngine">
-        <melodies>1,2,2</melodies>
+        <melodies>2,2,3</melodies>
         <minPitch>0</minPitch>
         <maxPitch>11</maxPitch>
 		<pitchDistances>-2,-2,-1,-1,-1,-1,0,0,1,1,1,1,2,2</pitchDistances>
@@ -145,7 +134,7 @@
 
   <player class="MidiPlayer">
     <bpm>
-      <random min="116" max="132" type="normal" variance="7" />
+      <random min="120" max="134" type="normal" variance="7" />
     </bpm>
     <transposition>
       <random min="65" max="69" />

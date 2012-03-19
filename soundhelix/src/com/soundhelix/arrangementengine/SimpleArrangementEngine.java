@@ -99,6 +99,12 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
         ActivityVectorConfiguration[] vectors = neededActivityVectors.values().toArray(new ActivityVectorConfiguration[neededActivityVectors.size()]);
 
+        int tracks = arrangementEntries.length;
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("Creating " + vectors.length + " ActivityVectors for " + tracks + " track" + (tracks == 1 ? "" : "s"));
+        }
+
         // create the song activity matrix
         createConstrainedActivityVectors(vectors);
         dumpActivityVectors(vectors);
@@ -205,12 +211,6 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
         if (maxActivityVectors <= 0) {
             maxActivityVectors = getActivityVectorMaximum(vectors, 0.40, 0.2);
-        }
-
-        int tracks = arrangementEntries.length;
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("Creating " + vectors + " ActivityVectors for " + tracks + " track" + (tracks == 1 ? "" : "s"));
         }
 
         int[] startActivityCounts = parseActivityCounts(startActivityCountsString, vectors);

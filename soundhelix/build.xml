@@ -122,7 +122,7 @@
 	<target name="packagebin" description="build binary zip" depends="init,jar">
 		<zip destfile="${binzip}"
 		     basedir=".."
-		     includes="soundhelix/SoundHelix.jar,soundhelix/run.bat,soundhelix/run.sh,soundhelix/examples/SoundHelix-Piano.xml,soundhelix/includes/*,soundhelix/doc/*,soundhelix/lib/*,soundhelix/log4j.*"/>		     
+		     includes="soundhelix/SoundHelix.jar,soundhelix/run.bat,soundhelix/run.sh,soundhelix/examples/SoundHelix-Piano.xml,soundhelix/examples/SoundHelix-Piano2.xml,soundhelix/includes/*,soundhelix/doc/*,soundhelix/lib/*,soundhelix/log4j.*"/>		     
 	</target>
 
     <target name="packagesrc" description="build zip including sources and javadoc" depends="init,jar,javadoc">

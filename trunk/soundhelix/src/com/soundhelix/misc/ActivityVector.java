@@ -3,9 +3,9 @@ package com.soundhelix.misc;
 import java.util.BitSet;
 
 /**
- * Represents a bit vector specifying for each tick whether a voice should be active or not. This vector should be considered a strong hint for a
- * SequenceEngine whether to add notes or to add pauses. However, it is not strictly forbidden to play notes while inactive. For example, after an
- * activity interval, a final note could be played at the start of the following inactivity interval.
+ * Represents a bit vector specifying for each tick whether a voice should be active or not. The bit vector grows dynamically as needed. This vector
+ * should be considered a strong hint for a SequenceEngine whether to add notes or to add pauses. However, it is not strictly forbidden to play notes
+ * while inactive. For example, after an activity interval, a final note could be played at the start of the following inactivity interval.
  * 
  * An ActivityVector must always span the whole length of a song.
  * 
@@ -16,11 +16,34 @@ import java.util.BitSet;
 
 public class ActivityVector {
     /** The bit set used (each bit represents a tick activity). */
-    private BitSet bitSet = new BitSet();
+    private final BitSet bitSet;
 
     /** The length of the vector in ticks. */
     private int totalTicks;
 
+    /** The name of the ActivityVector. */
+    private String name;
+    
+    /**
+     * Constructor. Initializes the internal BitSet's initial size to the default number of bits.
+     */
+    
+    public ActivityVector(String name) {
+        this.name = name;
+        bitSet = new BitSet();
+    }
+
+    /**
+     * Constructor. Initializes the internal BitSet's initial size to the given number of bits.
+     *
+     * @param bits the initial number of bits
+     */
+    
+    public ActivityVector(String name, int bits) {
+        this.name = name;
+        bitSet = new BitSet(bits);
+    }
+    
     /**
      * Appends an activity interval with the specified number of ticks.
      * 
@@ -87,6 +110,16 @@ public class ActivityVector {
                 return num - tick;
             }
         }
+    }
+
+    /**
+     * Returns the name of this ActivityVector.
+     * 
+     * @return the name
+     */
+
+    public String getName() {
+        return name;
     }
 
     /**

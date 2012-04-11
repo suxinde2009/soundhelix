@@ -1,6 +1,10 @@
 package com.soundhelix.sequenceengine;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import javax.xml.xpath.XPath;
@@ -21,6 +25,7 @@ import com.soundhelix.misc.Track.TrackType;
 import com.soundhelix.patternengine.PatternEngine;
 import com.soundhelix.util.HarmonyEngineUtils;
 import com.soundhelix.util.RandomUtils;
+import com.soundhelix.util.StringUtils;
 import com.soundhelix.util.XMLUtils;
 
 /**
@@ -42,9 +47,13 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
     /** Conditional pattern replace mode. */
     private static final int MODE_REPLACE = 1;
 
+    /** The drum entries. */
     private DrumEntry[] drumEntries;
+    
+    /** The conditional entries. */
     private ConditionalEntry[] conditionalEntries;
-
+    
+    /** The random generator. */    
     private Random random;
 
     public DrumSequenceEngine() {
@@ -140,6 +149,26 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
         int chordSections = HarmonyEngineUtils.getChordSectionCount(structure);
         int conditionalEntryCount = conditionalEntries.length;
 
+        Map<String, List<Integer>> map = new HashMap<String, List<Integer>>();
+        
+        for (int i = 0; i < activityVectors.length; i++) {
+            ActivityVector av = activityVectors[i];
+            List<Integer> list = map.get(av.getName());
+            if (list == null) {
+                list = new ArrayList<Integer>();
+                map.put(av.getName(), list);
+            }
+            
+            list.add(i);
+        }
+        
+        for (ConditionalEntry entry : conditionalEntries) {
+            if (entry.preCondition == null) {
+                entry.preCondition = getConditionPattern(map, drumEntries.length, entry.preConditionString);
+                entry.postCondition = getConditionPattern(map, drumEntries.length, entry.postConditionString);            
+            }
+        }
+                
         // the tick where each pattern was applied last (last tick of the pattern + 1), initially 0
         // (used to avoid overlapping application of patterns)
         int[] lastMatchedTick = new int[conditionalEntryCount];
@@ -314,13 +343,34 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
                 targets[k] = Integer.parseInt(targetStrings[k]);
             }
 
-            String conditionString = XMLUtils.parseString(random, "condition", nodeList.item(i), xpath);
-            String[] conditions = conditionString.split(">");
-            conditions[0] = conditions[0].replaceAll(",", "|").replaceAll("-", ".");
-            conditions[1] = conditions[1].replaceAll(",", "|").replaceAll("-", ".");
-            java.util.regex.Pattern preCondition = java.util.regex.Pattern.compile(conditions[0]);
-            java.util.regex.Pattern postCondition = java.util.regex.Pattern.compile(conditions[1]);
+            String conditionString = null;
+            
+            try {
+                conditionString = XMLUtils.parseString(random, "condition", nodeList.item(i), xpath);
+            } catch (Exception e) {
+            }
+            
+            java.util.regex.Pattern preCondition = null;
+            java.util.regex.Pattern postCondition = null;
+            String preConditionString = null;
+            String postConditionString = null;
 
+            if (conditionString != null && !conditionString.equals("")) {
+                String[] conditions = conditionString.split(">");
+                conditions[0] = conditions[0].replaceAll(",", "|").replaceAll("-", ".");
+                conditions[1] = conditions[1].replaceAll(",", "|").replaceAll("-", ".");
+                preCondition = java.util.regex.Pattern.compile(conditions[0]);
+                postCondition = java.util.regex.Pattern.compile(conditions[1]);
+                
+                // TODO remove support
+                logger.warn("The tag \"condition\" is deprecated. Use the tags \"precondition\" and \"postcondition\" instead.");
+            } else {
+                // we cannot evaluate the patterns yet, because we don't have the list of ActivityVectors yet during the configure pass
+                
+                preConditionString = XMLUtils.parseString(random, "precondition", nodeList.item(i), xpath);
+                postConditionString = XMLUtils.parseString(random, "postcondition", nodeList.item(i), xpath);
+            }
+            
             String modeString = XMLUtils.parseString(random, "mode", nodeList.item(i), xpath);
             int mode;
 
@@ -368,13 +418,70 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
 
             Pattern pattern = patternEngine.render("");
 
-            conditionalEntries[i] = new ConditionalEntry(pattern, preCondition, postCondition, mode, targets, probability, skipWhenApplied,
-                    skipWhenNotApplied);
+            if (preCondition != null) {
+                conditionalEntries[i] = new ConditionalEntry(pattern, preCondition, postCondition, mode, targets, probability, skipWhenApplied,
+                        skipWhenNotApplied);
+            } else {
+                conditionalEntries[i] = new ConditionalEntry(pattern, preConditionString, postConditionString, mode, targets, probability,
+                        skipWhenApplied, skipWhenNotApplied);
+            }
         }
 
         setConditionalEntries(conditionalEntries);
     }
 
+    /**
+     * Parses the given condition string and returns a pattern representing the condition. The condition string is given as a comma-separated list of
+     * ActivityVector names, which are each prefixed by either "+" or "-".
+     * 
+     * @param map the map that maps ActivityVector names to lists of offsets
+     * @param vectors the total number of ActivityVectors
+     * @param string the condition string
+     *
+     * @return the condition pattern
+     */
+        
+    private static java.util.regex.Pattern getConditionPattern(Map<String, List<Integer>> map, int vectors, String string) {
+        // start with a regexp string consisting of only dots
+        
+        StringBuilder sb = new StringBuilder(vectors);
+        
+        for (int i = 0; i < vectors; i++) {
+            sb.append('.');
+        }
+
+        if (string != null && !string.equals("")) {
+            String[] stringParts = StringUtils.split(string, ',');
+
+            for (String stringPart : stringParts) {
+                char c = stringPart.charAt(0);
+                String name = stringPart.substring(1);
+
+                if (c == '+') {
+                    c = '1';
+                } else if (c == '-') {
+                    c = '0';
+                } else {
+                    throw new IllegalArgumentException("Condition string part \"" + stringPart + "\" is invalid");
+                }
+
+                // set all characters at the offsets given by ActivityVector name to either "1" or "0"
+                
+                List<Integer> indexes = map.get(name);
+
+                if (indexes == null) {
+                    throw new IllegalArgumentException("Unknown ActitvityVector \"" + name + "\" referenced in condition pattern");
+                }
+
+                for (int index : indexes) {   
+                    sb.setCharAt(index, c);
+                }
+            }
+        }
+        
+        return java.util.regex.Pattern.compile(sb.toString());
+    }
+    
     private static final class DrumEntry {
         private final Pattern pattern;
         private final int pitch;
@@ -387,8 +494,10 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
 
     private static final class ConditionalEntry {
         private final Pattern pattern;
-        private final java.util.regex.Pattern preCondition;
-        private final java.util.regex.Pattern postCondition;
+        private java.util.regex.Pattern preCondition;
+        private java.util.regex.Pattern postCondition;
+        private final String preConditionString;
+        private final String postConditionString;
         private final int mode;
         private final int[] targets;
         private final double probability;
@@ -398,6 +507,8 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
         private ConditionalEntry(Pattern pattern, java.util.regex.Pattern preCondition, java.util.regex.Pattern postCondition, int mode,
                 int[] targets, double probability, int skipWhenApplied, int skipWhenNotApplied) {
             this.pattern = pattern;
+            this.preConditionString = null;
+            this.postConditionString = null;
             this.preCondition = preCondition;
             this.postCondition = postCondition;
             this.mode = mode;
@@ -406,5 +517,17 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
             this.skipWhenApplied = skipWhenApplied;
             this.skipWhenNotApplied = skipWhenNotApplied;
         }
-    }
+
+        private ConditionalEntry(Pattern pattern, String preConditionString, String postConditionString, int mode,
+                int[] targets, double probability, int skipWhenApplied, int skipWhenNotApplied) {
+            this.pattern = pattern;
+            this.preConditionString = preConditionString;
+            this.postConditionString = postConditionString;
+            this.mode = mode;
+            this.targets = targets;
+            this.probability = probability;
+            this.skipWhenApplied = skipWhenApplied;
+            this.skipWhenNotApplied = skipWhenNotApplied;
+        }
+}
 }

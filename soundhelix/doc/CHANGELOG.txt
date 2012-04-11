@@ -7,6 +7,13 @@ Author: Thomas Schürger (thomas@schuerger.com)
 Change log
 ----------
 
+0.5u:
+
+    - Added the tags "precondition" and "postcondition" to the "conditionalPattern" tag of the DrumSequenceEngine, which
+      replace the "condition" tag and have a much more user-friendly syntax for specifying the condition. The "condition"
+      tag is deprecated, but can still be used.
+
+
 0.4: 2012-03-13
 
     - Made the MelodySequenceEngine much more configurable. You can now specify the minimum pitch ("minPitch" tag), the

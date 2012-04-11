@@ -485,11 +485,12 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         int ticks = structure.getTicks();
 
         for (int i = 0; i < vectors; i++) {
-            ActivityVector av = new ActivityVector();
+            ActivityVectorConfiguration avc = activityVectorConfigurations[i];
+            ActivityVector av = new ActivityVector(avc.name, ticks);
             // make sure that the ticks of all AVs equals the song length (setActivityState() below does not
             // ensure this, because it only sets active segments in the AV)
             av.addInactivity(ticks);
-            activityVectorConfigurations[i].activityVector = av;
+            avc.activityVector = av;
         }
 
         HarmonyEngine harmonyEngine = structure.getHarmonyEngine();

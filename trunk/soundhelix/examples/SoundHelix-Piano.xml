@@ -225,7 +225,8 @@
         </pattern>
         <conditionalPattern>
           <target>1</target>
-          <condition>0---&gt;1---</condition>
+          <precondition>-base_and_snare</precondition>
+          <postcondition>+base_and_snare</postcondition>
           <mode>replace</mode>
           <probability>40</probability>
           <patternEngine class="CrescendoPatternEngine">
@@ -242,7 +243,8 @@
         </conditionalPattern>
         <conditionalPattern>
           <target>0</target>
-          <condition>1---&gt;0---</condition>
+          <precondition>+base_and_snare</precondition>
+          <postcondition>-base_and_snare</postcondition>
           <mode>add</mode>
           <probability>40</probability>
           <patternEngine class="StringPatternEngine">

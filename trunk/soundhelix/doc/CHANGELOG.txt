@@ -13,6 +13,8 @@ Change log
       replace the "condition" tag and have a much more user-friendly syntax for specifying the condition. The "condition"
       tag is deprecated, but can still be used.
 
+    - Updated included log4j version from 1.2.16 to 1.2.17.
+
 
 0.4: 2012-03-13
 

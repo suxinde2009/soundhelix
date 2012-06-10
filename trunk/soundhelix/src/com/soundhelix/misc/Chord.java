@@ -29,20 +29,38 @@ public class Chord {
     /** Code for the major chord. */
     private static final int MAJOR = 407;
 
+    /** Code for the faked major7 chord. */
+    private static final int MAJOR7 = 410;
+
     /** Code for the major6 chord. */
     private static final int MAJOR6 = 509;
+
+    /** Code for the faked major76 chord. */
+    private static final int MAJOR76 = 206;
 
     /** Code for the major4 chord. */
     private static final int MAJOR4 = 308;
 
+    /** Code for the faked major74 chord. */
+    private static final int MAJOR74 = 608;
+
     /** Code for the minor chord. */
     private static final int MINOR = 307;
+
+    /** Code for the faked minor7 chord. */
+    private static final int MINOR7 = 310;
 
     /** Code for the minor6 chord. */
     private static final int MINOR6 = 508;
 
+    /** Code for the faked minor76 chord. */
+    private static final int MINOR76 = 205;
+
     /** Code for the minor4 chord. */
     private static final int MINOR4 = 409;
+
+    /** Code for the faked minor74 chord. */
+    private static final int MINOR74 = 709;
 
     /** Code for the diminished chord. */
     private static final int DIM = 306;
@@ -94,11 +112,17 @@ public class Chord {
     static {
         for (int i = 0; i < 12; i++) {
             NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i).toUpperCase(), i * 10000 + MAJOR);
+            NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i).toUpperCase() + "7", i * 10000 + MAJOR7);
             NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i + 5).toUpperCase() + "6", i * 10000 + MAJOR6);
+            NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i + 5).toUpperCase() + "76", i * 10000 + MAJOR76);
             NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i - 4).toUpperCase() + "4", i * 10000 + MAJOR4);
+            NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i - 4).toUpperCase() + "74", i * 10000 + MAJOR74);
             NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i).toUpperCase() + "m", i * 10000 + MINOR);
+            NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i).toUpperCase() + "m7", i * 10000 + MINOR7);
             NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i + 5).toUpperCase() + "m6", i * 10000 + MINOR6);
+            NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i + 5).toUpperCase() + "m76", i * 10000 + MINOR76);
             NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i - 3).toUpperCase() + "m4", i * 10000 + MINOR4);
+            NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i - 3).toUpperCase() + "m74", i * 10000 + MINOR74);
             NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i).toUpperCase() + "dim", i * 10000 + DIM);
             NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i + 6).toUpperCase() + "dim6", i * 10000 + DIM6);
             NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i - 4).toUpperCase() + "dim4", i * 10000 + DIM4);
@@ -158,6 +182,16 @@ public class Chord {
     }
 
     /**
+     * Returns true iff this chord is a major7 chord.
+     * 
+     * @return true iff the chord is a major7 chord
+     */
+
+    public boolean isMajor7() {
+        return flavor == MAJOR7 || flavor == MAJOR76 || flavor == MAJOR74;
+    }
+
+    /**
      * Returns true iff this chord is a minor chord.
      * 
      * @return true iff the chord is a minor chord
@@ -165,6 +199,16 @@ public class Chord {
 
     public boolean isMinor() {
         return flavor == MINOR || flavor == MINOR6 || flavor == MINOR4;
+    }
+
+    /**
+     * Returns true iff this chord is a minor7 chord.
+     * 
+     * @return true iff the chord is a minor7 chord
+     */
+
+    public boolean isMinor7() {
+        return flavor == MINOR7 || flavor == MINOR76 || flavor == MINOR74;
     }
 
     /**
@@ -316,12 +360,20 @@ public class Chord {
         switch (flavor) {
             case MAJOR6:
                 return new Chord(middlePitch, middlePitch + 4, middlePitch + 7);
+            case MAJOR76:
+                return new Chord(middlePitch, middlePitch + 4, middlePitch + 10);
             case MAJOR4:
                 return new Chord(highPitch - 12, highPitch - 8, highPitch - 5);
+            case MAJOR74:
+                return new Chord(highPitch - 12, highPitch - 8, highPitch - 2);
             case MINOR6:
                 return new Chord(middlePitch, middlePitch + 3, middlePitch + 7);
+            case MINOR76:
+                return new Chord(middlePitch, middlePitch + 3, middlePitch + 10);
             case MINOR4:
                 return new Chord(highPitch - 12, highPitch - 9, highPitch - 5);
+            case MINOR74:
+                return new Chord(highPitch - 12, highPitch - 9, highPitch - 2);
             case DIM6:
                 return new Chord(middlePitch, middlePitch + 3, middlePitch + 6);
             case DIM4:

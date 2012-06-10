@@ -9,6 +9,9 @@ Change log
 
 0.5u:
 
+    - Added support for "fake" seventh chords, which use 3 instead of 4 notes. Seventh chords can be selected using a
+      simple syntax (e.g., "C7" for C major seventh, "Am76" for A minor seventh, second inversion).
+
     - Added the tags "precondition" and "postcondition" to the "conditionalPattern" tag of the DrumSequenceEngine, which
       replace the "condition" tag and have a much more user-friendly syntax for specifying the condition. The "condition"
       tag is deprecated, but can still be used.

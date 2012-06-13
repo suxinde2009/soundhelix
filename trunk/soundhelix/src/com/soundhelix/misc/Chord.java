@@ -114,13 +114,13 @@ public class Chord {
             NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i).toUpperCase(), i * 10000 + MAJOR);
             NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i).toUpperCase() + "7", i * 10000 + MAJOR7);
             NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i + 5).toUpperCase() + "6", i * 10000 + MAJOR6);
-            NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i + 5).toUpperCase() + "76", i * 10000 + MAJOR76);
+            NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i + 2).toUpperCase() + "76", i * 10000 + MAJOR76);
             NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i - 4).toUpperCase() + "4", i * 10000 + MAJOR4);
             NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i - 4).toUpperCase() + "74", i * 10000 + MAJOR74);
             NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i).toUpperCase() + "m", i * 10000 + MINOR);
             NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i).toUpperCase() + "m7", i * 10000 + MINOR7);
             NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i + 5).toUpperCase() + "m6", i * 10000 + MINOR6);
-            NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i + 5).toUpperCase() + "m76", i * 10000 + MINOR76);
+            NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i + 2).toUpperCase() + "m76", i * 10000 + MINOR76);
             NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i - 3).toUpperCase() + "m4", i * 10000 + MINOR4);
             NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i - 3).toUpperCase() + "m74", i * 10000 + MINOR74);
             NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i).toUpperCase() + "dim", i * 10000 + DIM);

@@ -7,22 +7,28 @@
     <property name="constantsclass" location="${build}/com/soundhelix/constants/BuildConstants.class"/>
     <property name="jar" location="SoundHelix.jar"/>
     <property name="javadoc" location="javadoc"/>
-    <property name="classpath" location="lib/log4j.jar"/>
 
     <property file="VERSION.txt"/>
     <property name="binzip" location="SoundHelix-${version}-bin.zip"/>
     <property name="srczip" location="SoundHelix-${version}-src.zip"/>
-	
-    <target name="init">
-        <tstamp>
-            <format property="TODAY" pattern="yyyy-MM-dd"/>
-            <format property="NOW" pattern="HH:mm:ss"/>
-        </tstamp>
-    </target>
-    
+
+    <path id="class.path">
+        <fileset dir="${basedir}/lib" >
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+    <pathconvert property="manifest-classpath" dirsep="/" pathsep=" " refid="class.path">
+        <map from="${basedir}/lib" to="lib" />
+    </pathconvert>
+
+    <tstamp>
+        <format property="TODAY" pattern="yyyy-MM-dd"/>
+        <format property="NOW" pattern="HH:mm:ss"/>
+    </tstamp>
+
     <target name="-createBuildConstants">
         <exec executable="svn" outputproperty="revision">
-        	 <env key="LANG" value="en_US"/>
+             <env key="LANG" value="en_US"/>
              <arg line="info"/>
              <redirector>
                  <outputfilterchain>
@@ -35,16 +41,15 @@
                   </outputfilterchain>
               </redirector>
            </exec>
-        <copy file="${constants}" tofile="${tmpconstants}" overwrite="true"/>    	
-    	
-    	<replaceregexp file="${tmpconstants}"
-    	               match="(\sVERSION\s*=\s*&quot;)[^&quot;]+?(&quot;)"
+        <copy file="${constants}" tofile="${tmpconstants}" overwrite="true"/>
+        <replaceregexp file="${tmpconstants}"
+                       match="(\sVERSION\s*=\s*&quot;)[^&quot;]+?(&quot;)"
                        replace="\1${version}\2"/>
 
         <replaceregexp file="${tmpconstants}"
                        match="(\sREVISION\s*=\s*&quot;)[^&quot;]+?(&quot;)"
                        replace="\1${revision}\2"/>
- 
+
         <replaceregexp file="${tmpconstants}"
                        match="(\sBUILD_DATE\s*=\s*&quot;)[^&quot;]+?(&quot;)"
                        replace="\1${TODAY}\2"/>
@@ -53,15 +58,15 @@
                        match="(\sBUILD_TIME\s*=\s*&quot;)[^&quot;]+?(&quot;)"
                        replace="\1${NOW}\2"/>
 
-    	<echo> Version: ${version}</echo>
+        <echo> Version: ${version}</echo>
         <echo>    Date: ${TODAY}</echo>
         <echo>    Time: ${NOW}</echo>
-        <echo>Revision: ${revision}</echo> 	
-    </target> 
-	
-    <target name="compile" depends="init,-createBuildConstants" description="compile the source">
+        <echo>Revision: ${revision}</echo>
+    </target>
+
+    <target name="compile" depends="-createBuildConstants" description="compile the source">
         <mkdir dir="${build}"/>
-        <javac encoding="UTF-8" classpath="${classpath}" destdir="${build}" debug="yes" target="1.6">
+        <javac encoding="UTF-8" classpathref="class.path" destdir="${build}" debug="yes" target="1.6">
             <src path="${tmpsrc}"/>
             <src path="${src}"/>
             <include name="**/*.java"/>
@@ -71,28 +76,28 @@
 
     <target name="jar" depends="compile" description="generate the JAR">
         <jar jarfile="${jar}" basedir="${build}" includes="**/*.class">
-        	<manifest>
-        	    <attribute name="Main-Class" value="com.soundhelix.SoundHelix"/>
-                <attribute name="Class-Path" value="lib/log4j.jar"/>
+            <manifest>
+                <attribute name="Main-Class" value="com.soundhelix.SoundHelix"/>
+                <attribute name="Class-Path" value="${manifest-classpath}"/>
                 <section name="common">
-        	        <attribute name="Specification-Title" value="SoundHelix"/>
-        	        <attribute name="Specification-Version" value="${version}"/>
-        	        <attribute name="Specification-Vendor" value="soundhelix.com"/>
-        	        <attribute name="Implementation-Title" value="SoundHelix"/>
-        	        <attribute name="Implementation-Version" value="${version} r${revision} ${TODAY}"/> 
-        	        <attribute name="Implementation-Vendor" value="soundhelix.com"/>
-        	    </section>
+                    <attribute name="Specification-Title" value="SoundHelix"/>
+                    <attribute name="Specification-Version" value="${version}"/>
+                    <attribute name="Specification-Vendor" value="soundhelix.com"/>
+                    <attribute name="Implementation-Title" value="SoundHelix"/>
+                    <attribute name="Implementation-Version" value="${version} r${revision} ${TODAY}"/>
+                    <attribute name="Implementation-Vendor" value="soundhelix.com"/>
+                </section>
             </manifest>
         </jar>
     </target>
 
-    <target name="javadoc" depends="init,-createBuildConstants" description="generate javadoc">
+    <target name="javadoc" depends="-createBuildConstants" description="generate javadoc">
         <delete dir="${javadoc}"/>
         <condition property="javadoc-version" value="${version} (r${revision})" else="${version}">
             <matches pattern="u$$" string="${version}"/>
         </condition>
         <javadoc sourcepath="${src}"
-                 classpath="${classpath}"
+                 classpathref="class.path"
                  defaultexcludes="yes"
                  destdir="${javadoc}"
                  author="true"
@@ -119,24 +124,24 @@
        </exec>
     </target>
 
-	<target name="packagebin" description="build binary zip" depends="init,jar">
-		<zip destfile="${binzip}"
-		     basedir=".."
-		     includes="soundhelix/SoundHelix.jar,soundhelix/run.bat,soundhelix/run.sh,soundhelix/examples/SoundHelix-Piano.xml,soundhelix/examples/SoundHelix-Piano2.xml,soundhelix/includes/*,soundhelix/doc/*,soundhelix/lib/*,soundhelix/log4j.*"/>		     
-	</target>
+    <target name="packagebin" description="build binary zip" depends="jar">
+        <zip destfile="${binzip}"
+             basedir=".."
+             includes="soundhelix/SoundHelix.jar,soundhelix/run.bat,soundhelix/run.sh,soundhelix/examples/SoundHelix-Piano.xml,soundhelix/examples/SoundHelix-Piano2.xml,soundhelix/includes/*,soundhelix/doc/*,soundhelix/lib/*,soundhelix/log4j.*"/>
+    </target>
 
-    <target name="packagesrc" description="build zip including sources and javadoc" depends="init,jar,javadoc">
-	    <zip destfile="${srczip}"
+    <target name="packagesrc" description="build zip including sources and javadoc" depends="jar,javadoc">
+        <zip destfile="${srczip}"
              basedir=".."
              includes="soundhelix/src/*,soundhelix/javadoc/*,soundhelix/build.xml,soundhelix/SoundHelix.jar,soundhelix/run.bat,soundhelix/run.sh,soundhelix/examples/*,soundhelix/includes/*,soundhelix/doc/*,soundhelix/lib/*,,soundhelix/log4j.*"/>
-	</target>
-  
+    </target>
+
     <target name="clean" description="clean up">
         <delete dir="${tmpsrc}"/>
         <delete dir="${build}"/>
         <delete file="${jar}"/>
         <delete dir="${javadoc}"/>
-    	<delete file="${binzip}"/>
+        <delete file="${binzip}"/>
         <delete file="${srczip}"/>
     </target>
 

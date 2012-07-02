@@ -2,6 +2,9 @@ package com.soundhelix;
 
 import java.io.File;
 import java.net.URL;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -15,6 +18,12 @@ import com.soundhelix.remotecontrol.ConsoleRemoteControl;
 import com.soundhelix.remotecontrol.RemoteControl;
 import com.soundhelix.util.SongUtils;
 import com.soundhelix.util.VersionUtils;
+
+import gnu.getopt.Getopt;
+import gnu.getopt.LongOpt;
+
+import javax.sound.midi.MidiDevice;
+import javax.sound.midi.MidiSystem;
 
 /**
  * Implements the main class. The main() method determines the configuration file and then waits for the next generated song and plays it. The
@@ -59,10 +68,69 @@ public class SoundHelix implements Runnable {
     }
 
     public static void main(String[] args) throws Exception {
-        if (args.length == 1 && args[0].equals("-h") || args.length > 2) {
-            System.out.println("java SoundHelix [XML-File [Songtitle]] ");
-            System.out.println("java SoundHelix [URL [Songtitle]] ");
-            System.exit(0);
+        LongOpt[] longopts = new LongOpt[] {
+            new LongOpt("help", LongOpt.NO_ARGUMENT, null, 'h'),
+            new LongOpt("song-name", LongOpt.REQUIRED_ARGUMENT, null, 's'),
+            new LongOpt("show-midi-devices", LongOpt.NO_ARGUMENT, null, 'm'),
+        };
+
+        Getopt g = new Getopt("SoundHelix", args, "-hs:m", longopts);
+
+        String songName = null;
+        String filename = null;
+        boolean showHelp = false;
+        boolean showMidiDevices = false;
+
+        int c;
+        while ((c = g.getopt()) != -1) {
+            switch (c) {
+                case 'h': showHelp = true;break;
+                case 'm': showMidiDevices = true;break;
+                case 's': songName = g.getOptarg();break;
+                case 1: if (filename == null) {
+                   filename = g.getOptarg();
+                   } else {
+                       System.out.println("XML-Filename specified more than once"); 
+                   }
+                   break;
+                case '?': return;
+            }
+        }
+
+
+        int count = 0;
+
+        if (showHelp) {
+          count++;
+        }
+
+        if (showMidiDevices) {
+          count++;
+        }
+         
+        if (count > 1) {
+          System.out.println("Please use one of \"--help\" or \"--show-midi-devices\"");
+          return;
+        }
+
+        if (showHelp) {
+            System.out.println("Usage: java -jar SoundHelix.jar [options] xml-filename");
+            System.out.println();
+            System.out.println("Options:");
+            System.out.println("   --help (-h)                 Show this help");
+            System.out.println("   --song-name (-s) songname   Set the song name for seeding the random generator");
+            System.out.println("   --show-midi-devices (-m)    Show available MIDI devices with MIDI IN port");
+            return;
+        }
+
+        if (showMidiDevices) {
+            showMidiDevices();
+            return;
+        }
+
+        if (filename == null) {
+            System.out.println("No XML filename specified");
+            return;
         }
 
         // initialize log4j
@@ -70,9 +138,6 @@ public class SoundHelix implements Runnable {
 
         logger = Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
         VersionUtils.logVersion();
-
-        String filename = args.length >= 1 ? args[0] : "examples/SoundHelix-Piano.xml";
-        String songName = args.length == 2 ? args[1] : null;
 
         long randomSeed = 0;
 
@@ -232,6 +297,33 @@ public class SoundHelix implements Runnable {
             }
 
             logger.trace("Finished shutdown hook");
+        }
+    }
+
+    private static void showMidiDevices() {
+        System.out.println("Available MIDI devices with MIDI IN:");
+        System.out.println();
+
+        List<String> list = new ArrayList<String>();
+        MidiDevice.Info[] infos = MidiSystem.getMidiDeviceInfo();
+
+        for (MidiDevice.Info info : infos) {
+            try {
+                MidiDevice device = MidiSystem.getMidiDevice(info);
+
+                if (device != null && device.getReceiver() != null) {
+                    list.add(info.getName());
+                }
+            } catch (Exception e) {
+            }
+        }
+
+        String[] array = new String[list.size()];
+        Arrays.sort(list.toArray(array));
+
+        int num = 0;
+        for (String device : array) {
+            System.out.println("Device " + (++num) + ": \"" + device + "\"");
         }
     }
 }

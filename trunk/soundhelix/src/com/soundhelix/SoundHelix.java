@@ -109,7 +109,7 @@ public class SoundHelix implements Runnable {
         }
          
         if (count > 1) {
-          System.out.println("Please use one of \"--help\" or \"--show-midi-devices\"");
+          System.out.println("Use one of \"--help\" and \"--show-midi-devices\"");
           return;
         }
 
@@ -117,9 +117,15 @@ public class SoundHelix implements Runnable {
             System.out.println("Usage: java -jar SoundHelix.jar [options] xml-filename");
             System.out.println();
             System.out.println("Options:");
-            System.out.println("   --help (-h)                 Show this help");
-            System.out.println("   --song-name (-s) songname   Set the song name for seeding the random generator");
-            System.out.println("   --show-midi-devices (-m)    Show available MIDI devices with MIDI IN port");
+            System.out.println();
+            System.out.println("   -h");
+            System.out.println("   --help                 Show this help");
+            System.out.println();
+            System.out.println("   -s songname");
+            System.out.println("   --song-name songname   Set the song name for seeding the random generator");
+            System.out.println();
+            System.out.println("   -m");
+            System.out.println("   --show-midi-devices    Show available MIDI devices with MIDI IN port");
             return;
         }
 
@@ -129,7 +135,7 @@ public class SoundHelix implements Runnable {
         }
 
         if (filename == null) {
-            System.out.println("No XML filename specified");
+            System.out.println("No XML filename provided");
             return;
         }
 

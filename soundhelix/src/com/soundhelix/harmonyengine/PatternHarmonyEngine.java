@@ -51,6 +51,9 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
     /** Boolean indicating whether chord distances should be minimized. */
     private boolean isMinimizeChordDistance = true;
 
+    /** The crossover pitch. */
+    private int crossoverPitch = 3;
+
     /** The random generator. */
     private Random random;
 
@@ -140,7 +143,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
                 sTicks = 0;
             }
 
-            Chord chord = Chord.parseChord(chordString);
+            Chord chord = Chord.parseChord(chordString, crossoverPitch);
 
             if (firstChord == null) {
                 firstChord = chord;
@@ -302,8 +305,8 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
                             // try again
                             return createPattern();
                         }
-                    } while (Chord.parseChord(chord).equalsNormalized(Chord.parseChord(prevChord)) || i == count - 1 && chord.equals(firstChord)
-                            || notrefnum >= 0 && Chord.parseChord(chord).equalsNormalized(Chord.parseChord(chordList.get(notrefnum))));
+                    } while (Chord.parseChord(chord, crossoverPitch).equalsNormalized(Chord.parseChord(prevChord, crossoverPitch)) || i == count - 1 && chord.equals(firstChord)
+                            || notrefnum >= 0 && Chord.parseChord(chord, crossoverPitch).equalsNormalized(Chord.parseChord(chordList.get(notrefnum), crossoverPitch)));
                 } else {
                     // we have a note, take the note (include 'm' suffix, if present)
                     chord = spec[0];
@@ -327,6 +330,10 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
     @Override
     public void configure(Node node, XPath xpath) throws XPathException {
         random = new Random(randomSeed);
+
+        try {
+            crossoverPitch = XMLUtils.parseInteger(random, "crossoverPitch", node, xpath); 
+        } catch (Exception e) {}
 
         NodeList nodeList = (NodeList) xpath.evaluate("chordPattern", node, XPathConstants.NODESET);
         ChordPattern[] chordPatterns = new ChordPattern[nodeList.getLength()];

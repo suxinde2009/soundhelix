@@ -9,6 +9,13 @@ Change log
 
 0.5u:
 
+    - For the PatternHarmonyEngine the chord crossover pitch can now be defined using the "crossoverPitch" tag. Any chord with
+      a root pitch higher than or equal to this pitch will be transposed one octave down, otherwise the root node is taken as-is.
+      This is only done if the chord is specified by its name (e.g. "Am6") rather than by providing the pitches in
+      "pitch1:pitch2:pitch3" syntax. Previously, the crossover pitch always was between "D" and "D#" (i.e., starting with D#, the
+      chords were transposed one octave down, C, C# and D were not transposed). It still defaults to this crossover pitch
+      (3 for "D#") for backwards compatibility.
+
     - Added usage of GNU Getopt for cleaner parameter parsing. Run "java -jar SoundHelix.jar -h" to see the details. The syntax
       of the start script parameters (run.bat and run.sh) have not been changed.
 

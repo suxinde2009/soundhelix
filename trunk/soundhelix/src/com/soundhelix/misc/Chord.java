@@ -486,11 +486,12 @@ public class Chord {
      * Parses the given chord string and returns a Chord instance that represents the chord string.
      * 
      * @param chordString the chord as a string
+     * @param crossoverPitch the crossover pitch (between 1 and 12)
      * 
      * @return the Chord
      */
 
-    public static Chord parseChord(String chordString) {
+    public static Chord parseChord(String chordString, int crossoverPitch) {
         if (chordString == null) {
             return null;
         }
@@ -506,7 +507,7 @@ public class Chord {
 
             chord = new Chord(p1, p2, p3);
         } else {
-            chord = getChordFromName(chordString);
+            chord = getChordFromName(chordString, crossoverPitch);
 
             if (chord == null) {
                 throw new RuntimeException("Invalid chord name " + chordString);
@@ -520,11 +521,12 @@ public class Chord {
      * Looks up the chord with the given name. If the chord cannot be found, null is returned, otherwise the chord is returned.
      * 
      * @param name the chord name
+     * @param crossoverPitch the crossover pitch (between 1 and 12)
      * 
      * @return the chord or null if the chord cannot be found
      */
 
-    private static Chord getChordFromName(String name) {
+    private static Chord getChordFromName(String name, int crossoverPitch) {
         Integer codeInteger = NAME_TO_CODE_MAP.get(name);
 
         if (codeInteger != null) {
@@ -534,7 +536,7 @@ public class Chord {
             int diff2 = code % 100;
             int pitch = code / 10000;
 
-            if (pitch > 2) {
+            if (pitch >= crossoverPitch) {
                 pitch -= 12;
             }
 

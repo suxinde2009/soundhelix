@@ -148,36 +148,6 @@ public class MidiPlayer extends AbstractPlayer {
     }
 
     /**
-     * Returns a string containing all available MIDI devices in the system that can receive MIDI messages.
-     * 
-     * @return the string of MIDI devices
-     */
-
-    private String getMidiDevices() {
-        StringBuilder sb = new StringBuilder();
-
-        MidiDevice.Info[] infos = MidiSystem.getMidiDeviceInfo();
-
-        int num = 0;
-
-        for (MidiDevice.Info info : infos) {
-            try {
-                MidiDevice device = MidiSystem.getMidiDevice(info);
-
-                if (device != null && device.getReceiver() != null) {
-                    if (sb.length() > 0) {
-                        sb.append('\n');
-                    }
-                    sb.append("MIDI device " + (++num) + ": \"" + info.getName() + "\"");
-                }
-            } catch (Exception e) {
-            }
-        }
-
-        return sb.toString();
-    }
-
-    /**
      * Closes all MIDI devices.
      */
 
@@ -313,24 +283,22 @@ public class MidiPlayer extends AbstractPlayer {
     }
 
     /**
-     * Takes a comma-separated list of MIDI devices and instantiates the first one that is available in the system.
+     * Tries to find the first available MIDI devices with a MIDI IN port among the given MIDI device names.
      * 
-     * @param namesString comma-separated list of MIDI device names
+     * @param deviceNames the array of MIDI device names
      * 
-     * @return a first instantiated MIDI device or null if none of the devices are available
+     * @return a first instantiated MIDI device with MIDI IN or null if none of the devices are available
      */
 
-    private MidiDevice findMidiDevice(String namesString) {
+    private MidiDevice findFirstMidiInMidiDevice(String[] deviceNames) {
         MidiDevice.Info[] infos = MidiSystem.getMidiDeviceInfo();
-        Map<String, MidiDevice.Info> map = new HashMap<String, MidiDevice.Info>();
+        Map<String, MidiDevice.Info> map = new HashMap<String, MidiDevice.Info>(infos.length);
 
         for (MidiDevice.Info info : infos) {
             map.put(info.getName(), info);
         }
 
-        String[] names = StringUtils.split(namesString, ',');
-
-        for (String name : names) {
+        for (String name : deviceNames) {
             MidiDevice.Info info = map.get(name);
 
             if (info != null) {
@@ -338,8 +306,9 @@ public class MidiPlayer extends AbstractPlayer {
 
                 try {
                     MidiDevice midiDevice = MidiSystem.getMidiDevice(info);
-                    logger.debug("Successfully opened MIDI device \"" + name + "\"");
-                    return midiDevice;
+                    if (midiDevice.getReceiver() != null) {
+                        return midiDevice;
+                    }
                 } catch (Exception e) {
                     logger.debug("MIDI device \"" + name + "\" could not be instantiated", e);
                 }
@@ -353,17 +322,13 @@ public class MidiPlayer extends AbstractPlayer {
     }
 
     public void play() {
-        Arrangement arrangement = this.arrangement;
-
         if (!opened) {
             throw new IllegalStateException("Must call open() first");
         }
+        
+        Arrangement arrangement = this.arrangement;
 
         try {
-            initializeControllerLFOs(arrangement);
-            muteAllChannels();
-            setChannelPrograms();
-
             Structure structure = arrangement.getStructure();
             int ticksPerBeat = structure.getTicksPerBeat();
             int ticks = structure.getTicks();
@@ -371,10 +336,14 @@ public class MidiPlayer extends AbstractPlayer {
             // when clock synchronization is used, we must make sure that
             // the ticks per beat divide CLOCK_SYNCHRONIZATION_TICKS_PER_BEAT
 
-            if (useClockSynchronization && (CLOCK_SYNCHRONIZATION_TICKS_PER_BEAT % structure.getTicksPerBeat()) != 0) {
-                throw new RuntimeException("Ticks per beat (" + structure.getTicksPerBeat() + ") must be a divider of "
+            if (useClockSynchronization && (CLOCK_SYNCHRONIZATION_TICKS_PER_BEAT % ticksPerBeat) != 0) {
+                throw new RuntimeException("Ticks per beat (" + ticksPerBeat + ") must be a divider of "
                         + CLOCK_SYNCHRONIZATION_TICKS_PER_BEAT + " for MIDI clock synchronization");
             }
+
+            initializeControllerLFOs(arrangement);
+            muteAllChannels();
+            setChannelPrograms();
 
             int clockTimingsPerTick = useClockSynchronization ? CLOCK_SYNCHRONIZATION_TICKS_PER_BEAT / structure.getTicksPerBeat() : 1;
 
@@ -383,21 +352,10 @@ public class MidiPlayer extends AbstractPlayer {
                         + ((double) milliBPM / 1000d) + " BPM)");
             }
 
-            if (useClockSynchronization) {
-                sendMidiMessageToClockSynchronized(ShortMessage.START);
-            }
-
-            long referenceTime = System.nanoTime();
-
             runBeforePlayCommands();
 
-            if (beforePlayWaitTicks > 0) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Waiting " + beforePlayWaitTicks + " ticks before playing");
-                }
-
-                // wait specified number of ticks before starting playing, sending timing ticks if configured
-                referenceTime = waitTicks(referenceTime, beforePlayWaitTicks, clockTimingsPerTick, structure.getTicksPerBeat());
+            if (useClockSynchronization) {
+                sendMidiMessageToClockSynchronized(ShortMessage.START);
             }
 
             /** Contains the remaining ticks of each note/pause currently played by a voice of an arrangement entry. */
@@ -415,6 +373,17 @@ public class MidiPlayer extends AbstractPlayer {
                 tickList.add(new int[size]);
                 posList.add(new int[size]);
                 pitchList.add(new int[size]);
+            }
+
+            long referenceTime = System.nanoTime();
+
+            if (beforePlayWaitTicks > 0) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Waiting " + beforePlayWaitTicks + " ticks before playing");
+                }
+
+                // wait specified number of ticks before starting playing, sending timing ticks if configured
+                referenceTime = waitTicks(referenceTime, beforePlayWaitTicks, clockTimingsPerTick, structure.getTicksPerBeat());
             }
 
             this.currentTick = 0;
@@ -1345,23 +1314,18 @@ public class MidiPlayer extends AbstractPlayer {
 
         public void open() {
             try {
-                midiDevice = findMidiDevice(midiName);
+                String[] deviceNames = StringUtils.split(midiName, ',');
+                midiDevice = findFirstMidiInMidiDevice(deviceNames);
 
                 if (midiDevice == null) {
-                    throw new RuntimeException("Could not find MIDI device \"" + midiName + "\". Available devices with MIDI IN:\n"
-                            + getMidiDevices());
+                    throw new RuntimeException("Could not find any configured MIDI device with MIDI IN");
                 }
 
                 midiDevice.open();
-
                 receiver = midiDevice.getReceiver();
-
-                if (receiver == null) {
-                    throw new RuntimeException("MIDI device \"" + midiName + "\" does not have a Receiver. Available devices with MIDI IN:\n"
-                            + getMidiDevices());
-                }
+                logger.debug("Successfully opened MIDI device \"" + name + "\" (using \"" + midiDevice.getDeviceInfo().getName() + "\")");
             } catch (Exception e) {
-                throw new RuntimeException("Error opening MIDI device \"" + midiName + "\"", e);
+                throw new RuntimeException("Error opening MIDI device", e);
             }
         }
 
@@ -1370,9 +1334,13 @@ public class MidiPlayer extends AbstractPlayer {
          */
 
         public void close() {
+            // the underlying receiver is closed automatically if the MIDI device is closed
+            
             if (midiDevice != null) {
                 midiDevice.close();
+                logger.debug("Successfully closed MIDI device \"" + name + "\"");
                 midiDevice = null;
+                receiver = null;
             }
         }
     }

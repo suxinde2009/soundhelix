@@ -2,6 +2,7 @@ package com.soundhelix.player;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -123,8 +124,17 @@ public class MidiPlayer extends AbstractPlayer {
     /** The tick that the player should skip to (only relevant if skipEnabled is true). */
     private int skipToTick;
 
-    /** The original milli-BPM before the skip (only relevant if skipEnabled is true). */
-    private int skipOriginalMilliBPM;
+    /** Contains the remaining ticks of each note/pause currently played by a voice of an arrangement entry. */
+    private List<int[]> tickList;
+
+    /** Contains the pattern position currently played by a voice of an arrangement entry. */
+    private List<int[]> posList;
+    
+    /**
+     * Contains the pitch used when the last note was played by a voice of an arrangement entry. This is used to be able to change the
+     * transposition while playing and still being able to send the correct NOTE_OFF pitches.
+     */
+    private List<int[]> pitchList;
 
     /**
      * Opens all MIDI devices.
@@ -220,6 +230,12 @@ public class MidiPlayer extends AbstractPlayer {
 
         this.milliBPM = milliBPM;
     }
+    
+    /**
+     * Sets the transposition.
+     * 
+     * @param transposition the transposition pitch
+     */
 
     public void setTransposition(int transposition) {
         if (transposition <= 0) {
@@ -321,6 +337,7 @@ public class MidiPlayer extends AbstractPlayer {
         return null;
     }
 
+    @Override
     public void play() {
         if (!opened) {
             throw new IllegalStateException("Must call open() first");
@@ -358,22 +375,7 @@ public class MidiPlayer extends AbstractPlayer {
                 sendMidiMessageToClockSynchronized(ShortMessage.START);
             }
 
-            /** Contains the remaining ticks of each note/pause currently played by a voice of an arrangement entry. */
-            List<int[]> tickList = new ArrayList<int[]>();
-            /** Contains the pattern position currently played by a voice of an arrangement entry. */
-            List<int[]> posList = new ArrayList<int[]>();
-            /**
-             * Contains the pitch used when the last note was played by a voice of an arrangement entry. This is used to be able to change the
-             * transposition while playing and still being able to send the correct NOTE_OFF pitches.
-             */
-            List<int[]> pitchList = new ArrayList<int[]>();
-
-            for (ArrangementEntry entry : arrangement) {
-                int size = entry.getTrack().size();
-                tickList.add(new int[size]);
-                posList.add(new int[size]);
-                pitchList.add(new int[size]);
-            }
+            resetPlayerState(arrangement);
 
             long referenceTime = System.nanoTime();
 
@@ -415,22 +417,33 @@ public class MidiPlayer extends AbstractPlayer {
                     if (tick == ticks) {
                         break;
                     }
-                    playTick(arrangement, tick, tickList, posList, pitchList);
+                    
+                    playTick(arrangement, tick);
                     tickReferenceTime += getTickNanos(tick, ticksPerBeat);
 
                     currentTick++;
                     this.currentTick++;
 
-                    if (skipEnabled && currentTick >= skipToTick) {
+                    if (skipEnabled) {
+                        logger.debug("Skipping to " + skipToTick);
+
                         skipEnabled = false;
-                        setMilliBPM(skipOriginalMilliBPM);
+                        muteActiveChannels(arrangement);
+                        resetPlayerState(arrangement);
+                        
+                        for (int i = 0; i < skipToTick; i++) {
+                            playSilentTick();
+                        }
+                        
+                        this.currentTick = skipToTick;
+                        currentTick = skipToTick;
                     }
                 }
             }
 
             // playing finished, send a NOTE_OFF for all current notes
 
-            muteActiveChannels(arrangement, posList, pitchList);
+            muteActiveChannels(arrangement);
 
             if (afterPlayWaitTicks > 0) {
                 if (logger.isDebugEnabled()) {
@@ -447,6 +460,56 @@ public class MidiPlayer extends AbstractPlayer {
             }
         } catch (Exception e) {
             throw new RuntimeException("Playback error", e);
+        }
+    }
+
+    private void dumpState() {
+        System.out.println("tickList");
+        for (int[] s : tickList) {
+            System.out.println(Arrays.toString(s));
+        }
+        System.out.println("");
+        System.out.println("posList");
+        for (int[] s : posList) {
+            System.out.println(Arrays.toString(s));
+        }
+        System.out.println("");
+        System.out.println("pitchList");
+        for (int[] s : pitchList) {
+            System.out.println(Arrays.toString(s));
+        }
+        System.out.println("");
+    }
+    
+    
+    
+    
+    /**
+     * Resets the player state. The state is set up for the first tick.
+     *
+     * @param arrangement the arrangement
+     */
+    
+    private void resetPlayerState(Arrangement arrangement) {
+        int arrangements = arrangement.size();
+        
+        /** Contains the remaining ticks of each note/pause currently played by a voice of an arrangement entry. */
+        tickList = new ArrayList<int[]>(arrangements);
+        
+        /** Contains the pattern position currently played by a voice of an arrangement entry. */
+        posList = new ArrayList<int[]>(arrangements);
+        
+        /**
+         * Contains the pitch used when the last note was played by a voice of an arrangement entry. This is used to be able to change the
+         * transposition while playing and still being able to send the correct NOTE_OFF pitches.
+         */
+        pitchList = new ArrayList<int[]>(arrangements);
+
+        for (ArrangementEntry entry : arrangement) {
+            int size = entry.getTrack().size();
+            tickList.add(new int[size]);
+            posList.add(new int[size]);
+            pitchList.add(new int[size]);
         }
     }
 
@@ -500,13 +563,11 @@ public class MidiPlayer extends AbstractPlayer {
      * Mutes all active channels.
      * 
      * @param arrangement the arrangement
-     * @param posList the list of positions
-     * @param pitchList the list of pitches
      * 
      * @throws InvalidMidiDataException in case of invalid MIDI data
      */
 
-    private void muteActiveChannels(Arrangement arrangement, List<int[]> posList, List<int[]> pitchList) throws InvalidMidiDataException {
+    private void muteActiveChannels(Arrangement arrangement) throws InvalidMidiDataException {
         int k = 0;
 
         for (ArrangementEntry entry : arrangement) {
@@ -539,14 +600,11 @@ public class MidiPlayer extends AbstractPlayer {
      * 
      * @param arrangement the arrangement
      * @param tick the tick
-     * @param tickList the tick list
-     * @param posList the position list
-     * @param pitchList the pitch list
      * 
      * @throws InvalidMidiDataException in case of invalid MIDI data
      */
 
-    private void playTick(Arrangement arrangement, int tick, List<int[]> tickList, List<int[]> posList, List<int[]> pitchList)
+    private void playTick(Arrangement arrangement, int tick)
             throws InvalidMidiDataException {
         Structure structure = arrangement.getStructure();
         int ticksPerBar = structure.getTicksPerBar();
@@ -554,7 +612,7 @@ public class MidiPlayer extends AbstractPlayer {
         if ((tick % (4 * ticksPerBar)) == 0) {
             logger.debug(String.format("Tick: %5d   Chord section: %3d   Seconds: %4d   Progress: %5.1f %%", tick,
                     HarmonyEngineUtils.getChordSectionNumber(arrangement.getStructure(), tick), tick * 60 * 1000
-                            / (structure.getTicksPerBeat() * (skipEnabled ? skipOriginalMilliBPM : milliBPM)),
+                            / (structure.getTicksPerBeat() * milliBPM),
                     (double) tick * 100 / structure.getTicks()));
         }
 
@@ -643,7 +701,40 @@ public class MidiPlayer extends AbstractPlayer {
             k++;
         }
     }
+    
+    /**
+     * Updates the player state to simulate playing the next tick.
+     */
+    
+    private void playSilentTick() {
+        int k = 0;
 
+        for (ArrangementEntry entry : arrangement) {
+            Track track = entry.getTrack();
+
+            int[] t = tickList.get(k);
+            int[] p = posList.get(k);
+            int[] pitches = pitchList.get(k);
+
+            for (int j = 0; j < t.length; j++) {
+                if (--t[j] <= 0) {
+                    Sequence s = track.get(j);
+                    SequenceEntry se = s.get(p[j]);
+                    
+                    if (se.isNote()) {
+                        int pitch = (track.getType() == TrackType.MELODY ? transposition : 0) + se.getPitch();
+                        pitches[j] = pitch;
+                    }
+                    
+                    p[j]++;
+                    t[j] = se.getTicks();
+                }
+            }
+
+            k++;
+        }
+    }
+    
     /**
      * Initializes all controller LFOs of the arrangement.
      * 
@@ -1234,26 +1325,12 @@ public class MidiPlayer extends AbstractPlayer {
      */
 
     public boolean skipToTick(int tick) {
-        int currentTick = this.currentTick;
-
         if (tick == currentTick) {
             // not an error, but nothing to do
             return true;
-        } else if (tick < currentTick) {
-            // cannot skip backwards
-            logger.warn("Cannot skip backwards");
-            return false;
         } else {
-            if (skipEnabled) {
-                // already skipping, update target tick
-                this.skipToTick = tick;
-            } else {
-                this.skipToTick = tick;
-                this.skipOriginalMilliBPM = this.milliBPM;
-                skipEnabled = true;
-                setMilliBPM(8000 * 1000);
-            }
-
+            this.skipToTick = tick;
+            skipEnabled = true;
             return true;
         }
     }

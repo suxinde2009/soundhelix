@@ -121,7 +121,7 @@ public final class RandomUtils {
         if (exponent >= 0.0d) {
             return min + (max - min) * Math.pow(random.nextDouble(), exponent);
         } else {
-            return min + (max - min) * Math.pow(random.nextDouble(), exponent);
+            return min + (min - max) * Math.pow(random.nextDouble(), -exponent);
         }
     }
 

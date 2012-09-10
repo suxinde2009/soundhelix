@@ -196,6 +196,7 @@ SoundHelix checkstyle configuration
       <property name="severity" value="info"/>
       <property name="ignoreConstructorParameter" value="true"/>
       <property name="ignoreSetter" value="true"/>
+      <property name="ignoreAbstractMethods" value="true"/>
     </module>
     <module name="AbstractClassName">
       <property name="format" value="^Abstract.*$"/>

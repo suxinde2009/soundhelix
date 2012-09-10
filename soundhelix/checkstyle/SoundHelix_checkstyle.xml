@@ -122,7 +122,7 @@ SoundHelix checkstyle configuration
       <property name="max" value="30"/>
     </module>
     <module name="CyclomaticComplexity">
-      <property name="max" value="15"/>
+      <property name="max" value="20"/>
     </module>
     <module name="EmptyForIteratorPad"/>
     <module name="ExecutableStatementCount">

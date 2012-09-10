@@ -32,10 +32,10 @@ import com.soundhelix.util.XMLUtils;
  * Implements a sequence engine for drum machines. Drum machines normally play a certain sample (e.g., a base drum or a snare) when a certain pitch is
  * played. This class supports an arbitrary number of combinations of patterns, pitches and activity vectors. Each pattern acts as a voice for a
  * certain pitch.
- * 
+ *
  * Conditional patterns allow the modification of the generated sequences when certain conditions are met, e.g., for generating fill-ins, crescendos,
  * etc. when monitored ActivityVectors become active or inactive.
- * 
+ *
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
@@ -49,11 +49,11 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
 
     /** The drum entries. */
     private DrumEntry[] drumEntries;
-    
+
     /** The conditional entries. */
     private ConditionalEntry[] conditionalEntries;
-    
-    /** The random generator. */    
+
+    /** The random generator. */
     private Random random;
 
     public DrumSequenceEngine() {
@@ -87,7 +87,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
 
     /**
      * Process all non-conditional patterns.
-     * 
+     *
      * @param activityVectors the array of activity vectors
      * @param seqs the array of sequences
      * @param structure the structure
@@ -137,7 +137,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
 
     /**
      * Process all conditional patterns.
-     * 
+     *
      * @param activityVectors the array of activity vectors
      * @param seqs the array of sequences
      * @param structure the structure
@@ -150,7 +150,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
         int conditionalEntryCount = conditionalEntries.length;
 
         Map<String, List<Integer>> map = new HashMap<String, List<Integer>>();
-        
+
         for (int i = 0; i < activityVectors.length; i++) {
             ActivityVector av = activityVectors[i];
             List<Integer> list = map.get(av.getName());
@@ -158,17 +158,17 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
                 list = new ArrayList<Integer>();
                 map.put(av.getName(), list);
             }
-            
+
             list.add(i);
         }
-        
+
         for (ConditionalEntry entry : conditionalEntries) {
             if (entry.preCondition == null) {
                 entry.preCondition = getConditionPattern(map, drumEntries.length, entry.preConditionString);
-                entry.postCondition = getConditionPattern(map, drumEntries.length, entry.postConditionString);            
+                entry.postCondition = getConditionPattern(map, drumEntries.length, entry.postConditionString);
             }
         }
-                
+
         // the tick where each pattern was applied last (last tick of the pattern + 1), initially 0
         // (used to avoid overlapping application of patterns)
         int[] lastMatchedTick = new int[conditionalEntryCount];
@@ -272,10 +272,10 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
     /**
      * Returns the activity string of the given tick. The activity string is a concatenation of '0' and '1' characters specifying whether the
      * ActivityVectors from the list are active or not. If the tick is negative, the returned string consists of only '0' characters.
-     * 
+     *
      * @param tick the tick to check
      * @param activityVectors the array of ActivityVectors
-     * 
+     *
      * @return the activity string
      */
 
@@ -344,12 +344,12 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
             }
 
             String conditionString = null;
-            
+
             try {
                 conditionString = XMLUtils.parseString(random, "condition", nodeList.item(i), xpath);
             } catch (Exception e) {
             }
-            
+
             java.util.regex.Pattern preCondition = null;
             java.util.regex.Pattern postCondition = null;
             String preConditionString = null;
@@ -361,16 +361,16 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
                 conditions[1] = conditions[1].replaceAll(",", "|").replaceAll("-", ".");
                 preCondition = java.util.regex.Pattern.compile(conditions[0]);
                 postCondition = java.util.regex.Pattern.compile(conditions[1]);
-                
+
                 // TODO remove support
                 logger.warn("The tag \"condition\" is deprecated. Use the tags \"precondition\" and \"postcondition\" instead.");
             } else {
                 // we cannot evaluate the patterns yet, because we don't have the list of ActivityVectors yet during the configure pass
-                
+
                 preConditionString = XMLUtils.parseString(random, "precondition", nodeList.item(i), xpath);
                 postConditionString = XMLUtils.parseString(random, "postcondition", nodeList.item(i), xpath);
             }
-            
+
             String modeString = XMLUtils.parseString(random, "mode", nodeList.item(i), xpath);
             int mode;
 
@@ -433,19 +433,19 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
     /**
      * Parses the given condition string and returns a pattern representing the condition. The condition string is given as a comma-separated list of
      * ActivityVector names, which are each prefixed by either "+" or "-".
-     * 
+     *
      * @param map the map that maps ActivityVector names to lists of offsets
      * @param vectors the total number of ActivityVectors
      * @param string the condition string
      *
      * @return the condition pattern
      */
-        
+
     private static java.util.regex.Pattern getConditionPattern(Map<String, List<Integer>> map, int vectors, String string) {
         // start with a regexp string consisting of only dots
-        
+
         StringBuilder sb = new StringBuilder(vectors);
-        
+
         for (int i = 0; i < vectors; i++) {
             sb.append('.');
         }
@@ -466,22 +466,22 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
                 }
 
                 // set all characters at the offsets given by ActivityVector name to either "1" or "0"
-                
+
                 List<Integer> indexes = map.get(name);
 
                 if (indexes == null) {
                     throw new IllegalArgumentException("Unknown ActitvityVector \"" + name + "\" referenced in condition pattern");
                 }
 
-                for (int index : indexes) {   
+                for (int index : indexes) {
                     sb.setCharAt(index, c);
                 }
             }
         }
-        
+
         return java.util.regex.Pattern.compile(sb.toString());
     }
-    
+
     private static final class DrumEntry {
         private final Pattern pattern;
         private final int pitch;
@@ -529,5 +529,5 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
             this.skipWhenApplied = skipWhenApplied;
             this.skipWhenNotApplied = skipWhenNotApplied;
         }
-}
+    }
 }

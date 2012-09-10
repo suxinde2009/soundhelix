@@ -27,7 +27,7 @@ import com.soundhelix.util.XMLUtils;
  * beats" and could result in the chord sequence "Am/4,F/4,G/4,F/4" (given suitable random tables). Normally, each chord pattern is an individual
  * chord section. A pattern can be split into two or more chord sections by using "+" signs directly before a chord/length combination (e.g.,
  * "Am/4,F/4,G/4,C/4,+Am/4,F/4,G/4,Em/4").
- * 
+ *
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
@@ -99,6 +99,10 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
             return 0;
         }
     }
+
+    /**
+     * Parses the chord pattern.
+     */
 
     private void parsePattern() {
         int ticks = structure.getTicks();
@@ -227,7 +231,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 
     /**
      * Creates a pattern that can be parsed using parsePattern().
-     * 
+     *
      * @return a pattern
      */
 
@@ -305,8 +309,10 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
                             // try again
                             return createPattern();
                         }
-                    } while (Chord.parseChord(chord, crossoverPitch).equalsNormalized(Chord.parseChord(prevChord, crossoverPitch)) || i == count - 1 && chord.equals(firstChord)
-                            || notrefnum >= 0 && Chord.parseChord(chord, crossoverPitch).equalsNormalized(Chord.parseChord(chordList.get(notrefnum), crossoverPitch)));
+                    } while (Chord.parseChord(chord, crossoverPitch).equalsNormalized(Chord.parseChord(
+                            prevChord, crossoverPitch)) || i == count - 1 && chord.equals(firstChord)
+                            || notrefnum >= 0 && Chord.parseChord(chord, crossoverPitch).equalsNormalized(
+                            Chord.parseChord(chordList.get(notrefnum), crossoverPitch)));
                 } else {
                     // we have a note, take the note (include 'm' suffix, if present)
                     chord = spec[0];
@@ -332,7 +338,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
         random = new Random(randomSeed);
 
         try {
-            crossoverPitch = XMLUtils.parseInteger(random, "crossoverPitch", node, xpath); 
+            crossoverPitch = XMLUtils.parseInteger(random, "crossoverPitch", node, xpath);
         } catch (Exception e) {}
 
         NodeList nodeList = (NodeList) xpath.evaluate("chordPattern", node, XPathConstants.NODESET);

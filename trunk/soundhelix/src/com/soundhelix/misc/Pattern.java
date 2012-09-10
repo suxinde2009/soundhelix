@@ -2,6 +2,7 @@ package com.soundhelix.misc;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.regex.Matcher;
 
 import com.soundhelix.misc.Pattern.PatternEntry;
 
@@ -18,6 +19,12 @@ public class Pattern implements Iterable<PatternEntry> {
 
     /** The total number of ticks. */
     private int totalTicks;
+
+    /** The pattern for matching groups. */
+    private static final java.util.regex.Pattern groupPattern = java.util.regex.Pattern.compile("\\(([^()]+)\\)\\*(\\d+)");
+
+    /** The pattern for matching groups. */
+    private static final java.util.regex.Pattern groupCharPattern = java.util.regex.Pattern.compile("[()]");
 
     /**
      * Private constructor.
@@ -43,6 +50,8 @@ public class Pattern implements Iterable<PatternEntry> {
     }
 
     public static Pattern parseString(String patternString, String wildcardString) {
+        patternString = expandPatternString(patternString, ',');
+
         if (patternString == null || patternString.equals("")) {
             return null;
         }
@@ -85,7 +94,80 @@ public class Pattern implements Iterable<PatternEntry> {
         return new Pattern(pattern);
     }
 
+    /**
+     * Expands the given pattern string until no more expansion is possible. This method search for occurences of the
+     * pattern "(string)*count" and replaces this with the string concatenated count times using the separator character
+     * in between. These constructs can be nested. The replacement starts with the innermost occurence.
+     *
+     * @param patternString the pattern string
+     * @param separator the separator character for pattern entries
+     *
+     * @return the expanded pattern string
+     */
+
+    public static String expandPatternString(String patternString, char separator) {
+        if (patternString == null || patternString.equals("")) {
+            return null;
+        }
+
+        String string = patternString; 
+
+        while (true) {
+            StringBuffer sb = new StringBuffer();
+            Matcher matcher = groupPattern.matcher(string);
+            boolean found = false;
+
+            while (matcher.find()) {
+                String str = matcher.group(1);
+                int multiplier = Integer.parseInt(matcher.group(2));
+                matcher.appendReplacement(sb, Matcher.quoteReplacement(multiply(str, multiplier, separator)));
+                found = true;
+            }
+
+            if (!found) {
+                if (groupCharPattern.matcher(string).find()) {
+                    throw new IllegalArgumentException("Pattern string \"" + patternString + "\" is invalid");
+                }
+
+                return string;
+            }
+
+            matcher.appendTail(sb);
+            string = sb.toString();
+        }
+    }
+
+    /**
+     * Multiplies the string, which means the string is concatenated count times using the separator in between.
+     *
+     * @param str the string
+     * @param cound the number of concatenations
+     * @param separator the separator character
+     */
+
+    private static String multiply(String str, int count, char separator) {
+        int len = str.length();
+
+        if (len == 0 || count == 0) {
+            return "";
+        }
+
+        StringBuilder sb = new StringBuilder((len + 1) * count - 1);
+
+        for (int i = 0; i < count; i++) {
+            if (i > 0) {
+                sb.append(separator);
+            }
+
+            sb.append(str);
+        }
+
+        return sb.toString();
+    }
+
     public static int getStringTicks(String patternString) {
+        patternString = expandPatternString(patternString, ',');
+
         String[] p = patternString.split(",");
         int len = p.length;
         int ticks = 0;

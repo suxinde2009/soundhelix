@@ -9,7 +9,7 @@ import java.util.List;
  * velocity (between 0 and Short.MAX_VALUE) and a positive length in ticks. A pause is represented by an arbitrary pitch, a velocity of -1 and a
  * positive length in ticks. The velocity can be used to represent a note's volume, but after all, it is up to the playback device how it interprets
  * the velocity. For example, a device might always play a note at its full volume and use the velocity to control filter cut-off instead.
- * 
+ *
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
@@ -25,7 +25,7 @@ public class Sequence {
 
     /**
      * Calls addNote(pitch,ticks,Short.MAX_VALUE).
-     * 
+     *
      * @param pitch the pitch
      * @param ticks the ticks
      */
@@ -36,7 +36,7 @@ public class Sequence {
 
     /**
      * Calls addNote(pitch,Short.MAX_VALUE,ticks,false).
-     * 
+     *
      * @param pitch the pitch
      * @param ticks the ticks
      * @param velocity the velocity
@@ -49,7 +49,7 @@ public class Sequence {
     /**
      * Appends a new note with the given pitch, velocity and number of ticks, which logically means a note-down for the given number of ticks and a
      * note-up afterwards. This method does nothing if ticks is 0. If velocity is 0, an equivalently sized pause is added.
-     * 
+     *
      * @param pitch the pitch
      * @param velocity the velocity (between 0 and 32767)
      * @param ticks the ticks
@@ -71,7 +71,7 @@ public class Sequence {
     /**
      * Appends a pause with the given number of ticks. If the previous sequence entry already was a pause, that pause is extended by the number of
      * ticks instead of adding another pause. The method does nothing if ticks is 0.
-     * 
+     *
      * @param ticks the ticks
      */
 
@@ -94,7 +94,7 @@ public class Sequence {
     /**
      * Extends the previous sequence entry (which must be note) by the given number of ticks. An IllegalStateException will be thrown if the sequence
      * is empty or if the previous entry is not a note.
-     * 
+     *
      * @param ticks the number of ticks
      */
 
@@ -119,9 +119,9 @@ public class Sequence {
 
     /**
      * Returns the total number of ticks this sequence spans.
-     * 
+     *
      * @see #size()
-     * 
+     *
      * @return the number of ticks
      */
 
@@ -131,9 +131,9 @@ public class Sequence {
 
     /**
      * Returns the sequence entry with the given index.
-     * 
+     *
      * @param index the index
-     * 
+     *
      * @return the sequence entry at that index
      */
 
@@ -143,9 +143,9 @@ public class Sequence {
 
     /**
      * Returns the number of sequence entries this sequence contains.
-     * 
+     *
      * @return the size of the sequence
-     * 
+     *
      * @see #getTicks()
      */
 
@@ -183,7 +183,7 @@ public class Sequence {
 
     /**
      * Transposes all notes of this sequence up by the given number of halftones.
-     * 
+     *
      * @param halftones the number of halftones (positive or negative)
      */
 
@@ -207,7 +207,7 @@ public class Sequence {
     /**
      * Replaces the entry at the given tick by the given entry. The tick can be any tick within the sequence and any note can be given. Note that this
      * is an expensive operation, because the runtime grows linearly with the number of entries in the sequence.
-     * 
+     *
      * @param tick the tick where the replacement should take place
      * @param entry the SequenceEntry to insert
      */

@@ -2,7 +2,6 @@ package com.soundhelix.player;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -45,16 +44,16 @@ import com.soundhelix.util.XMLUtils;
  * Clock synchronization should be used for devices using synchronized effects (for example, synchronized echo) in order to communicate the BPM speed
  * to use. As clock synchronization requires some additional overhead, e.g., sending out MIDI messages 24 times per beat instead of the number of
  * ticks per beat, it should only be used if really required.
- * 
+ *
  * Timing the ticks (or clock synchronization ticks) is done by using a feedback algorithm based on Thread.sleep() calls with nanosecond resolution.
  * As mentioned, sending out timing ticks is not groove-dependent, whereas sending out note MIDI messages is groove-dependent.
- * 
+ *
  * This player supports LFOs, whose frequency can be based on a second, a beat, the whole song or on the activity (first activity until last activity)
  * of an instrument. The granularity of an LFO is always a tick. With every tick, each LFO will send out a MIDI message with the new value for the
  * target controller, but only if the LFO value is the first one sent or if it has changed since the last value sent.
- * 
+ *
  * Instances of this class are not thread-safe. They must not be used in multiple threads without external synchronization.
- * 
+ *
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
@@ -129,7 +128,7 @@ public class MidiPlayer extends AbstractPlayer {
 
     /** Contains the pattern position currently played by a voice of an arrangement entry. */
     private List<int[]> posList;
-    
+
     /**
      * Contains the pitch used when the last note was played by a voice of an arrangement entry. This is used to be able to change the
      * transposition while playing and still being able to send the correct NOTE_OFF pitches.
@@ -183,7 +182,7 @@ public class MidiPlayer extends AbstractPlayer {
 
     /**
      * Sets the MIDI devices.
-     * 
+     *
      * @param devices the MIDI devices
      */
 
@@ -207,7 +206,7 @@ public class MidiPlayer extends AbstractPlayer {
 
     /**
      * Gets the number of beats per minute for playback.
-     * 
+     *
      * @return the number of millibeats per minute
      */
 
@@ -217,7 +216,7 @@ public class MidiPlayer extends AbstractPlayer {
 
     /**
      * Sets the number of beats per minute for playback.
-     * 
+     *
      * @param milliBPM the number of millibeats per minute
      */
 
@@ -230,10 +229,10 @@ public class MidiPlayer extends AbstractPlayer {
 
         this.milliBPM = milliBPM;
     }
-    
+
     /**
      * Sets the transposition.
-     * 
+     *
      * @param transposition the transposition pitch
      */
 
@@ -252,7 +251,7 @@ public class MidiPlayer extends AbstractPlayer {
      * each, then they would be 125 ms and 75 ms, respectively. The default groove (i.e., no groove) is "1", resulting in equally timed ticks. Note
      * that even though the groove is handled correctly by the player, it might not be handled as expected on the MIDI device used for playback. For
      * example, if some time-synchronized echo is used on the MIDI device, it might sound strange if grooved input is used for a non-grooved echo.
-     * 
+     *
      * @param grooveString the groove string
      */
 
@@ -290,7 +289,7 @@ public class MidiPlayer extends AbstractPlayer {
 
     /**
      * Sets the channel map, which maps instruments to MIDI devices and channels. All used instruments must be mapped.
-     * 
+     *
      * @param channelMap the channel map
      */
 
@@ -300,9 +299,9 @@ public class MidiPlayer extends AbstractPlayer {
 
     /**
      * Tries to find the first available MIDI devices with a MIDI IN port among the given MIDI device names.
-     * 
+     *
      * @param deviceNames the array of MIDI device names
-     * 
+     *
      * @return a first instantiated MIDI device with MIDI IN or null if none of the devices are available
      */
 
@@ -342,7 +341,7 @@ public class MidiPlayer extends AbstractPlayer {
         if (!opened) {
             throw new IllegalStateException("Must call open() first");
         }
-        
+
         Arrangement arrangement = this.arrangement;
 
         try {
@@ -417,7 +416,7 @@ public class MidiPlayer extends AbstractPlayer {
                     if (tick == ticks) {
                         break;
                     }
-                    
+
                     playTick(arrangement, tick);
                     tickReferenceTime += getTickNanos(tick, ticksPerBeat);
 
@@ -430,11 +429,11 @@ public class MidiPlayer extends AbstractPlayer {
                         skipEnabled = false;
                         muteActiveChannels(arrangement);
                         resetPlayerState(arrangement);
-                        
+
                         for (int i = 0; i < skipToTick; i++) {
                             playSilentTick();
                         }
-                        
+
                         this.currentTick = skipToTick;
                         currentTick = skipToTick;
                     }
@@ -463,42 +462,21 @@ public class MidiPlayer extends AbstractPlayer {
         }
     }
 
-    private void dumpState() {
-        System.out.println("tickList");
-        for (int[] s : tickList) {
-            System.out.println(Arrays.toString(s));
-        }
-        System.out.println("");
-        System.out.println("posList");
-        for (int[] s : posList) {
-            System.out.println(Arrays.toString(s));
-        }
-        System.out.println("");
-        System.out.println("pitchList");
-        for (int[] s : pitchList) {
-            System.out.println(Arrays.toString(s));
-        }
-        System.out.println("");
-    }
-    
-    
-    
-    
     /**
      * Resets the player state. The state is set up for the first tick.
      *
      * @param arrangement the arrangement
      */
-    
+
     private void resetPlayerState(Arrangement arrangement) {
         int arrangements = arrangement.size();
-        
+
         /** Contains the remaining ticks of each note/pause currently played by a voice of an arrangement entry. */
         tickList = new ArrayList<int[]>(arrangements);
-        
+
         /** Contains the pattern position currently played by a voice of an arrangement entry. */
         posList = new ArrayList<int[]>(arrangements);
-        
+
         /**
          * Contains the pitch used when the last note was played by a voice of an arrangement entry. This is used to be able to change the
          * transposition while playing and still being able to send the correct NOTE_OFF pitches.
@@ -515,7 +493,7 @@ public class MidiPlayer extends AbstractPlayer {
 
     /**
      * Runs the configured before play commands (if any).
-     * 
+     *
      * @throws IOException in case of an I/O problem
      * @throws InterruptedException in case of an interruption
      */
@@ -538,7 +516,7 @@ public class MidiPlayer extends AbstractPlayer {
 
     /**
      * Runs the configured after play commands (if any).
-     * 
+     *
      * @throws IOException in case of an I/O problem
      * @throws InterruptedException in case of an interruption
      */
@@ -561,9 +539,9 @@ public class MidiPlayer extends AbstractPlayer {
 
     /**
      * Mutes all active channels.
-     * 
+     *
      * @param arrangement the arrangement
-     * 
+     *
      * @throws InvalidMidiDataException in case of invalid MIDI data
      */
 
@@ -597,15 +575,14 @@ public class MidiPlayer extends AbstractPlayer {
 
     /**
      * Plays a tick, sending NOTE_OFF messages for notes that should be muted and NOTE_ON messages for notes that should be started.
-     * 
+     *
      * @param arrangement the arrangement
      * @param tick the tick
-     * 
+     *
      * @throws InvalidMidiDataException in case of invalid MIDI data
      */
 
-    private void playTick(Arrangement arrangement, int tick)
-            throws InvalidMidiDataException {
+    private void playTick(Arrangement arrangement, int tick) throws InvalidMidiDataException {
         Structure structure = arrangement.getStructure();
         int ticksPerBar = structure.getTicksPerBar();
 
@@ -701,11 +678,11 @@ public class MidiPlayer extends AbstractPlayer {
             k++;
         }
     }
-    
+
     /**
      * Updates the player state to simulate playing the next tick.
      */
-    
+
     private void playSilentTick() {
         int k = 0;
 
@@ -720,12 +697,12 @@ public class MidiPlayer extends AbstractPlayer {
                 if (--t[j] <= 0) {
                     Sequence s = track.get(j);
                     SequenceEntry se = s.get(p[j]);
-                    
+
                     if (se.isNote()) {
                         int pitch = (track.getType() == TrackType.MELODY ? transposition : 0) + se.getPitch();
                         pitches[j] = pitch;
                     }
-                    
+
                     p[j]++;
                     t[j] = se.getTicks();
                 }
@@ -734,10 +711,10 @@ public class MidiPlayer extends AbstractPlayer {
             k++;
         }
     }
-    
+
     /**
      * Initializes all controller LFOs of the arrangement.
-     * 
+     *
      * @param arrangement the arrangement
      */
 
@@ -785,9 +762,9 @@ public class MidiPlayer extends AbstractPlayer {
     /**
      * Sends messages to all configured controllers based on the LFOs. A message is only send to a controller if its LFO value has changed or if tick
      * is 0.
-     * 
+     *
      * @param tick the tick
-     * 
+     *
      * @throws InvalidMidiDataException in case of invalid MIDI data
      */
 
@@ -847,14 +824,14 @@ public class MidiPlayer extends AbstractPlayer {
     /**
      * Waits the given number of ticks, sending out TIMING_CLOCK events to the MIDI devices, if necessary. Waiting is done by using a simple feedback
      * algorithm that tries hard to keep the player exactly in sync with the system clock.
-     * 
+     *
      * @param referenceTime the reference time (from System.nanoTime())
      * @param ticks the number of ticks to wait
      * @param clockTimingsPerTick the number of clock timings per tick
      * @param ticksPerBeat the number of ticks per beat
-     * 
+     *
      * @return the new reference time
-     * 
+     *
      * @throws InvalidMidiDataException in case of invalid MIDI data
      * @throws InterruptedException in case of sleep interruption
      */
@@ -890,12 +867,12 @@ public class MidiPlayer extends AbstractPlayer {
      * Waits until either time1 or time2 (both are given in nano seconds) is reached, whichever comes first. Both times are based on
      * System.nanoTime(). If time1 or time2 is in the past, this method returns immediately. In all cases, the time waited on is returned (either
      * time1 or time2).
-     * 
+     *
      * @param time1 the first point in time
      * @param time2 the second point in time
-     * 
+     *
      * @return the point in time waited on (minimum of time1 and time2)
-     * 
+     *
      * @throws InterruptedException in case of sleep interruption
      */
 
@@ -912,10 +889,10 @@ public class MidiPlayer extends AbstractPlayer {
 
     /**
      * Returns the number of nanos of the given tick, taking the current groove into account.
-     * 
+     *
      * @param tick the tick
      * @param ticksPerBeat the number of ticks per beat
-     * 
+     *
      * @return the number of nanos
      */
 
@@ -925,10 +902,10 @@ public class MidiPlayer extends AbstractPlayer {
 
     /**
      * Returns the number of nanos for a timing tick.
-     * 
+     *
      * @param ticksPerBeat the ticks per beat
      * @param clockTimingsPerTick the clock timings per tick
-     * 
+     *
      * @return the number of nanos for a timing tick
      */
 
@@ -939,7 +916,7 @@ public class MidiPlayer extends AbstractPlayer {
     /**
      * Sets the channel programs of all DeviceChannels used. This method does not set the program of a DeviceChannel more than once. Channels whose
      * program is set to -1 are ignored, so that the currently selected program remains active.
-     * 
+     *
      * @throws InvalidMidiDataException in case of invalid MIDI data
      */
 
@@ -961,9 +938,9 @@ public class MidiPlayer extends AbstractPlayer {
 
     /**
      * Sends the given single-byte message to all devices that are using clock synchronization.
-     * 
+     *
      * @param status the message
-     * 
+     *
      * @throws InvalidMidiDataException in case of invalid MIDI data
      */
 
@@ -982,7 +959,7 @@ public class MidiPlayer extends AbstractPlayer {
     /**
      * Mutes all channels of all devices. This is done by sending an ALL SOUND OFF message to all channels. In addition to that (because this does not
      * include sending NOTE OFF) a NOTE_OFF is sent for each of the 128 possible pitches to each channel.
-     * 
+     *
      * @throws InvalidMidiDataException in case of invalid MIDI data
      */
 
@@ -1011,9 +988,9 @@ public class MidiPlayer extends AbstractPlayer {
 
     /**
      * Converts our internal velocity (between 0 and Short.MAX_VALUE) to a MIDI velocity (between 0 and 127).
-     * 
+     *
      * @param velocity the velocity to convert
-     * 
+     *
      * @return the MIDI velocity
      */
 
@@ -1033,10 +1010,10 @@ public class MidiPlayer extends AbstractPlayer {
      * Checks if the given instrument is part of the arrangement and if so, determines the tick of the first note and the tick of the end of the last
      * note plus 1. The start and end ticks are returned as a two-dimensional int array. If the instrument is not found or the instrument's track
      * contains no note, null is returned.
-     * 
+     *
      * @param arrangement the arrangement
      * @param instrument the number of the instrument
-     * 
+     *
      * @return a two-dimensional int array containing start and end tick (or null)
      */
 
@@ -1165,9 +1142,9 @@ public class MidiPlayer extends AbstractPlayer {
             int maxValue = Integer.MAX_VALUE;
             int minAmplitude = 0;
             int maxAmplitude = 0;
-            
+
             boolean usesLegacyTags = false;
-            
+
             try {
                 minAmplitude = XMLUtils.parseInteger(random, (Node) xpath.evaluate("minimum", nodeList.item(i), XPathConstants.NODE), xpath);
                 usesLegacyTags = true;
@@ -1179,12 +1156,12 @@ public class MidiPlayer extends AbstractPlayer {
                 usesLegacyTags = true;
             } catch (Exception e) {
             }
-            
+
             if (usesLegacyTags) {
                 logger.warn("The tags \"minimum\" and \"maximum\" for LFOs have been deprecated. "
                         + "Use \"minAmplitude\" and \"maxAmplitude\" instead.");
             }
-            
+
             try {
                 minAmplitude = XMLUtils.parseInteger(random, (Node) xpath.evaluate("minAmplitude", nodeList.item(i), XPathConstants.NODE), xpath);
             } catch (Exception e) {
@@ -1198,7 +1175,7 @@ public class MidiPlayer extends AbstractPlayer {
             if (minAmplitude > maxAmplitude) {
                 throw new RuntimeException("minAmplitude must be <= maxAmplitude");
             }
-            
+
             try {
                 minValue = XMLUtils.parseInteger(random, (Node) xpath.evaluate("minValue", nodeList.item(i), XPathConstants.NODE), xpath);
             } catch (Exception e) {
@@ -1212,7 +1189,7 @@ public class MidiPlayer extends AbstractPlayer {
             if (minValue > maxValue) {
                 throw new RuntimeException("minValue must be <= maxValue");
             }
-            
+
             double speed = XMLUtils.parseDouble(random, (Node) xpath.evaluate("speed", nodeList.item(i), XPathConstants.NODE), xpath);
 
             String controller = XMLUtils.parseString(random, (Node) xpath.evaluate("controller", nodeList.item(i), XPathConstants.NODE), xpath);
@@ -1267,12 +1244,12 @@ public class MidiPlayer extends AbstractPlayer {
 
     /**
      * Sends a MIDI message with the given status, data1 and data2 to the given device channel.
-     * 
+     *
      * @param deviceChannel the device channel
      * @param status the MIDI status
      * @param data1 the first MIDI data
      * @param data2 the second MIDI data
-     * 
+     *
      * @throws InvalidMidiDataException in case of invalid MIDI data
      */
 
@@ -1284,13 +1261,13 @@ public class MidiPlayer extends AbstractPlayer {
 
     /**
      * Sends a MIDI message with the given status, data1 and data2 to the given channel on the given device.
-     * 
+     *
      * @param device the device
      * @param channel the channel number (0-15)
      * @param status the MIDI status
      * @param data1 the first MIDI data
      * @param data2 the second MIDI data
-     * 
+     *
      * @throws InvalidMidiDataException in case of invalid MIDI data
      */
 
@@ -1302,10 +1279,10 @@ public class MidiPlayer extends AbstractPlayer {
 
     /**
      * Sends a MIDI message with the given status to the given device.
-     * 
+     *
      * @param device the device
      * @param status the MIDI status
-     * 
+     *
      * @throws InvalidMidiDataException in case of invalid MIDI data
      */
 
@@ -1318,9 +1295,9 @@ public class MidiPlayer extends AbstractPlayer {
     /**
      * Skips to the specified tick. This is done by temporarily setting the BPM to a high number until the specified tick has been reached. It is
      * currently not possible to skip backwards in this player.
-     * 
+     *
      * @param tick the tick
-     * 
+     *
      * @return true if skipping was successful, false otherwise
      */
 
@@ -1412,7 +1389,7 @@ public class MidiPlayer extends AbstractPlayer {
 
         public void close() {
             // the underlying receiver is closed automatically if the MIDI device is closed
-            
+
             if (midiDevice != null) {
                 midiDevice.close();
                 logger.debug("Successfully closed MIDI device \"" + name + "\"");

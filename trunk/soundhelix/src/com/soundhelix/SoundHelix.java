@@ -29,7 +29,7 @@ import javax.sound.midi.MidiSystem;
  * Implements the main class. The main() method determines the configuration file and then waits for the next generated song and plays it. The
  * configuration parsing and generation of songs is done in a separate thread to guarantee seamless playing. The thread priority for the song
  * generator is set to a low value, the priority of the playing thread is set to a high value.
- * 
+ *
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
@@ -84,16 +84,25 @@ public class SoundHelix implements Runnable {
         int c;
         while ((c = g.getopt()) != -1) {
             switch (c) {
-                case 'h': showHelp = true;break;
-                case 'm': showMidiDevices = true;break;
-                case 's': songName = g.getOptarg();break;
-                case 1: if (filename == null) {
-                   filename = g.getOptarg();
-                   } else {
-                       System.out.println("XML-Filename specified more than once"); 
-                   }
-                   break;
-                case '?': return;
+                case 'h':
+                    showHelp = true;
+                    break;
+                case 'm':
+                    showMidiDevices = true;
+                    break;
+                case 's':
+                    songName = g.getOptarg();
+                    break;
+                case 1:
+                    if (filename == null) {
+                        filename = g.getOptarg();
+                    } else {
+                        System.out.println("XML-Filename specified more than once");
+                    }
+                    break;
+                case '?':
+                    return;
+                default:
             }
         }
 
@@ -101,16 +110,16 @@ public class SoundHelix implements Runnable {
         int count = 0;
 
         if (showHelp) {
-          count++;
+            count++;
         }
 
         if (showMidiDevices) {
-          count++;
+            count++;
         }
-         
+
         if (count > 1) {
-          System.out.println("Use one of \"--help\" and \"--show-midi-devices\"");
-          return;
+            System.out.println("Use one of \"--help\" and \"--show-midi-devices\"");
+            return;
         }
 
         if (showHelp) {
@@ -260,14 +269,44 @@ public class SoundHelix implements Runnable {
 
     /**
      * Removes and returns the next SongQueueEntry from the queue. This method will block until an entry is available.
-     * 
+     *
      * @return the next SongQueueEntry
-     * 
+     *
      * @throws InterruptedException if interrupted
      */
 
     public Player getNextSongFromQueue() throws InterruptedException {
         return songQueue.take();
+    }
+
+    /**
+     * Prints all available MIDI devices.
+     */
+
+    private static void showMidiDevices() {
+        System.out.println("Available MIDI devices with MIDI IN:");
+        System.out.println();
+
+        List<String> list = new ArrayList<String>();
+        MidiDevice.Info[] infos = MidiSystem.getMidiDeviceInfo();
+
+        for (MidiDevice.Info info : infos) {
+            try {
+                MidiDevice device = MidiSystem.getMidiDevice(info);
+
+                if (device != null && device.getReceiver() != null) {
+                    list.add(info.getName());
+                }
+            } catch (Exception e) {}
+        }
+
+        String[] array = new String[list.size()];
+        Arrays.sort(list.toArray(array));
+
+        int num = 0;
+        for (String device : array) {
+            System.out.println("Device " + (++num) + ": \"" + device + "\"");
+        }
     }
 
     /**
@@ -303,33 +342,6 @@ public class SoundHelix implements Runnable {
             }
 
             logger.trace("Finished shutdown hook");
-        }
-    }
-
-    private static void showMidiDevices() {
-        System.out.println("Available MIDI devices with MIDI IN:");
-        System.out.println();
-
-        List<String> list = new ArrayList<String>();
-        MidiDevice.Info[] infos = MidiSystem.getMidiDeviceInfo();
-
-        for (MidiDevice.Info info : infos) {
-            try {
-                MidiDevice device = MidiSystem.getMidiDevice(info);
-
-                if (device != null && device.getReceiver() != null) {
-                    list.add(info.getName());
-                }
-            } catch (Exception e) {
-            }
-        }
-
-        String[] array = new String[list.size()];
-        Arrays.sort(list.toArray(array));
-
-        int num = 0;
-        for (String device : array) {
-            System.out.println("Device " + (++num) + ": \"" + device + "\"");
         }
     }
 }

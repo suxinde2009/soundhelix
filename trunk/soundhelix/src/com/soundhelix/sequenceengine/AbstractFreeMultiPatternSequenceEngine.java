@@ -12,7 +12,7 @@ import com.soundhelix.misc.Track.TrackType;
  * Implements a sequence engine that repeats a set of user-specified patterns in a voice each. A pattern is a string containing any number of
  * comma-separated integers and minus signs. Integers play the corresponding semitone (0 is C, 1 is C#, etc.; the numbers may also be negative). A
  * minus sign is a pause.
- * 
+ *
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
@@ -23,6 +23,12 @@ public abstract class AbstractFreeMultiPatternSequenceEngine extends AbstractSeq
 
     /** The Pattern array. */
     private Pattern[] patterns;
+
+    /**
+     * Sets the patterns.
+     *
+     * @param patterns
+     */
 
     public void setPatterns(Pattern[] patterns) {
         this.patterns = patterns;

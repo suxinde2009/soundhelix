@@ -7,7 +7,7 @@ import com.soundhelix.misc.Structure;
 
 /**
  * Implements an abstract HarmonyEngine with some basic functionality.
- * 
+ *
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
@@ -22,6 +22,10 @@ public abstract class AbstractHarmonyEngine implements HarmonyEngine {
 
     /** The random seed. */
     protected long randomSeed;
+
+    /**
+     * Constructor.
+     */
 
     public AbstractHarmonyEngine() {
         logger = Logger.getLogger(getClass());

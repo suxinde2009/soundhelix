@@ -24,14 +24,14 @@ import com.soundhelix.util.XMLUtils;
  * Implements a simple ArrangementEngine. The song starts with a configurable "fade-in" of the number of active ActivityVectors and ends with a
  * configurable "fade-out" of the number of active ActivityVectors. For each chord section in between, the number of active AVs is varied in the
  * configured range.
- * 
+ *
  * ActivityVector activity can be constrained individually to enforce certain properties. All AVs are filled at the same time because there is always
  * the above-mentioned overall song constraint that defines the number of active AVs for each chord section. For each chord section a choice is made
  * whether to activate or deactivate AVs or to leave the number of active AVs unchanged, according to the AVs that should be active. The list of
  * generated AVs are called a song activity matrix.
  *
  * The following constraints are supported for ActivityVectors:
- * 
+ *
  * - minActive(n): the AV must be active for at least n% of the song; granularity is at chord section level; it is
  *                 also possible define that the AV may be inactive for the whole song or be active with at least n%
  *                 of the song
@@ -52,13 +52,13 @@ import com.soundhelix.util.XMLUtils;
  * selections about which AVs to activate or deactivate. If a constraint violation is detected, a number of different random choices at the same
  * section is tried by reverting the previous choice and choosing another one; if all these fail, the algorithm backtracks to the previous section. To
  * avoid the overhead of recursion, the algorithm is implemented iteratively.
- * 
+ *
  * The algorithm is able to find a valid song activity matrix pretty quickly (if one exists), much faster than the simpler algorithm used in version
  * 0.1 of SoundHelix and before.
- * 
+ *
  * The algorithm scales pretty well with increasing numbers of constraints, but keep in mind that every additional constraint increases the complexity
  * level of finding a valid song activity matrix.
- * 
+ *
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
@@ -117,7 +117,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
     /**
      * Returns the needed activity vectors as a map that maps from the activity vector name to its configuration. Rather than returning all activity
      * vectors, this method only returns the activity vectors that are used within at least one SequenceEngine.
-     * 
+     *
      * @return the map of activity vectors
      */
 
@@ -144,9 +144,9 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
     /**
      * Creates an arrangement based on the given map of needed activity vectors. This is done by rendering a track for each SequenceEngine based on
      * the already generated activity vectors.
-     * 
+     *
      * @param neededActivityVector the map of needed activity vectors
-     * 
+     *
      * @return the created arrangement
      */
 
@@ -184,7 +184,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
     /**
      * Shifts the interval boundaries of all activity vectors where a start or stop shift has been configured.
-     * 
+     *
      * @param neededActivityVector the needed activity vectors
      */
 
@@ -258,7 +258,8 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
         long startTime = System.nanoTime();
 
-        nextSection: while (section < sections) {
+    nextSection:
+        while (section < sections) {
             BitSet previousBitSet;
 
             if (section == 0) {
@@ -475,7 +476,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
     /**
      * Converts the BitSets into a set of ActivityVectors which have their activity set based on the BitSets.
-     * 
+     *
      * @param activityVectorConfigurations the array of activity vector configurations
      * @param bitSets the array of BitSets
      */
@@ -516,7 +517,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
     /**
      * Copies the state from the previous chord section to the current chord section state.
-     * 
+     *
      * @param section the section number
      * @param state the array of states
      */
@@ -553,7 +554,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
     /**
      * Dumps the activity vectors as an activity matrix.
-     * 
+     *
      * @param vectors the array of activity vector configurations
      */
 
@@ -644,10 +645,10 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
     /**
      * Sets one random bit in the BitSet from false to true, if this is possible (i.e., if not all bits are set already). The number of the set bit is
      * returned or -1 if all bits were true.
-     * 
+     *
      * @param bitSet the BitSet to modify
      * @param size the size of the BitSet
-     * 
+     *
      * @return the number of the set bit (or -1 if no false bit existed)
      */
 
@@ -682,9 +683,9 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
     /**
      * Clears one random bit in the BitSet, if this is possible (i.e., if at least one bit is set to true). The number of the cleared bit is returned
      * or -1 if all bits were false.
-     * 
+     *
      * @param bitSet the BitSet to modify
-     * 
+     *
      * @return the number of the cleared bit (or -1 if no true bit existed)
      */
 
@@ -970,11 +971,11 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
      * activityVectors goes to infinity. The lambda value specifies the speed of the exponential drop-off. The goal is to use almost all
      * ActivityVectors when the number of ActivityVectors is small and use (in relation) fewer ActivityVectors when the number of ActivityVectors
      * becomes larger.
-     * 
+     *
      * @param activityVectors the number of ActivtiyVectors (must be positive)
      * @param factor the factor (between 0 and 1)
      * @param lambda the drop-off factor (must be positive)
-     * 
+     *
      * @return the maximum number of ActivityVectors to use
      */
 

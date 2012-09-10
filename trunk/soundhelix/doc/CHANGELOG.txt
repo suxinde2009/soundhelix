@@ -19,6 +19,9 @@ Change log
       chords were transposed one octave down, C, C# and D were not transposed). The crossover pitch defaults to this value (3 for
       "D#") for backwards compatibility.
 
+    - Added support for nested pattern expansion where pattern strings are used, using the syntax "(string)*count". For example,
+      instead of using "0/2,0/2,0/2,1/2,0/2,0/2,0/2,1/2" in a pattern string you can now use "((0/2)*3,1/2)*2" instead.
+
     - Added usage of GNU Getopt for cleaner parameter parsing. Run "java -jar SoundHelix.jar -h" to see the details. The syntax
       of the start script parameters (run.bat and run.sh) have not been changed.
 

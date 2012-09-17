@@ -635,8 +635,15 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
                 }
             }
 
-            // output number in base-36 format (0-9,a-z)
-            sb.append(Integer.toString(c, 36));
+            // output number in base-62 format (0-9, a-z, A-Z)
+
+            if (c >= 36) {
+                sb.append((char) ('A' + c - 36));
+            } else if (c >= 10) {
+                sb.append((char) ('a' + c - 10));
+            } else {
+                sb.append((char) ('0' + c));
+            }
         }
 
         logger.debug(sb.toString());

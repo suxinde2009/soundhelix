@@ -68,17 +68,12 @@ public class SoundHelix implements Runnable {
     }
 
     public static void main(String[] args) throws Exception {
-        LongOpt[] longopts = new LongOpt[] {
-            new LongOpt("help", LongOpt.NO_ARGUMENT, null, 'h'),
-            new LongOpt("song-name", LongOpt.REQUIRED_ARGUMENT, null, 's'),
-            new LongOpt("show-midi-devices", LongOpt.NO_ARGUMENT, null, 'm'),
-        };
-
-        Getopt g = new Getopt("SoundHelix", args, "-hs:m", longopts);
+        Getopt g = parseParameters(args);
 
         String songName = null;
         String filename = null;
         boolean showHelp = false;
+        boolean showVersion = false;
         boolean showMidiDevices = false;
 
         int c;
@@ -86,6 +81,9 @@ public class SoundHelix implements Runnable {
             switch (c) {
                 case 'h':
                     showHelp = true;
+                    break;
+                case 'v':
+                    showVersion = true;
                     break;
                 case 'm':
                     showMidiDevices = true;
@@ -98,10 +96,12 @@ public class SoundHelix implements Runnable {
                         filename = g.getOptarg();
                     } else {
                         System.out.println("XML-Filename specified more than once");
+                        System.exit(1);
                     }
                     break;
                 case '?':
-                    return;
+                    System.exit(1);
+                    break;
                 default:
             }
         }
@@ -113,13 +113,17 @@ public class SoundHelix implements Runnable {
             count++;
         }
 
+        if (showVersion) {
+            count++;
+        }
+
         if (showMidiDevices) {
             count++;
         }
 
         if (count > 1) {
-            System.out.println("Use one of \"--help\" and \"--show-midi-devices\"");
-            return;
+            System.out.println("Use one of \"--help\", \"--version\" and \"--show-midi-devices\"");
+            System.exit(1);
         }
 
         if (showHelp) {
@@ -130,22 +134,30 @@ public class SoundHelix implements Runnable {
             System.out.println("   -h");
             System.out.println("   --help                 Show this help");
             System.out.println();
+            System.out.println("   -v");
+            System.out.println("   --version              Show the application version");
+            System.out.println();
             System.out.println("   -s songname");
             System.out.println("   --song-name songname   Set the song name for seeding the random generator");
             System.out.println();
             System.out.println("   -m");
             System.out.println("   --show-midi-devices    Show available MIDI devices with MIDI IN port");
-            return;
+            System.exit(0);
+        }
+
+        if (showVersion) {
+            System.out.println(VersionUtils.getVersion());
+            System.exit(0);
         }
 
         if (showMidiDevices) {
             showMidiDevices();
-            return;
+            System.exit(0);
         }
 
         if (filename == null) {
             System.out.println("No XML filename provided");
-            return;
+            System.exit(1);
         }
 
         // initialize log4j
@@ -278,6 +290,26 @@ public class SoundHelix implements Runnable {
     public Player getNextSongFromQueue() throws InterruptedException {
         return songQueue.take();
     }
+
+    /**
+     * Parse command-line parameters and return a Getopt instance.
+     *
+     * @param args the command-line parameters
+     *
+     * @return the Getopt instance
+     */
+
+    private static Getopt parseParameters(String[] args) {
+        LongOpt[] longopts = new LongOpt[] {
+            new LongOpt("help", LongOpt.NO_ARGUMENT, null, 'h'),
+            new LongOpt("version", LongOpt.NO_ARGUMENT, null, 'v'),
+            new LongOpt("song-name", LongOpt.REQUIRED_ARGUMENT, null, 's'),
+            new LongOpt("show-midi-devices", LongOpt.NO_ARGUMENT, null, 'm'),
+        };
+
+        return new Getopt("SoundHelix", args, "-hvs:m", longopts);
+    }
+
 
     /**
      * Prints all available MIDI devices.

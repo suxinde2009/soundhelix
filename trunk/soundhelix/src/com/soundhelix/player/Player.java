@@ -6,13 +6,11 @@ import com.soundhelix.misc.XMLConfigurable;
 
 /**
  * Represents an interface for playing Arrangements. A player's task usually is to play the arrangement in real-time.
- * 
+ *
  * @see Arrangement
- * 
+ *
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
-
-// TODO: check if more methods should be available, for example, getting the current tick, setting the current tick
 
 public interface Player extends XMLConfigurable, RandomSeedable {
     /**
@@ -23,7 +21,7 @@ public interface Player extends XMLConfigurable, RandomSeedable {
 
     /**
      * Gets the arrangement to play.
-     * 
+     *
      * @return the arrangement
      */
 
@@ -31,7 +29,7 @@ public interface Player extends XMLConfigurable, RandomSeedable {
 
     /**
      * Sets the arrangement to play.
-     * 
+     *
      * @param arrangement the arrangement
      */
 
@@ -52,7 +50,7 @@ public interface Player extends XMLConfigurable, RandomSeedable {
 
     /**
      * Gets the playback speed in milli-BPM.
-     * 
+     *
      * @return the speed in milli-BPM
      */
 
@@ -60,7 +58,7 @@ public interface Player extends XMLConfigurable, RandomSeedable {
 
     /**
      * Sets the playback speed in milli-BPM. Setting the BPM speed should be possible while the player is playing an arrangement.
-     * 
+     *
      * @param milliBPM the speed in milli-BPM
      */
 
@@ -71,9 +69,9 @@ public interface Player extends XMLConfigurable, RandomSeedable {
      * support skipping at all or may not support skipping backwards. In this case, the player must ignore the skip request and must return false.
      * This method should return immediately, even if skipping takes a while to complete. Skipping to a different tick while in the midst of skipping
      * to a different tick may or may not be supported by the player.
-     * 
+     *
      * @param tick the tick to skip to
-     * 
+     *
      * @return true if skipping was successful
      */
 
@@ -82,7 +80,7 @@ public interface Player extends XMLConfigurable, RandomSeedable {
     /**
      * Returns the current tick of the player. If the player is not yet playing, if it is in the warm-up phase or in the cool-down phase or playing
      * has finished, -1 will be returned.
-     * 
+     *
      * @return the current tick (or -1)
      */
 

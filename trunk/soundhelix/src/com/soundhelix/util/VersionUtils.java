@@ -6,7 +6,7 @@ import com.soundhelix.constants.BuildConstants;
 
 /**
  * Implements some static methods for versions.
- * 
+ *
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
@@ -32,7 +32,7 @@ public final class VersionUtils {
     /**
      * Returns the application version.
      *
-     * @return the application version	
+     * @return the application version
      */
 
     public static String getVersion() {
@@ -43,10 +43,10 @@ public final class VersionUtils {
     /**
      * Compares the two given version strings. Returns a negative number if the first is smaller than the second, a positive number of the first is
      * greater than the second, 0 if they are equal.
-     * 
+     *
      * @param version1 the first version string
      * @param version2 the second version string
-     * 
+     *
      * @return an integer determining the relative order of the two version strings
      */
 
@@ -60,10 +60,10 @@ public final class VersionUtils {
     /**
      * Compares the two given version integer arrays. Returns a negative number if the first is smaller than the second, a positive number of the
      * first is greater than the second, 0 if they are equal.
-     * 
+     *
      * @param versionInts1 the first version int array
      * @param versionInts2 the second version int array
-     * 
+     *
      * @return an integer determining the relative order of the two version int arrays
      */
 
@@ -94,12 +94,12 @@ public final class VersionUtils {
      * Splits the given string into version integers and returns them as an int array. If the version string ends with "u" (meaning unreleased), the
      * "u" is chopped off and the remaining version is used. Otherwise, an artificial ".0" is appended to the version. This will make unreleased
      * versions (e.g., "0.3u", which is converted to "0.3") smaller than released versions (e.g., "0.3", which is converted to "0.3.0").
-     * 
+     *
      * The returned int array should not be interpreted in any way other than feeding it into compareVersions(). This will allow for more extended
      * version syntaxes in the future (alpha, beta, release candidates, etc.).
-     * 
+     *
      * @param string the string to parse
-     * 
+     *
      * @return the int array
      */
 

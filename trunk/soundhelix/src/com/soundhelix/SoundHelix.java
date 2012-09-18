@@ -33,8 +33,6 @@ import javax.sound.midi.MidiSystem;
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
-// TODO: provide a DTD or XML Schema for the configuration file
-
 public class SoundHelix implements Runnable {
 
     /** The logger. */

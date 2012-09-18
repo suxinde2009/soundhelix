@@ -27,7 +27,7 @@ public abstract class AbstractFreeMultiPatternSequenceEngine extends AbstractSeq
     /**
      * Sets the patterns.
      *
-     * @param patterns
+     * @param patterns the patterns
      */
 
     public void setPatterns(Pattern[] patterns) {

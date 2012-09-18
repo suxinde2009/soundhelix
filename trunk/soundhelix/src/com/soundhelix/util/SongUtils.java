@@ -35,7 +35,7 @@ import com.soundhelix.songnameengine.SongNameEngine;
 
 /**
  * Provides static convenience methods for creating a song.
- * 
+ *
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
@@ -58,12 +58,12 @@ public final class SongUtils {
 
     /**
      * Parses the XML file provided by the given input stream, creates an arrangement and a player and configures the player to use this arrangement.
-     * 
+     *
      * @param url the URL
      * @param randomSeed the random seed
-     * 
+     *
      * @return the player
-     * 
+     *
      * @throws Exception in case of a problem
      */
 
@@ -74,13 +74,13 @@ public final class SongUtils {
 
     /**
      * Parses the XML file provided by the given input stream, creates an arrangement and a player and configures the player to use this arrangement.
-     * 
+     *
      * @param inputStream the input stream
      * @param systemId the system ID specifying the source of the input stream
      * @param randomSeed the random seed
-     * 
+     *
      * @return the player
-     * 
+     *
      * @throws Exception in case of a problem
      */
 
@@ -91,12 +91,12 @@ public final class SongUtils {
 
     /**
      * Parses the XML file provided by the given input stream, creates an arrangement and a player and configures the player to use this arrangement.
-     * 
+     *
      * @param url the URL
      * @param songName the song name
-     * 
+     *
      * @return the player
-     * 
+     *
      * @throws Exception in case of a problem
      */
 
@@ -107,13 +107,13 @@ public final class SongUtils {
 
     /**
      * Parses the XML file provided by the given input stream, creates an arrangement and a player and configures the player to use this arrangement.
-     * 
+     *
      * @param inputStream the input stream
      * @param systemId the system ID specifying the source of the input stream
      * @param songName the song name
-     * 
+     *
      * @return the player
-     * 
+     *
      * @throws Exception in case of a problem
      */
 
@@ -124,11 +124,16 @@ public final class SongUtils {
 
     /**
      * Creates a SongNameEngine, generates a song and creates a Player from it.
-     * 
+     *
      * @param doc the parsed document
      * @param randomSeed the random seed
-     * 
+     *
      * @return the player
+     *
+     * @throws ClassNotFoundException if the class cannot be found
+     * @throws IllegalAccessException if access is illegal
+     * @throws InstantiationException if the class cannot be instantiated
+     * @throws XPathException in case of an XPath error
      */
 
     private static Player createPlayer(Document doc, long randomSeed) throws InstantiationException, XPathException, IllegalAccessException,
@@ -151,11 +156,16 @@ public final class SongUtils {
 
     /**
      * Creates a player using the specified song name.
-     * 
+     *
      * @param doc the parsed document
      * @param songName the song name
-     * 
+     *
      * @return the player
+     *
+     * @throws ClassNotFoundException if the class cannot be found
+     * @throws IllegalAccessException if access is illegal
+     * @throws InstantiationException if the class cannot be instantiated
+     * @throws XPathException in case of an XPath error
      */
 
     private static Player createPlayer(Document doc, String songName) throws InstantiationException, XPathException, IllegalAccessException,
@@ -171,14 +181,14 @@ public final class SongUtils {
     }
 
     /**
-     * 
+     *
      * Generates a new song based on the given document and random seed and returns the pre-configured player that can be used to play the song.
-     * 
+     *
      * @param doc the document
      * @param randomSeed the random seed
-     * 
+     *
      * @return the player
-     * 
+     *
      * @throws InstantiationException if a class cannot be instantiated
      * @throws XPathException in case of an XPath problem
      * @throws IllegalAccessException if an illegal class access is made
@@ -226,11 +236,11 @@ public final class SongUtils {
     /**
      * Parses the XML document provided by the given URL. The URL is used as the system ID (i.e., base URL) of the document, so relative URLs
      * referenced in the XML document (e.g., for XInclude inclusion), will use the document URL as the base.
-     * 
+     *
      * @param url the URL
-     * 
+     *
      * @return the parsed document
-     * 
+     *
      * @throws ParserConfigurationException in case of a parsing exception
      * @throws SAXException if a SAX exception occurs
      * @throws IOException in case of an I/O problem
@@ -244,12 +254,12 @@ public final class SongUtils {
     /**
      * Parses the XML document provided by the input stream. The system ID is used as the base URL of the document, so relative URLs referenced in the
      * XML document (e.g., for XInclude inclusion), will use the document URL as the base.
-     * 
+     *
      * @param inputStream the input stream
      * @param systemId the system ID of the XML content
-     * 
+     *
      * @return the parsed document
-     * 
+     *
      * @throws ParserConfigurationException in case of a parsing exception
      * @throws SAXException if a SAX exception occurs
      * @throws IOException in case of an I/O problem
@@ -287,12 +297,12 @@ public final class SongUtils {
 
     /**
      * Parses the structure tag and creates a Structure instance. Note that no HarmonyEngine is set yet.
-     * 
+     *
      * @param randomSeed the random seed
      * @param node the node of the tag
      * @param xpath an XPath instance
      * @param songName the song name
-     * 
+     *
      * @return a Structure
      */
 
@@ -322,10 +332,10 @@ public final class SongUtils {
 
     /**
      * Determines the root node and calls checkVersion().
-     * 
+     *
      * @param doc the parsed document
-     * 
-     * @throws XPathExpressionException
+     *
+     * @throws XPathExpressionException in case of an XPath expression problem
      */
 
     private static void checkVersion(Document doc) throws XPathExpressionException {
@@ -337,10 +347,10 @@ public final class SongUtils {
     /**
      * Checks if the version of the XML document is compatible with the application version. If the versions are not compatible a RuntimeException
      * will be thrown with an appropriate message. If the application version is undefined ("???"), the check is skipped.
-     * 
+     *
      * @param xpath the XPath instance
      * @param rootNode the root node
-     * 
+     *
      * @throws XPathExpressionException in case of an XPath expression problem
      */
 
@@ -371,9 +381,9 @@ public final class SongUtils {
 
     /**
      * Returns the random seed for the song title.
-     * 
+     *
      * @param title the song tile
-     * 
+     *
      * @return the random seed
      */
 

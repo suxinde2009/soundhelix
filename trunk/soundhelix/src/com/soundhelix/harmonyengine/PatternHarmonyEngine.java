@@ -312,7 +312,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
                     } while (Chord.parseChord(chord, crossoverPitch).equalsNormalized(Chord.parseChord(
                             prevChord, crossoverPitch)) || i == count - 1 && chord.equals(firstChord)
                             || notrefnum >= 0 && Chord.parseChord(chord, crossoverPitch).equalsNormalized(
-                            Chord.parseChord(chordList.get(notrefnum), crossoverPitch)));
+                                Chord.parseChord(chordList.get(notrefnum), crossoverPitch)));
                 } else {
                     // we have a note, take the note (include 'm' suffix, if present)
                     chord = spec[0];

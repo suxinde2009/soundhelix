@@ -107,8 +107,9 @@
                  charset="UTF-8"
                  windowtitle="SoundHelix ${version} API">
             <doctitle><![CDATA[<h1>SoundHelix ${javadoc-version}</h1>]]></doctitle>
-            <link offline="true" href="http://java.sun.com/javase/6/docs/api/" packagelistLoc="C:/tmp"/>
             <link href="http://java.sun.com/javase/6/docs/api/"/>
+            <link href="http://logging.apache.org/log4j/1.2/apidocs/"/>
+            <link href="http://www.gnu.org/software/gnuprologjava/api/"/>
         </javadoc>
     </target>
 

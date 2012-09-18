@@ -26,9 +26,19 @@ public final class VersionUtils {
      */
 
     public static void logVersion() {
-        LOGGER.info("SoundHelix " + BuildConstants.VERSION + " (r" + BuildConstants.REVISION + "), built on " + BuildConstants.BUILD_DATE
-                + " *** http://www.soundhelix.com");
+        LOGGER.info(getVersion() + " *** http://www.soundhelix.com");
     }
+
+    /**
+     * Returns the application version.
+     *
+     * @return the application version	
+     */
+
+    public static String getVersion() {
+        return "SoundHelix " + BuildConstants.VERSION + " (r" + BuildConstants.REVISION + "), built on " + BuildConstants.BUILD_DATE;
+    }
+
 
     /**
      * Compares the two given version strings. Returns a negative number if the first is smaller than the second, a positive number of the first is

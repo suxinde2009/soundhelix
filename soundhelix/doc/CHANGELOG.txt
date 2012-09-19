@@ -22,17 +22,18 @@ Change log
     - Added support for nested pattern expansion where pattern strings are used, using the syntax "(string)*count". For example,
       instead of using "0/2,0/2,0/2,1/2,0/2,0/2,0/2,1/2" in a pattern string you can now use "((0/2)*3,1/2)*2" instead.
 
-    - Added usage of GNU Getopt for cleaner parameter parsing. Run "java -jar SoundHelix.jar -h" to see the details. The syntax
-      of the start script parameters (run.bat and run.sh) have not been changed.
-
-    - Added the possibility to list all available MIDI devices with MIDI IN by starting SoundHelix with the "-m" option.
-
     - Added support for "fake" seventh chords, which use 3 instead of 4 notes. Seventh chords can be selected using a simple
       syntax (e.g., "C7" for C major seventh, "Am76" for A minor seventh, second inversion).
 
     - Added the tags "precondition" and "postcondition" to the "conditionalPattern" tag of the DrumSequenceEngine, which
       replace the "condition" tag and have a much more user-friendly syntax for specifying the condition. The "condition"
       tag is deprecated, but can still be used.
+
+    - Added usage of GNU Getopt for cleaner parameter parsing. Run "java -jar SoundHelix.jar -h" to see the details. Note that
+      the syntax of the start script parameters (run.bat and run.sh) have been changed as well. Run "run.sh -h" or "run.bat -h"
+      to see the details. You can still run the two scripts without parameters to run SoundHelix with the default XML file.
+
+    - Added the possibility to list all available MIDI devices with MIDI IN by starting SoundHelix with the "-m" option.
 
     - Updated included log4j version from 1.2.16 to 1.2.17.
 

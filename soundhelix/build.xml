@@ -33,10 +33,11 @@
              <redirector>
                  <outputfilterchain>
                      <linecontainsregexp>
-                         <regexp pattern='^Revision' />
+                         <regexp pattern='^Revision|is not a working copy' />
                      </linecontainsregexp>
                      <tokenfilter>
-                         <replaceregex pattern='[\D]+([\d]+)' replace="\1" />
+                         <replaceregex pattern=".*is not a working copy.*" replace="???" />
+                         <replaceregex pattern="[\D]+([\d]+)" replace="\1" />
                      </tokenfilter>
                   </outputfilterchain>
               </redirector>
@@ -129,15 +130,15 @@
     </target>
 
     <target name="packagebin" description="build binary zip" depends="jar">
-        <zip destfile="${binzip}"
-             basedir=".."
-             includes="soundhelix/SoundHelix.jar,soundhelix/run.bat,soundhelix/run.sh,soundhelix/examples/SoundHelix-Piano.xml,soundhelix/examples/SoundHelix-Piano2.xml,soundhelix/includes/*,soundhelix/doc/*,soundhelix/lib/*,soundhelix/log4j.*"/>
+        <zip destfile="${binzip}">
+            <zipfileset dir="." includes="SoundHelix.jar,run.bat,run.sh,examples/SoundHelix-Piano.xml,examples/SoundHelix-Piano2.xml,includes/*,doc/*,lib/*.jar,log4j.*" prefix="soundhelix-${version}"/>
+        </zip>
     </target>
 
-    <target name="packagesrc" description="build zip including sources and javadoc" depends="jar,javadoc">
-        <zip destfile="${srczip}"
-             basedir=".."
-             includes="soundhelix/src/*,soundhelix/javadoc/*,soundhelix/build.xml,soundhelix/SoundHelix.jar,soundhelix/run.bat,soundhelix/run.sh,soundhelix/examples/*,soundhelix/includes/*,soundhelix/doc/*,soundhelix/lib/*,,soundhelix/log4j.*"/>
+    <target name="packagesrc" description="build source zip including binary, sources and javadoc" depends="jar,javadoc">
+        <zip destfile="${srczip}">
+             <zipfileset dir="." includes="src/**/*,javadoc/**/*,build.xml,VERSION.txt,SoundHelix.jar,run.bat,run.sh,examples/SoundHelix-Piano.xml,examples/SoundHelix-Piano2.xml,includes/*,doc/*,lib/*.jar,log4j.*" prefix="soundhelix-${version}"/>
+        </zip>
     </target>
 
     <target name="clean" description="clean up">

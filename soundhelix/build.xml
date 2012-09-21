@@ -107,7 +107,7 @@
                  overview="src/overview.html"
                  charset="UTF-8"
                  windowtitle="SoundHelix ${version} API">
-            <doctitle><![CDATA[<h1>SoundHelix ${javadoc-version}</h1>]]></doctitle>
+            <doctitle><![CDATA[<h1>SoundHelix ${javadoc-version} API</h1>]]></doctitle>
             <link href="http://java.sun.com/javase/6/docs/api/"/>
             <link href="http://logging.apache.org/log4j/1.2/apidocs/"/>
             <link href="http://www.gnu.org/software/gnuprologjava/api/"/>
@@ -126,6 +126,21 @@
        <echo>Extracting compressed javadoc</echo>
        <exec executable="ssh">
             <arg line="soundhelix.com 'cd soundhelix.com/public_html/javadoc/current &amp;&amp; \\rm -rf * &amp;&amp; tar -zxvf ~/javadoc.tar.gz &amp;&amp; find . -type f -exec chmod a+r {} \\; &amp;&amp; find . -type d -exec chmod a+rx {} \\;'"/>
+       </exec>
+    </target>
+
+    <target name="deployreleasejavadoc" depends="javadoc" description="deploy release javadoc">
+       <echo>Compressing javadoc</echo>
+       <exec executable="bash">
+            <arg line="-c 'cd javadoc;tar -zcf ../javadoc.tar.gz .'"/>
+       </exec>
+       <echo>Copying compressed javadoc</echo>
+       <exec executable="scp">
+            <arg line="javadoc.tar.gz soundhelix.com:"/>
+       </exec>
+       <echo>Extracting compressed javadoc</echo>
+       <exec executable="ssh">
+            <arg line="soundhelix.com 'cd soundhelix.com/public_html/javadoc/release &amp;&amp; \\rm -rf * &amp;&amp; tar -zxvf ~/javadoc.tar.gz &amp;&amp; find . -type f -exec chmod a+r {} \\; &amp;&amp; find . -type d -exec chmod a+rx {} \\;'"/>
        </exec>
     </target>
 

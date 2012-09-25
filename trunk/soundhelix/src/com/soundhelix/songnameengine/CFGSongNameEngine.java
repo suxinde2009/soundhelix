@@ -24,16 +24,16 @@ import com.soundhelix.util.XMLUtils;
 
 public class CFGSongNameEngine extends AbstractSongNameEngine {
     /** The pattern for variable replacement. */
-    private static Pattern variablePattern = Pattern.compile("\\$\\{(.*?)\\}");
+    protected static Pattern variablePattern = Pattern.compile("\\$\\{([^}]+)\\}");
 
     /** The variable map. */
-    private Map<String, RandomStrings> variableMap;
+    protected Map<String, RandomStrings> variableMap;
 
     /** The start variable. */
-    private String startVariable = "songName";
+    protected String startVariable = "songName";
 
     /** The separator. */
-    private char stringSeparator = ',';
+    protected char stringSeparator = ',';
 
     @Override
     public String createSongName() {
@@ -46,7 +46,7 @@ public class CFGSongNameEngine extends AbstractSongNameEngine {
         }
 
         String songName = strings.next(random);
-        songName = replaceVariables(random, songName, variableMap);
+        songName = replaceVariables(songName, variableMap, random);
 
         return StringUtils.capitalize(songName);
     }
@@ -86,14 +86,14 @@ public class CFGSongNameEngine extends AbstractSongNameEngine {
     /**
      * Recursively replaces all variables in the given string by a randomly chosen value from the corresponding variable map values.
      *
-     * @param random the random generator to use
      * @param string the string to perform replacements in
      * @param variableMap the variable map
+     * @param random the random generator to use
      *
      * @return the string with all variables replaced
      */
 
-    public static String replaceVariables(Random random, String string, Map<String, RandomStrings> variableMap) {
+    public static String replaceVariables(String string, Map<String, RandomStrings> variableMap, Random random) {
         if (string.indexOf('$') < 0) {
             // string contains no variables, return it unchanged
             return string;
@@ -114,7 +114,7 @@ public class CFGSongNameEngine extends AbstractSongNameEngine {
 
         matcher.appendTail(sb);
 
-        return replaceVariables(random, sb.toString(), variableMap);
+        return replaceVariables(sb.toString(), variableMap, random);
     }
 
     public Map<String, RandomStrings> getVariableMap() {
@@ -129,7 +129,7 @@ public class CFGSongNameEngine extends AbstractSongNameEngine {
      * Container for random strings.
      */
 
-    private static class RandomStrings {
+    protected static class RandomStrings {
         /** The array of strings. */
         private String[] strings;
 

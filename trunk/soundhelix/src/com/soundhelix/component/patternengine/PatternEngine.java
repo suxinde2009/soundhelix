@@ -1,23 +1,22 @@
 package com.soundhelix.component.patternengine;
 
+import com.soundhelix.misc.Component;
 import com.soundhelix.misc.Pattern;
-import com.soundhelix.misc.RandomSeedable;
-import com.soundhelix.misc.XMLConfigurable;
 
 /**
  * Represents a generator for patterns.
- * 
+ *
  * @see com.soundhelix.misc.Pattern
- * 
+ *
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
-public interface PatternEngine extends XMLConfigurable, RandomSeedable {
+public interface PatternEngine extends Component {
     /**
      * Generates a pattern.
-     * 
+     *
      * @param wildcardString the string containing the wildcard characters
-     * 
+     *
      * @return the pattern entry
      */
 

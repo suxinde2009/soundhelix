@@ -1,8 +1,7 @@
 package com.soundhelix.component.player;
 
 import com.soundhelix.misc.Arrangement;
-import com.soundhelix.misc.RandomSeedable;
-import com.soundhelix.misc.XMLConfigurable;
+import com.soundhelix.misc.Component;
 
 /**
  * Represents an interface for playing Arrangements. A player's task usually is to play the arrangement in real-time.
@@ -12,7 +11,7 @@ import com.soundhelix.misc.XMLConfigurable;
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
-public interface Player extends XMLConfigurable, RandomSeedable {
+public interface Player extends Component {
     /**
      * Opens all required resources for playing.
      */

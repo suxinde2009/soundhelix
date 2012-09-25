@@ -133,6 +133,9 @@ public class MidiPlayer extends AbstractPlayer {
     /** Contains the pattern position currently played by a voice of an arrangement entry. */
     private List<int[]> posList;
 
+    /** The template for MIDI filenames. */
+    private String midiFilename;
+    
     /**
      * Contains the pitch used when the last note was played by a voice of an arrangement entry. This is used to be able to change the
      * transposition while playing and still being able to send the correct NOTE_OFF pitches.
@@ -371,7 +374,9 @@ public class MidiPlayer extends AbstractPlayer {
         Arrangement arrangement = this.arrangement;
         
         try {
-            saveMidiFiles(arrangement);
+            if (midiFilename != null) {
+                saveMidiFiles(arrangement);
+            }
             
             Structure structure = arrangement.getStructure();
             int ticksPerBeat = structure.getTicksPerBeat();
@@ -741,9 +746,13 @@ public class MidiPlayer extends AbstractPlayer {
         }
         
         for (Device device : devices) {
-            File f = new File(device.midiFilename);
-            MidiSystem.write(sequenceMap.get(device), 1, new File(device.midiFilename));
-            logger.debug("Wrote MIDI data for device \"" + device.name + "\" to MIDI file \"" + device.midiFilename + "\" (" + f.length() + " bytes)");
+            Map<String, String> auxMap = new HashMap<String, String>();
+            auxMap.put("deviceName", device.name);
+            String midiFilename = replacePlaceholders(this.midiFilename, auxMap);
+            
+            File file = new File(midiFilename);
+            MidiSystem.write(sequenceMap.get(device), 1, file);
+            logger.debug("Wrote MIDI data for device \"" + device.name + "\" to MIDI file \"" + midiFilename + "\" (" + file.length() + " bytes)");
         }
     }
     
@@ -1269,34 +1278,62 @@ public class MidiPlayer extends AbstractPlayer {
         return null;
     }
 
-    private String replacePlaceholders(String string) {
-        Structure structure = arrangement.getStructure();
+    /**
+     * Takes the given string and replaces all valid placeholders with their values. 
+     * 
+     * @param string the string
+     * 
+     * @return the string with replaced placeholders
+     */
 
+    private String replacePlaceholders(String string) {
+        return replacePlaceholders(string, null);
+    }
+    
+    /**
+     * Takes the given string and replaces all valid placeholders with their values. Additional placeholders can be provided in the auxiliary
+     * map.
+     * 
+     * @param string the string
+     * @param auxMap the auxiliary map
+     * 
+     * @return the string with replaced placeholders
+     */
+    
+    private String replacePlaceholders(String string, Map<String, String> auxMap) {
+        Structure structure = arrangement.getStructure();
         String songName = structure.getSongName();
-        String safeSongName = UNSAFE_CHARACTER_PATTERN.matcher(songName).replaceAll("_");
 
         string = string.replace("${songName}", songName);
-        string = string.replace("${safeSongName}", safeSongName);
+        string = string.replace("${safeSongName}", UNSAFE_CHARACTER_PATTERN.matcher(songName).replaceAll("_"));
         string = string.replace("${randomSeed}", String.valueOf(structure.getRandomSeed()));
+        string = string.replace("${safeRandomSeed}", String.valueOf(structure.getRandomSeed()));
 
+        if (auxMap != null) {
+            for (Map.Entry<String, String> entry : auxMap.entrySet()) {
+                string = string.replace("${" + entry.getKey() + "}", entry.getValue());
+                string = string.replace("${safe" + (Character.toUpperCase(entry.getKey().charAt(0))) + entry.getKey().substring(1) + "}",
+                        UNSAFE_CHARACTER_PATTERN.matcher(entry.getValue()).replaceAll("_"));
+            }
+        }
+        
         return string;
     }
 
     public final void configure(Node node, XPath xpath) throws XPathException {
         random = new Random(randomSeed);
 
+        setMidiFilename(XMLUtils.parseString(random, (Node) xpath.evaluate("midiFilename", node, XPathConstants.NODE), xpath));
+        
         NodeList nodeList = (NodeList) xpath.evaluate("device", node, XPathConstants.NODESET);
         int entries = nodeList.getLength();
         Device[] devices = new Device[entries];
 
-        String prefix = "midifiles/midifile-" + System.nanoTime() + "-";
-        String suffix = ".mid";
-        
         for (int i = 0; i < entries; i++) {
             String name = (String) xpath.evaluate("attribute::name", nodeList.item(i), XPathConstants.STRING);
             String midiName = XMLUtils.parseString(random, nodeList.item(i), xpath);
-            boolean useClockSynchronization = XMLUtils.parseBoolean(random, "attribute::clockSynchronization", nodeList.item(i), xpath);
-            devices[i] = new Device(name, midiName, useClockSynchronization, prefix + (i + 1) + suffix);
+            boolean useClockSynchronization = XMLUtils.parseBoolean(random, "attribute::clockSynchronization", nodeList.item(i), xpath);           
+            devices[i] = new Device(name, midiName, useClockSynchronization);
         }
 
         beforePlayCommands = XMLUtils.parseString(random, (Node) xpath.evaluate("beforePlayCommands", node, XPathConstants.NODE), xpath);
@@ -1558,16 +1595,13 @@ public class MidiPlayer extends AbstractPlayer {
         /** The MIDI device. */
         private MidiDevice midiDevice;
 
-        /** The MIDI filename (can be null). */
-        private String midiFilename;
-        
         /** The MIDI receiver. */
         private Receiver receiver;
 
         /** Flag for using MIDI clock synchronization. */
         private boolean useClockSynchronization;
 
-        public Device(String name, String midiName, boolean useClockSynchronization, String midiFilename) {
+        public Device(String name, String midiName, boolean useClockSynchronization) {
             if (name == null || name.equals("")) {
                 throw new IllegalArgumentException("Name must not be null or empty");
             }
@@ -1579,7 +1613,6 @@ public class MidiPlayer extends AbstractPlayer {
             this.name = name;
             this.midiName = midiName;
             this.useClockSynchronization = useClockSynchronization;
-            this.midiFilename = midiFilename;
         }
 
         /**
@@ -1718,6 +1751,10 @@ public class MidiPlayer extends AbstractPlayer {
             this.parameter = parameter;
             this.byteCount = byteCount;
         }
+    }
+
+    public void setMidiFilename(String midiFilename) {
+        this.midiFilename = midiFilename;
     }
     
     

@@ -4,9 +4,9 @@ import java.security.AccessControlException;
 
 import org.apache.log4j.Logger;
 
+import com.soundhelix.component.player.Player;
+import com.soundhelix.component.player.impl.MidiPlayer;
 import com.soundhelix.misc.Structure;
-import com.soundhelix.player.MidiPlayer;
-import com.soundhelix.player.Player;
 import com.soundhelix.util.HarmonyEngineUtils;
 
 /**

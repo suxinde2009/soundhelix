@@ -9,7 +9,7 @@ import java.util.BitSet;
  *
  * An ActivityVector must always span the whole length of a song.
  *
- * @see com.soundhelix.sequenceengine.SequenceEngine
+ * @see com.soundhelix.component.sequenceengine.SequenceEngine
  *
  * @author Thomas Schuerger (thomas@schuerger.com)
  */

@@ -33,8 +33,8 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.spi.LoggingEvent;
 
-import com.soundhelix.player.MidiPlayer;
-import com.soundhelix.player.Player;
+import com.soundhelix.component.player.Player;
+import com.soundhelix.component.player.impl.MidiPlayer;
 import com.soundhelix.remotecontrol.SwingRemoteControl;
 import com.soundhelix.remotecontrol.TextRemoteControl;
 import com.soundhelix.util.SongUtils;

@@ -129,7 +129,7 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
             melodyIndexMap.put(section, melodyIndex);
         }
 
-        Track track = new Track(TrackType.MELODY);
+        Track track = new Track(TrackType.MELODIC);
         track.add(seq);
         return track;
     }

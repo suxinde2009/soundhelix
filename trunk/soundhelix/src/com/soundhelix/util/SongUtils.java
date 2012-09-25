@@ -25,13 +25,13 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
-import com.soundhelix.arrangementengine.ArrangementEngine;
+import com.soundhelix.component.arrangementengine.ArrangementEngine;
+import com.soundhelix.component.harmonyengine.HarmonyEngine;
+import com.soundhelix.component.player.Player;
+import com.soundhelix.component.songnameengine.SongNameEngine;
 import com.soundhelix.constants.BuildConstants;
-import com.soundhelix.harmonyengine.HarmonyEngine;
 import com.soundhelix.misc.Arrangement;
 import com.soundhelix.misc.Structure;
-import com.soundhelix.player.Player;
-import com.soundhelix.songnameengine.SongNameEngine;
 
 /**
  * Provides static convenience methods for creating a song.

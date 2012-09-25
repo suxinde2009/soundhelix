@@ -12,8 +12,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import com.soundhelix.player.MidiPlayer;
-import com.soundhelix.player.Player;
+import com.soundhelix.component.player.Player;
+import com.soundhelix.component.player.impl.MidiPlayer;
 import com.soundhelix.remotecontrol.ConsoleRemoteControl;
 import com.soundhelix.remotecontrol.RemoteControl;
 import com.soundhelix.util.SongUtils;

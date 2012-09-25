@@ -1,6 +1,6 @@
 package com.soundhelix.misc;
 
-import com.soundhelix.harmonyengine.HarmonyEngine;
+import com.soundhelix.component.harmonyengine.HarmonyEngine;
 
 /**
  * Defines the logical structure of a song. The logical structure consists of the song's signature (internal note quantization) and the HarmonyEngine.

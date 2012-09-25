@@ -422,8 +422,8 @@ public final class XMLUtils {
         }
 
         if (className.indexOf('.') < 0) {
-            // prefix the class name with the package name of the superclass
-            className = superclazz.getName().substring(0, superclazz.getName().lastIndexOf('.') + 1) + className;
+            // prefix the class name with the package name of the superclass plus ".impl"
+            className = superclazz.getName().substring(0, superclazz.getName().lastIndexOf('.') + 1) + "impl." + className;
         }
 
         boolean isSeedProvided = false;

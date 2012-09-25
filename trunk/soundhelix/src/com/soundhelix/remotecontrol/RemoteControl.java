@@ -1,6 +1,6 @@
 package com.soundhelix.remotecontrol;
 
-import com.soundhelix.player.Player;
+import com.soundhelix.component.player.Player;
 
 /**
  * Interface for remote-controlling a player.

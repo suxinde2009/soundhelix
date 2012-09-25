@@ -9,6 +9,9 @@ Change log
 
 0.5u:
 
+    - Added first version of the MIDI file export to the MidiPlayer. Use the tag "midiFilename" to define the MIDI filename template
+      for writing MIDI files (one for each MIDI device) between generating and playing a song.
+
     - Added arbitrary skipping support to the MidiPlayer, including backward skipping. Skipping is now done instantaneously, muting
       the MIDI channels first. Use "skip 0" to replay the current song from the beginning.
 

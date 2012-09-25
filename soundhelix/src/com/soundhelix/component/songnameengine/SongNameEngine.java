@@ -1,18 +1,17 @@
 package com.soundhelix.component.songnameengine;
 
-import com.soundhelix.misc.RandomSeedable;
-import com.soundhelix.misc.XMLConfigurable;
+import com.soundhelix.misc.Component;
 
 /**
  * Interface for song name engines.
- * 
+ *
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
-public interface SongNameEngine extends RandomSeedable, XMLConfigurable {
+public interface SongNameEngine extends Component {
     /**
      * Generates and returns a song name.
-     * 
+     *
      * @return a song name
      */
 

@@ -656,7 +656,7 @@ public class MidiPlayer extends AbstractPlayer {
                         SequenceEntry se = s.get(p[j]);
 
                         if (se.isNote()) {
-                            int pitch = (track.getType() == TrackType.MELODY ? transposition : 0) + se.getPitch();
+                            int pitch = (track.getType() == TrackType.MELODIC ? transposition : 0) + se.getPitch();
                             sendMidiMessage(channel, ShortMessage.NOTE_ON, pitch, getMidiVelocity(se.getVelocity()));
                             pitches[j] = pitch;
                         }
@@ -699,7 +699,7 @@ public class MidiPlayer extends AbstractPlayer {
                     SequenceEntry se = s.get(p[j]);
 
                     if (se.isNote()) {
-                        int pitch = (track.getType() == TrackType.MELODY ? transposition : 0) + se.getPitch();
+                        int pitch = (track.getType() == TrackType.MELODIC ? transposition : 0) + se.getPitch();
                         pitches[j] = pitch;
                     }
 

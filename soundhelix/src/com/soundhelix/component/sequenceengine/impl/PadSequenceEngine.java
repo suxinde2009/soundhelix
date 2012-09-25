@@ -83,7 +83,7 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
     public Track render(ActivityVector[] activityVectors) {
         ActivityVector activityVector = activityVectors[0];
 
-        Track track = new Track(TrackType.MELODY);
+        Track track = new Track(TrackType.MELODIC);
 
         for (int i = 0; i < voiceCount; i++) {
             track.add(new Sequence());

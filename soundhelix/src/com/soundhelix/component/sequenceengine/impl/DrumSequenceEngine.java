@@ -71,7 +71,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
     public Track render(ActivityVector[] activityVectors) {
         int drumEntryCount = drumEntries.length;
 
-        Track track = new Track(TrackType.RHYTHM);
+        Track track = new Track(TrackType.RHYTHMIC);
         Sequence[] seqs = new Sequence[drumEntryCount];
 
         for (int i = 0; i < drumEntryCount; i++) {

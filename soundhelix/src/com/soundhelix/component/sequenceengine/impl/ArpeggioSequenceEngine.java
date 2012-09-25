@@ -118,7 +118,7 @@ public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
             }
         }
 
-        Track track = new Track(TrackType.MELODY);
+        Track track = new Track(TrackType.MELODIC);
         track.add(seq);
 
         return track;

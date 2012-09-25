@@ -25,9 +25,9 @@ public class Track {
     /** The possible track types. */
     public static enum TrackType {
         /** The track contains melodic sequences, subject to transposition. */
-        MELODY,
+        MELODIC,
         /** The track contains fixed-pitch sequences, which must not be transposed. */
-        RHYTHM
+        RHYTHMIC
     }
 
     /** The track type. */
@@ -102,7 +102,7 @@ public class Track {
             return;
         }
 
-        if (type == TrackType.RHYTHM) {
+        if (type == TrackType.RHYTHMIC) {
             // non-zero transposition is forbidden for this type
             throw new IllegalArgumentException("Tracks of type RHYTHM must not be transposed");
         }

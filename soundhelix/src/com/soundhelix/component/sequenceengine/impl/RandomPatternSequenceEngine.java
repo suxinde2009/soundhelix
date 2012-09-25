@@ -89,7 +89,7 @@ public class RandomPatternSequenceEngine extends AbstractSequenceEngine {
             tick += len;
         }
 
-        Track track = new Track(TrackType.MELODY);
+        Track track = new Track(TrackType.MELODIC);
         track.add(seq);
         return track;
     }

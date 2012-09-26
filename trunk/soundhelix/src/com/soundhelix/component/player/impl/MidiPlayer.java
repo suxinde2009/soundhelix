@@ -744,15 +744,19 @@ public class MidiPlayer extends AbstractPlayer {
             
             tick++;
         }
-        
+      
+        int number = 1;
+ 
         for (Device device : devices) {
             Map<String, String> auxMap = new HashMap<String, String>();
             auxMap.put("deviceName", device.name);
+            auxMap.put("deviceNumber", String.valueOf(number));
             String midiFilename = replacePlaceholders(this.midiFilename, auxMap);
             
             File file = new File(midiFilename);
             MidiSystem.write(sequenceMap.get(device), 1, file);
             logger.debug("Wrote MIDI data for device \"" + device.name + "\" to MIDI file \"" + midiFilename + "\" (" + file.length() + " bytes)");
+            number++;
         }
     }
     

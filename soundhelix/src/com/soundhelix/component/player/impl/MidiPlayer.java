@@ -1554,8 +1554,8 @@ public class MidiPlayer extends AbstractPlayer {
     }
 
     /**
-     * Skips to the specified tick. This is done by temporarily setting the BPM to a high number until the specified tick has been reached. It is
-     * currently not possible to skip backwards in this player.
+     * Skips to the specified tick. This is done by muting all channels, resetting the player state and then silently
+     * fast-forwarding to the specified tick.
      *
      * @param tick the tick
      *
@@ -1563,10 +1563,13 @@ public class MidiPlayer extends AbstractPlayer {
      */
 
     public boolean skipToTick(int tick) {
-        this.skipToTick = tick;
-        skipEnabled = true;
-
-        return true;
+        if (tick < 0 || tick > arrangement.getStructure().getTicks()) {
+            return false;
+        } else {
+            this.skipToTick = tick;
+            skipEnabled = true;
+            return true;
+        }
     }
 
     public void abortPlay() {

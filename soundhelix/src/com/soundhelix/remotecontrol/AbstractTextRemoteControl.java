@@ -71,16 +71,20 @@ public abstract class AbstractTextRemoteControl implements TextRemoteControl {
                                 tick = Integer.parseInt(line.substring(5));
                             }
 
-                            if (tick < 0 || tick >= structure.getTicks()) {
+                            if (tick < 0 || tick > structure.getTicks()) {
                                 writeLine("Invalid tick to skip to selected");
                             } else {
                                 boolean success = player.skipToTick(tick);
 
                                 if (success) {
                                     int chordSection = HarmonyEngineUtils.getChordSectionNumber(structure, tick);
-                                    int chordSectionTick = tick - HarmonyEngineUtils.getChordSectionTick(structure, chordSection);
 
-                                    writeLine("Skipping to tick " + tick + " (tick " + chordSectionTick + " of chord section " + chordSection + ")");
+                                    if (chordSection >= 0) {
+                                        int chordSectionTick = tick - HarmonyEngineUtils.getChordSectionTick(structure, chordSection);
+                                        writeLine("Skipping to tick " + tick + " (tick " + chordSectionTick + " of chord section " + chordSection + ")");
+                                    } else {
+                                        writeLine("Skipping to tick " + tick);
+                                    }
                                 } else {
                                     writeLine("Skipping failed");
                                 }

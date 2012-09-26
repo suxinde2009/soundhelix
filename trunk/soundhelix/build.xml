@@ -7,7 +7,7 @@
     <property name="constantsclass" location="${build}/com/soundhelix/constants/BuildConstants.class"/>
     <property name="jar" location="SoundHelix.jar"/>
     <property name="javadoc" location="javadoc"/>
-
+    <property name="svnbaseurl" value="https://svn.code.sf.net/p/soundhelix/code"/>
     <property file="VERSION.txt"/>
     <property name="binzip" location="SoundHelix-${version}-bin.zip"/>
     <property name="srczip" location="SoundHelix-${version}-src.zip"/>
@@ -167,7 +167,7 @@
 
     <target name="createsvntag" description="create SVN tag for current trunk">
         <exec executable="svn">
-            <arg line="copy -m 'Created tag for release ${version}.' https://soundhelix.svn.sourceforge.net/svnroot/soundhelix/trunk/soundhelix https://soundhelix.svn.sourceforge.net/svnroot/soundhelix/tags/soundhelix-${version}"/>
+            <arg line="copy -m 'Created tag for release ${version}.' ${svnbaseurl}/trunk/soundhelix ${svnbaseurl}/tags/soundhelix-${version}"/>
         </exec>
     </target>
 </project>

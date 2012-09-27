@@ -15,7 +15,6 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathException;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
@@ -359,7 +358,7 @@ public final class SongUtils {
             return;
         }
 
-        String version = (String) xpath.evaluate("attribute::version", rootNode, XPathConstants.STRING);
+        String version = XMLUtils.parseString(null, "attribute::version", rootNode, xpath);
 
         if (version != null && !version.equals("")) {
             if (version.endsWith("+")) {

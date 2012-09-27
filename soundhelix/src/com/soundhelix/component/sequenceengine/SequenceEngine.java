@@ -1,7 +1,7 @@
 package com.soundhelix.component.sequenceengine;
 
+import com.soundhelix.component.Component;
 import com.soundhelix.misc.ActivityVector;
-import com.soundhelix.misc.Component;
 import com.soundhelix.misc.Structure;
 import com.soundhelix.misc.Track;
 

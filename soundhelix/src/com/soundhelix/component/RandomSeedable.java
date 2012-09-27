@@ -1,4 +1,4 @@
-package com.soundhelix.misc;
+package com.soundhelix.component;
 
 /**
  * Simple interface that adds random-seedability to a class. A class that implements this interface, but does not want to use it needs to supply at

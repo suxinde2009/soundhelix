@@ -1,4 +1,4 @@
-package com.soundhelix.misc;
+package com.soundhelix.component;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathException;

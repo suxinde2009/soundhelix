@@ -1,6 +1,6 @@
 package com.soundhelix.component.lfo;
 
-import com.soundhelix.misc.Component;
+import com.soundhelix.component.Component;
 
 /**
  * Represents a low frequency oscillator (LFO). The oscillator can run in one of four modes: synchronized to time (e.g, a full rotation every 5

@@ -1,4 +1,4 @@
-package com.soundhelix.misc;
+package com.soundhelix.component;
 
 /**
  * Convenience interface.

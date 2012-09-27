@@ -1,6 +1,6 @@
 package com.soundhelix.component.songnameengine;
 
-import com.soundhelix.misc.Component;
+import com.soundhelix.component.Component;
 
 /**
  * Interface for song name engines.

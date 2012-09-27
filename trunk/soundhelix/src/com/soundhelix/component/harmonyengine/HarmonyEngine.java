@@ -1,7 +1,7 @@
 package com.soundhelix.component.harmonyengine;
 
+import com.soundhelix.component.Component;
 import com.soundhelix.misc.Chord;
-import com.soundhelix.misc.Component;
 import com.soundhelix.misc.Structure;
 
 /**

@@ -1,6 +1,6 @@
 package com.soundhelix.component.patternengine;
 
-import com.soundhelix.misc.Component;
+import com.soundhelix.component.Component;
 import com.soundhelix.misc.Pattern;
 
 /**

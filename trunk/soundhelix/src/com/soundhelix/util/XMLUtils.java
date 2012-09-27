@@ -9,8 +9,8 @@ import javax.xml.xpath.XPathException;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Node;
 
-import com.soundhelix.misc.RandomSeedable;
-import com.soundhelix.misc.XMLConfigurable;
+import com.soundhelix.component.RandomSeedable;
+import com.soundhelix.component.XMLConfigurable;
 
 /**
  * Implements some static methods for parsing XML data.

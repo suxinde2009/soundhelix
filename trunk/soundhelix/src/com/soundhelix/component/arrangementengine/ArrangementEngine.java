@@ -1,7 +1,7 @@
 package com.soundhelix.component.arrangementengine;
 
+import com.soundhelix.component.Component;
 import com.soundhelix.misc.Arrangement;
-import com.soundhelix.misc.Component;
 import com.soundhelix.misc.Structure;
 
 /**

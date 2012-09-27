@@ -29,14 +29,16 @@ Change log
       syntax (e.g., "C7" for C major seventh, "Am76" for A minor seventh, second inversion).
 
     - Added the tags "precondition" and "postcondition" to the "conditionalPattern" tag of the DrumSequenceEngine, which
-      replace the "condition" tag and have a much more user-friendly syntax for specifying the condition. The "condition"
-      tag is deprecated, but can still be used.
+      replace the "condition" tag and have a much more user-friendly syntax for specifying the condition. For example, instead
+      of the old ugly syntax like "0--10>1--10", you can now use something like "-base,+clap,-snare" as the precondition and
+      "+base,+clap,-snare" as the postcondition. The "condition" tag is deprecated, but can still be used.
 
     - Added LinearRandomLFO, which is an LFO that linearly interpolates between a given number of random values.
 
-    - Added usage of GNU Getopt for cleaner parameter parsing. Run "java -jar SoundHelix.jar -h" to see the details. Note that
-      the syntax of the start script parameters (run.bat and run.sh) have been changed as well. Run "run.sh -h" or "run.bat -h"
-      to see the details. You can still run the two scripts without parameters to run SoundHelix with the default XML file.
+    - Added usage of GNU Getopt 1.0.14 for cleaner parameter parsing. Run "java -jar SoundHelix.jar -h" to see the details.
+      Note that the syntax of the start script parameters (run.bat and run.sh) have been changed as well. Run "run.sh -h"
+      or "run.bat -h" to see the details. You can still run the two scripts without parameters to run SoundHelix with the default
+      XML file.
 
     - Added the possibility to list all available MIDI devices with MIDI IN by starting SoundHelix with the "-m" option.
 

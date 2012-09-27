@@ -5,9 +5,11 @@ import java.util.Random;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathException;
+import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import com.soundhelix.component.RandomSeedable;
 import com.soundhelix.component.XMLConfigurable;
@@ -30,6 +32,38 @@ public final class XMLUtils {
      */
 
     private XMLUtils() {
+    }
+
+    /**
+     * Returns the node found at the given path.
+     *
+     * @param path the path
+     * @param node the node
+     * @param xpath an XPath instance
+     *
+     * @return the node list
+     *
+     * @throws XPathExpressionException in case of an XPath expression problem
+     */
+
+    public static Node getNode(String path, Node node, XPath xpath) throws XPathExpressionException {
+        return XMLUtils.getNode(path, node, xpath);
+    }
+
+    /**
+     * Returns the node list found at the given path.
+     *
+     * @param path the path
+     * @param node the node
+     * @param xpath an XPath instance
+     *
+     * @return the node list
+     *
+     * @throws XPathExpressionException in case of an XPath expression problem
+     */
+
+    public static NodeList getNodeList(String path, Node node, XPath xpath) throws XPathExpressionException {
+        return (NodeList) xpath.evaluate(path, node, XPathConstants.NODESET);
     }
 
     /**
@@ -66,7 +100,7 @@ public final class XMLUtils {
 
     public static int parseInteger(Random random, String path, Node parentNode, XPath xpath) {
         try {
-            Node node = (Node) xpath.evaluate(path, parentNode, XPathConstants.NODE);
+            Node node = XMLUtils.getNode(path, parentNode, xpath);
 
             if (node == null) {
                 throw new RuntimeException("Path \"" + path + "\" not found within node " + parentNode.getNodeName());
@@ -159,7 +193,7 @@ public final class XMLUtils {
 
     public static double parseDouble(Random random, String path, Node parentNode, XPath xpath) {
         try {
-            Node node = (Node) xpath.evaluate(path, parentNode, XPathConstants.NODE);
+            Node node = XMLUtils.getNode(path, parentNode, xpath);
 
             if (node == null) {
                 throw new RuntimeException("Path \"" + path + "\" not found within node " + parentNode.getNodeName());
@@ -188,7 +222,7 @@ public final class XMLUtils {
 
     public static boolean parseBoolean(Random random, String path, Node parentNode, XPath xpath) {
         try {
-            Node node = (Node) xpath.evaluate(path, parentNode, XPathConstants.NODE);
+            Node node = XMLUtils.getNode(path, parentNode, xpath);
 
             if (node == null) {
                 throw new RuntimeException("Path \"" + path + "\" not found within node " + parentNode.getNodeName());
@@ -249,12 +283,7 @@ public final class XMLUtils {
 
     public static String parseString(Random random, String path, Node parentNode, XPath xpath) {
         try {
-            Node node = (Node) xpath.evaluate(path, parentNode, XPathConstants.NODE);
-
-            if (node == null) {
-                throw new RuntimeException("Path \"" + path + "\" not found within node " + parentNode.getNodeName());
-            }
-
+            Node node = XMLUtils.getNode(path, parentNode, xpath);
             return XMLUtils.parseString(random, node, xpath);
         } catch (Exception e) {
             throw new RuntimeException("Error parsing string", e);
@@ -275,7 +304,7 @@ public final class XMLUtils {
 
     public static String[] parseStringList(Random random, String path, Node parentNode, char separatorChar, XPath xpath) {
         try {
-            Node node = (Node) xpath.evaluate(path, parentNode, XPathConstants.NODE);
+            Node node = XMLUtils.getNode(path, parentNode, xpath);
 
             if (node == null) {
                 throw new RuntimeException("Path \"" + path + "\" not found within node " + parentNode.getNodeName());

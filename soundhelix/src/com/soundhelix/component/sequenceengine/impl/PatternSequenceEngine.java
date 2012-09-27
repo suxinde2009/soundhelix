@@ -31,7 +31,7 @@ public class PatternSequenceEngine extends AbstractMultiPatternSequenceEngine {
     public void configure(Node node, XPath xpath) throws XPathException {
         random = new Random(randomSeed);
 
-        NodeList nodeList = (NodeList) xpath.evaluate("patternEngine", node, XPathConstants.NODESET);
+        NodeList nodeList = XMLUtils.getNodeList("patternEngine", node, xpath);
 
         if (nodeList.getLength() == 0) {
             throw new RuntimeException("Need at least 1 patternEngine");

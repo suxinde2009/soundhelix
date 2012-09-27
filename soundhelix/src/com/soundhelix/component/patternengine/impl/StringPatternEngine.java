@@ -29,7 +29,7 @@ public class StringPatternEngine extends AbstractPatternEngine {
     public void configure(Node node, XPath xpath) throws XPathException {
         Random random = new Random(randomSeed);
 
-        NodeList nodeList = (NodeList) xpath.evaluate("string", node, XPathConstants.NODESET);
+        NodeList nodeList = XMLUtils.getNodeList("string", node, xpath);
 
         if (nodeList.getLength() == 0) {
             throw new RuntimeException("Need at least 1 pattern string");

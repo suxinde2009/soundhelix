@@ -53,7 +53,7 @@ public class ChordSequenceEngine extends MultiPatternSequenceEngine {
         } catch (Exception e) {
         }
 
-        NodeList nodeList = (NodeList) xpath.evaluate("patternEngine", node, XPathConstants.NODESET);
+        NodeList nodeList = XMLUtils.getNodeList("patternEngine", node, xpath);
 
         if (nodeList.getLength() == 0) {
             throw new RuntimeException("Need at least 1 pattern");

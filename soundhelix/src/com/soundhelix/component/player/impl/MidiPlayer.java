@@ -135,7 +135,7 @@ public class MidiPlayer extends AbstractPlayer {
 
     /** The template for MIDI filenames. */
     private String midiFilename;
-    
+
     /**
      * Contains the pitch used when the last note was played by a voice of an arrangement entry. This is used to be able to change the
      * transposition while playing and still being able to send the correct NOTE_OFF pitches.
@@ -143,7 +143,7 @@ public class MidiPlayer extends AbstractPlayer {
     private List<int[]> pitchList;
 
     private static Map<String, MidiController> midiControllerMap;
-    
+
     static {
         midiControllerMap = new HashMap<String, MidiController>();
 
@@ -163,7 +163,7 @@ public class MidiPlayer extends AbstractPlayer {
         midiControllerMap.put("attackTime", new MidiController(ShortMessage.CONTROL_CHANGE, 73, 1));
         midiControllerMap.put("brightness", new MidiController(ShortMessage.CONTROL_CHANGE, 74, 1));
     }
-    
+
     /**
      * Opens all MIDI devices.
      */
@@ -372,12 +372,12 @@ public class MidiPlayer extends AbstractPlayer {
         }
 
         Arrangement arrangement = this.arrangement;
-        
+
         try {
             if (midiFilename != null) {
                 saveMidiFiles(arrangement);
             }
-            
+
             Structure structure = arrangement.getStructure();
             int ticksPerBeat = structure.getTicksPerBeat();
             int ticks = structure.getTicks();
@@ -615,7 +615,7 @@ public class MidiPlayer extends AbstractPlayer {
 
         Map<Device, javax.sound.midi.Sequence> sequenceMap = new HashMap<Device, javax.sound.midi.Sequence>();
         Map<Device, javax.sound.midi.Track> trackMap = new HashMap<Device, javax.sound.midi.Track>();
-        
+
         for (Device device : devices) {
             javax.sound.midi.Sequence s =  new javax.sound.midi.Sequence(javax.sound.midi.Sequence.PPQ, ticksPerBeat);
             sequenceMap.put(device, s);
@@ -623,12 +623,12 @@ public class MidiPlayer extends AbstractPlayer {
             trackMap.put(device, s.createTrack());
 
             long mpqn = 60000000000L / milliBPM;
-            
+
             MetaMessage mt = new MetaMessage();
             byte[] bt = {(byte) ((mpqn / 65536) & 0xFF), (byte) ((mpqn / 256) & 0xFF), (byte) (mpqn & 0xFF)};
             mt.setMessage(0x51, bt, 3);
             metaTrack.add(new MidiEvent(mt, 0L));
-            
+
             mt = new MetaMessage();
             bt = structure.getSongName().getBytes("ISO-8859-1");
             mt.setMessage(0x01, bt, bt.length);
@@ -639,7 +639,7 @@ public class MidiPlayer extends AbstractPlayer {
             mt.setMessage(0x02, bt, bt.length);
             metaTrack.add(new MidiEvent(mt, 0L));
         }
-        
+
         Map<DeviceChannel, Boolean> map = new HashMap<DeviceChannel, Boolean>();
         Iterator<DeviceChannel> i = channelMap.values().iterator();
 
@@ -651,7 +651,7 @@ public class MidiPlayer extends AbstractPlayer {
                 map.put(dc, true);
             }
         }
-        
+
         resetPlayerState(arrangement);
 
         // contains a list of all current pitches where a NOTE_OFF must be sent after the next NOTE_ON (usually tiny)
@@ -664,7 +664,7 @@ public class MidiPlayer extends AbstractPlayer {
 
         while (tick < ticks) {
             sendControllerLFOMessages(trackMap, tick);
-            
+
             int k = 0;
 
             for (ArrangementEntry entry : arrangement) {
@@ -741,25 +741,25 @@ public class MidiPlayer extends AbstractPlayer {
 
                 k++;
             }
-            
+
             tick++;
         }
-      
+
         int number = 1;
- 
+
         for (Device device : devices) {
             Map<String, String> auxMap = new HashMap<String, String>();
             auxMap.put("deviceName", device.name);
             auxMap.put("deviceNumber", String.valueOf(number));
             String midiFilename = replacePlaceholders(this.midiFilename, auxMap);
-            
+
             File file = new File(midiFilename);
             MidiSystem.write(sequenceMap.get(device), 1, file);
             logger.debug("Wrote MIDI data for device \"" + device.name + "\" to MIDI file \"" + midiFilename + "\" (" + file.length() + " bytes)");
             number++;
         }
     }
-    
+
     /**
      * Plays a tick, sending NOTE_OFF messages for notes that should be muted and NOTE_ON messages for notes that should be started.
      *
@@ -969,7 +969,7 @@ public class MidiPlayer extends AbstractPlayer {
                     this.milliBPM = value;
                 } else {
                     MidiController midiController = midiControllerMap.get(controller);
-                    
+
                     if (midiController != null) {
                         if (midiController.parameter == -1 && midiController.byteCount == 2) {
                             sendMidiMessage(device, clfo.channel, midiController.status, value % 128, value / 128);
@@ -987,14 +987,14 @@ public class MidiPlayer extends AbstractPlayer {
             }
         }
     }
-    
+
     /**
      * Sends messages to all configured controllers based on the LFOs. A message is only send to a controller if its LFO value has changed or if tick
      * is 0.
-     * 
+     *
      * @param trackMap the map that maps devices to MIDI tracks
      * @param tick the tick
-     * 
+     *
      * @throws InvalidMidiDataException in case of invalid MIDI data
      */
 
@@ -1010,17 +1010,17 @@ public class MidiPlayer extends AbstractPlayer {
                 javax.sound.midi.Track track = trackMap.get(device);
 
                 if (controller.equals("milliBPM")) {
-                    long mpqn = 60000000000L / value;                    
+                    long mpqn = 60000000000L / value;
                     MetaMessage mt = new MetaMessage();
                     byte[] bt = {(byte) ((mpqn / 65536) & 0xFF), (byte) ((mpqn / 256) & 0xFF), (byte) (mpqn & 0xFF)};
                     mt.setMessage(0x51, bt, 3);
-                    
+
                     for (Device d : devices) {
                         trackMap.get(d).add(new MidiEvent(mt, (long) tick + 1));
                     }
                 } else {
                     MidiController midiController = midiControllerMap.get(controller);
-                    
+
                     if (midiController != null) {
                         if (midiController.parameter == -1 && midiController.byteCount == 2) {
                             sendMidiMessage(track, tick, clfo.channel, midiController.status, value % 128, value / 128);
@@ -1283,27 +1283,27 @@ public class MidiPlayer extends AbstractPlayer {
     }
 
     /**
-     * Takes the given string and replaces all valid placeholders with their values. 
-     * 
+     * Takes the given string and replaces all valid placeholders with their values.
+     *
      * @param string the string
-     * 
+     *
      * @return the string with replaced placeholders
      */
 
     private String replacePlaceholders(String string) {
         return replacePlaceholders(string, null);
     }
-    
+
     /**
      * Takes the given string and replaces all valid placeholders with their values. Additional placeholders can be provided in the auxiliary
      * map.
-     * 
+     *
      * @param string the string
      * @param auxMap the auxiliary map
-     * 
+     *
      * @return the string with replaced placeholders
      */
-    
+
     private String replacePlaceholders(String string, Map<String, String> auxMap) {
         Structure structure = arrangement.getStructure();
         String songName = structure.getSongName();
@@ -1320,38 +1320,39 @@ public class MidiPlayer extends AbstractPlayer {
                         UNSAFE_CHARACTER_PATTERN.matcher(entry.getValue()).replaceAll("_"));
             }
         }
-        
+
         return string;
     }
 
     public final void configure(Node node, XPath xpath) throws XPathException {
         random = new Random(randomSeed);
 
-        setMidiFilename(XMLUtils.parseString(random, (Node) xpath.evaluate("midiFilename", node, XPathConstants.NODE), xpath));
-        
-        NodeList nodeList = (NodeList) xpath.evaluate("device", node, XPathConstants.NODESET);
+        setMidiFilename(XMLUtils.parseString(random, XMLUtils.getNode("midiFilename", node, xpath), xpath));
+        setMidiFilename(XMLUtils.parseString(random, "midiFilename", node, xpath));
+
+        NodeList nodeList = XMLUtils.getNodeList("device", node, xpath);
         int entries = nodeList.getLength();
         Device[] devices = new Device[entries];
 
         for (int i = 0; i < entries; i++) {
             String name = (String) xpath.evaluate("attribute::name", nodeList.item(i), XPathConstants.STRING);
             String midiName = XMLUtils.parseString(random, nodeList.item(i), xpath);
-            boolean useClockSynchronization = XMLUtils.parseBoolean(random, "attribute::clockSynchronization", nodeList.item(i), xpath);           
+            boolean useClockSynchronization = XMLUtils.parseBoolean(random, "attribute::clockSynchronization", nodeList.item(i), xpath);
             devices[i] = new Device(name, midiName, useClockSynchronization);
         }
 
-        beforePlayCommands = XMLUtils.parseString(random, (Node) xpath.evaluate("beforePlayCommands", node, XPathConstants.NODE), xpath);
+        beforePlayCommands = XMLUtils.parseString(random, "beforePlayCommands", node, xpath);
 
-        afterPlayCommands = XMLUtils.parseString(random, (Node) xpath.evaluate("afterPlayCommands", node, XPathConstants.NODE), xpath);
+        afterPlayCommands = XMLUtils.parseString(random, "afterPlayCommands", node, xpath);
 
         setDevices(devices);
-        setMilliBPM((int) (1000 * XMLUtils.parseInteger(random, (Node) xpath.evaluate("bpm", node, XPathConstants.NODE), xpath)));
-        setTransposition(XMLUtils.parseInteger(random, (Node) xpath.evaluate("transposition", node, XPathConstants.NODE), xpath));
-        setGroove(XMLUtils.parseString(random, (Node) xpath.evaluate("groove", node, XPathConstants.NODE), xpath));
-        setBeforePlayWaitTicks(XMLUtils.parseInteger(random, (Node) xpath.evaluate("beforePlayWaitTicks", node, XPathConstants.NODE), xpath));
-        setAfterPlayWaitTicks(XMLUtils.parseInteger(random, (Node) xpath.evaluate("afterPlayWaitTicks", node, XPathConstants.NODE), xpath));
+        setMilliBPM((int) (1000 * XMLUtils.parseInteger(random, "bpm", node, xpath)));
+        setTransposition(XMLUtils.parseInteger(random, "transposition", node, xpath));
+        setGroove(XMLUtils.parseString(random, "groove", node, xpath));
+        setBeforePlayWaitTicks(XMLUtils.parseInteger(random, "beforePlayWaitTicks", node, xpath));
+        setAfterPlayWaitTicks(XMLUtils.parseInteger(random, "afterPlayWaitTicks", node, xpath));
 
-        nodeList = (NodeList) xpath.evaluate("map", node, XPathConstants.NODESET);
+        nodeList = XMLUtils.getNodeList("map", node, xpath);
         entries = nodeList.getLength();
 
         Map<String, DeviceChannel> channelMap = new HashMap<String, DeviceChannel>();
@@ -1382,7 +1383,7 @@ public class MidiPlayer extends AbstractPlayer {
 
         setChannelMap(channelMap);
 
-        nodeList = (NodeList) xpath.evaluate("controllerLFO", node, XPathConstants.NODESET);
+        nodeList = XMLUtils.getNodeList("controllerLFO", node, xpath);
         entries = nodeList.getLength();
         ControllerLFO[] controllerLFOs = new ControllerLFO[entries];
 
@@ -1395,13 +1396,13 @@ public class MidiPlayer extends AbstractPlayer {
             boolean usesLegacyTags = false;
 
             try {
-                minAmplitude = XMLUtils.parseInteger(random, (Node) xpath.evaluate("minimum", nodeList.item(i), XPathConstants.NODE), xpath);
+                minAmplitude = XMLUtils.parseInteger(random, "minimum", nodeList.item(i), xpath);
                 usesLegacyTags = true;
             } catch (Exception e) {
             }
 
             try {
-                maxAmplitude = XMLUtils.parseInteger(random, (Node) xpath.evaluate("maximum", nodeList.item(i), XPathConstants.NODE), xpath);
+                maxAmplitude = XMLUtils.parseInteger(random, "maximum", nodeList.item(i), xpath);
                 usesLegacyTags = true;
             } catch (Exception e) {
             }
@@ -1412,12 +1413,12 @@ public class MidiPlayer extends AbstractPlayer {
             }
 
             try {
-                minAmplitude = XMLUtils.parseInteger(random, (Node) xpath.evaluate("minAmplitude", nodeList.item(i), XPathConstants.NODE), xpath);
+                minAmplitude = XMLUtils.parseInteger(random, "minAmplitude", nodeList.item(i), xpath);
             } catch (Exception e) {
             }
 
             try {
-                maxAmplitude = XMLUtils.parseInteger(random, (Node) xpath.evaluate("maxAmplitude", nodeList.item(i), XPathConstants.NODE), xpath);
+                maxAmplitude = XMLUtils.parseInteger(random, "maxAmplitude", nodeList.item(i), xpath);
             } catch (Exception e) {
             }
 
@@ -1426,12 +1427,12 @@ public class MidiPlayer extends AbstractPlayer {
             }
 
             try {
-                minValue = XMLUtils.parseInteger(random, (Node) xpath.evaluate("minValue", nodeList.item(i), XPathConstants.NODE), xpath);
+                minValue = XMLUtils.parseInteger(random, "minValue", nodeList.item(i), xpath);
             } catch (Exception e) {
             }
 
             try {
-                maxValue = XMLUtils.parseInteger(random, (Node) xpath.evaluate("maxValue", nodeList.item(i), XPathConstants.NODE), xpath);
+                maxValue = XMLUtils.parseInteger(random, "maxValue", nodeList.item(i), xpath);
             } catch (Exception e) {
             }
 
@@ -1439,30 +1440,30 @@ public class MidiPlayer extends AbstractPlayer {
                 throw new RuntimeException("minValue must be <= maxValue");
             }
 
-            double speed = XMLUtils.parseDouble(random, (Node) xpath.evaluate("speed", nodeList.item(i), XPathConstants.NODE), xpath);
+            double speed = XMLUtils.parseDouble(random, XMLUtils.getNode("speed", nodeList.item(i), xpath), xpath);
 
-            String controller = XMLUtils.parseString(random, (Node) xpath.evaluate("controller", nodeList.item(i), XPathConstants.NODE), xpath);
+            String controller = XMLUtils.parseString(random, "controller", nodeList.item(i), xpath);
 
             String device = null;
             int channel = -1;
 
             if (!controller.equals("milliBPM")) {
-                device = XMLUtils.parseString(random, (Node) xpath.evaluate("device", nodeList.item(i), XPathConstants.NODE), xpath);
-                channel = XMLUtils.parseInteger(random, (Node) xpath.evaluate("channel", nodeList.item(i), XPathConstants.NODE), xpath) - 1;
+                device = XMLUtils.parseString(random, "device", nodeList.item(i), xpath);
+                channel = XMLUtils.parseInteger(random, "channel", nodeList.item(i), xpath) - 1;
             }
 
-            String rotationUnit = XMLUtils.parseString(random, (Node) xpath.evaluate("rotationUnit", nodeList.item(i), XPathConstants.NODE), xpath);
+            String rotationUnit = XMLUtils.parseString(random, "rotationUnit", nodeList.item(i), xpath);
 
             double phase = 0.0d;
             String instrument = null;
 
             try {
-                phase = XMLUtils.parseDouble(random, (Node) xpath.evaluate("phase", nodeList.item(i), XPathConstants.NODE), xpath);
+                phase = XMLUtils.parseDouble(random, XMLUtils.getNode("phase", nodeList.item(i), xpath), xpath);
             } catch (Exception e) {
             }
 
             try {
-                instrument = XMLUtils.parseString(random, (Node) xpath.evaluate("instrument", nodeList.item(i), XPathConstants.NODE), xpath);
+                instrument = XMLUtils.parseString(random, "instrument", nodeList.item(i), xpath);
             } catch (Exception e) {
             }
 
@@ -1470,7 +1471,7 @@ public class MidiPlayer extends AbstractPlayer {
                 throw new RuntimeException("Rotation unit \"activity\" requires an instrument");
             }
 
-            Node lfoNode = (Node) xpath.evaluate("lfo", nodeList.item(i), XPathConstants.NODE);
+            Node lfoNode = XMLUtils.getNode("lfo", nodeList.item(i), xpath);
 
             LFO lfo;
 
@@ -1741,12 +1742,12 @@ public class MidiPlayer extends AbstractPlayer {
             this.phase = phase;
         }
     }
-    
+
     private static class MidiController {
         int status;
         int parameter;
         int byteCount;
-        
+
         public MidiController(int status, int byteCount) {
             this.status = status;
             this.parameter = -1;
@@ -1763,7 +1764,7 @@ public class MidiPlayer extends AbstractPlayer {
     public void setMidiFilename(String midiFilename) {
         this.midiFilename = midiFilename;
     }
-    
-    
-    
+
+
+
 }

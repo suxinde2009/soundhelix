@@ -301,7 +301,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
     public void configure(Node node, XPath xpath) throws XPathException {
         random = new Random(randomSeed);
 
-        NodeList nodeList = (NodeList) xpath.evaluate("pattern", node, XPathConstants.NODESET);
+        NodeList nodeList = XMLUtils.getNodeList("pattern", node, xpath);
         int patterns = nodeList.getLength();
 
         DrumEntry[] drumEntries = new DrumEntry[patterns];
@@ -313,7 +313,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
         for (int i = 0; i < patterns; i++) {
             int pitch = XMLUtils.parseInteger(random, "pitch", nodeList.item(i), xpath);
 
-            Node patternEngineNode = (Node) xpath.evaluate("patternEngine", nodeList.item(i), XPathConstants.NODE);
+            Node patternEngineNode = XMLUtils.getNode("patternEngine", nodeList.item(i), xpath);
 
             PatternEngine patternEngine;
 
@@ -329,7 +329,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
 
         setDrumEntries(drumEntries);
 
-        nodeList = (NodeList) xpath.evaluate("conditionalPattern", node, XPathConstants.NODESET);
+        nodeList = XMLUtils.getNodeList("conditionalPattern", node, xpath);
         patterns = nodeList.getLength();
 
         ConditionalEntry[] conditionalEntries = new ConditionalEntry[patterns];
@@ -406,7 +406,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
                 throw new RuntimeException("Skip value \"" + skipWhenNotApplied + "\" would skip out of conditonal pattern range");
             }
 
-            Node patternEngineNode = (Node) xpath.evaluate("patternEngine", nodeList.item(i), XPathConstants.NODE);
+            Node patternEngineNode = XMLUtils.getNode("patternEngine", nodeList.item(i), xpath);
 
             PatternEngine patternEngine;
 

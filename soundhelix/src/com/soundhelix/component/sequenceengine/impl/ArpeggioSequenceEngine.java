@@ -169,7 +169,7 @@ public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
     public void configure(Node node, XPath xpath) throws XPathException {
         Random random = new Random(randomSeed);
 
-        NodeList patternEnginesNodes = (NodeList) xpath.evaluate("patternEngines", node, XPathConstants.NODESET);
+        NodeList patternEnginesNodes = XMLUtils.getNodeList("patternEngines", node, xpath);
 
         int patternEnginesCount = patternEnginesNodes.getLength();
 
@@ -179,7 +179,7 @@ public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
 
         Node patternEnginesNode = patternEnginesNodes.item(random.nextInt(patternEnginesCount));
 
-        NodeList nodeList = (NodeList) xpath.evaluate("patternEngine", patternEnginesNode, XPathConstants.NODESET);
+        NodeList nodeList = XMLUtils.getNodeList("patternEngine", patternEnginesNode, xpath);
 
         if (nodeList.getLength() == 0) {
             throw new RuntimeException("Need at least 1 patternEngine");

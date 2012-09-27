@@ -341,7 +341,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
             crossoverPitch = XMLUtils.parseInteger(random, "crossoverPitch", node, xpath);
         } catch (Exception e) {}
 
-        NodeList nodeList = (NodeList) xpath.evaluate("chordPattern", node, XPathConstants.NODESET);
+        NodeList nodeList = XMLUtils.getNodeList("chordPattern", node, xpath);
         ChordPattern[] chordPatterns = new ChordPattern[nodeList.getLength()];
 
         for (int i = 0; i < nodeList.getLength(); i++) {
@@ -359,7 +359,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 
         setChordPatterns(chordPatterns);
 
-        nodeList = (NodeList) xpath.evaluate("chordRandomTable", node, XPathConstants.NODESET);
+        nodeList = XMLUtils.getNodeList("chordRandomTable", node, xpath);
         String[][] chordRandomTables = new String[nodeList.getLength()][];
 
         for (int i = 0; i < nodeList.getLength(); i++) {

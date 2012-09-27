@@ -47,7 +47,7 @@ public final class XMLUtils {
      */
 
     public static Node getNode(String path, Node node, XPath xpath) throws XPathExpressionException {
-        return XMLUtils.getNode(path, node, xpath);
+        return (Node) xpath.evaluate(path, node, XPathConstants.NODE);
     }
 
     /**

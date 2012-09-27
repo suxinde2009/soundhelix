@@ -1335,7 +1335,7 @@ public class MidiPlayer extends AbstractPlayer {
         Device[] devices = new Device[entries];
 
         for (int i = 0; i < entries; i++) {
-            String name = (String) xpath.evaluate("attribute::name", nodeList.item(i), XPathConstants.STRING);
+            String name = XMLUtils.parseString(random, "attribute::name", nodeList.item(i), xpath);
             String midiName = XMLUtils.parseString(random, nodeList.item(i), xpath);
             boolean useClockSynchronization = XMLUtils.parseBoolean(random, "attribute::clockSynchronization", nodeList.item(i), xpath);
             devices[i] = new Device(name, midiName, useClockSynchronization);
@@ -1358,9 +1358,9 @@ public class MidiPlayer extends AbstractPlayer {
         Map<String, DeviceChannel> channelMap = new HashMap<String, DeviceChannel>();
 
         for (int i = 0; i < entries; i++) {
-            String instrument = (String) xpath.evaluate("attribute::instrument", nodeList.item(i), XPathConstants.STRING);
-            String device = (String) xpath.evaluate("attribute::device", nodeList.item(i), XPathConstants.STRING);
-            int channel = Integer.parseInt((String) xpath.evaluate("attribute::channel", nodeList.item(i), XPathConstants.STRING)) - 1;
+            String instrument = XMLUtils.parseString(random, "attribute::instrument", nodeList.item(i), xpath);
+            String device = XMLUtils.parseString(random, "attribute::device", nodeList.item(i), xpath);
+            int channel = Integer.parseInt(XMLUtils.parseString(random, "attribute::channel", nodeList.item(i), xpath)) - 1;
 
             if (channelMap.containsKey(instrument)) {
                 throw new RuntimeException("Instrument " + instrument + " must not be re-mapped");
@@ -1373,7 +1373,7 @@ public class MidiPlayer extends AbstractPlayer {
             int program = -1;
 
             try {
-                program = Integer.parseInt((String) xpath.evaluate("attribute::program", nodeList.item(i), XPathConstants.STRING)) - 1;
+                program = Integer.parseInt(XMLUtils.parseString(random, "attribute::program", nodeList.item(i), xpath)) - 1;
             } catch (Exception e) {
             }
 

@@ -331,12 +331,12 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
         }
 
         try {
-            setMinPitch(XMLUtils.parseInteger(random, (Node) xpath.evaluate("minPitch", node, XPathConstants.NODE), xpath));
+            setMinPitch(XMLUtils.parseInteger(random, "minPitch", node, xpath));
         } catch (Exception e) {
         }
 
         try {
-            setMaxPitch(XMLUtils.parseInteger(random, (Node) xpath.evaluate("maxPitch", node, XPathConstants.NODE), xpath));
+            setMaxPitch(XMLUtils.parseInteger(random, "maxPitch", node, xpath));
         } catch (Exception e) {
         }
 
@@ -344,7 +344,7 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
             throw new RuntimeException("minPitch and maxPitch must be at least 5 halftones apart");
         }
 
-        NodeList nodeList = (NodeList) xpath.evaluate("patternEngine", node, XPathConstants.NODESET);
+        NodeList nodeList = XMLUtils.getNodeList("patternEngine", node, xpath);
 
         if (nodeList.getLength() == 0) {
             throw new RuntimeException("Need at least one pattern engine");

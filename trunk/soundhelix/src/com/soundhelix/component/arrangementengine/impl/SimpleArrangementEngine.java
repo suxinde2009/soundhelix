@@ -805,7 +805,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         int maxActivityChangeCount = XMLUtils.parseInteger(random, "maxActivityChangeCount", node, xpath);
         setMaxActivityChangeCount(maxActivityChangeCount);
 
-        NodeList nodeList = (NodeList) xpath.evaluate("activityVector", node, XPathConstants.NODESET);
+        NodeList nodeList = XMLUtils.getNodeList("activityVector", node, xpath);
 
         int activityVectorCount = nodeList.getLength();
 
@@ -923,11 +923,11 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
         setActivityVectorConfiguration(activityVectorConfigurationHashMap);
 
-        nodeList = (NodeList) xpath.evaluate("track[@solo=\"true\"]", node, XPathConstants.NODESET);
+        nodeList = XMLUtils.getNodeList("track[@solo=\"true\"]", node, xpath);
         int tracks = nodeList.getLength();
 
         if (tracks == 0) {
-            nodeList = (NodeList) xpath.evaluate("track", node, XPathConstants.NODESET);
+            nodeList = XMLUtils.getNodeList("track", node, xpath);
             tracks = nodeList.getLength();
 
             if (tracks == 0) {
@@ -951,9 +951,9 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
             } catch (Exception e) {
             }
 
-            Node sequenceEngineNode = (Node) xpath.evaluate("sequenceEngine", nodeList.item(i), XPathConstants.NODE);
+            Node sequenceEngineNode = XMLUtils.getNode("sequenceEngine", nodeList.item(i), xpath);
 
-            NodeList nameNodeList = (NodeList) xpath.evaluate("activityVector", nodeList.item(i), XPathConstants.NODESET);
+            NodeList nameNodeList = XMLUtils.getNodeList("activityVector", nodeList.item(i), xpath);
 
             String[] activityVectorNames = new String[nameNodeList.getLength()];
 

@@ -139,10 +139,10 @@ public final class SongUtils {
     private static Player createPlayer(Document doc, long randomSeed) throws InstantiationException, XPathException, IllegalAccessException,
             ClassNotFoundException {
         XPath xpath = XPathFactory.newInstance().newXPath();
-        Node rootNode = (Node) xpath.evaluate("/*", doc, XPathConstants.NODE);
+        Node rootNode = XMLUtils.getNode("/*", doc, xpath);
         checkVersion(rootNode, xpath);
 
-        Node songNameEngineNode = (Node) xpath.evaluate("songNameEngine", rootNode, XPathConstants.NODE);
+        Node songNameEngineNode = XMLUtils.getNode("songNameEngine", rootNode, xpath);
         SongNameEngine songNameEngine = XMLUtils.getInstance(SongNameEngine.class, songNameEngineNode, xpath, randomSeed, -1);
 
         String songName = songNameEngine.createSongName();
@@ -203,12 +203,12 @@ public final class SongUtils {
         XPath xpath = XPathFactory.newInstance().newXPath();
 
         // get the root element of the file (we don't care what it's called)
-        Node mainNode = (Node) xpath.evaluate("/*", doc, XPathConstants.NODE);
+        Node mainNode = XMLUtils.getNode("/*", doc, xpath);
 
-        Node structureNode = (Node) xpath.evaluate("structure", mainNode, XPathConstants.NODE);
-        Node harmonyEngineNode = (Node) xpath.evaluate("harmonyEngine", mainNode, XPathConstants.NODE);
-        Node arrangementEngineNode = (Node) xpath.evaluate("arrangementEngine", mainNode, XPathConstants.NODE);
-        Node playerNode = (Node) xpath.evaluate("player", mainNode, XPathConstants.NODE);
+        Node structureNode = XMLUtils.getNode("structure", mainNode, xpath);
+        Node harmonyEngineNode = XMLUtils.getNode("harmonyEngine", mainNode, xpath);
+        Node arrangementEngineNode = XMLUtils.getNode("arrangementEngine", mainNode, xpath);
+        Node playerNode = XMLUtils.getNode("player", mainNode, xpath);
 
         Random random = new Random(randomSeed);
 
@@ -340,7 +340,7 @@ public final class SongUtils {
 
     private static void checkVersion(Document doc) throws XPathExpressionException {
         XPath xpath = XPathFactory.newInstance().newXPath();
-        Node rootNode = (Node) xpath.evaluate("/*", doc, XPathConstants.NODE);
+        Node rootNode = XMLUtils.getNode("/*", doc, xpath);
         checkVersion(rootNode, xpath);
     }
 

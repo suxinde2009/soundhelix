@@ -55,7 +55,7 @@ public class CFGSongNameEngine extends AbstractSongNameEngine {
     public void configure(Node node, XPath xpath) throws XPathException {
         Random random = new Random(randomSeed);
 
-        NodeList nodeList = (NodeList) xpath.evaluate("variable", node, XPathConstants.NODESET);
+        NodeList nodeList = XMLUtils.getNodeList("variable", node, xpath);
         int variableCount = nodeList.getLength();
 
         Map<String, RandomStrings> variableMap = new HashMap<String, RandomStrings>(variableCount);

@@ -48,7 +48,7 @@ public class LinearRandomLFO extends AbstractLFO {
     public final void configure(Node node, XPath xpath) throws XPathException {
         random = new Random(randomSeed);
         
-        int values = XMLUtils.parseInteger(random, (Node) xpath.evaluate("valueCount", node, XPathConstants.NODE), xpath);
+        int values = XMLUtils.parseInteger(random, "valueCount", node, xpath);
         
         if (values <= 0) {
             throw new RuntimeException("valueCount must be positive");
@@ -56,8 +56,8 @@ public class LinearRandomLFO extends AbstractLFO {
         
         setValueCount(values);
     
-        double minDist = XMLUtils.parseDouble(random, (Node) xpath.evaluate("minDistance", node, XPathConstants.NODE), xpath);
-        double maxDist = XMLUtils.parseDouble(random, (Node) xpath.evaluate("maxDistance", node, XPathConstants.NODE), xpath);
+        double minDist = XMLUtils.parseDouble(random, XMLUtils.getNode("minDistance", node, xpath), xpath);
+        double maxDist = XMLUtils.parseDouble(random, XMLUtils.getNode("maxDistance", node, xpath), xpath);
         
         if (minDist < 0.0 || minDist > 0.5) {
             throw new RuntimeException("minDistance must be in the range [0, 0.5]");

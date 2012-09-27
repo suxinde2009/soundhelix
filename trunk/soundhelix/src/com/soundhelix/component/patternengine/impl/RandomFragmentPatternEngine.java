@@ -59,7 +59,7 @@ public class RandomFragmentPatternEngine extends StringPatternEngine {
         } catch (Exception e) {
         }
 
-        NodeList nodeList = (NodeList) xpath.evaluate("pattern", node, XPathConstants.NODESET);
+        NodeList nodeList = XMLUtils.getNodeList("pattern", node, xpath);
         int patterns = nodeList.getLength();
 
         patternStringMap = new HashMap<Character, String[]>(patterns);

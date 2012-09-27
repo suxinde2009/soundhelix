@@ -154,7 +154,7 @@ public class RandomPatternSequenceEngine extends AbstractSequenceEngine {
     public void configure(Node node, XPath xpath) throws XPathException {
         random = new Random(randomSeed);
 
-        NodeList nodeList = (NodeList) xpath.evaluate("pattern", node, XPathConstants.NODESET);
+        NodeList nodeList = XMLUtils.getNodeList("pattern", node, xpath);
         setPattern(XMLUtils.parseString(random, nodeList.item(random.nextInt(nodeList.getLength())), xpath));
 
         String offsetString = XMLUtils.parseString(random, "offsets", node, xpath);

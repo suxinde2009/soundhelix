@@ -99,30 +99,30 @@ public final class XMLUtils {
 
         if (n.getNodeName().equals("random")) {
             try {
-                String s = (String) xpath.evaluate("attribute::list", n, XPathConstants.STRING);
+                String s = xpath.evaluate("attribute::list", n);
 
                 if (s != null && !s.equals("")) {
                     String[] str = s.split("\\|");
 
                     return Integer.parseInt(str[random.nextInt(str.length)]);
                 } else {
-                    int min = Integer.parseInt((String) xpath.evaluate("attribute::min", n, XPathConstants.STRING));
-                    int max = Integer.parseInt((String) xpath.evaluate("attribute::max", n, XPathConstants.STRING));
+                    int min = Integer.parseInt(xpath.evaluate("attribute::min", n));
+                    int max = Integer.parseInt(xpath.evaluate("attribute::max", n));
 
-                    String type = (String) xpath.evaluate("attribute::type", n, XPathConstants.STRING);
+                    String type = xpath.evaluate("attribute::type", n);
 
                     if (type == null || type.equals("") || type.equals("uniform")) {
                         int step = 1;
 
                         try {
-                            step = Integer.parseInt((String) xpath.evaluate("attribute::step", n, XPathConstants.STRING));
+                            step = Integer.parseInt(xpath.evaluate("attribute::step", n));
                         } catch (NumberFormatException e) {
                         }
 
                         return RandomUtils.getUniformInteger(random, min, max, step);
                     } else if (type.equals("normal")) {
                         double mean;
-                        String meanstr = (String) xpath.evaluate("attribute::mean", n, XPathConstants.STRING);
+                        String meanstr = xpath.evaluate("attribute::mean", n);
 
                         if (meanstr != null && !meanstr.equals("")) {
                             mean = Double.parseDouble(meanstr);
@@ -131,7 +131,7 @@ public final class XMLUtils {
                             mean = (min + max) / 2.0f;
                         }
 
-                        double variance = Double.parseDouble((String) xpath.evaluate("attribute::variance", n, XPathConstants.STRING));
+                        double variance = Double.parseDouble(xpath.evaluate("attribute::variance", n));
 
                         return RandomUtils.getNormalInteger(random, min, max, mean, variance);
                     } else {
@@ -226,7 +226,7 @@ public final class XMLUtils {
 
         if (n.getNodeName().equals("random")) {
             try {
-                double prob = Double.parseDouble((String) xpath.evaluate("attribute::probability", n, XPathConstants.STRING));
+                double prob = Double.parseDouble(xpath.evaluate("attribute::probability", n));
                 return RandomUtils.getBoolean(random, prob / 100.0d);
             } catch (Exception e) {
                 throw new RuntimeException("Error parsing random attributes", e);
@@ -310,7 +310,7 @@ public final class XMLUtils {
 
         if (n.getNodeName().equals("random")) {
             try {
-                String s = (String) xpath.evaluate("attribute::list", n, XPathConstants.STRING);
+                String s = xpath.evaluate("attribute::list", n);
 
                 if (s == null) {
                     throw new RuntimeException("Attribute \"list\" is undefined");
@@ -351,7 +351,7 @@ public final class XMLUtils {
 
         if (n.getNodeName().equals("random")) {
             try {
-                String s = (String) xpath.evaluate("attribute::list", n, XPathConstants.STRING);
+                String s = xpath.evaluate("attribute::list", n);
 
                 if (s == null || s.equals("")) {
                     throw new RuntimeException("Attribute \"list\" is empty");
@@ -415,7 +415,7 @@ public final class XMLUtils {
             throw new IllegalArgumentException("Node is null");
         }
 
-        String className = (String) xpath.evaluate("attribute::class", node, XPathConstants.STRING);
+        String className = xpath.evaluate("attribute::class", node);
 
         if (className == null) {
             throw new RuntimeException("Attribute \"class\" not defined");
@@ -429,8 +429,8 @@ public final class XMLUtils {
         boolean isSeedProvided = false;
         long providedSeed = 0;
 
-        String seedString = (String) xpath.evaluate("attribute::seed", node, XPathConstants.STRING);
-        String saltString = (String) xpath.evaluate("attribute::salt", node, XPathConstants.STRING);
+        String seedString = xpath.evaluate("attribute::seed", node);
+        String saltString = xpath.evaluate("attribute::salt", node);
 
         if (seedString != null && !seedString.equals("") && saltString != null && !saltString.equals("")) {
             throw new RuntimeException("Only one of the attributes \"seed\" and \"salt\" may be provided");

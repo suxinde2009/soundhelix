@@ -285,10 +285,17 @@ public class Sequence {
      */
 
     public static class SequenceEntry {
+        /** The pitch. */
         private int pitch;
-        private short velocity;
+        
+        /** The velocity. */
+        private final short velocity;
+        
+        /** The number of ticks. */
         private int ticks;
-        private boolean legato;
+        
+        /** The legato flag. */
+        private final boolean legato;
 
         public SequenceEntry(int pitch, short velocity, int ticks, boolean legato) {
             this.pitch = pitch;

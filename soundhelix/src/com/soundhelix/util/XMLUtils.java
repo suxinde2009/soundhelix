@@ -33,11 +33,11 @@ public final class XMLUtils {
 
     private XMLUtils() {
     }
-
+    
     /**
      * Returns the node found at the given path.
      *
-     * @param path the path
+     * @param path the XPath expression relative to the node
      * @param node the node
      * @param xpath an XPath instance
      *
@@ -53,7 +53,7 @@ public final class XMLUtils {
     /**
      * Returns the node list found at the given path.
      *
-     * @param path the path
+     * @param path the XPath expression relative to the node
      * @param node the node
      * @param xpath an XPath instance
      *
@@ -81,6 +81,7 @@ public final class XMLUtils {
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 return node;
             }
+            
             node = node.getNextSibling();
         }
 
@@ -91,22 +92,22 @@ public final class XMLUtils {
      * Searches for the element pointed to by path and tries to parse it as an integer.
      *
      * @param random the random generator
-     * @param path the XPath expression
-     * @param parentNode the parent node to start searching from
+     * @param path the XPath expression relative to the node
+     * @param node the node
      * @param xpath an XPath instance
      *
      * @return the integer
      */
 
-    public static int parseInteger(Random random, String path, Node parentNode, XPath xpath) {
+    public static int parseInteger(Random random, String path, Node node, XPath xpath) {
         try {
-            Node node = XMLUtils.getNode(path, parentNode, xpath);
+            Node node2 = XMLUtils.getNode(path, node, xpath);
 
-            if (node == null) {
-                throw new RuntimeException("Path \"" + path + "\" not found within node " + parentNode.getNodeName());
+            if (node2 == null) {
+                throw new RuntimeException("Path \"" + path + "\" not found within node " + node.getNodeName());
             }
 
-            return parseInteger(random, node, xpath);
+            return parseInteger(random, node2, xpath);
         } catch (Exception e) {
             throw new RuntimeException("Error parsing integer", e);
         }
@@ -184,22 +185,22 @@ public final class XMLUtils {
      * Searches for the element pointed to by path and tries to parse it as an integer.
      *
      * @param random the random generator
-     * @param path the XPath expression
-     * @param parentNode the parent node to start searching from
+     * @param path the XPath expression relative to the node
+     * @param node the node
      * @param xpath an XPath instance
      *
      * @return the integer
      */
 
-    public static double parseDouble(Random random, String path, Node parentNode, XPath xpath) {
+    public static double parseDouble(Random random, String path, Node node, XPath xpath) {
         try {
-            Node node = XMLUtils.getNode(path, parentNode, xpath);
+            Node node2 = XMLUtils.getNode(path, node, xpath);
 
-            if (node == null) {
-                throw new RuntimeException("Path \"" + path + "\" not found within node " + parentNode.getNodeName());
+            if (node2 == null) {
+                throw new RuntimeException("Path \"" + path + "\" not found within node " + node.getNodeName());
             }
 
-            return XMLUtils.parseDouble(random, node, xpath);
+            return XMLUtils.parseDouble(random, node2, xpath);
         } catch (Exception e) {
             throw new RuntimeException("Error parsing double", e);
         }
@@ -220,15 +221,15 @@ public final class XMLUtils {
         return Double.parseDouble(node.getTextContent());
     }
 
-    public static boolean parseBoolean(Random random, String path, Node parentNode, XPath xpath) {
+    public static boolean parseBoolean(Random random, String path, Node node, XPath xpath) {
         try {
-            Node node = XMLUtils.getNode(path, parentNode, xpath);
+            Node node2 = XMLUtils.getNode(path, node, xpath);
 
-            if (node == null) {
-                throw new RuntimeException("Path \"" + path + "\" not found within node " + parentNode.getNodeName());
+            if (node2 == null) {
+                throw new RuntimeException("Path \"" + path + "\" not found within node " + node.getNodeName());
             }
 
-            return XMLUtils.parseBoolean(random, node, xpath);
+            return XMLUtils.parseBoolean(random, node2, xpath);
         } catch (Exception e) {
             throw new RuntimeException("Error parsing boolean", e);
         }
@@ -274,17 +275,17 @@ public final class XMLUtils {
      * Searches for the element pointed to by path and tries to parse it as a string.
      *
      * @param random the random generator
-     * @param path the XPath expression
-     * @param parentNode the parent node to start searching from
+     * @param path the XPath expression relative to the node
+     * @param node the node
      * @param xpath an XPath instance
      *
      * @return the integer
      */
 
-    public static String parseString(Random random, String path, Node parentNode, XPath xpath) {
+    public static String parseString(Random random, String path, Node node, XPath xpath) {
         try {
-            Node node = XMLUtils.getNode(path, parentNode, xpath);
-            return XMLUtils.parseString(random, node, xpath);
+            Node node2 = XMLUtils.getNode(path, node, xpath);
+            return XMLUtils.parseString(random, node2, xpath);
         } catch (Exception e) {
             throw new RuntimeException("Error parsing string", e);
         }
@@ -294,23 +295,23 @@ public final class XMLUtils {
      * Searches for the element pointed to by path and tries to parse it as a string list, split by the given separator character.
      *
      * @param random the random generator
-     * @param path the XPath expression
-     * @param parentNode the parent node to start searching from
+     * @param path the XPath expression relative to the node
+     * @param node the node
      * @param separatorChar the separator character
      * @param xpath an XPath instance
      *
      * @return the integer
      */
 
-    public static String[] parseStringList(Random random, String path, Node parentNode, char separatorChar, XPath xpath) {
+    public static String[] parseStringList(Random random, String path, Node node, char separatorChar, XPath xpath) {
         try {
-            Node node = XMLUtils.getNode(path, parentNode, xpath);
+            Node node2 = XMLUtils.getNode(path, node, xpath);
 
-            if (node == null) {
-                throw new RuntimeException("Path \"" + path + "\" not found within node " + parentNode.getNodeName());
+            if (node2 == null) {
+                throw new RuntimeException("Path \"" + path + "\" not found within node " + node.getNodeName());
             }
 
-            return StringUtils.split(XMLUtils.parseString(random, node, xpath), separatorChar);
+            return StringUtils.split(XMLUtils.parseString(random, node2, xpath), separatorChar);
         } catch (Exception e) {
             throw new RuntimeException("Error parsing string list", e);
         }
@@ -397,8 +398,8 @@ public final class XMLUtils {
         }
     }
 
-    public static int[] parseIntegerListString(Random random, String path, Node parentNode, XPath xpath) {
-        String string = XMLUtils.parseString(random, path, parentNode, xpath);
+    public static int[] parseIntegerListString(Random random, String path, Node node, XPath xpath) {
+        String string = XMLUtils.parseString(random, path, node, xpath);
 
         if (string == null || string.equals("")) {
             return null;

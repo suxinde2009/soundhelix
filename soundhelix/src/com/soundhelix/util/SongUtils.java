@@ -67,8 +67,7 @@ public final class SongUtils {
      */
 
     public static Player generateSong(URL url, long randomSeed) throws Exception {
-        Document doc = parseDocument(url);
-        return createPlayer(doc, randomSeed);
+        return createPlayer(parseDocument(url), randomSeed);
     }
 
     /**
@@ -84,8 +83,7 @@ public final class SongUtils {
      */
 
     public static Player generateSong(InputStream inputStream, String systemId, long randomSeed) throws Exception {
-        Document doc = parseDocument(inputStream, systemId);
-        return createPlayer(doc, randomSeed);
+        return createPlayer(parseDocument(inputStream, systemId), randomSeed);
     }
 
     /**
@@ -100,8 +98,7 @@ public final class SongUtils {
      */
 
     public static Player generateSong(URL url, String songName) throws Exception {
-        Document doc = parseDocument(url);
-        return createPlayer(doc, songName);
+        return createPlayer(parseDocument(url), songName);
     }
 
     /**
@@ -117,8 +114,7 @@ public final class SongUtils {
      */
 
     public static Player generateSong(InputStream inputStream, String systemId, String songName) throws Exception {
-        Document doc = parseDocument(inputStream, systemId);
-        return createPlayer(doc, songName);
+        return createPlayer(parseDocument(inputStream, systemId), songName);
     }
 
     /**
@@ -265,9 +261,7 @@ public final class SongUtils {
      */
 
     private static Document parseDocument(InputStream inputStream, String systemId) throws ParserConfigurationException, SAXException, IOException {
-
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-
         dbf.setNamespaceAware(true);
         dbf.setXIncludeAware(true);
         dbf.setValidating(false);
@@ -284,11 +278,7 @@ public final class SongUtils {
 
             // validate the DOM tree against the schema
 
-            try {
-                schema.newValidator().validate(new DOMSource(doc));
-            } catch (SAXException e) {
-                throw e;
-            }
+            schema.newValidator().validate(new DOMSource(doc));
         }
 
         return doc;

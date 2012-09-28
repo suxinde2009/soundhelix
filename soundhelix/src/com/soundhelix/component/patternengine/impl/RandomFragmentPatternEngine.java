@@ -7,7 +7,6 @@ import java.util.Random;
 import java.util.Set;
 
 import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathException;
 
 import org.w3c.dom.Node;

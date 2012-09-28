@@ -18,7 +18,6 @@ import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Receiver;
 import javax.sound.midi.ShortMessage;
 import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathException;
 
 import org.w3c.dom.Node;
@@ -72,6 +71,9 @@ public class MidiPlayer extends AbstractPlayer {
 
     /** The (conservative) pattern for unsafe characters in filenames. */
     private static final Pattern UNSAFE_CHARACTER_PATTERN = Pattern.compile("[^0-9a-zA-Z_\\-]");
+
+    /** The map which maps MIDI controller names to MidiController instances. */
+    private static Map<String, MidiController> midiControllerMap;
 
     /** The random generator. */
     private Random random;
@@ -141,8 +143,6 @@ public class MidiPlayer extends AbstractPlayer {
      * transposition while playing and still being able to send the correct NOTE_OFF pitches.
      */
     private List<int[]> pitchList;
-
-    private static Map<String, MidiController> midiControllerMap;
 
     static {
         midiControllerMap = new HashMap<String, MidiController>();
@@ -606,6 +606,14 @@ public class MidiPlayer extends AbstractPlayer {
         }
     }
 
+    /**
+     * Saves the arrangement as one or more MIDI files.
+     * 
+     * @param arrangement the arrangement
+     * @throws InvalidMidiDataException in case of a MIDI data problem
+     * @throws IOException in case of an I/O problem
+     */
+    
     private void saveMidiFiles(Arrangement arrangement) throws InvalidMidiDataException, IOException {
         initializeControllerLFOs(arrangement);
 
@@ -1324,6 +1332,7 @@ public class MidiPlayer extends AbstractPlayer {
         return string;
     }
 
+    @Override
     public final void configure(Node node, XPath xpath) throws XPathException {
         random = new Random(randomSeed);
 
@@ -1589,6 +1598,10 @@ public class MidiPlayer extends AbstractPlayer {
         return currentTick;
     }
 
+    public void setMidiFilename(String midiFilename) {
+        this.midiFilename = midiFilename;
+    }
+
     /**
      * Container for a MIDI device.
      */
@@ -1744,9 +1757,14 @@ public class MidiPlayer extends AbstractPlayer {
     }
 
     private static class MidiController {
-        int status;
-        int parameter;
-        int byteCount;
+        /** The MIDI status byte. */
+        private int status;
+        
+        /** The parameter. */
+        private int parameter;
+        
+        /** The number of bytes. */
+        private int byteCount;
 
         public MidiController(int status, int byteCount) {
             this.status = status;
@@ -1760,11 +1778,4 @@ public class MidiPlayer extends AbstractPlayer {
             this.byteCount = byteCount;
         }
     }
-
-    public void setMidiFilename(String midiFilename) {
-        this.midiFilename = midiFilename;
-    }
-
-
-
 }

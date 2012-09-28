@@ -170,7 +170,7 @@ SoundHelix checkstyle configuration
       <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="error"/>
     </module>
     <module name="RegexpSinglelineJava">
-      <property name="severity" value="error"/>
+      <property name="severity" value="warning"/>
       <property name="format" value="(.*)System.(out|err).print(.*)"/>
       <property name="message" value="Use logger methods to log messages and not system.out calls."/>
       <metadata name="com.atlassw.tools.eclipse.checkstyle.comment" value="SYSOUT: Do not use either System.out.xxx or System.err.xxxx. Use logger methods instead."/>

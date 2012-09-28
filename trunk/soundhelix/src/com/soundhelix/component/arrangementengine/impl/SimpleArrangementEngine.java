@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Random;
 
 import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathException;
 
 import org.w3c.dom.Node;
@@ -1032,10 +1031,17 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
     }
 
     private static final class ArrangementEntry {
-        private String instrument;
-        private SequenceEngine sequenceEngine;
-        private int transposition;
-        private String[] activityVectorNames;
+        /** The instrument name. */
+        private final String instrument;
+        
+        /** The sequence engine. */
+        private final SequenceEngine sequenceEngine;
+        
+        /** The transposition. */
+        private final int transposition;
+        
+        /** The names of ActivityVectors. */
+        private final String[] activityVectorNames;
 
         private ArrangementEntry(String instrument, SequenceEngine sequenceEngine, int transposition, String[] activityVectorNames) {
             this.instrument = instrument;

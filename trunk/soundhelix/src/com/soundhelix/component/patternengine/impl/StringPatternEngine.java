@@ -3,7 +3,6 @@ package com.soundhelix.component.patternengine.impl;
 import java.util.Random;
 
 import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathException;
 
 import org.w3c.dom.Node;

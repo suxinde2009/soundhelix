@@ -3,7 +3,6 @@ package com.soundhelix.component.sequenceengine.impl;
 import java.util.Random;
 
 import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathException;
 
 import org.w3c.dom.Node;
@@ -28,6 +27,7 @@ public class PatternSequenceEngine extends AbstractMultiPatternSequenceEngine {
         super();
     }
 
+    @Override
     public void configure(Node node, XPath xpath) throws XPathException {
         random = new Random(randomSeed);
 

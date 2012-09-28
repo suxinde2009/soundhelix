@@ -374,10 +374,10 @@ public class Pattern implements Iterable<PatternEntry> {
         private int pitch;
 
         /** The velocity. */
-        private short velocity;
+        private final short velocity;
 
         /** The number of ticks. */
-        private int ticks;
+        private final int ticks;
 
         /** Flag for wildcards. */
         private boolean isWildcard;

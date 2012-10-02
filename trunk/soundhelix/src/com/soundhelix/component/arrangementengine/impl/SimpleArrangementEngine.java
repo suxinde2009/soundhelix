@@ -109,8 +109,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         dumpActivityVectors(vectors);
         shiftIntervalBoundaries(neededActivityVectors);
 
-        Arrangement arrangement = createArrangement(neededActivityVectors);
-        return arrangement;
+        return createArrangement(neededActivityVectors);
     }
 
     /**

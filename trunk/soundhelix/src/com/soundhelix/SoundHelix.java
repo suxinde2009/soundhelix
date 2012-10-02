@@ -367,7 +367,7 @@ public class SoundHelix implements Runnable {
                     logger.trace("Muting all MIDI channels");
                     ((MidiPlayer) player).muteAllChannels();
                 }
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 logger.error("Exception during shutdoown hook", e);
             }
 

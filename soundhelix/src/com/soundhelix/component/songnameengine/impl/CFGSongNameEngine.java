@@ -23,7 +23,7 @@ import com.soundhelix.util.XMLUtils;
 
 public class CFGSongNameEngine extends AbstractSongNameEngine {
     /** The pattern for variable replacement. */
-    protected static Pattern variablePattern = Pattern.compile("\\$\\{([^}]+)\\}");
+    protected static final Pattern VARIABLE_PATTERN = Pattern.compile("\\$\\{([^}]+)\\}");
 
     /** The variable map. */
     protected Map<String, RandomStrings> variableMap;
@@ -98,7 +98,7 @@ public class CFGSongNameEngine extends AbstractSongNameEngine {
             return string;
         }
 
-        Matcher matcher = variablePattern.matcher(string);
+        Matcher matcher = VARIABLE_PATTERN.matcher(string);
         StringBuffer sb = new StringBuffer();
 
         while (matcher.find()) {

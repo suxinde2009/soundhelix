@@ -2,7 +2,6 @@ package com.soundhelix.component.sequenceengine.impl;
 
 import java.util.Random;
 
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathException;
 
 import org.w3c.dom.Node;
@@ -28,23 +27,23 @@ public class PatternSequenceEngine extends AbstractMultiPatternSequenceEngine {
     }
 
     @Override
-    public void configure(Node node, XPath xpath) throws XPathException {
+    public void configure(Node node) throws XPathException {
         random = new Random(randomSeed);
 
-        NodeList nodeList = XMLUtils.getNodeList("patternEngine", node, xpath);
+        NodeList nodeList = XMLUtils.getNodeList("patternEngine", node);
 
         if (nodeList.getLength() == 0) {
             throw new RuntimeException("Need at least 1 patternEngine");
         }
 
         try {
-            setNormalizeChords(!XMLUtils.parseBoolean(random, "obeyChordSubtype", node, xpath));
+            setNormalizeChords(!XMLUtils.parseBoolean(random, "obeyChordSubtype", node));
             logger.warn("The tag \"obeyChordSubtype\" has been deprecated. " + "Use \"normalizeChords\" with inverted value instead.");
         } catch (Exception e) {
         }
 
         try {
-            setNormalizeChords(XMLUtils.parseBoolean(random, "normalizeChords", node, xpath));
+            setNormalizeChords(XMLUtils.parseBoolean(random, "normalizeChords", node));
         } catch (Exception e) {
         }
 
@@ -52,7 +51,7 @@ public class PatternSequenceEngine extends AbstractMultiPatternSequenceEngine {
 
         try {
             int i = random.nextInt(nodeList.getLength());
-            patternEngine = XMLUtils.getInstance(PatternEngine.class, nodeList.item(i), xpath, randomSeed, i);
+            patternEngine = XMLUtils.getInstance(PatternEngine.class, nodeList.item(i), randomSeed, i);
         } catch (Exception e) {
             throw new RuntimeException("Error instantiating PatternEngine", e);
         }

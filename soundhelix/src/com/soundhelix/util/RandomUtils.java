@@ -155,7 +155,7 @@ public final class RandomUtils {
      */
 
     public static boolean getBoolean(Random random, double probability) {
-        if (probability == 0.5d) {
+        if (Math.abs(0.5d - probability) < 0.0000001) {
             return random.nextBoolean();
         } else if (probability >= 1.0d) {
             return true;

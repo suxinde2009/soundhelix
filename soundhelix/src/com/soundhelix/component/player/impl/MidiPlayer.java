@@ -17,7 +17,6 @@ import javax.sound.midi.MidiEvent;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Receiver;
 import javax.sound.midi.ShortMessage;
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathException;
 
 import org.w3c.dom.Node;
@@ -1333,43 +1332,43 @@ public class MidiPlayer extends AbstractPlayer {
     }
 
     @Override
-    public final void configure(Node node, XPath xpath) throws XPathException {
+    public final void configure(Node node) throws XPathException {
         random = new Random(randomSeed);
 
-        setMidiFilename(XMLUtils.parseString(random, XMLUtils.getNode("midiFilename", node, xpath), xpath));
-        setMidiFilename(XMLUtils.parseString(random, "midiFilename", node, xpath));
+        setMidiFilename(XMLUtils.parseString(random, XMLUtils.getNode("midiFilename", node)));
+        setMidiFilename(XMLUtils.parseString(random, "midiFilename", node));
 
-        NodeList nodeList = XMLUtils.getNodeList("device", node, xpath);
+        NodeList nodeList = XMLUtils.getNodeList("device", node);
         int entries = nodeList.getLength();
         Device[] devices = new Device[entries];
 
         for (int i = 0; i < entries; i++) {
-            String name = XMLUtils.parseString(random, "attribute::name", nodeList.item(i), xpath);
-            String midiName = XMLUtils.parseString(random, nodeList.item(i), xpath);
-            boolean useClockSynchronization = XMLUtils.parseBoolean(random, "attribute::clockSynchronization", nodeList.item(i), xpath);
+            String name = XMLUtils.parseString(random, "attribute::name", nodeList.item(i));
+            String midiName = XMLUtils.parseString(random, nodeList.item(i));
+            boolean useClockSynchronization = XMLUtils.parseBoolean(random, "attribute::clockSynchronization", nodeList.item(i));
             devices[i] = new Device(name, midiName, useClockSynchronization);
         }
 
-        beforePlayCommands = XMLUtils.parseString(random, "beforePlayCommands", node, xpath);
+        beforePlayCommands = XMLUtils.parseString(random, "beforePlayCommands", node);
 
-        afterPlayCommands = XMLUtils.parseString(random, "afterPlayCommands", node, xpath);
+        afterPlayCommands = XMLUtils.parseString(random, "afterPlayCommands", node);
 
         setDevices(devices);
-        setMilliBPM((int) (1000 * XMLUtils.parseInteger(random, "bpm", node, xpath)));
-        setTransposition(XMLUtils.parseInteger(random, "transposition", node, xpath));
-        setGroove(XMLUtils.parseString(random, "groove", node, xpath));
-        setBeforePlayWaitTicks(XMLUtils.parseInteger(random, "beforePlayWaitTicks", node, xpath));
-        setAfterPlayWaitTicks(XMLUtils.parseInteger(random, "afterPlayWaitTicks", node, xpath));
+        setMilliBPM((int) (1000 * XMLUtils.parseInteger(random, "bpm", node)));
+        setTransposition(XMLUtils.parseInteger(random, "transposition", node));
+        setGroove(XMLUtils.parseString(random, "groove", node));
+        setBeforePlayWaitTicks(XMLUtils.parseInteger(random, "beforePlayWaitTicks", node));
+        setAfterPlayWaitTicks(XMLUtils.parseInteger(random, "afterPlayWaitTicks", node));
 
-        nodeList = XMLUtils.getNodeList("map", node, xpath);
+        nodeList = XMLUtils.getNodeList("map", node);
         entries = nodeList.getLength();
 
         Map<String, DeviceChannel> channelMap = new HashMap<String, DeviceChannel>();
 
         for (int i = 0; i < entries; i++) {
-            String instrument = XMLUtils.parseString(random, "attribute::instrument", nodeList.item(i), xpath);
-            String device = XMLUtils.parseString(random, "attribute::device", nodeList.item(i), xpath);
-            int channel = Integer.parseInt(XMLUtils.parseString(random, "attribute::channel", nodeList.item(i), xpath)) - 1;
+            String instrument = XMLUtils.parseString(random, "attribute::instrument", nodeList.item(i));
+            String device = XMLUtils.parseString(random, "attribute::device", nodeList.item(i));
+            int channel = Integer.parseInt(XMLUtils.parseString(random, "attribute::channel", nodeList.item(i))) - 1;
 
             if (channelMap.containsKey(instrument)) {
                 throw new RuntimeException("Instrument " + instrument + " must not be re-mapped");
@@ -1382,7 +1381,7 @@ public class MidiPlayer extends AbstractPlayer {
             int program = -1;
 
             try {
-                program = Integer.parseInt(XMLUtils.parseString(random, "attribute::program", nodeList.item(i), xpath)) - 1;
+                program = Integer.parseInt(XMLUtils.parseString(random, "attribute::program", nodeList.item(i))) - 1;
             } catch (Exception e) {
             }
 
@@ -1392,7 +1391,7 @@ public class MidiPlayer extends AbstractPlayer {
 
         setChannelMap(channelMap);
 
-        nodeList = XMLUtils.getNodeList("controllerLFO", node, xpath);
+        nodeList = XMLUtils.getNodeList("controllerLFO", node);
         entries = nodeList.getLength();
         ControllerLFO[] controllerLFOs = new ControllerLFO[entries];
 
@@ -1405,13 +1404,13 @@ public class MidiPlayer extends AbstractPlayer {
             boolean usesLegacyTags = false;
 
             try {
-                minAmplitude = XMLUtils.parseInteger(random, "minimum", nodeList.item(i), xpath);
+                minAmplitude = XMLUtils.parseInteger(random, "minimum", nodeList.item(i));
                 usesLegacyTags = true;
             } catch (Exception e) {
             }
 
             try {
-                maxAmplitude = XMLUtils.parseInteger(random, "maximum", nodeList.item(i), xpath);
+                maxAmplitude = XMLUtils.parseInteger(random, "maximum", nodeList.item(i));
                 usesLegacyTags = true;
             } catch (Exception e) {
             }
@@ -1422,12 +1421,12 @@ public class MidiPlayer extends AbstractPlayer {
             }
 
             try {
-                minAmplitude = XMLUtils.parseInteger(random, "minAmplitude", nodeList.item(i), xpath);
+                minAmplitude = XMLUtils.parseInteger(random, "minAmplitude", nodeList.item(i));
             } catch (Exception e) {
             }
 
             try {
-                maxAmplitude = XMLUtils.parseInteger(random, "maxAmplitude", nodeList.item(i), xpath);
+                maxAmplitude = XMLUtils.parseInteger(random, "maxAmplitude", nodeList.item(i));
             } catch (Exception e) {
             }
 
@@ -1436,12 +1435,12 @@ public class MidiPlayer extends AbstractPlayer {
             }
 
             try {
-                minValue = XMLUtils.parseInteger(random, "minValue", nodeList.item(i), xpath);
+                minValue = XMLUtils.parseInteger(random, "minValue", nodeList.item(i));
             } catch (Exception e) {
             }
 
             try {
-                maxValue = XMLUtils.parseInteger(random, "maxValue", nodeList.item(i), xpath);
+                maxValue = XMLUtils.parseInteger(random, "maxValue", nodeList.item(i));
             } catch (Exception e) {
             }
 
@@ -1449,30 +1448,30 @@ public class MidiPlayer extends AbstractPlayer {
                 throw new RuntimeException("minValue must be <= maxValue");
             }
 
-            double speed = XMLUtils.parseDouble(random, XMLUtils.getNode("speed", nodeList.item(i), xpath), xpath);
+            double speed = XMLUtils.parseDouble(random, XMLUtils.getNode("speed", nodeList.item(i)));
 
-            String controller = XMLUtils.parseString(random, "controller", nodeList.item(i), xpath);
+            String controller = XMLUtils.parseString(random, "controller", nodeList.item(i));
 
             String device = null;
             int channel = -1;
 
             if (!controller.equals("milliBPM")) {
-                device = XMLUtils.parseString(random, "device", nodeList.item(i), xpath);
-                channel = XMLUtils.parseInteger(random, "channel", nodeList.item(i), xpath) - 1;
+                device = XMLUtils.parseString(random, "device", nodeList.item(i));
+                channel = XMLUtils.parseInteger(random, "channel", nodeList.item(i)) - 1;
             }
 
-            String rotationUnit = XMLUtils.parseString(random, "rotationUnit", nodeList.item(i), xpath);
+            String rotationUnit = XMLUtils.parseString(random, "rotationUnit", nodeList.item(i));
 
             double phase = 0.0d;
             String instrument = null;
 
             try {
-                phase = XMLUtils.parseDouble(random, XMLUtils.getNode("phase", nodeList.item(i), xpath), xpath);
+                phase = XMLUtils.parseDouble(random, XMLUtils.getNode("phase", nodeList.item(i)));
             } catch (Exception e) {
             }
 
             try {
-                instrument = XMLUtils.parseString(random, "instrument", nodeList.item(i), xpath);
+                instrument = XMLUtils.parseString(random, "instrument", nodeList.item(i));
             } catch (Exception e) {
             }
 
@@ -1480,12 +1479,12 @@ public class MidiPlayer extends AbstractPlayer {
                 throw new RuntimeException("Rotation unit \"activity\" requires an instrument");
             }
 
-            Node lfoNode = XMLUtils.getNode("lfo", nodeList.item(i), xpath);
+            Node lfoNode = XMLUtils.getNode("lfo", nodeList.item(i));
 
             LFO lfo;
 
             try {
-                lfo = XMLUtils.getInstance(LFO.class, lfoNode, xpath, randomSeed, i);
+                lfo = XMLUtils.getInstance(LFO.class, lfoNode, randomSeed, i);
             } catch (Exception e) {
                 throw new RuntimeException("Could not instantiate LFO", e);
             }

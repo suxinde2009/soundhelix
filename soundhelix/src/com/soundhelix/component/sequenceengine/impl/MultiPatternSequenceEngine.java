@@ -2,7 +2,6 @@ package com.soundhelix.component.sequenceengine.impl;
 
 import java.util.Random;
 
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathException;
 
 import org.w3c.dom.Node;
@@ -28,10 +27,10 @@ public class MultiPatternSequenceEngine extends AbstractMultiPatternSequenceEngi
         super();
     }
 
-    public void configure(Node node, XPath xpath) throws XPathException {
+    public void configure(Node node) throws XPathException {
         random = new Random(randomSeed);
 
-        NodeList patternsList = XMLUtils.getNodeList("patternEngines", node, xpath);
+        NodeList patternsList = XMLUtils.getNodeList("patternEngines", node);
 
         if (patternsList.getLength() == 0) {
             throw new RuntimeException("Need at least 1 list of patternEngines");
@@ -39,7 +38,7 @@ public class MultiPatternSequenceEngine extends AbstractMultiPatternSequenceEngi
 
         Node patternsNode = patternsList.item(random.nextInt(patternsList.getLength()));
 
-        NodeList patternList = XMLUtils.getNodeList("patternEngine", patternsNode, xpath);
+        NodeList patternList = XMLUtils.getNodeList("patternEngine", patternsNode);
 
         if (patternList.getLength() == 0) {
             throw new RuntimeException("Need at least 1 pattern");
@@ -51,7 +50,7 @@ public class MultiPatternSequenceEngine extends AbstractMultiPatternSequenceEngi
             PatternEngine patternEngine;
 
             try {
-                patternEngine = XMLUtils.getInstance(PatternEngine.class, patternList.item(i), xpath, randomSeed, i);
+                patternEngine = XMLUtils.getInstance(PatternEngine.class, patternList.item(i), randomSeed, i);
             } catch (Exception e) {
                 throw new RuntimeException("Error instantiating PatternEngine", e);
             }
@@ -62,13 +61,13 @@ public class MultiPatternSequenceEngine extends AbstractMultiPatternSequenceEngi
         setPatterns(patterns);
 
         try {
-            setNormalizeChords(!XMLUtils.parseBoolean(random, "obeyChordSubtype", node, xpath));
+            setNormalizeChords(!XMLUtils.parseBoolean(random, "obeyChordSubtype", node));
             logger.warn("The tag \"obeyChordSubtype\" has been deprecated. Use \"normalizeChords\" with inverted value instead.");
         } catch (Exception e) {
         }
 
         try {
-            setNormalizeChords(XMLUtils.parseBoolean(random, "normalizeChords", node, xpath));
+            setNormalizeChords(XMLUtils.parseBoolean(random, "normalizeChords", node));
         } catch (Exception e) {
         }
     }

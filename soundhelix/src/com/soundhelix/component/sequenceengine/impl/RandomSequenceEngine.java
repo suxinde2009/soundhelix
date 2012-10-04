@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathException;
 
 import org.w3c.dom.Node;
@@ -78,33 +77,33 @@ public class RandomSequenceEngine extends AbstractMultiPatternSequenceEngine {
                 + "RandomPatternEngine or RandomFragmentPatternEngine with another SequenceEngine instead");
     }
 
-    public void configure(Node node, XPath xpath) throws XPathException {
+    public void configure(Node node) throws XPathException {
         random = new Random(randomSeed);
 
         try {
-            setNormalizeChords(!XMLUtils.parseBoolean(random, "obeyChordSubtype", node, xpath));
+            setNormalizeChords(!XMLUtils.parseBoolean(random, "obeyChordSubtype", node));
             logger.warn("The tag \"obeyChordSubtype\" has been deprecated. Use \"normalizeChords\" with inverted value instead.");
         } catch (Exception e) {
         }
 
         try {
-            setNormalizeChords(XMLUtils.parseBoolean(random, "normalizeChords", node, xpath));
+            setNormalizeChords(XMLUtils.parseBoolean(random, "normalizeChords", node));
         } catch (Exception e) {
         }
 
-        setPatternTicks(XMLUtils.parseInteger(random, "patternTicks", node, xpath));
-        setNoteProbability(XMLUtils.parseDouble(random, "noteProbability", node, xpath) / 100.0);
-        setLegatoProbability(XMLUtils.parseDouble(random, "legatoProbability", node, xpath) / 100.0);
-        setMinVelocity(XMLUtils.parseInteger(random, "minVelocity", node, xpath));
-        setMaxVelocity(XMLUtils.parseInteger(random, "maxVelocity", node, xpath));
-        setMinActiveTicks(XMLUtils.parseInteger(random, "minActiveTicks", node, xpath));
-        setMaxActiveTicks(XMLUtils.parseInteger(random, "maxActiveTicks", node, xpath));
-        setOffsets(XMLUtils.parseIntegerListString(random, "offsets", node, xpath));
-        setNoteLengths(XMLUtils.parseIntegerListString(random, "noteLengths", node, xpath));
-        setPauseLengths(XMLUtils.parseIntegerListString(random, "pauseLengths", node, xpath));
-        setPitchVelocityCorrelation(XMLUtils.parseDouble(random, "pitchVelocityCorrelation", node, xpath) / 100.0d);
-        setVelocityExponent(XMLUtils.parseDouble(random, "velocityExponent", node, xpath));
-        setPatternString(XMLUtils.parseString(random, "patternString", node, xpath));
+        setPatternTicks(XMLUtils.parseInteger(random, "patternTicks", node));
+        setNoteProbability(XMLUtils.parseDouble(random, "noteProbability", node) / 100.0);
+        setLegatoProbability(XMLUtils.parseDouble(random, "legatoProbability", node) / 100.0);
+        setMinVelocity(XMLUtils.parseInteger(random, "minVelocity", node));
+        setMaxVelocity(XMLUtils.parseInteger(random, "maxVelocity", node));
+        setMinActiveTicks(XMLUtils.parseInteger(random, "minActiveTicks", node));
+        setMaxActiveTicks(XMLUtils.parseInteger(random, "maxActiveTicks", node));
+        setOffsets(XMLUtils.parseIntegerListString(random, "offsets", node));
+        setNoteLengths(XMLUtils.parseIntegerListString(random, "noteLengths", node));
+        setPauseLengths(XMLUtils.parseIntegerListString(random, "pauseLengths", node));
+        setPitchVelocityCorrelation(XMLUtils.parseDouble(random, "pitchVelocityCorrelation", node) / 100.0d);
+        setVelocityExponent(XMLUtils.parseDouble(random, "velocityExponent", node));
+        setPatternString(XMLUtils.parseString(random, "patternString", node));
         setPatterns(new Pattern[] {Pattern.parseString(generatePattern(patternString))});
     }
 

@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathException;
 
 import org.w3c.dom.Node;
@@ -165,10 +164,10 @@ public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
     }
 
     @Override
-    public void configure(Node node, XPath xpath) throws XPathException {
+    public void configure(Node node) throws XPathException {
         Random random = new Random(randomSeed);
 
-        NodeList patternEnginesNodes = XMLUtils.getNodeList("patternEngines", node, xpath);
+        NodeList patternEnginesNodes = XMLUtils.getNodeList("patternEngines", node);
 
         int patternEnginesCount = patternEnginesNodes.getLength();
 
@@ -178,25 +177,25 @@ public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
 
         Node patternEnginesNode = patternEnginesNodes.item(random.nextInt(patternEnginesCount));
 
-        NodeList nodeList = XMLUtils.getNodeList("patternEngine", patternEnginesNode, xpath);
+        NodeList nodeList = XMLUtils.getNodeList("patternEngine", patternEnginesNode);
 
         if (nodeList.getLength() == 0) {
             throw new RuntimeException("Need at least 1 patternEngine");
         }
 
         try {
-            setNormalizeChords(!XMLUtils.parseBoolean(random, "obeyChordSubtype", node, xpath));
+            setNormalizeChords(!XMLUtils.parseBoolean(random, "obeyChordSubtype", node));
             logger.warn("The tag \"obeyChordSubtype\" has been deprecated. Use \"normalizeChords\" with inverted value instead.");
         } catch (Exception e) {
         }
 
         try {
-            setNormalizeChords(XMLUtils.parseBoolean(random, "normalizeChords", node, xpath));
+            setNormalizeChords(XMLUtils.parseBoolean(random, "normalizeChords", node));
         } catch (Exception e) {
         }
 
         try {
-            setObeyChordSections(XMLUtils.parseBoolean(random, "obeyChordSections", node, xpath));
+            setObeyChordSections(XMLUtils.parseBoolean(random, "obeyChordSections", node));
         } catch (Exception e) {
         }
 
@@ -210,7 +209,7 @@ public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
             PatternEngine patternEngine;
 
             try {
-                patternEngine = XMLUtils.getInstance(PatternEngine.class, nodeList.item(i), xpath, randomSeed, i);
+                patternEngine = XMLUtils.getInstance(PatternEngine.class, nodeList.item(i), randomSeed, i);
             } catch (Exception e) {
                 throw new RuntimeException("Error instantiating PatternEngine", e);
             }

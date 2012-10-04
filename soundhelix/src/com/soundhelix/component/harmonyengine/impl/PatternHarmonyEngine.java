@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathException;
 
 import org.w3c.dom.Node;
@@ -333,22 +332,22 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
     }
 
     @Override
-    public void configure(Node node, XPath xpath) throws XPathException {
+    public void configure(Node node) throws XPathException {
         random = new Random(randomSeed);
 
         try {
-            crossoverPitch = XMLUtils.parseInteger(random, "crossoverPitch", node, xpath);
+            crossoverPitch = XMLUtils.parseInteger(random, "crossoverPitch", node);
         } catch (Exception e) {}
 
-        NodeList nodeList = XMLUtils.getNodeList("chordPattern", node, xpath);
+        NodeList nodeList = XMLUtils.getNodeList("chordPattern", node);
         ChordPattern[] chordPatterns = new ChordPattern[nodeList.getLength()];
 
         for (int i = 0; i < nodeList.getLength(); i++) {
-            String pattern = XMLUtils.parseString(random, nodeList.item(i), xpath);
+            String pattern = XMLUtils.parseString(random, nodeList.item(i));
             int minimizeChordDistance = -1;
 
             try {
-                boolean b = XMLUtils.parseBoolean(random, "attribute::minimizeChordDistance", nodeList.item(i), xpath);
+                boolean b = XMLUtils.parseBoolean(random, "attribute::minimizeChordDistance", nodeList.item(i));
                 minimizeChordDistance = b ? 1 : 0;
             } catch (Exception e) {
             }
@@ -358,16 +357,16 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 
         setChordPatterns(chordPatterns);
 
-        nodeList = XMLUtils.getNodeList("chordRandomTable", node, xpath);
+        nodeList = XMLUtils.getNodeList("chordRandomTable", node);
         String[][] chordRandomTables = new String[nodeList.getLength()][];
 
         for (int i = 0; i < nodeList.getLength(); i++) {
-            String table = XMLUtils.parseString(random, nodeList.item(i), xpath);
+            String table = XMLUtils.parseString(random, nodeList.item(i));
             chordRandomTables[i] = table.split(",");
         }
 
         try {
-            setMinimizeChordDistance(XMLUtils.parseBoolean(random, "minimizeChordDistance", node, xpath));
+            setMinimizeChordDistance(XMLUtils.parseBoolean(random, "minimizeChordDistance", node));
         } catch (Exception e) {
         }
 

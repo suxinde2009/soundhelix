@@ -1,6 +1,5 @@
 package com.soundhelix.component;
 
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathException;
 
 import org.w3c.dom.Node;
@@ -20,10 +19,9 @@ public interface XMLConfigurable {
      * up to the implementation of this method. The method should (but need not) use XPath to access the node's tags.
      * 
      * @param node the parent XML node of the configuration tags
-     * @param xpath the XPath instance to use
      * 
      * @throws XPathException in case of an XPath problem
      */
 
-    void configure(Node node, XPath xpath) throws XPathException;
+    void configure(Node node) throws XPathException;
 }

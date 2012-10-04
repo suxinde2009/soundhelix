@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathException;
 
 import org.w3c.dom.Node;
@@ -77,25 +76,25 @@ public class RandomPatternEngine extends StringPatternEngine {
     private double velocityExponent = 3.0d;
 
     @Override
-    public void configure(Node node, XPath xpath) throws XPathException {
+    public void configure(Node node) throws XPathException {
         random = new Random(randomSeed);
 
-        setPatternTicks(XMLUtils.parseInteger(random, "patternTicks", node, xpath));
-        setNoteProbability(XMLUtils.parseDouble(random, "noteProbability", node, xpath) / 100.0);
-        setLegatoProbability(XMLUtils.parseDouble(random, "legatoProbability", node, xpath) / 100.0);
-        setMinVelocity(XMLUtils.parseInteger(random, "minVelocity", node, xpath));
-        setMaxVelocity(XMLUtils.parseInteger(random, "maxVelocity", node, xpath));
-        setMinActiveTicks(XMLUtils.parseInteger(random, "minActiveTicks", node, xpath));
-        setMaxActiveTicks(XMLUtils.parseInteger(random, "maxActiveTicks", node, xpath));
-        setOffsets(parsePatternEntryListString(random, "offsets", node, xpath));
-        setNoteLengths(XMLUtils.parseIntegerListString(random, "noteLengths", node, xpath));
-        setPauseLengths(XMLUtils.parseIntegerListString(random, "pauseLengths", node, xpath));
-        setPitchVelocityCorrelation(XMLUtils.parseDouble(random, "pitchVelocityCorrelation", node, xpath) / 100.0d);
-        setVelocityExponent(XMLUtils.parseDouble(random, "velocityExponent", node, xpath));
-        setPatternString(XMLUtils.parseString(random, "patternString", node, xpath));
+        setPatternTicks(XMLUtils.parseInteger(random, "patternTicks", node));
+        setNoteProbability(XMLUtils.parseDouble(random, "noteProbability", node) / 100.0);
+        setLegatoProbability(XMLUtils.parseDouble(random, "legatoProbability", node) / 100.0);
+        setMinVelocity(XMLUtils.parseInteger(random, "minVelocity", node));
+        setMaxVelocity(XMLUtils.parseInteger(random, "maxVelocity", node));
+        setMinActiveTicks(XMLUtils.parseInteger(random, "minActiveTicks", node));
+        setMaxActiveTicks(XMLUtils.parseInteger(random, "maxActiveTicks", node));
+        setOffsets(parsePatternEntryListString(random, "offsets", node));
+        setNoteLengths(XMLUtils.parseIntegerListString(random, "noteLengths", node));
+        setPauseLengths(XMLUtils.parseIntegerListString(random, "pauseLengths", node));
+        setPitchVelocityCorrelation(XMLUtils.parseDouble(random, "pitchVelocityCorrelation", node) / 100.0d);
+        setVelocityExponent(XMLUtils.parseDouble(random, "velocityExponent", node));
+        setPatternString(XMLUtils.parseString(random, "patternString", node));
 
         try {
-            setUniquePatternParts(XMLUtils.parseBoolean(random, "uniquePatternParts", node, xpath));
+            setUniquePatternParts(XMLUtils.parseBoolean(random, "uniquePatternParts", node));
         } catch (Exception e) {
         }
 
@@ -403,8 +402,8 @@ public class RandomPatternEngine extends StringPatternEngine {
         this.maxActiveTicks = maxActiveTicks;
     }
 
-    private static PatternEntry[] parsePatternEntryListString(Random random, String path, Node parentNode, XPath xpath) {
-        String string = XMLUtils.parseString(random, path, parentNode, xpath);
+    private static PatternEntry[] parsePatternEntryListString(Random random, String path, Node parentNode) {
+        String string = XMLUtils.parseString(random, path, parentNode);
 
         if (string == null || string.equals("")) {
             return null;

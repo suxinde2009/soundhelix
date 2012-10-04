@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathException;
 
 import org.w3c.dom.Node;
@@ -297,10 +296,10 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
     }
 
     @Override
-    public void configure(Node node, XPath xpath) throws XPathException {
+    public void configure(Node node) throws XPathException {
         random = new Random(randomSeed);
 
-        NodeList nodeList = XMLUtils.getNodeList("pattern", node, xpath);
+        NodeList nodeList = XMLUtils.getNodeList("pattern", node);
         int patterns = nodeList.getLength();
 
         DrumEntry[] drumEntries = new DrumEntry[patterns];
@@ -310,14 +309,14 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
         }
 
         for (int i = 0; i < patterns; i++) {
-            int pitch = XMLUtils.parseInteger(random, "pitch", nodeList.item(i), xpath);
+            int pitch = XMLUtils.parseInteger(random, "pitch", nodeList.item(i));
 
-            Node patternEngineNode = XMLUtils.getNode("patternEngine", nodeList.item(i), xpath);
+            Node patternEngineNode = XMLUtils.getNode("patternEngine", nodeList.item(i));
 
             PatternEngine patternEngine;
 
             try {
-                patternEngine = XMLUtils.getInstance(PatternEngine.class, patternEngineNode, xpath, randomSeed, i);
+                patternEngine = XMLUtils.getInstance(PatternEngine.class, patternEngineNode, randomSeed, i);
             } catch (Exception e) {
                 throw new RuntimeException("Error instantiating PatternEngine", e);
             }
@@ -328,13 +327,13 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
 
         setDrumEntries(drumEntries);
 
-        nodeList = XMLUtils.getNodeList("conditionalPattern", node, xpath);
+        nodeList = XMLUtils.getNodeList("conditionalPattern", node);
         patterns = nodeList.getLength();
 
         ConditionalEntry[] conditionalEntries = new ConditionalEntry[patterns];
 
         for (int i = 0; i < patterns; i++) {
-            String targetString = XMLUtils.parseString(random, "target", nodeList.item(i), xpath);
+            String targetString = XMLUtils.parseString(random, "target", nodeList.item(i));
             String[] targetStrings = targetString.split(",");
             int[] targets = new int[targetStrings.length];
 
@@ -345,7 +344,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
             String conditionString = null;
 
             try {
-                conditionString = XMLUtils.parseString(random, "condition", nodeList.item(i), xpath);
+                conditionString = XMLUtils.parseString(random, "condition", nodeList.item(i));
             } catch (Exception e) {
             }
 
@@ -366,11 +365,11 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
             } else {
                 // we cannot evaluate the patterns yet, because we don't have the list of ActivityVectors yet during the configure pass
 
-                preConditionString = XMLUtils.parseString(random, "precondition", nodeList.item(i), xpath);
-                postConditionString = XMLUtils.parseString(random, "postcondition", nodeList.item(i), xpath);
+                preConditionString = XMLUtils.parseString(random, "precondition", nodeList.item(i));
+                postConditionString = XMLUtils.parseString(random, "postcondition", nodeList.item(i));
             }
 
-            String modeString = XMLUtils.parseString(random, "mode", nodeList.item(i), xpath);
+            String modeString = XMLUtils.parseString(random, "mode", nodeList.item(i));
             int mode;
 
             if (modeString.equals("add")) {
@@ -381,12 +380,12 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
                 throw new RuntimeException("Unknown mode \"" + modeString + "\"");
             }
 
-            double probability = XMLUtils.parseDouble(random, "probability", nodeList.item(i), xpath) / 100.0d;
+            double probability = XMLUtils.parseDouble(random, "probability", nodeList.item(i)) / 100.0d;
 
             int skipWhenApplied = 0;
 
             try {
-                skipWhenApplied = XMLUtils.parseInteger(random, "skipWhenApplied", nodeList.item(i), xpath);
+                skipWhenApplied = XMLUtils.parseInteger(random, "skipWhenApplied", nodeList.item(i));
             } catch (Exception e) {
             }
 
@@ -397,7 +396,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
             int skipWhenNotApplied = 0;
 
             try {
-                skipWhenNotApplied = XMLUtils.parseInteger(random, "skipWhenNotApplied", nodeList.item(i), xpath);
+                skipWhenNotApplied = XMLUtils.parseInteger(random, "skipWhenNotApplied", nodeList.item(i));
             } catch (Exception e) {
             }
 
@@ -405,12 +404,12 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
                 throw new RuntimeException("Skip value \"" + skipWhenNotApplied + "\" would skip out of conditonal pattern range");
             }
 
-            Node patternEngineNode = XMLUtils.getNode("patternEngine", nodeList.item(i), xpath);
+            Node patternEngineNode = XMLUtils.getNode("patternEngine", nodeList.item(i));
 
             PatternEngine patternEngine;
 
             try {
-                patternEngine = XMLUtils.getInstance(PatternEngine.class, patternEngineNode, xpath, randomSeed, -i - 1);
+                patternEngine = XMLUtils.getInstance(PatternEngine.class, patternEngineNode, randomSeed, -i - 1);
             } catch (Exception e) {
                 throw new RuntimeException("Error instantiating PatternEngine", e);
             }

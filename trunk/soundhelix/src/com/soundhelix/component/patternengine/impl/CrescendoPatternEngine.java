@@ -3,7 +3,6 @@ package com.soundhelix.component.patternengine.impl;
 import java.util.Iterator;
 import java.util.Random;
 
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathException;
 
 import org.w3c.dom.Node;
@@ -47,41 +46,41 @@ public class CrescendoPatternEngine extends StringPatternEngine {
     private String suffixPatternString;
 
     @Override
-    public void configure(Node node, XPath xpath) throws XPathException {
+    public void configure(Node node) throws XPathException {
         random = new Random(randomSeed);
         
         try {
-            setPatternTicks(XMLUtils.parseInteger(random, "patternTicks", node, xpath));
+            setPatternTicks(XMLUtils.parseInteger(random, "patternTicks", node));
         } catch (Exception e) {
         }
 
         try {
-            setMinVelocity(XMLUtils.parseInteger(random, "minVelocity", node, xpath));
+            setMinVelocity(XMLUtils.parseInteger(random, "minVelocity", node));
         } catch (Exception e) {
         }
 
         try {
-            setMaxVelocity(XMLUtils.parseInteger(random, "maxVelocity", node, xpath));
+            setMaxVelocity(XMLUtils.parseInteger(random, "maxVelocity", node));
         } catch (Exception e) {
         }
 
         try {
-            setVelocityExponent(XMLUtils.parseDouble(random, "velocityExponent", node, xpath));
+            setVelocityExponent(XMLUtils.parseDouble(random, "velocityExponent", node));
         } catch (Exception e) {
         }
 
         try {
-            setPrefixPatternString(XMLUtils.parseString(random, "prefixPattern", node, xpath));
+            setPrefixPatternString(XMLUtils.parseString(random, "prefixPattern", node));
         } catch (Exception e) {
         }
 
         try {
-            setPatternString(XMLUtils.parseString(random, "pattern", node, xpath));
+            setPatternString(XMLUtils.parseString(random, "pattern", node));
         } catch (Exception e) {
         }
 
         try {
-            setSuffixPatternString(XMLUtils.parseString(random, "suffixPattern", node, xpath));
+            setSuffixPatternString(XMLUtils.parseString(random, "suffixPattern", node));
         } catch (Exception e) {
         }
 

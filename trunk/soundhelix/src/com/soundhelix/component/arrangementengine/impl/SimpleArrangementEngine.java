@@ -5,7 +5,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Random;
 
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathException;
 
 import org.w3c.dom.Node;
@@ -766,19 +765,19 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         this.stopActivityCountsString = stopActivityCountsString;
     }
 
-    public void configure(Node node, XPath xpath) throws XPathException {
+    public void configure(Node node) throws XPathException {
         random = new Random(randomSeed);
 
         int maxIterations = 1000000;
 
         try {
-            maxIterations = XMLUtils.parseInteger(random, "maxIterations", node, xpath);
+            maxIterations = XMLUtils.parseInteger(random, "maxIterations", node);
         } catch (Exception e) {
         }
 
         setMaxIterations(maxIterations);
 
-        String activityString = XMLUtils.parseString(random, "startActivityCounts", node, xpath);
+        String activityString = XMLUtils.parseString(random, "startActivityCounts", node);
 
         if (activityString == null) {
             activityString = "1,2,3";
@@ -786,7 +785,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
         setStartActivityCountsString(activityString);
 
-        activityString = XMLUtils.parseString(random, "stopActivityCounts", node, xpath);
+        activityString = XMLUtils.parseString(random, "stopActivityCounts", node);
 
         if (activityString == null) {
             activityString = "3,2,1";
@@ -794,16 +793,16 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
         setStopActivityCountsString(activityString);
 
-        int minActivityCount = XMLUtils.parseInteger(random, "minActivityCount", node, xpath);
+        int minActivityCount = XMLUtils.parseInteger(random, "minActivityCount", node);
         setMinActivityCount(minActivityCount);
 
-        int maxActivityCount = XMLUtils.parseInteger(random, "maxActivityCount", node, xpath);
+        int maxActivityCount = XMLUtils.parseInteger(random, "maxActivityCount", node);
         setMaxActivityCount(maxActivityCount);
 
-        int maxActivityChangeCount = XMLUtils.parseInteger(random, "maxActivityChangeCount", node, xpath);
+        int maxActivityChangeCount = XMLUtils.parseInteger(random, "maxActivityChangeCount", node);
         setMaxActivityChangeCount(maxActivityChangeCount);
 
-        NodeList nodeList = XMLUtils.getNodeList("activityVector", node, xpath);
+        NodeList nodeList = XMLUtils.getNodeList("activityVector", node);
 
         int activityVectorCount = nodeList.getLength();
 
@@ -815,7 +814,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
                 activityVectorCount);
 
         for (int i = 0; i < activityVectorCount; i++) {
-            String name = XMLUtils.parseString(random, "attribute::name", nodeList.item(i), xpath);
+            String name = XMLUtils.parseString(random, "attribute::name", nodeList.item(i));
 
             if (activityVectorConfigurationHashMap.containsKey(name)) {
                 throw new RuntimeException("ActivityVector \"" + name + "\" already defined");
@@ -824,93 +823,93 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
             double minActive = 0;
 
             try {
-                minActive = Double.parseDouble(XMLUtils.parseString(random, "minActive", nodeList.item(i), xpath));
+                minActive = Double.parseDouble(XMLUtils.parseString(random, "minActive", nodeList.item(i)));
             } catch (Exception e) {
             }
 
             boolean allowInactive = false;
 
             try {
-                allowInactive = XMLUtils.parseBoolean(random, "minActive/attribute::allowInactive", nodeList.item(i), xpath);
+                allowInactive = XMLUtils.parseBoolean(random, "minActive/attribute::allowInactive", nodeList.item(i));
             } catch (Exception e) {
             }
 
             double maxActive = 100.0d;
 
             try {
-                maxActive = Double.parseDouble(XMLUtils.parseString(random, "maxActive", nodeList.item(i), xpath));
+                maxActive = Double.parseDouble(XMLUtils.parseString(random, "maxActive", nodeList.item(i)));
             } catch (Exception e) {
             }
 
             int startShift = 0;
             try {
-                startShift = XMLUtils.parseInteger(random, "startShift", nodeList.item(i), xpath);
+                startShift = XMLUtils.parseInteger(random, "startShift", nodeList.item(i));
             } catch (Exception e) {
             }
 
             int stopShift = 0;
             try {
-                stopShift = XMLUtils.parseInteger(random, "stopShift", nodeList.item(i), xpath);
+                stopShift = XMLUtils.parseInteger(random, "stopShift", nodeList.item(i));
             } catch (Exception e) {
             }
 
             int startBeforeSection = Integer.MAX_VALUE;
             try {
-                startBeforeSection = XMLUtils.parseInteger(random, "startBeforeSection", nodeList.item(i), xpath);
+                startBeforeSection = XMLUtils.parseInteger(random, "startBeforeSection", nodeList.item(i));
             } catch (Exception e) {
             }
 
             int startAfterSection = -1;
             try {
-                startAfterSection = XMLUtils.parseInteger(random, "startAfterSection", nodeList.item(i), xpath);
+                startAfterSection = XMLUtils.parseInteger(random, "startAfterSection", nodeList.item(i));
             } catch (Exception e) {
             }
 
             int stopBeforeSection = -1;
             try {
-                stopBeforeSection = XMLUtils.parseInteger(random, "stopBeforeSection", nodeList.item(i), xpath);
+                stopBeforeSection = XMLUtils.parseInteger(random, "stopBeforeSection", nodeList.item(i));
             } catch (Exception e) {
             }
 
             int stopAfterSection = Integer.MAX_VALUE;
             try {
-                stopAfterSection = XMLUtils.parseInteger(random, "stopAfterSection", nodeList.item(i), xpath);
+                stopAfterSection = XMLUtils.parseInteger(random, "stopAfterSection", nodeList.item(i));
             } catch (Exception e) {
             }
 
             int minSegmentCount = 0;
             try {
-                minSegmentCount = XMLUtils.parseInteger(random, "minSegmentCount", nodeList.item(i), xpath);
+                minSegmentCount = XMLUtils.parseInteger(random, "minSegmentCount", nodeList.item(i));
             } catch (Exception e) {
             }
 
             int maxSegmentCount = Integer.MAX_VALUE;
             try {
-                maxSegmentCount = XMLUtils.parseInteger(random, "maxSegmentCount", nodeList.item(i), xpath);
+                maxSegmentCount = XMLUtils.parseInteger(random, "maxSegmentCount", nodeList.item(i));
             } catch (Exception e) {
             }
 
             int minSegmentLength = 0;
             try {
-                minSegmentLength = XMLUtils.parseInteger(random, "minSegmentLength", nodeList.item(i), xpath);
+                minSegmentLength = XMLUtils.parseInteger(random, "minSegmentLength", nodeList.item(i));
             } catch (Exception e) {
             }
 
             int maxSegmentLength = Integer.MAX_VALUE;
             try {
-                maxSegmentLength = XMLUtils.parseInteger(random, "maxSegmentLength", nodeList.item(i), xpath);
+                maxSegmentLength = XMLUtils.parseInteger(random, "maxSegmentLength", nodeList.item(i));
             } catch (Exception e) {
             }
 
             int minPauseLength = 0;
             try {
-                minPauseLength = XMLUtils.parseInteger(random, "minPauseLength", nodeList.item(i), xpath);
+                minPauseLength = XMLUtils.parseInteger(random, "minPauseLength", nodeList.item(i));
             } catch (Exception e) {
             }
 
             int maxPauseLength = Integer.MAX_VALUE;
             try {
-                maxPauseLength = XMLUtils.parseInteger(random, "maxPauseLength", nodeList.item(i), xpath);
+                maxPauseLength = XMLUtils.parseInteger(random, "maxPauseLength", nodeList.item(i));
             } catch (Exception e) {
             }
 
@@ -921,11 +920,11 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
         setActivityVectorConfiguration(activityVectorConfigurationHashMap);
 
-        nodeList = XMLUtils.getNodeList("track[@solo=\"true\"]", node, xpath);
+        nodeList = XMLUtils.getNodeList("track[@solo=\"true\"]", node);
         int tracks = nodeList.getLength();
 
         if (tracks == 0) {
-            nodeList = XMLUtils.getNodeList("track", node, xpath);
+            nodeList = XMLUtils.getNodeList("track", node);
             tracks = nodeList.getLength();
 
             if (tracks == 0) {
@@ -936,7 +935,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         ArrangementEntry[] arrangementEntries = new ArrangementEntry[tracks];
 
         for (int i = 0; i < tracks; i++) {
-            String instrument = XMLUtils.parseString(random, "instrument", nodeList.item(i), xpath);
+            String instrument = XMLUtils.parseString(random, "instrument", nodeList.item(i));
 
             if (instrument == null || instrument.equals("")) {
                 throw new RuntimeException("Track has no instrument");
@@ -945,13 +944,13 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
             int transposition = 0;
 
             try {
-                transposition = XMLUtils.parseInteger(random, "transposition", nodeList.item(i), xpath);
+                transposition = XMLUtils.parseInteger(random, "transposition", nodeList.item(i));
             } catch (Exception e) {
             }
 
-            Node sequenceEngineNode = XMLUtils.getNode("sequenceEngine", nodeList.item(i), xpath);
+            Node sequenceEngineNode = XMLUtils.getNode("sequenceEngine", nodeList.item(i));
 
-            NodeList nameNodeList = XMLUtils.getNodeList("activityVector", nodeList.item(i), xpath);
+            NodeList nameNodeList = XMLUtils.getNodeList("activityVector", nodeList.item(i));
 
             String[] activityVectorNames = new String[nameNodeList.getLength()];
 
@@ -960,7 +959,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
             }
 
             try {
-                SequenceEngine sequenceEngine = XMLUtils.getInstance(SequenceEngine.class, sequenceEngineNode, xpath, randomSeed, i);
+                SequenceEngine sequenceEngine = XMLUtils.getInstance(SequenceEngine.class, sequenceEngineNode, randomSeed, i);
                 arrangementEntries[i] = new ArrangementEntry(instrument, sequenceEngine, transposition, activityVectorNames);
             } catch (Exception e) {
                 throw new RuntimeException("Error instantiating SequenceEngine for instrument \"" + instrument + "\"", e);

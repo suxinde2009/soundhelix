@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathException;
 
 import org.w3c.dom.Node;
@@ -316,26 +315,26 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
     }
 
     @Override
-    public void configure(Node node, XPath xpath) throws XPathException {
+    public void configure(Node node) throws XPathException {
         random = new Random(randomSeed);
 
         try {
-            setPitchDistances(XMLUtils.parseIntegerListString(random, "pitchDistances", node, xpath));
+            setPitchDistances(XMLUtils.parseIntegerListString(random, "pitchDistances", node));
         } catch (Exception e) {
         }
 
         try {
-            setMelodies(XMLUtils.parseIntegerListString(random, "melodies", node, xpath));
+            setMelodies(XMLUtils.parseIntegerListString(random, "melodies", node));
         } catch (Exception e) {
         }
 
         try {
-            setMinPitch(XMLUtils.parseInteger(random, "minPitch", node, xpath));
+            setMinPitch(XMLUtils.parseInteger(random, "minPitch", node));
         } catch (Exception e) {
         }
 
         try {
-            setMaxPitch(XMLUtils.parseInteger(random, "maxPitch", node, xpath));
+            setMaxPitch(XMLUtils.parseInteger(random, "maxPitch", node));
         } catch (Exception e) {
         }
 
@@ -343,7 +342,7 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
             throw new RuntimeException("minPitch and maxPitch must be at least 5 halftones apart");
         }
 
-        NodeList nodeList = XMLUtils.getNodeList("patternEngine", node, xpath);
+        NodeList nodeList = XMLUtils.getNodeList("patternEngine", node);
 
         if (nodeList.getLength() == 0) {
             throw new RuntimeException("Need at least one pattern engine");
@@ -353,7 +352,7 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
 
         try {
             int i = random.nextInt(nodeList.getLength());
-            patternEngine = XMLUtils.getInstance(PatternEngine.class, nodeList.item(i), xpath, randomSeed, i);
+            patternEngine = XMLUtils.getInstance(PatternEngine.class, nodeList.item(i), randomSeed, i);
         } catch (Exception e) {
             throw new RuntimeException("Error instantiating PatternEngine", e);
         }

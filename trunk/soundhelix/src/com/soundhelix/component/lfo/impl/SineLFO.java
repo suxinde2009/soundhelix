@@ -1,6 +1,5 @@
 package com.soundhelix.component.lfo.impl;
 
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathException;
 
 import org.w3c.dom.Node;
@@ -19,6 +18,6 @@ public class SineLFO extends AbstractLFO {
     }
     
     @Override
-    public final void configure(Node node, XPath xpath) throws XPathException {
+    public final void configure(Node node) throws XPathException {
     }
 }

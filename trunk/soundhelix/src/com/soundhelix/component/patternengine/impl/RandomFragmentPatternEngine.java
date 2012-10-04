@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathException;
 
 import org.w3c.dom.Node;
@@ -47,24 +46,24 @@ public class RandomFragmentPatternEngine extends StringPatternEngine {
     private Map<Character, String[]> patternStringMap;
 
     @Override
-    public void configure(Node node, XPath xpath) throws XPathException {
+    public void configure(Node node) throws XPathException {
         random = new Random(randomSeed);
 
-        setPatternTicks(XMLUtils.parseInteger(random, "patternTicks", node, xpath));
-        setPatternString(XMLUtils.parseString(random, "patternString", node, xpath));
+        setPatternTicks(XMLUtils.parseInteger(random, "patternTicks", node));
+        setPatternString(XMLUtils.parseString(random, "patternString", node));
 
         try {
-            setUniquePatternParts(XMLUtils.parseBoolean(random, "uniquePatternParts", node, xpath));
+            setUniquePatternParts(XMLUtils.parseBoolean(random, "uniquePatternParts", node));
         } catch (Exception e) {
         }
 
-        NodeList nodeList = XMLUtils.getNodeList("pattern", node, xpath);
+        NodeList nodeList = XMLUtils.getNodeList("pattern", node);
         int patterns = nodeList.getLength();
 
         patternStringMap = new HashMap<Character, String[]>(patterns);
 
         for (int i = 0; i < patterns; i++) {
-            String group = XMLUtils.parseString(random, "attribute::group", nodeList.item(i), xpath);
+            String group = XMLUtils.parseString(random, "attribute::group", nodeList.item(i));
 
             if (group == null || group.length() != 1) {
                 throw new RuntimeException("Need exactly one character, got \"" + group + "\"");
@@ -76,7 +75,7 @@ public class RandomFragmentPatternEngine extends StringPatternEngine {
                 throw new RuntimeException("Pattern string for group \"" + character + "\" defined more than once");
             }
 
-            String[] patternArray = XMLUtils.parseStringList(random, nodeList.item(i), '|', xpath);
+            String[] patternArray = XMLUtils.parseStringList(random, nodeList.item(i), '|');
 
             if (patternArray == null || patternArray.length == 0) {
                 throw new RuntimeException("Pattern string for group \"" + character + "\" is empty");

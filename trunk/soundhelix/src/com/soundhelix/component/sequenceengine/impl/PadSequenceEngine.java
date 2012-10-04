@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathException;
 
 import org.w3c.dom.Node;
@@ -174,10 +173,11 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
         return track;
     }
 
-    public void configure(Node node, XPath xpath) throws XPathException {
+    @Override
+    public void configure(Node node) throws XPathException {
         random = new Random();
 
-        String offsetString = XMLUtils.parseString(random, "offsets", node, xpath);
+        String offsetString = XMLUtils.parseString(random, "offsets", node);
 
         if (offsetString == null || offsetString.equals("")) {
             offsetString = "0,1,2";
@@ -194,28 +194,28 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
         setOffsets(offsets);
 
         try {
-            setNormalizeChords(!XMLUtils.parseBoolean(random, "obeyChordSubtype", node, xpath));
+            setNormalizeChords(!XMLUtils.parseBoolean(random, "obeyChordSubtype", node));
             logger.warn("The tag \"obeyChordSubtype\" has been deprecated. Use \"normalizeChords\" with inverted value instead.");
         } catch (Exception e) {
         }
 
         try {
-            setNormalizeChords(XMLUtils.parseBoolean(random, "normalizeChords", node, xpath));
+            setNormalizeChords(XMLUtils.parseBoolean(random, "normalizeChords", node));
         } catch (Exception e) {
         }
 
         try {
-            setObeyChordSections(XMLUtils.parseBoolean(random, "obeyChordSections", node, xpath));
+            setObeyChordSections(XMLUtils.parseBoolean(random, "obeyChordSections", node));
         } catch (Exception e) {
         }
 
         try {
-            setRetriggerPitches(XMLUtils.parseBoolean(random, "retriggerPitches", node, xpath));
+            setRetriggerPitches(XMLUtils.parseBoolean(random, "retriggerPitches", node));
         } catch (Exception e) {
         }
 
         try {
-            setVelocity((short) XMLUtils.parseInteger(random, "velocity", node, xpath));
+            setVelocity((short) XMLUtils.parseInteger(random, "velocity", node));
         } catch (Exception e) {
         }
     }

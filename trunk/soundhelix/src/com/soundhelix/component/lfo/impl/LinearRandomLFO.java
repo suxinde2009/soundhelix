@@ -2,7 +2,6 @@ package com.soundhelix.component.lfo.impl;
 
 import java.util.Random;
 
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathException;
 
 import org.w3c.dom.Node;
@@ -44,10 +43,10 @@ public class LinearRandomLFO extends AbstractLFO {
     }
 
     @Override
-    public final void configure(Node node, XPath xpath) throws XPathException {
+    public final void configure(Node node) throws XPathException {
         random = new Random(randomSeed);
         
-        int values = XMLUtils.parseInteger(random, "valueCount", node, xpath);
+        int values = XMLUtils.parseInteger(random, "valueCount", node);
         
         if (values <= 0) {
             throw new RuntimeException("valueCount must be positive");
@@ -55,8 +54,8 @@ public class LinearRandomLFO extends AbstractLFO {
         
         setValueCount(values);
     
-        double minDist = XMLUtils.parseDouble(random, XMLUtils.getNode("minDistance", node, xpath), xpath);
-        double maxDist = XMLUtils.parseDouble(random, XMLUtils.getNode("maxDistance", node, xpath), xpath);
+        double minDist = XMLUtils.parseDouble(random, XMLUtils.getNode("minDistance", node));
+        double maxDist = XMLUtils.parseDouble(random, XMLUtils.getNode("maxDistance", node));
         
         if (minDist < 0.0 || minDist > 0.5) {
             throw new RuntimeException("minDistance must be in the range [0, 0.5]");

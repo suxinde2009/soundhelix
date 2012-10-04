@@ -14,10 +14,8 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathException;
 import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
@@ -131,14 +129,13 @@ public final class SongUtils {
      * @throws XPathException in case of an XPath error
      */
 
-    private static Player createPlayer(Document doc, long randomSeed) throws InstantiationException, XPathException, IllegalAccessException,
-            ClassNotFoundException {
-        XPath xpath = XPathFactory.newInstance().newXPath();
-        Node rootNode = XMLUtils.getNode("/*", doc, xpath);
-        checkVersion(rootNode, xpath);
+    private static Player createPlayer(Document doc, long randomSeed) throws InstantiationException, IllegalAccessException,
+            ClassNotFoundException, XPathException {
+        Node rootNode = XMLUtils.getNode("/*", doc);
+        checkVersion(rootNode);
 
-        Node songNameEngineNode = XMLUtils.getNode("songNameEngine", rootNode, xpath);
-        SongNameEngine songNameEngine = XMLUtils.getInstance(SongNameEngine.class, songNameEngineNode, xpath, randomSeed, -1);
+        Node songNameEngineNode = XMLUtils.getNode("songNameEngine", rootNode);
+        SongNameEngine songNameEngine = XMLUtils.getInstance(SongNameEngine.class, songNameEngineNode, randomSeed, -1);
 
         String songName = songNameEngine.createSongName();
         LOGGER.info("Song name: \"" + songName + "\"");
@@ -163,8 +160,8 @@ public final class SongUtils {
      * @throws XPathException in case of an XPath error
      */
 
-    private static Player createPlayer(Document doc, String songName) throws InstantiationException, XPathException, IllegalAccessException,
-            ClassNotFoundException {
+    private static Player createPlayer(Document doc, String songName) throws InstantiationException, IllegalAccessException,
+            ClassNotFoundException, XPathException {
         checkVersion(doc);
 
         LOGGER.info("Song name: \"" + songName + "\"");
@@ -190,30 +187,28 @@ public final class SongUtils {
      * @throws ClassNotFoundException if a class cannot be found
      */
 
-    private static Player generateSong(Document doc, long randomSeed) throws InstantiationException, XPathException, IllegalAccessException,
-            ClassNotFoundException {
+    private static Player generateSong(Document doc, long randomSeed) throws InstantiationException, IllegalAccessException,
+            ClassNotFoundException, XPathException {
 
         LOGGER.debug("Rendering new song with random seed " + randomSeed);
 
-        XPath xpath = XPathFactory.newInstance().newXPath();
-
         // get the root element of the file (we don't care what it's called)
-        Node mainNode = XMLUtils.getNode("/*", doc, xpath);
+        Node mainNode = XMLUtils.getNode("/*", doc);
 
-        Node structureNode = XMLUtils.getNode("structure", mainNode, xpath);
-        Node harmonyEngineNode = XMLUtils.getNode("harmonyEngine", mainNode, xpath);
-        Node arrangementEngineNode = XMLUtils.getNode("arrangementEngine", mainNode, xpath);
-        Node playerNode = XMLUtils.getNode("player", mainNode, xpath);
+        Node structureNode = XMLUtils.getNode("structure", mainNode);
+        Node harmonyEngineNode = XMLUtils.getNode("harmonyEngine", mainNode);
+        Node arrangementEngineNode = XMLUtils.getNode("arrangementEngine", mainNode);
+        Node playerNode = XMLUtils.getNode("player", mainNode);
 
         Random random = new Random(randomSeed);
 
-        Structure structure = parseStructure(random.nextLong(), structureNode, xpath, null);
+        Structure structure = parseStructure(random.nextLong(), structureNode, null);
         structure.setRandomSeed(randomSeed);
 
-        HarmonyEngine harmonyEngine = XMLUtils.getInstance(HarmonyEngine.class, harmonyEngineNode, xpath, randomSeed, 0);
+        HarmonyEngine harmonyEngine = XMLUtils.getInstance(HarmonyEngine.class, harmonyEngineNode, randomSeed, 0);
         structure.setHarmonyEngine(harmonyEngine);
 
-        ArrangementEngine arrangementEngine = XMLUtils.getInstance(ArrangementEngine.class, arrangementEngineNode, xpath, randomSeed, 1);
+        ArrangementEngine arrangementEngine = XMLUtils.getInstance(ArrangementEngine.class, arrangementEngineNode, randomSeed, 1);
         arrangementEngine.setStructure(structure);
         long startTime = System.nanoTime();
         Arrangement arrangement = arrangementEngine.render();
@@ -223,7 +218,7 @@ public final class SongUtils {
             LOGGER.debug("Rendering took " + (time / 1000000) + " ms");
         }
 
-        Player player = XMLUtils.getInstance(Player.class, playerNode, xpath, randomSeed, 2);
+        Player player = XMLUtils.getInstance(Player.class, playerNode, randomSeed, 2);
         player.setArrangement(arrangement);
         return player;
     }
@@ -289,18 +284,17 @@ public final class SongUtils {
      *
      * @param randomSeed the random seed
      * @param node the node of the tag
-     * @param xpath an XPath instance
      * @param songName the song name
      *
      * @return a Structure
      */
 
-    private static Structure parseStructure(long randomSeed, Node node, XPath xpath, String songName) {
+    private static Structure parseStructure(long randomSeed, Node node, String songName) {
         Random random = new Random(randomSeed);
 
-        int bars = XMLUtils.parseInteger(random, "bars", node, xpath);
-        int beatsPerBar = XMLUtils.parseInteger(random, "beatsPerBar", node, xpath);
-        int ticksPerBeat = XMLUtils.parseInteger(random, "ticksPerBeat", node, xpath);
+        int bars = XMLUtils.parseInteger(random, "bars", node);
+        int beatsPerBar = XMLUtils.parseInteger(random, "beatsPerBar", node);
+        int ticksPerBeat = XMLUtils.parseInteger(random, "ticksPerBeat", node);
 
         if (bars <= 0) {
             throw new RuntimeException("Number of bars must be > 0");
@@ -328,27 +322,25 @@ public final class SongUtils {
      */
 
     private static void checkVersion(Document doc) throws XPathExpressionException {
-        XPath xpath = XPathFactory.newInstance().newXPath();
-        Node rootNode = XMLUtils.getNode("/*", doc, xpath);
-        checkVersion(rootNode, xpath);
+        Node rootNode = XMLUtils.getNode("/*", doc);
+        checkVersion(rootNode);        
     }
 
     /**
      * Checks if the version of the XML document is compatible with the application version. If the versions are not compatible a RuntimeException
      * will be thrown with an appropriate message. If the application version is undefined ("???"), the check is skipped.
      *
-     * @param xpath the XPath instance
      * @param rootNode the root node
      *
      * @throws XPathExpressionException in case of an XPath expression problem
      */
 
-    private static void checkVersion(Node rootNode, XPath xpath) throws XPathExpressionException {
+    private static void checkVersion(Node rootNode) throws XPathExpressionException {
         if (BuildConstants.VERSION.equals("???")) {
             return;
         }
 
-        String version = XMLUtils.parseString(null, "attribute::version", rootNode, xpath);
+        String version = XMLUtils.parseString(null, "attribute::version", rootNode);
 
         if (version != null && !version.equals("")) {
             if (version.endsWith("+")) {

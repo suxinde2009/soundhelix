@@ -6,6 +6,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathException;
 import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.Node;
@@ -27,6 +28,13 @@ public final class XMLUtils {
     /** The factor used for augmenting the random seed (56-bit prime). */
     private static final long RANDOM_SEED_PRIME = 0xFFFFFFFFFFFFC7L;
 
+    /** The ThreadLocal for XPath instances. Makes sure that every thread uses its own XPath instance, as XPath instances are not thread-safe. */
+    private static final ThreadLocal<XPath> XPATH = new ThreadLocal<XPath>() {
+        @Override protected XPath initialValue() {
+            return XPathFactory.newInstance().newXPath();
+        }
+    };
+    
     /**
      * Private constructor.
      */
@@ -39,15 +47,14 @@ public final class XMLUtils {
      *
      * @param path the XPath expression relative to the node
      * @param node the node
-     * @param xpath an XPath instance
      *
      * @return the node list
      *
      * @throws XPathExpressionException in case of an XPath expression problem
      */
 
-    public static Node getNode(String path, Node node, XPath xpath) throws XPathExpressionException {
-        return (Node) xpath.evaluate(path, node, XPathConstants.NODE);
+    public static Node getNode(String path, Node node) throws XPathExpressionException {
+        return (Node) XPATH.get().evaluate(path, node, XPathConstants.NODE);
     }
 
     /**
@@ -55,15 +62,14 @@ public final class XMLUtils {
      *
      * @param path the XPath expression relative to the node
      * @param node the node
-     * @param xpath an XPath instance
      *
      * @return the node list
      *
      * @throws XPathExpressionException in case of an XPath expression problem
      */
 
-    public static NodeList getNodeList(String path, Node node, XPath xpath) throws XPathExpressionException {
-        return (NodeList) xpath.evaluate(path, node, XPathConstants.NODESET);
+    public static NodeList getNodeList(String path, Node node) throws XPathExpressionException {
+        return (NodeList) XPATH.get().evaluate(path, node, XPathConstants.NODESET);
     }
 
     /**
@@ -94,20 +100,19 @@ public final class XMLUtils {
      * @param random the random generator
      * @param path the XPath expression relative to the node
      * @param node the node
-     * @param xpath an XPath instance
      *
      * @return the integer
      */
 
-    public static int parseInteger(Random random, String path, Node node, XPath xpath) {
+    public static int parseInteger(Random random, String path, Node node) {
         try {
-            Node node2 = XMLUtils.getNode(path, node, xpath);
+            Node node2 = XMLUtils.getNode(path, node);
 
             if (node2 == null) {
                 throw new RuntimeException("Path \"" + path + "\" not found within node " + node.getNodeName());
             }
 
-            return parseInteger(random, node2, xpath);
+            return parseInteger(random, node2);
         } catch (Exception e) {
             throw new RuntimeException("Error parsing integer", e);
         }
@@ -119,17 +124,18 @@ public final class XMLUtils {
      *
      * @param random the random generator
      * @param node the node to parse
-     * @param xpath an XPath instance
      *
      * @return the integer
      */
 
-    public static int parseInteger(Random random, Node node, XPath xpath) {
+    public static int parseInteger(Random random, Node node) {
         try {
             return Integer.parseInt(node.getTextContent());
         } catch (RuntimeException e) {
         }
 
+        XPath xpath = XPATH.get();
+        
         Node n = getFirstElementChild(node);
 
         if (n.getNodeName().equals("random")) {
@@ -187,20 +193,19 @@ public final class XMLUtils {
      * @param random the random generator
      * @param path the XPath expression relative to the node
      * @param node the node
-     * @param xpath an XPath instance
      *
      * @return the integer
      */
 
-    public static double parseDouble(Random random, String path, Node node, XPath xpath) {
+    public static double parseDouble(Random random, String path, Node node) {
         try {
-            Node node2 = XMLUtils.getNode(path, node, xpath);
+            Node node2 = XMLUtils.getNode(path, node);
 
             if (node2 == null) {
                 throw new RuntimeException("Path \"" + path + "\" not found within node " + node.getNodeName());
             }
 
-            return XMLUtils.parseDouble(random, node2, xpath);
+            return XMLUtils.parseDouble(random, node2);
         } catch (Exception e) {
             throw new RuntimeException("Error parsing double", e);
         }
@@ -212,24 +217,23 @@ public final class XMLUtils {
      *
      * @param random the random generator
      * @param node the node to parse
-     * @param xpath an XPath instance
      *
      * @return the integer
      */
 
-    public static double parseDouble(Random random, Node node, XPath xpath) {
+    public static double parseDouble(Random random, Node node) {
         return Double.parseDouble(node.getTextContent());
     }
 
-    public static boolean parseBoolean(Random random, String path, Node node, XPath xpath) {
+    public static boolean parseBoolean(Random random, String path, Node node) {
         try {
-            Node node2 = XMLUtils.getNode(path, node, xpath);
+            Node node2 = XMLUtils.getNode(path, node);
 
             if (node2 == null) {
                 throw new RuntimeException("Path \"" + path + "\" not found within node " + node.getNodeName());
             }
 
-            return XMLUtils.parseBoolean(random, node2, xpath);
+            return XMLUtils.parseBoolean(random, node2);
         } catch (Exception e) {
             throw new RuntimeException("Error parsing boolean", e);
         }
@@ -241,12 +245,11 @@ public final class XMLUtils {
      *
      * @param random the random generator
      * @param node the node to parse
-     * @param xpath an XPath instance
      *
      * @return the boolean
      */
 
-    public static boolean parseBoolean(Random random, Node node, XPath xpath) {
+    public static boolean parseBoolean(Random random, Node node) {
         String content = node.getTextContent();
 
         if (content != null && !content.equals("")) {
@@ -261,7 +264,7 @@ public final class XMLUtils {
 
         if (n.getNodeName().equals("random")) {
             try {
-                double prob = Double.parseDouble(xpath.evaluate("attribute::probability", n));
+                double prob = Double.parseDouble(XPATH.get().evaluate("attribute::probability", n));
                 return RandomUtils.getBoolean(random, prob / 100.0d);
             } catch (Exception e) {
                 throw new RuntimeException("Error parsing random attributes", e);
@@ -277,15 +280,14 @@ public final class XMLUtils {
      * @param random the random generator
      * @param path the XPath expression relative to the node
      * @param node the node
-     * @param xpath an XPath instance
      *
      * @return the integer
      */
 
-    public static String parseString(Random random, String path, Node node, XPath xpath) {
+    public static String parseString(Random random, String path, Node node) {
         try {
-            Node node2 = XMLUtils.getNode(path, node, xpath);
-            return XMLUtils.parseString(random, node2, xpath);
+            Node node2 = XMLUtils.getNode(path, node);
+            return XMLUtils.parseString(random, node2);
         } catch (Exception e) {
             throw new RuntimeException("Error parsing string", e);
         }
@@ -298,20 +300,19 @@ public final class XMLUtils {
      * @param path the XPath expression relative to the node
      * @param node the node
      * @param separatorChar the separator character
-     * @param xpath an XPath instance
      *
      * @return the integer
      */
 
-    public static String[] parseStringList(Random random, String path, Node node, char separatorChar, XPath xpath) {
+    public static String[] parseStringList(Random random, String path, Node node, char separatorChar) {
         try {
-            Node node2 = XMLUtils.getNode(path, node, xpath);
+            Node node2 = XMLUtils.getNode(path, node);
 
             if (node2 == null) {
                 throw new RuntimeException("Path \"" + path + "\" not found within node " + node.getNodeName());
             }
 
-            return StringUtils.split(XMLUtils.parseString(random, node2, xpath), separatorChar);
+            return StringUtils.split(XMLUtils.parseString(random, node2), separatorChar);
         } catch (Exception e) {
             throw new RuntimeException("Error parsing string list", e);
         }
@@ -322,12 +323,11 @@ public final class XMLUtils {
      *
      * @param random the random generator
      * @param node the node
-     * @param xpath an XPath instance
      *
      * @return the string (or null)
      */
 
-    public static String parseString(Random random, Node node, XPath xpath) {
+    public static String parseString(Random random, Node node) {
         if (node == null) {
             return null;
         }
@@ -340,7 +340,7 @@ public final class XMLUtils {
 
         if (n.getNodeName().equals("random")) {
             try {
-                String s = xpath.evaluate("attribute::list", n);
+                String s = XPATH.get().evaluate("attribute::list", n);
 
                 if (s == null) {
                     throw new RuntimeException("Attribute \"list\" is undefined");
@@ -363,12 +363,11 @@ public final class XMLUtils {
      * @param random the random generator
      * @param node the node
      * @param separatorChar the separator character
-     * @param xpath an XPath instance
      *
      * @return the string (or null)
      */
 
-    public static String[] parseStringList(Random random, Node node, char separatorChar, XPath xpath) {
+    public static String[] parseStringList(Random random, Node node, char separatorChar) {
         if (node == null) {
             return null;
         }
@@ -381,7 +380,7 @@ public final class XMLUtils {
 
         if (n.getNodeName().equals("random")) {
             try {
-                String s = xpath.evaluate("attribute::list", n);
+                String s = XPATH.get().evaluate("attribute::list", n);
 
                 if (s == null || s.equals("")) {
                     throw new RuntimeException("Attribute \"list\" is empty");
@@ -398,8 +397,8 @@ public final class XMLUtils {
         }
     }
 
-    public static int[] parseIntegerListString(Random random, String path, Node node, XPath xpath) {
-        String string = XMLUtils.parseString(random, path, node, xpath);
+    public static int[] parseIntegerListString(Random random, String path, Node node) {
+        String string = XMLUtils.parseString(random, path, node);
 
         if (string == null || string.equals("")) {
             return null;
@@ -426,7 +425,6 @@ public final class XMLUtils {
      *
      * @param superclazz the superclass
      * @param node the node to use for configuration
-     * @param xpath an XPath instance
      * @param parentRandomSeed the random seed origin to use (the random seed of the parent component)
      * @param salt the random salt (each instance created by the parent should use a different salt value)
      * @param <T> the type
@@ -439,11 +437,13 @@ public final class XMLUtils {
      * @throws IllegalAccessException if the class cannot be instantiated
      */
 
-    public static <T> T getInstance(Class<T> superclazz, Node node, XPath xpath, long parentRandomSeed, int salt) throws InstantiationException,
+    public static <T> T getInstance(Class<T> superclazz, Node node, long parentRandomSeed, int salt) throws InstantiationException,
             XPathException, IllegalAccessException, ClassNotFoundException {
         if (node == null) {
             throw new IllegalArgumentException("Node is null");
         }
+        
+        XPath xpath = XPATH.get();
 
         String className = xpath.evaluate("attribute::class", node);
 
@@ -513,7 +513,7 @@ public final class XMLUtils {
         // configure instance if it is XML-configurable
 
         if (instance instanceof XMLConfigurable) {
-            ((XMLConfigurable) instance).configure(node, xpath);
+            ((XMLConfigurable) instance).configure(node);
         }
 
         return instance;

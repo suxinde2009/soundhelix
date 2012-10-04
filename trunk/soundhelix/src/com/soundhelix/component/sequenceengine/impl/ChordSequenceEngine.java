@@ -2,7 +2,6 @@ package com.soundhelix.component.sequenceengine.impl;
 
 import java.util.Random;
 
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathException;
 
 import org.w3c.dom.Node;
@@ -24,10 +23,10 @@ public class ChordSequenceEngine extends MultiPatternSequenceEngine {
         super();
     }
 
-    public void configure(Node node, XPath xpath) throws XPathException {
+    public void configure(Node node) throws XPathException {
         random = new Random(randomSeed);
 
-        String offsetString = XMLUtils.parseString(random, "offsets", node, xpath);
+        String offsetString = XMLUtils.parseString(random, "offsets", node);
 
         if (offsetString == null || offsetString.equals("")) {
             offsetString = "0,1,2";
@@ -42,17 +41,17 @@ public class ChordSequenceEngine extends MultiPatternSequenceEngine {
         }
 
         try {
-            setNormalizeChords(!XMLUtils.parseBoolean(random, "obeyChordSubtype", node, xpath));
+            setNormalizeChords(!XMLUtils.parseBoolean(random, "obeyChordSubtype", node));
             logger.warn("The tag \"obeyChordSubtype\" has been deprecated. Use \"normalizeChords\" with inverted value instead.");
         } catch (Exception e) {
         }
 
         try {
-            setNormalizeChords(XMLUtils.parseBoolean(random, "normalizeChords", node, xpath));
+            setNormalizeChords(XMLUtils.parseBoolean(random, "normalizeChords", node));
         } catch (Exception e) {
         }
 
-        NodeList nodeList = XMLUtils.getNodeList("patternEngine", node, xpath);
+        NodeList nodeList = XMLUtils.getNodeList("patternEngine", node);
 
         if (nodeList.getLength() == 0) {
             throw new RuntimeException("Need at least 1 pattern");
@@ -62,7 +61,7 @@ public class ChordSequenceEngine extends MultiPatternSequenceEngine {
 
         try {
             int i = random.nextInt(nodeList.getLength());
-            patternEngine = XMLUtils.getInstance(PatternEngine.class, nodeList.item(i), xpath, randomSeed, i);
+            patternEngine = XMLUtils.getInstance(PatternEngine.class, nodeList.item(i), randomSeed, i);
         } catch (Exception e) {
             throw new RuntimeException("Error instantiating PatternEngine", e);
         }

@@ -6,7 +6,6 @@ import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathException;
 
 import org.w3c.dom.Node;
@@ -51,20 +50,20 @@ public class CFGSongNameEngine extends AbstractSongNameEngine {
     }
 
     @Override
-    public void configure(Node node, XPath xpath) throws XPathException {
+    public void configure(Node node) throws XPathException {
         Random random = new Random(randomSeed);
 
-        NodeList nodeList = XMLUtils.getNodeList("variable", node, xpath);
+        NodeList nodeList = XMLUtils.getNodeList("variable", node);
         int variableCount = nodeList.getLength();
 
         Map<String, RandomStrings> variableMap = new HashMap<String, RandomStrings>(variableCount);
 
         for (int i = 0; i < variableCount; i++) {
-            String name = XMLUtils.parseString(random, "attribute::name", nodeList.item(i), xpath);
+            String name = XMLUtils.parseString(random, "attribute::name", nodeList.item(i));
             boolean once;
 
             try {
-                once = XMLUtils.parseBoolean(random, "attribute::once", nodeList.item(i), xpath);
+                once = XMLUtils.parseBoolean(random, "attribute::once", nodeList.item(i));
             } catch (Exception e) {
                 once = true;
             }
@@ -73,7 +72,7 @@ public class CFGSongNameEngine extends AbstractSongNameEngine {
                 throw new RuntimeException("Variable \"" + name + "\" defined more than once");
             }
 
-            String valueString = XMLUtils.parseString(random, nodeList.item(i), xpath);
+            String valueString = XMLUtils.parseString(random, nodeList.item(i));
             String[] values = StringUtils.split(valueString, stringSeparator);
 
             variableMap.put(name, new RandomStrings(values, once));

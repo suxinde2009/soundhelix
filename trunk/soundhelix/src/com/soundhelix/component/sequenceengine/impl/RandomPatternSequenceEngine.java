@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathException;
 
 import org.w3c.dom.Node;
@@ -150,13 +149,13 @@ public class RandomPatternSequenceEngine extends AbstractSequenceEngine {
         return sectionMap;
     }
 
-    public void configure(Node node, XPath xpath) throws XPathException {
+    public void configure(Node node) throws XPathException {
         random = new Random(randomSeed);
 
-        NodeList nodeList = XMLUtils.getNodeList("pattern", node, xpath);
-        setPattern(XMLUtils.parseString(random, nodeList.item(random.nextInt(nodeList.getLength())), xpath));
+        NodeList nodeList = XMLUtils.getNodeList("pattern", node);
+        setPattern(XMLUtils.parseString(random, nodeList.item(random.nextInt(nodeList.getLength()))));
 
-        String offsetString = XMLUtils.parseString(random, "offsets", node, xpath);
+        String offsetString = XMLUtils.parseString(random, "offsets", node);
 
         if (offsetString == null || offsetString.equals("")) {
             offsetString = "0,1,2";

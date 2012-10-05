@@ -5,15 +5,15 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Represents a track. A track consists of an arbitrary number of sequences and a type. The type can either be MELODY, which means that the sequences
- * contain melodic notes which are subject for transposition, or it can be RHYTHM, which means the sequences contain rhythm notes which must never be
- * transposed. For example, for drum machines, RHYTHM must be used, because each pitch of a sequence selects a drum sample to play (c' might be the
+ * Represents a track. A track consists of an arbitrary number of sequences and a type. The type can either be MELODIC, which means that the sequences
+ * contain melodic notes which are subject for transposition, or it can be RHYTHMIC, which means the sequences contain rhythm notes which must never be
+ * transposed. For example, for drum machines, RHYTHMIC must be used, because each pitch of a sequence selects a drum sample to play (c' might be the
  * base drum, c#' might be the snare and so on) rather than a frequency of a tone to play.
  * 
  * Only a whole track can be assigned to an instrument, so all contained sequences use the same instrument for playback. If different instruments are
  * needed, the sequences must each be put into a track individually. The assignment of a whole track to an instrument is also the reason why it
- * doesn't make sense to individually assign the types to sequences. If you have an instrument where part of the keys should use RHYTHM, the others
- * should use MELODY, you should split these off into two different tracks and assign them to the same MIDI channel for playback.
+ * doesn't make sense to individually assign the types to sequences. If you have an instrument where part of the keys should use RHYTHMIC, the others
+ * should use MELODIC, you should split these off into two different tracks and assign them to the same MIDI channel for playback.
  * 
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
@@ -91,7 +91,7 @@ public class Track {
 
     /**
      * Transposes all sequences of this track up by the given number of halftones. If the number of halftones is not zero, the track type must not be
-     * RHYTHM.
+     * RHYTHMIC.
      * 
      * @param halftones the number of halftones (positive or negative)
      */
@@ -104,7 +104,7 @@ public class Track {
 
         if (type == TrackType.RHYTHMIC) {
             // non-zero transposition is forbidden for this type
-            throw new IllegalArgumentException("Tracks of type RHYTHM must not be transposed");
+            throw new IllegalArgumentException("Tracks of type RHYTHMIC must not be transposed");
         }
 
         // transpose all the sequences of this track up by the number of halftones

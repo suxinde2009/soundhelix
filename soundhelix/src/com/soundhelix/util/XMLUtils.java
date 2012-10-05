@@ -418,10 +418,11 @@ public final class XMLUtils {
 
     /**
      * Tries to instantiate an instance from the class defined by the node's attribute "class" by calling its nullary (empty) constructor. If the
-     * given class name is not fully qualified (i.e., contains no dot), the package of the given superclass is prefixed to the class name. The class
-     * must be a subclass of the given class to succeed. If the class defines the interface RandomSeedable, it is random-seeded by creating a random
-     * seed based on the specified random seed, the class name and the specified modifier. If the class defines the interface XMLConfigurable, it is
-     * configured by calling configure() with the node as the configuration root. The given salt value can be overridden by using a "seed" attribute.
+     * given class name is not fully qualified (i.e., contains no dot), the package of the given superclass plus "." is prefixed to the class name (unless 
+     * the given superclass is an interface, then the package plus ".impl." is prefixed to the class name).  The class must be a subclass of the given class
+     * (or implement the interface) to succeed. If the class defines the interface RandomSeedable, it is random-seeded by creating a random seed based on the
+     * specified random seed, the class name and the specified modifier. If the class defines the interface XMLConfigurable, it is configured by calling
+     * configure() with the node as the configuration root. The given salt value can be overridden by using a "salt" or "seed" attribute.
      *
      * @param superclazz the superclass
      * @param node the node to use for configuration
@@ -452,8 +453,14 @@ public final class XMLUtils {
         }
 
         if (className.indexOf('.') < 0) {
-            // prefix the class name with the package name of the superclass plus ".impl"
-            className = superclazz.getName().substring(0, superclazz.getName().lastIndexOf('.') + 1) + "impl." + className;
+            // determine the superclass' package (including the trailing dot)
+            String packageName = superclazz.getName().substring(0, superclazz.getName().lastIndexOf('.') + 1);
+
+            if (superclazz.isInterface()) {
+                className = packageName + "impl." + className;
+            } else {
+                className = packageName + className;
+            }
         }
 
         boolean isSeedProvided = false;

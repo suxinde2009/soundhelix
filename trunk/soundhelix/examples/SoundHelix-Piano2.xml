@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!-- Example XML file for SoundHelix. Author: Thomas Schuerger. -->
-<SoundHelix version="0.4+" xmlns:xi="http://www.w3.org/2001/XInclude">
+<SoundHelix version="0.5+" xmlns:xi="http://www.w3.org/2001/XInclude">
   <xi:include href="../includes/Standard-SongNameEngine.xml" />
   <structure>
     <bars>
@@ -81,7 +81,7 @@
         <melodies>2,3,4</melodies>
         <minPitch>0</minPitch>
         <maxPitch>9</maxPitch>
-		<pitchDistances>-2,-2,-1,-1,-1,-1,0,0,1,1,1,1,2,2</pitchDistances>
+        <pitchDistances>-2,-2,-1,-1,-1,-1,0,0,1,1,1,1,2,2</pitchDistances>
         <patternEngine class="RandomPatternEngine">
           <patternTicks>16</patternTicks>
           <patternString>
@@ -109,7 +109,7 @@
         <melodies>2,2,3</melodies>
         <minPitch>0</minPitch>
         <maxPitch>11</maxPitch>
-		<pitchDistances>-2,-2,-1,-1,-1,-1,0,0,1,1,1,1,2,2</pitchDistances>
+        <pitchDistances>-2,-2,-1,-1,-1,-1,0,0,1,1,1,1,2,2</pitchDistances>
         <patternEngine class="RandomPatternEngine">
           <patternTicks>16</patternTicks>
           <patternString>

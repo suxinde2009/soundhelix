@@ -144,6 +144,8 @@
     <groove>
       <random list="100|110,90|120,80|115,85" />
     </groove>
+    <!-- uncomment the following line if you want to write all generated songs as MIDI files -->
+    <!-- <midiFilename>midifiles/${safeSongName}-${safeDeviceName}.mid</midiFilename> -->
     <device name="device1" clockSynchronization="true">Microsoft GS Wavetable Synth,Microsoft GS Wavetable SW Synth,Gervill,Java Sound Synthesizer</device>
     <map instrument="accompbass" device="device1" channel="1" program="1" />
     <map instrument="accomp" device="device1" channel="2" program="1" />

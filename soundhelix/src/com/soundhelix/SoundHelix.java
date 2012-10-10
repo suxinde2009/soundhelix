@@ -126,6 +126,7 @@ public class SoundHelix implements Runnable {
 
         if (showHelp) {
             System.out.println("Usage: java -jar SoundHelix.jar [options] xml-filename");
+            System.out.println("       java -jar SoundHelix.jar [options] xml-url");
             System.out.println();
             System.out.println("Options:");
             System.out.println();

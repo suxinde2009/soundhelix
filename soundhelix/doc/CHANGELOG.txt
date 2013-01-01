@@ -7,6 +7,14 @@ Author: Thomas Schürger (thomas@schuerger.com)
 Change log
 ----------
 
+
+0.6:
+
+    - Fixed applet to include the SoundHelix XML file URL in Facebook and Twitter URLs.
+
+    - Added new example SoundHelix-Percussion.xml.
+
+
 0.5: 2012-10-07
 
     - Added first version of the MIDI file export to the MidiPlayer. Use the tag "midiFilename" to define the MIDI filename template

@@ -146,13 +146,13 @@
 
     <target name="packagebin" description="build binary zip" depends="jar">
         <zip destfile="${binzip}">
-            <zipfileset dir="." includes="SoundHelix.jar,run.bat,run.sh,examples/SoundHelix-Piano.xml,examples/SoundHelix-Piano2.xml,includes/*.xml,doc/*,lib/*.jar,log4j.*" prefix="soundhelix-${version}"/>
+            <zipfileset dir="." includes="SoundHelix.jar,run.bat,run.sh,examples/SoundHelix-Piano.xml,examples/SoundHelix-Piano2.xml,examples/SoundHelix-Percussion.xml,includes/*.xml,doc/*,lib/*.jar,log4j.*" prefix="soundhelix-${version}"/>
         </zip>
     </target>
 
     <target name="packagesrc" description="build source zip including binary, sources and javadoc" depends="jar,javadoc">
         <zip destfile="${srczip}">
-             <zipfileset dir="." includes="src/**/*,javadoc/**/*,build.xml,VERSION.txt,SoundHelix.jar,run.bat,run.sh,examples/SoundHelix-Piano.xml,examples/SoundHelix-Piano2.xml,includes/*.xml,doc/*,lib/*.jar,log4j.*" prefix="soundhelix-${version}"/>
+             <zipfileset dir="." includes="src/**/*,javadoc/**/*,build.xml,VERSION.txt,SoundHelix.jar,run.bat,run.sh,examples/SoundHelix-Piano.xml,examples/SoundHelix-Piano2.xml,examples/SoundHelix-Percussion.xml,includes/*.xml,doc/*,lib/*.jar,log4j.*" prefix="soundhelix-${version}"/>
         </zip>
     </target>
 

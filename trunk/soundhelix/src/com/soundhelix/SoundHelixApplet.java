@@ -263,9 +263,9 @@ public class SoundHelixApplet extends JApplet implements Runnable {
                             String url;
 
                             if (button == facebookShareButton) {
-                                url = getFacebookUrl(currentSongName);
+                                url = getFacebookUrl(currentSongName, urlString);
                             } else if (button == twitterShareButton) {
-                                url = getTwitterUrl(currentSongName);
+                                url = getTwitterUrl(currentSongName, urlString);
                             } else if (button == youTubeShareButton) {
                                 url = "http://www.youtube.com/SoundHelix/";
                             } else {
@@ -371,25 +371,27 @@ public class SoundHelixApplet extends JApplet implements Runnable {
      * Generates and returns a Facebook URL for sharing the given song.
      *
      * @param songName the song name
+     * @param xmlUrl the XML URL
      *
      * @return the URL
      */
 
-    private static String getFacebookUrl(String songName) {
+    private static String getFacebookUrl(String songName, String xmlUrl) {
         return "http://www.facebook.com/sharer.php?u="
-                + urlEncode("http://www.soundhelix.com/applet/SoundHelix-applet.jnlp?songName=" + urlEncode(songName));
+                + urlEncode("http://www.soundhelix.com/applet/SoundHelix-applet.jnlp?songName=" + urlEncode(songName) + "&url=" + urlEncode(xmlUrl));
     }
 
     /**
      * Generates and returns a Facebook URL for sharing the given song.
      *
      * @param songName the song name
+     * @param xmlUrl the XML URL
      *
      * @return the URL
      */
 
-    private static String getTwitterUrl(String songName) {
-        String url = "http://www.soundhelix.com/applet/SoundHelix-applet.jnlp?songName=" + urlEncode(songName);
+    private static String getTwitterUrl(String songName, String xmlUrl) {
+        String url = "http://www.soundhelix.com/applet/SoundHelix-applet.jnlp?songName=" + urlEncode(songName) + "&url=" + urlEncode(xmlUrl);
         String text = "Check out this cool song called \"" + songName + "\"! Needs audio and a browser with " + "Java 6 plugin.";
 
         // URL shortener creates URL like http://t.co/CmVMQgu

@@ -47,6 +47,12 @@
       <minSegmentCount>2</minSegmentCount>
       <maxSegmentCount>4</maxSegmentCount>
     </activityVector>
+    <activityVector name="clap">
+      <startAfterSection>1</startAfterSection>
+      <minActive>10</minActive>
+      <maxActive>100</maxActive>
+      <minSegmentLength>2</minSegmentLength>
+    </activityVector>
     <activityVector name="hihat">
       <startAfterSection>0</startAfterSection>
       <minActive>30</minActive>
@@ -129,6 +135,17 @@
             <pattern group="A">-,-,-,-,0,-,-,-</pattern>
             <pattern group="B">-,-,-,-,0,-,-,-|-,-,-,-,0,-,-,0</pattern>
             <pattern group="C">-,-,-,-,0,-,-,0|-,-,-,0,0,-,0,-|-,-,-,0,0,0,-,0|-,-,-,0,0,0,0,-</pattern>
+          </patternEngine>
+        </pattern>
+        <pattern>
+          <!-- clap -->
+          <pitch>39</pitch>
+          <patternEngine class="RandomFragmentPatternEngine">
+            <patternTicks>16</patternTicks>
+            <patternString><random list="A1,B1,A1,B2|A1,B1,A1,B2,A1,B1,A1,B3|A1,A1,A1,B1,A1,A1,A1,B2,A1,A1,A1,B1,A1,A1,A1,B3|C1,A1,C1,B1,C1,A1,C1,B2"/></patternString>
+            <pattern group="A">-/12,0,-/3</pattern>
+            <pattern group="B">-/11,0:16384,0,-/3|-/12,0,0,-/2|-/12,0,0,-,0|-/9,0,-,-,0,-/3|-/9,0,-,-,0,-,0,-</pattern>
+            <pattern group="C">-/16</pattern>
           </patternEngine>
         </pattern>
         <pattern>
@@ -309,6 +326,7 @@
       </sequenceEngine>
       <activityVector>base</activityVector>
       <activityVector>snare</activityVector>
+      <activityVector>clap</activityVector>
       <activityVector>hihat</activityVector>
       <activityVector>hihat</activityVector>
       <activityVector>clave</activityVector>

@@ -107,6 +107,7 @@
       <minSegmentLength>2</minSegmentLength>
     </activityVector>
     <activityVector name="cymbal">
+      <startAfterSection>2</startAfterSection>
       <minActive>10</minActive>
       <maxActive>90</maxActive>
       <minSegmentLength>2</minSegmentLength>
@@ -354,7 +355,7 @@
       <random list="100|110,90" />
     </groove>
     <!-- uncomment the following line if you want to write all generated songs as MIDI files in the subdirectory "midifiles" -->
-    <!-- <midiFilename>midifiles/SoundHelix-Percussion-${safeSongName}.mid</midiFilename> -->
+    <!-- <midiFilename>midifiles/SoundHelix-Percussion_-_${safeSongName}.mid</midiFilename> -->
     <device name="device1" clockSynchronization="true">Microsoft GS Wavetable Synth,Microsoft GS Wavetable SW Synth,Gervill,Java Sound Synthesizer</device>
     <map instrument="percussion" device="device1" channel="10" />
   </player>

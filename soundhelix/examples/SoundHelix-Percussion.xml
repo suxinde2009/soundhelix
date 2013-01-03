@@ -27,8 +27,8 @@
     <activityVector name="base">
       <startAfterSection>1</startAfterSection>
       <startBeforeSection>4</startBeforeSection>
-      <stopBeforeSection>-1</stopBeforeSection>
-      <stopAfterSection>4</stopAfterSection>
+      <stopBeforeSection>0</stopBeforeSection>
+      <stopAfterSection>3</stopAfterSection>
       <minActive>50</minActive>
       <maxActive>90</maxActive>
       <minSegmentLength>2</minSegmentLength>
@@ -49,7 +49,7 @@
     </activityVector>
     <activityVector name="clap">
       <startAfterSection>1</startAfterSection>
-      <minActive>10</minActive>
+      <minActive>20</minActive>
       <maxActive>100</maxActive>
       <minSegmentLength>2</minSegmentLength>
     </activityVector>
@@ -107,7 +107,7 @@
     </activityVector>
     <activityVector name="cymbal">
       <minActive>10</minActive>
-      <maxActive>80</maxActive>
+      <maxActive>90</maxActive>
       <minSegmentLength>2</minSegmentLength>
     </activityVector>
 

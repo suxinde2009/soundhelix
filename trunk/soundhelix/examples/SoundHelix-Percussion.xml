@@ -24,6 +24,7 @@
     <stopActivityCounts>
       <random list="4,2|5,3,2|5,4,2" />
     </stopActivityCounts>
+    <!-- make sure the constraints are not too restrictive; with a large number of AVs it may easily become infeasible to find a valid song matrix which fulfills all constraints -->
     <activityVector name="base">
       <startAfterSection>1</startAfterSection>
       <startBeforeSection>4</startBeforeSection>
@@ -306,8 +307,8 @@
             <patternString><random list="A1,A2,A1,A3|A1,A2,A1,A3,A1,A2,A1,A4"/></patternString>
             <noteProbability>40</noteProbability>
             <legatoProbability>0</legatoProbability>
-            <minVelocity>24000</minVelocity>
-            <maxVelocity>24000</maxVelocity>
+            <minVelocity>16000</minVelocity>
+            <maxVelocity>16000</maxVelocity>
             <minActiveTicks>2</minActiveTicks>
             <maxActiveTicks>5</maxActiveTicks>
             <offsets>0</offsets>

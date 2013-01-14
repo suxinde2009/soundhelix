@@ -139,7 +139,7 @@
     <transposition>
       <random min="65" max="69" />
     </transposition>
-    <beforePlayWaitTicks>16</beforePlayWaitTicks>
+    <beforePlayWaitTicks>0</beforePlayWaitTicks>
     <afterPlayWaitTicks>16</afterPlayWaitTicks>
     <groove>
       <random list="100|110,90|120,80|115,85" />

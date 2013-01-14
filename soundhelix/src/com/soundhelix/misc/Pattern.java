@@ -242,8 +242,48 @@ public class Pattern implements Iterable<PatternEntry> {
                 // make a modified copy of the PatternEntry
                 newPattern[i] = new PatternEntry(entry.pitch + pitch, entry.velocity, entry.ticks, entry.isLegato);
             } else {
-                // just use the original PatternEntry
+                // just use the original PatternEntry (pauses and wildcards)
                 newPattern[i] = entry;
+            }
+        }
+
+        return new Pattern(newPattern);
+    }
+
+    /**
+     * Returns a new pattern whose entries' ticks are scaled by the given factor. 
+     *
+     * @param factor the scale factor
+     *
+     * @return a new pattern that is a scaled by the factor
+     */
+
+    public Pattern scale(double factor) {
+        if (factor == 1.0d) {
+            // nothing to do; as instances are immutable, we can just return this pattern
+            return this;
+        }
+
+        if (factor <= 0.0d) {
+            throw new IllegalArgumentException("Factor must be > 0");
+        }
+
+        PatternEntry[] newPattern = new PatternEntry[pattern.length];
+
+        for (int i = 0; i < pattern.length; i++) {
+            PatternEntry entry = pattern[i];
+            int ticks = (int) ((entry.ticks) * factor + 0.5d);
+
+            if (ticks == 0) {
+                throw new IllegalArgumentException("Scaling leads to 0 ticks");
+            }
+
+            if (entry.isNote()) {
+                newPattern[i] = new PatternEntry(entry.pitch, entry.velocity, ticks, entry.isLegato);
+            } else if (entry.isWildcard()) {
+                newPattern[i] = new PatternEntry(entry.wildcardCharacter, entry.velocity, ticks, entry.isLegato);
+            } else {
+                newPattern[i] = new PatternEntry(ticks);
             }
         }
 
@@ -263,7 +303,7 @@ public class Pattern implements Iterable<PatternEntry> {
     }
 
     /**
-     * Returns the sequence entry with the given index.
+     * Returns the pattern entry with the given index.
      *
      * @param index the index
      *

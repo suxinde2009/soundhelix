@@ -137,7 +137,7 @@
             <patternString>A1,A1,A1,B1,A1,A1,A1,C1,A1,A1,A1,B1,A1,A1,A1,C2</patternString>
             <pattern group="A">-,-,-,-,0,-,-,-</pattern>
             <pattern group="B">-,-,-,-,0,-,-,-|-,-,-,-,0,-,-,0</pattern>
-            <pattern group="C">-,-,-,-,0,-,-,0|-,-,-,0,0,-,0,-|-,-,-,0,0,0,-,0|-,-,-,0,0,0,0,-</pattern>
+            <pattern group="C">-,-,-,-,0,-,-,0|-,-,-,0,0,-,0,-|-,-,-,0,0,0,-,0|-,-,-,0,0,0,0,-|-,0,-,0,0,0,0,-</pattern>
           </patternEngine>
         </pattern>
         <pattern>
@@ -165,7 +165,7 @@
           <pitch>46</pitch>
           <patternEngine class="RandomFragmentPatternEngine">
             <patternTicks>8</patternTicks>
-            <patternString>A1,B1,A1,B2,A1,B1,A1,B3</patternString>
+            <patternString><random list="A1,B1,A1,B2,A1,B1,A1,B3|A1,A1,A1,B1,A1,A1,A1,B2|A1,A1,A1,B1,A1,A1,A1,B2,A1,A1,A1,B1,A1,A1,A1,B3"/></patternString>
             <pattern group="A">-,-,0:20000,-,-,-,0:20000,-</pattern>
             <pattern group="B">-,-,0:20000,-,-,-,0:20000,-|-,-,0:20000,-,-,-,-,0:20000|-,-,0:20000,-,-,0:20000,-,0:20000</pattern>
           </patternEngine>

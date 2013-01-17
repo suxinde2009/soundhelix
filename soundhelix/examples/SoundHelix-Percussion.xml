@@ -22,7 +22,7 @@
       <random list="1,2,3|2,3,4" />
     </startActivityCounts>
     <stopActivityCounts>
-      <random list="4,2|5,3,2|5,4,2" />
+      <random list="4,3|5,3,2|5,4,2|5,4,3" />
     </stopActivityCounts>
     <!-- make sure the constraints are not too restrictive; with a large number of AVs it may easily become infeasible to find a valid song matrix which fulfills all constraints -->
     <activityVector name="base">

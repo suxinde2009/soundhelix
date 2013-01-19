@@ -948,7 +948,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
             } catch (Exception e) {
             }
 
-            Node sequenceEngineNode = XMLUtils.getNode("sequenceEngine", nodeList.item(i));
+            NodeList sequenceEngineNodeList = XMLUtils.getNodeList("sequenceEngine", nodeList.item(i));
 
             NodeList nameNodeList = XMLUtils.getNodeList("activityVector", nodeList.item(i));
 
@@ -959,7 +959,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
             }
 
             try {
-                SequenceEngine sequenceEngine = XMLUtils.getInstance(SequenceEngine.class, sequenceEngineNode, randomSeed, i);
+                SequenceEngine sequenceEngine = XMLUtils.getInstance(SequenceEngine.class, sequenceEngineNodeList.item(random.nextInt(sequenceEngineNodeList.getLength())), randomSeed, i);
                 arrangementEntries[i] = new ArrangementEntry(instrument, sequenceEngine, transposition, activityVectorNames);
             } catch (Exception e) {
                 throw new RuntimeException("Error instantiating SequenceEngine for instrument \"" + instrument + "\"", e);

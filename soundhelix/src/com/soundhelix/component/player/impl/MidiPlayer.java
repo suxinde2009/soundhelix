@@ -107,6 +107,9 @@ public class MidiPlayer extends AbstractPlayer {
     /** The map that maps from device name to MIDI device. */
     private Map<String, Device> deviceMap;
 
+    /** The array of initial MIDI controller values. */
+    private ControllerValue[] controllerValues;
+
     /** The array of controller LFOs. */
     private ControllerLFO[] controllerLFOs;
 
@@ -392,6 +395,7 @@ public class MidiPlayer extends AbstractPlayer {
             initializeControllerLFOs(arrangement);
             muteAllChannels();
             setChannelPrograms();
+            sendControllerValues();
 
             int clockTimingsPerTick = useClockSynchronization ? CLOCK_SYNCHRONIZATION_TICKS_PER_BEAT / structure.getTicksPerBeat() : 1;
 
@@ -650,12 +654,30 @@ public class MidiPlayer extends AbstractPlayer {
         Map<DeviceChannel, Boolean> map = new HashMap<DeviceChannel, Boolean>();
         Iterator<DeviceChannel> i = channelMap.values().iterator();
 
-        while (i.hasNext()) {
-            DeviceChannel dc = i.next();
-
+        for (DeviceChannel dc : channelMap.values()) {
             if (dc.program != -1 && !map.containsKey(dc)) {
                 sendMidiMessage(trackMap.get(dc.device), 0, dc.channel, ShortMessage.PROGRAM_CHANGE, dc.program, 0);
                 map.put(dc, true);
+            }
+        }
+
+        for (ControllerValue cvalue : controllerValues) {
+            String controller = cvalue.controller;
+            Device device = deviceMap.get(cvalue.deviceName);
+            int value = cvalue.value;
+
+            MidiController midiController = midiControllerMap.get(controller);
+
+            if (midiController != null) {
+                if (midiController.parameter == -1 && midiController.byteCount == 2) {
+                    sendMidiMessage(trackMap.get(device), 0, cvalue.channel, midiController.status, value % 128, value / 128);
+                } else if (midiController.parameter >= 0 && midiController.byteCount == 1) {
+                    sendMidiMessage(trackMap.get(device), 0, cvalue.channel, midiController.status, midiController.parameter, value);
+                } else {
+                    throw new RuntimeException("Error in MIDI controller \"" + controller + "\"");
+                }
+            } else {
+                throw new RuntimeException("Invalid MIDI controller \"" + controller + "\"");
             }
         }
 
@@ -780,7 +802,7 @@ public class MidiPlayer extends AbstractPlayer {
         Structure structure = arrangement.getStructure();
         int ticksPerBar = structure.getTicksPerBar();
 
-        if ((tick % (4 * ticksPerBar)) == 0) {
+        if (tick == 0 || arrangement.getStructure().getHarmonyEngine().getChordSectionTicks(tick - 1) == 1) {
             logger.debug(String.format("Tick: %5d   Chord section: %3d   Seconds: %4d   Progress: %5.1f %%", tick,
                     HarmonyEngineUtils.getChordSectionNumber(arrangement.getStructure(), tick), tick * 60 * 1000
                             / (structure.getTicksPerBeat() * milliBPM),
@@ -1162,6 +1184,34 @@ public class MidiPlayer extends AbstractPlayer {
     }
 
     /**
+     * Sends the initial MIDI controller values.
+     *
+     * @throws InvalidMidiDataException in case of invalid MIDI data
+     */
+
+    private void sendControllerValues() throws InvalidMidiDataException {
+        for (ControllerValue cvalue : controllerValues) {
+            String controller = cvalue.controller;
+            Device device = deviceMap.get(cvalue.deviceName);
+            int value = cvalue.value;
+
+            MidiController midiController = midiControllerMap.get(controller);
+
+            if (midiController != null) {
+                if (midiController.parameter == -1 && midiController.byteCount == 2) {
+                    sendMidiMessage(device, cvalue.channel, midiController.status, value % 128, value / 128);
+                } else if (midiController.parameter >= 0 && midiController.byteCount == 1) {
+                    sendMidiMessage(device, cvalue.channel, midiController.status, midiController.parameter, value);
+                } else {
+                    throw new RuntimeException("Error in MIDI controller \"" + controller + "\"");
+                }
+            } else {
+                throw new RuntimeException("Invalid MIDI controller \"" + controller + "\"");
+            }
+        }
+    }
+
+    /**
      * Sends the given single-byte message to all devices that are using clock synchronization.
      *
      * @param status the message
@@ -1391,6 +1441,21 @@ public class MidiPlayer extends AbstractPlayer {
 
         setChannelMap(channelMap);
 
+        nodeList = XMLUtils.getNodeList("controllerValue", node);
+        entries = nodeList.getLength();
+        ControllerValue[] controllerValues = new ControllerValue[entries];
+
+        for (int i = 0; i < entries; i++) {
+            String device = XMLUtils.parseString(random, "attribute::device", nodeList.item(i));
+            int channel = Integer.parseInt(XMLUtils.parseString(random, "attribute::channel", nodeList.item(i))) - 1;
+            String controller = XMLUtils.parseString(random, "attribute::controller", nodeList.item(i));
+            int value = Integer.parseInt(XMLUtils.parseString(random, ".", nodeList.item(i)));
+
+            controllerValues[i] = new ControllerValue(device, channel, controller, value);
+        }
+
+        setControllerValues(controllerValues);
+
         nodeList = XMLUtils.getNodeList("controllerLFO", node);
         entries = nodeList.getLength();
         ControllerLFO[] controllerLFOs = new ControllerLFO[entries];
@@ -1601,6 +1666,10 @@ public class MidiPlayer extends AbstractPlayer {
         this.midiFilename = midiFilename;
     }
 
+    public final void setControllerValues(ControllerValue[] controllerValues) {
+        this.controllerValues = controllerValues;
+    }
+
     /**
      * Container for a MIDI device.
      */
@@ -1707,6 +1776,30 @@ public class MidiPlayer extends AbstractPlayer {
         @Override
         public final int hashCode() {
             return device.hashCode() * 16273 + channel * 997 + program;
+        }
+    }
+
+    /**
+     * Container for MIDI controller values.
+     */
+    private static class ControllerValue {
+        /** The device name. */
+        private final String deviceName;
+
+        /** The MIDI channel. */
+        private int channel;
+
+        /** The name of the MIDI controller. */
+        private String controller;
+        
+        /** The value of the MIDI controller. */
+        private int value;
+
+        public ControllerValue(String deviceName, int channel, String controller, int value) {
+            this.deviceName = deviceName;
+            this.channel = channel;
+            this.controller = controller;
+            this.value = value;
         }
     }
 

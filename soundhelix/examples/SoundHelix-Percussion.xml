@@ -86,7 +86,7 @@
       <maxActive>100</maxActive>
       <minSegmentLength>2</minSegmentLength>
     </activityVector>
-    <activityVector name="high tom">
+    <activityVector name="mid+high tom">
       <minActive>10</minActive>
       <maxActive>100</maxActive>
       <minSegmentLength>2</minSegmentLength>
@@ -101,16 +101,16 @@
       <maxActive>100</maxActive>
       <minSegmentLength>2</minSegmentLength>
     </activityVector>
-    <activityVector name="triangle">
-      <startAfterSection>1</startAfterSection>
-      <minActive>10</minActive>
-      <maxActive>100</maxActive>
-      <minSegmentLength>2</minSegmentLength>
-    </activityVector>
     <activityVector name="cymbal">
       <startAfterSection>2</startAfterSection>
       <minActive>10</minActive>
       <maxActive>90</maxActive>
+      <minSegmentLength>2</minSegmentLength>
+    </activityVector>
+    <activityVector name="congas">
+      <minSegmentLength>2</minSegmentLength>
+    </activityVector>
+    <activityVector name="timbales">
       <minSegmentLength>2</minSegmentLength>
     </activityVector>
 
@@ -225,7 +225,8 @@
         </pattern>
         <pattern>
           <!-- low tom -->
-          <pitch>43</pitch>
+          <!-- uses Low Tom 1 (43) and Low Tom 2 (41) -->
+          <pitch>41</pitch>
           <patternEngine class="RandomPatternEngine">
             <patternTicks>16</patternTicks>
             <patternString><random list="A1,A2,A1,A3|A1,A2,A1,A3,A1,A2,A1,A4"/></patternString>
@@ -235,7 +236,7 @@
             <maxVelocity>28000</maxVelocity>
             <minActiveTicks>6</minActiveTicks>
             <maxActiveTicks>11</maxActiveTicks>
-            <offsets>0</offsets>
+            <offsets>0,2,2,2</offsets>
             <noteLengths>1</noteLengths>
             <pauseLengths>1,2</pauseLengths>
             <pitchVelocityCorrelation>100</pitchVelocityCorrelation>
@@ -243,8 +244,9 @@
           </patternEngine>
         </pattern>
         <pattern>
-          <!-- high tom -->
-          <pitch>48</pitch>
+          <!-- mid+high tom -->
+          <!-- uses Mid Tom 1 (47), Mid Tom 2 (45), High Tom 1 (50) and High Tom 2 (48) -->
+          <pitch>45</pitch>
           <patternEngine class="RandomPatternEngine">
             <patternTicks>16</patternTicks>
             <patternString><random list="A1,A2,A1,A3|A1,A2,A1,A3,A1,A2,A1,A4"/></patternString>
@@ -254,10 +256,10 @@
             <maxVelocity>32767</maxVelocity>
             <minActiveTicks>6</minActiveTicks>
             <maxActiveTicks>13</maxActiveTicks>
-            <offsets>0</offsets>
+            <offsets>0,0,0,0,0,2,3,3,3,3,3,5</offsets>
             <noteLengths>1</noteLengths>
             <pauseLengths>1,2</pauseLengths>
-            <pitchVelocityCorrelation>100</pitchVelocityCorrelation>
+            <pitchVelocityCorrelation>0</pitchVelocityCorrelation>
             <velocityExponent>3</velocityExponent>
           </patternEngine>
         </pattern>
@@ -300,30 +302,51 @@
           </patternEngine>
         </pattern>
         <pattern>
-          <!-- triangle -->
-          <pitch>81</pitch>
-          <patternEngine class="RandomPatternEngine">
-            <patternTicks>16</patternTicks>
-            <patternString><random list="A1,A2,A1,A3|A1,A2,A1,A3,A1,A2,A1,A4"/></patternString>
-            <noteProbability>40</noteProbability>
-            <legatoProbability>0</legatoProbability>
-            <minVelocity>16000</minVelocity>
-            <maxVelocity>16000</maxVelocity>
-            <minActiveTicks>2</minActiveTicks>
-            <maxActiveTicks>5</maxActiveTicks>
-            <offsets>0</offsets>
-            <noteLengths>1,2</noteLengths>
-            <pauseLengths>1,2,3</pauseLengths>
-            <pitchVelocityCorrelation>100</pitchVelocityCorrelation>
-            <velocityExponent>3</velocityExponent>
-          </patternEngine>
-        </pattern>
-        <pattern>
           <!-- cymbal -->
           <pitch>49</pitch>
           <patternEngine class="StringPatternEngine">
             <string>0,-/63</string>
             <string>0,-/127</string>
+          </patternEngine>
+        </pattern>
+        <pattern>
+          <!-- congas -->
+          <!-- uses Low Conga (64), Mute High Conga (62) and Open High Conga (63) -->
+          <pitch>62</pitch>
+          <patternEngine class="RandomPatternEngine" salt="49911">
+            <patternTicks>16</patternTicks>
+            <patternString><random list="A1,A2,A1,A3|A1,A2,A1,A3,A1,A2,A1,B1"/></patternString>
+            <noteProbability>60</noteProbability>
+            <legatoProbability>0</legatoProbability>
+            <minVelocity>18000</minVelocity>
+            <maxVelocity>24000</maxVelocity>
+            <minActiveTicks>7</minActiveTicks>
+            <maxActiveTicks>12</maxActiveTicks>
+            <offsets>0,1,1,1,1,2,2,2</offsets>
+            <noteLengths>1</noteLengths>
+            <pauseLengths>1,2</pauseLengths>
+            <pitchVelocityCorrelation>0</pitchVelocityCorrelation>
+            <velocityExponent>1</velocityExponent>
+          </patternEngine>
+        </pattern>
+        <pattern>
+          <!-- timbales -->
+          <!-- uses Mute Cuica (78) and Open Cuica (79) -->
+          <pitch>65</pitch>
+          <patternEngine class="RandomPatternEngine">
+            <patternTicks>16</patternTicks>
+            <patternString><random list="A1,A2,A1,A3|A1,A2,A1,A3,A1,A2,A1,B1"/></patternString>
+            <noteProbability>60</noteProbability>
+            <legatoProbability>0</legatoProbability>
+            <minVelocity>12000</minVelocity>
+            <maxVelocity>16000</maxVelocity>
+            <minActiveTicks>7</minActiveTicks>
+            <maxActiveTicks>12</maxActiveTicks>
+            <offsets>0,1</offsets>
+            <noteLengths>1</noteLengths>
+            <pauseLengths>1,2</pauseLengths>
+            <pitchVelocityCorrelation>0</pitchVelocityCorrelation>
+            <velocityExponent>1</velocityExponent>
           </patternEngine>
         </pattern>
       </sequenceEngine>
@@ -337,11 +360,12 @@
       <activityVector>whistle</activityVector>
       <activityVector>cowbell</activityVector>
       <activityVector>low tom</activityVector>
-      <activityVector>high tom</activityVector>
+      <activityVector>mid+high tom</activityVector>
       <activityVector>low wood block</activityVector>
       <activityVector>high wood block</activityVector>
-      <activityVector>triangle</activityVector>
       <activityVector>cymbal</activityVector>
+      <activityVector>congas</activityVector>
+      <activityVector>timbales</activityVector>
     </track>
   </arrangementEngine>
 

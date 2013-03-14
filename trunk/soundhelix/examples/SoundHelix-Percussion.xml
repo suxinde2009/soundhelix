@@ -181,9 +181,21 @@
         <pattern>
           <!-- bell -->
           <pitch>53</pitch>
-          <patternEngine class="StringPatternEngine">
-            <string>0:24000,-,-,0:24000,-,-,0:24000,0:24000,-,-,0:24000,-,0:24000,-,-,0:24000</string>
-         </patternEngine>
+          <patternEngine class="RandomPatternEngine">
+            <patternTicks>16</patternTicks>
+            <patternString><random list="A1,A2,A1,A3|A1,A2,A1,A3,A1,A2,A1,A4"/></patternString>
+            <noteProbability>70</noteProbability>
+            <legatoProbability>0</legatoProbability>
+            <minVelocity>15000</minVelocity>
+            <maxVelocity>28000</maxVelocity>
+            <minActiveTicks>5</minActiveTicks>
+            <maxActiveTicks>11</maxActiveTicks>
+            <offsets>0</offsets>
+            <noteLengths>1</noteLengths>
+            <pauseLengths>1,2</pauseLengths>
+            <pitchVelocityCorrelation>100</pitchVelocityCorrelation>
+            <velocityExponent>1</velocityExponent>
+          </patternEngine>
         </pattern>
         <pattern>
           <!-- whistle -->
@@ -322,7 +334,7 @@
             <maxVelocity>24000</maxVelocity>
             <minActiveTicks>7</minActiveTicks>
             <maxActiveTicks>12</maxActiveTicks>
-            <offsets>0,1,1,1,1,2,2,2</offsets>
+            <offsets>0,0,1,1,1,1,1,2,2,2,2</offsets>
             <noteLengths>1</noteLengths>
             <pauseLengths>1,2</pauseLengths>
             <pitchVelocityCorrelation>0</pitchVelocityCorrelation>
@@ -339,12 +351,12 @@
             <noteProbability>60</noteProbability>
             <legatoProbability>0</legatoProbability>
             <minVelocity>12000</minVelocity>
-            <maxVelocity>16000</maxVelocity>
-            <minActiveTicks>7</minActiveTicks>
-            <maxActiveTicks>12</maxActiveTicks>
+            <maxVelocity>20000</maxVelocity>
+            <minActiveTicks>9</minActiveTicks>
+            <maxActiveTicks>14</maxActiveTicks>
             <offsets>0,1</offsets>
-            <noteLengths>1</noteLengths>
-            <pauseLengths>1,2</pauseLengths>
+            <noteLengths>1,2</noteLengths>
+            <pauseLengths>1,2,2</pauseLengths>
             <pitchVelocityCorrelation>0</pitchVelocityCorrelation>
             <velocityExponent>1</velocityExponent>
           </patternEngine>

@@ -1,4 +1,5 @@
 <harmonyEngine class="PatternHarmonyEngine">
+  <crossoverPitch>3</crossoverPitch>
   <minimizeChordDistance>true</minimizeChordDistance>
   <chordPattern minimizeChordDistance="false">Am/4,-5:-1:5/2,G/2,Dm4/4,-7:-3:4/2,F/2,Am/4,-5:-1:5/2,G/2,Dm4/4,-7:-3:4/2,Em4/2</chordPattern>
   <chordPattern minimizeChordDistance="false">Am/4,Em4/4,-7:-3:4/4,Dm4/4,Am/4,Em4/4,Dm4/4,F/4</chordPattern> 
@@ -25,7 +26,7 @@
   <chordPattern>0/4,1/4,1/4,1/4,0/4,1/4,1/4,1/2,2/2</chordPattern>
   <chordPattern>0/4,1/4,1/2,1/2,2/4</chordPattern>
   <chordPattern>0/4,1/4,$0/4,1/2,$1/2</chordPattern>
-  <chordPattern>0/16,1/8,1/8</chordPattern>
+  <chordPattern>0/16,1/8,1/8,+0/16,1!1/8,1!2/8</chordPattern>
   <chordPattern>0/8,1/8,$0/8,1!1/8</chordPattern>
   <chordPattern>0/16,1/8,1/8,+$0/16,1/8,1/4,1/4</chordPattern>
   <chordRandomTable>Am,Am,Am,Am,F</chordRandomTable>

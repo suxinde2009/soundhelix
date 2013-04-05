@@ -61,7 +61,7 @@ public class Pattern implements Iterable<PatternEntry> {
      */
 
     public static Pattern parseString(String patternString) {
-        return parseString(patternString, null, 1, 2);
+        return parseString(patternString, null, 1, 1);
     }
 
     /**
@@ -88,7 +88,7 @@ public class Pattern implements Iterable<PatternEntry> {
      */
 
     public static Pattern parseString(String patternString, String wildcardString) {
-        return parseString(patternString, wildcardString, 1, 2);
+        return parseString(patternString, wildcardString, 1, 1);
     }
 
     /**

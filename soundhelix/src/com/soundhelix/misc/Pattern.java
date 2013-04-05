@@ -61,7 +61,21 @@ public class Pattern implements Iterable<PatternEntry> {
      */
 
     public static Pattern parseString(String patternString) {
-        return parseString(patternString, null);
+        return parseString(patternString, null, 1, 2);
+    }
+
+    /**
+     * Parses the given pattern string using no wildcards.
+     *
+     * @param patternString the pattern string
+     * @param currentTPB the ticks per beat of the song
+     * @param targetTPB the ticks per beat the pattern is for
+     *
+     * @return the pattern
+     */
+
+    public static Pattern parseString(String patternString, int currentTPB, int targetTPB) {
+        return parseString(patternString, null, currentTPB, targetTPB);
     }
 
     /**
@@ -74,6 +88,21 @@ public class Pattern implements Iterable<PatternEntry> {
      */
 
     public static Pattern parseString(String patternString, String wildcardString) {
+        return parseString(patternString, wildcardString, 1, 2);
+    }
+
+    /**
+     * Parses the given pattern string using the given wildcard string.
+     *
+     * @param patternString the pattern string
+     * @param wildcardString the wildcard string
+     * @param currentTPB the ticks per beat of the song
+     * @param targetTPB the ticks per beat the pattern is for
+     *
+     * @return the pattern
+     */
+
+    public static Pattern parseString(String patternString, String wildcardString, int currentTPB, int targetTPB) {
         patternString = expandPatternString(patternString, ',');
 
         if (patternString == null || patternString.equals("")) {
@@ -98,6 +127,12 @@ public class Pattern implements Iterable<PatternEntry> {
             short v = a.length > 1 ? Short.parseShort(a[1]) : Short.MAX_VALUE;
             String[] b = a[0].split("/");
             int t = b.length > 1 ? Integer.parseInt(b[1]) : 1;
+
+            if (((t * currentTPB) % targetTPB) != 0) {
+                throw new RuntimeException("Tick value " + t + " in pattern \"" + patternString + "\" can't be scaled by a ratio of " + currentTPB + ":" + targetTPB);
+            } else {
+                t = (t * currentTPB) / targetTPB;
+            }
 
             boolean legato = b[0].endsWith("~");
 

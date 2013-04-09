@@ -141,6 +141,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
      * Creates an arrangement based on the given map of needed activity vectors. This is done by rendering a track for each SequenceEngine based on
      * the already generated activity vectors.
      *
+     * @param songContext the song context
      * @param neededActivityVector the map of needed activity vectors
      *
      * @return the created arrangement
@@ -473,11 +474,15 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
     /**
      * Converts the BitSets into a set of ActivityVectors which have their activity set based on the BitSets.
      *
+     * @param songContext the song context
      * @param activityVectorConfigurations the array of activity vector configurations
      * @param bitSets the array of BitSets
+     * 
+     * @return the activity matrix
      */
 
-    private ActivityMatrix convertBitSetsToActivityVectors(SongContext songContext, ActivityVectorConfiguration[] activityVectorConfigurations, BitSet[] bitSets) {
+    private ActivityMatrix convertBitSetsToActivityVectors(SongContext songContext, ActivityVectorConfiguration[] activityVectorConfigurations,
+            BitSet[] bitSets) {
         Structure structure = songContext.getStructure();
         Harmony harmony = songContext.getHarmony();
 
@@ -868,7 +873,8 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
             }
 
             try {
-                SequenceEngine sequenceEngine = XMLUtils.getInstance(songContext, SequenceEngine.class, sequenceEngineNodeList.item(random.nextInt(sequenceEngineNodeList.getLength())), randomSeed, i);
+                SequenceEngine sequenceEngine = XMLUtils.getInstance(songContext, SequenceEngine.class, sequenceEngineNodeList.item(
+                        random.nextInt(sequenceEngineNodeList.getLength())), randomSeed, i);
                 arrangementEntries[i] = new ArrangementEntry(instrument, sequenceEngine, transposition, activityVectorNames);
             } catch (Exception e) {
                 throw new RuntimeException("Error instantiating SequenceEngine for instrument \"" + instrument + "\"", e);

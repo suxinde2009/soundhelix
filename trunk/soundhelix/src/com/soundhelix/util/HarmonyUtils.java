@@ -23,13 +23,17 @@ public final class HarmonyUtils {
     /** The logger. */
     private static final Logger LOGGER = Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
 
+    /**
+     * Private constructor.
+     */
+    
     private HarmonyUtils() {
     }
 
     /**
      * Returns the total number of chord sections.
      * 
-     * @param structure the structure
+     * @param songContext the song context
      * 
      * @return the total number of chord sections
      */
@@ -54,6 +58,7 @@ public final class HarmonyUtils {
      * Returns a string specifying the chord section that starts at the specified tick, which is a comma-separated list of chords and tick lengths.
      * This is done by listing all the chords and their lengths until the next chord section starts or the song ends.
      * 
+     * @param songContext the song context
      * @param structure the structure
      * @param tick the starting tick
      * 
@@ -95,7 +100,7 @@ public final class HarmonyUtils {
     /**
      * Returns the number of the chord section of the given tick (counted from 0) or -1 if the tick is negative or at or beyond the end of the song.
      * 
-     * @param structure the structure
+     * @param songContext the song context
      * @param tick the tick
      * 
      * @return the chord section number (or -1)
@@ -129,7 +134,7 @@ public final class HarmonyUtils {
      * Returns the first tick of the given chord section number (starting from 0) or -1 if the chord section number is negative or at or beyond the
      * end of the song.
      * 
-     * @param structure the structure
+     * @param songContext the song context
      * @param chordSection the number of the chord section
      * 
      * @return the tick (or -1)
@@ -168,7 +173,7 @@ public final class HarmonyUtils {
     /**
      * Returns the number of distinct chord sections.
      * 
-     * @param structure the structure
+     * @param songContext the song context
      * 
      * @return the number of distinct chord sections
      */
@@ -192,6 +197,7 @@ public final class HarmonyUtils {
      * Returns a list of start ticks for all chord sections, in ascending order. The first chord section will always start at tick 0. The number of
      * list entries always equals getChordSectionCount(structure).
      * 
+     * @param songContext the song context
      * @param structure the structure
      * 
      * @return a list of start ticks for all chord sections
@@ -216,7 +222,7 @@ public final class HarmonyUtils {
      * all pauses between activity segments, all counted in chord sections. Returns null if the ActivityVector never becomes active. If the
      * ActivityVector only has one activity segment, then there is no pause, and therefore the minimum and maximum pause length will be 0.
      * 
-     * @param structure the structure
+     * @param songContext the song context
      * @param av the ActivityVector
      * 
      * @return a 4-element int array containing the minimum and the maximum segment length and the minimum and maximum pause length (in this order) or
@@ -293,6 +299,8 @@ public final class HarmonyUtils {
     
     /**
      * Dumps all chords and their lengths in ticks.
+     * 
+     * @param songContext the song context
      */
 
     public static void dumpChords(SongContext songContext) {
@@ -323,6 +331,12 @@ public final class HarmonyUtils {
 
         LOGGER.debug(sb.toString());
     }
+    
+    /**
+     * Checks the sanity of the song's harmony. An exception with details will be thrown if the sanity check has failed.
+     * 
+     * @param songContext the song context
+     */
     
     public static void checkSanity(SongContext songContext) {
         Structure structure = songContext.getStructure();

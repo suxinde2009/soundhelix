@@ -1,30 +1,30 @@
 package com.soundhelix;
 
+import gnu.getopt.Getopt;
+import gnu.getopt.LongOpt;
+
 import java.io.File;
 import java.net.URL;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+
+import javax.sound.midi.MidiDevice;
+import javax.sound.midi.MidiSystem;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import com.soundhelix.component.player.Player;
 import com.soundhelix.component.player.impl.MidiPlayer;
+import com.soundhelix.misc.SongContext;
 import com.soundhelix.remotecontrol.ConsoleRemoteControl;
 import com.soundhelix.remotecontrol.RemoteControl;
-import com.soundhelix.misc.SongContext;
 import com.soundhelix.util.SongUtils;
 import com.soundhelix.util.VersionUtils;
-
-import gnu.getopt.Getopt;
-import gnu.getopt.LongOpt;
-
-import javax.sound.midi.MidiDevice;
-import javax.sound.midi.MidiSystem;
 
 /**
  * Implements the main class. The main() method determines the configuration file and then waits for the next generated song and plays it. The
@@ -245,6 +245,7 @@ public class SoundHelix implements Runnable {
      * queue to be empty.
      */
 
+    @Override
     public void run() {
         long randomSeed = this.randomSeed;
         Random random;
@@ -330,7 +331,8 @@ public class SoundHelix implements Runnable {
                 if (device != null && device.getReceiver() != null) {
                     list.add(info.getName());
                 }
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
         }
 
         String[] array = new String[list.size()];
@@ -356,6 +358,7 @@ public class SoundHelix implements Runnable {
             this.player = player;
         }
 
+        @Override
         public void run() {
             logger.trace("Starting shutdown hook");
 

@@ -37,111 +37,134 @@ public abstract class AbstractTextRemoteControl implements TextRemoteControl {
                 String line = readLine();
 
                 if (line != null && !line.equals("")) {
-                    Harmony harmony = songContext.getHarmony();
-                    Player player = songContext.getPlayer();
-                    
-                    if (line.startsWith("bpm ")) {
-                        if (player != null) {
-                            writeLine("Setting BPM");
-
-                            player.setMilliBPM((int) (1000 * Double.parseDouble(line.substring(4))));
-                        }
-                    } else if (line.startsWith("skip ") || line.equals("+")) {
-                        if (player != null) {
-                            int tick;
-                            Structure structure = songContext.getStructure();
-
-                            if (line.endsWith("%")) {
-                                double percentage = Double.parseDouble(line.substring(5, line.length() - 1));
-                                tick = (int) (percentage * structure.getTicks() / 100d);
-                            } else {
-                                if (line.equals("+") || line.substring(5).equals("+")) {
-                                    tick = player.getCurrentTick();
-
-                                    if (tick >= 0) {
-                                        tick += harmony.getChordSectionTicks(tick);
-                                    }
-                                } else if (line.charAt(5) == '#') {
-                                    double chordSectionDouble = Double.parseDouble(line.substring(6));
-
-                                    int chordSection = (int) chordSectionDouble;
-                                    double chordSectionFraction = chordSectionDouble - Math.floor(chordSectionDouble);
-
-                                    // use the integer part to find the start of the chord section
-                                    tick = HarmonyUtils.getChordSectionTick(songContext, chordSection);
-
-                                    // add the fractional part
-                                    tick += (int) (harmony.getChordSectionTicks(tick) * chordSectionFraction);
-                                } else {
-                                    tick = Integer.parseInt(line.substring(5));
-                                }
-                            }
-
-                            if (tick < 0 || tick > structure.getTicks()) {
-                                writeLine("Invalid tick to skip to selected");
-                            } else {
-                                boolean success = player.skipToTick(tick);
-
-                                if (success) {
-                                    int chordSection = HarmonyUtils.getChordSectionNumber(songContext, tick);
-
-                                    if (chordSection >= 0) {
-                                        int chordSectionTick = tick - HarmonyUtils.getChordSectionTick(songContext, chordSection);
-                                        writeLine("Skipping to tick " + tick + " (tick " + chordSectionTick + " of chord section " + chordSection + ")");
-                                    } else {
-                                        writeLine("Skipping to tick " + tick);
-                                    }
-                                } else {
-                                    writeLine("Skipping failed");
-                                }
-                            }
-                        }
-                    } else if (line.startsWith("transposition ")) {
-                        if (player != null && player instanceof MidiPlayer) {
-                            writeLine("Setting transposition");
-
-                            ((MidiPlayer) player).setTransposition(Integer.parseInt(line.substring(14)));
-                        }
-                    } else if (line.startsWith("groove ")) {
-                        if (player != null && player instanceof MidiPlayer) {
-                            writeLine("Setting groove");
-
-                            ((MidiPlayer) player).setGroove(line.substring(7));
-                        }
-                    } else if (line.equals("next")) {
-                        if (player != null) {
-                            writeLine("Next Song");
-                            player.abortPlay();
-                        }
-                    } else if (hasExitPermission && line.equals("quit")) {
-                        writeLine("Quitting");
-                        System.exit(0);
-                    } else if (line.equals("help")) {
-                        writeLine("\nAvailable commands");
-                        writeLine("------------------\n");
-                        writeLine("bpm <value>             Sets the BPM. Example: \"bpm 140\"");
-                        writeLine("skip <value>            Skips to the specified tick. Example: \"skip 1000\"");
-                        writeLine("skip <value>%           Skips to the specified tick percentage. Example: \"skip 50.8%\"");
-                        writeLine("skip #<value>           Skips to the specified chord section. "
-                                + "Example: \"skip #3.5\" (skips to the middle of chord section 3)");
-                        writeLine("skip +                  Skips to the first tick of the next chord section. "
-                                + "Example: \"skip +\". Short form: \"+\"");
-                        writeLine("transposition <value>   Sets the transposition. Example: \"transposition 70\"");
-                        writeLine("groove <value>          Sets the groove pattern. Example: \"groove 130,70\"");
-                        writeLine("next                    Aborts playing and starts the next song. Example: \"next\"");
-                        if (hasExitPermission) {
-                            writeLine("quit                    Quits. Example: \"quit\"");
-                        }
-                        writeLine("");
-                    } else {
-                        writeLine("Invalid command. Type \"help\" for help.");
-                    }
+                    handleCommand(line, hasExitPermission);
                 } else {
                     Thread.sleep(100);
                 }
             } catch (Exception e) {
                 LOGGER.error("Exception in console thread", e);
             }
+        }
+    }
+
+    /**
+     * Handles the line entered by the user.
+     * 
+     * @param line the line
+     * @param hasExitPermission flag indicating whether the user may call System.exit()
+     */
+    
+    private void handleCommand(String line, boolean hasExitPermission) {
+        Harmony harmony = songContext.getHarmony();
+        Player player = songContext.getPlayer();
+        
+        if (line.startsWith("bpm ")) {
+            if (player != null) {
+                writeLine("Setting BPM");
+
+                player.setMilliBPM((int) (1000 * Double.parseDouble(line.substring(4))));
+            }
+        } else if (line.startsWith("skip ") || line.equals("+")) {
+            if (player != null) {
+                int tick;
+                Structure structure = songContext.getStructure();
+
+                if (line.endsWith("%")) {
+                    double percentage = Double.parseDouble(line.substring(5, line.length() - 1));
+                    tick = (int) (percentage * structure.getTicks() / 100d);
+                } else {
+                    if (line.equals("+") || line.substring(5).equals("+")) {
+                        tick = player.getCurrentTick();
+
+                        if (tick >= 0) {
+                            tick += harmony.getChordSectionTicks(tick);
+                        }
+                    } else if (line.charAt(5) == '#') {
+                        double chordSectionDouble = Double.parseDouble(line.substring(6));
+
+                        int chordSection = (int) chordSectionDouble;
+                        double chordSectionFraction = chordSectionDouble - Math.floor(chordSectionDouble);
+
+                        // use the integer part to find the start of the chord section
+                        tick = HarmonyUtils.getChordSectionTick(songContext, chordSection);
+
+                        // add the fractional part
+                        tick += (int) (harmony.getChordSectionTicks(tick) * chordSectionFraction);
+                    } else {
+                        tick = Integer.parseInt(line.substring(5));
+                    }
+                }
+
+                if (tick < 0 || tick > structure.getTicks()) {
+                    writeLine("Invalid tick to skip to selected");
+                } else {
+                    boolean success = player.skipToTick(tick);
+
+                    if (success) {
+                        int chordSection = HarmonyUtils.getChordSectionNumber(songContext, tick);
+
+                        if (chordSection >= 0) {
+                            int chordSectionTick = tick - HarmonyUtils.getChordSectionTick(songContext, chordSection);
+                            writeLine("Skipping to tick " + tick + " (tick " + chordSectionTick
+                                    + " of chord section " + chordSection + ")");
+                        } else {
+                            writeLine("Skipping to tick " + tick);
+                        }
+                    } else {
+                        writeLine("Skipping failed");
+                    }
+                }
+            }
+        } else if (line.startsWith("transposition ")) {
+            if (player != null && player instanceof MidiPlayer) {
+                writeLine("Setting transposition");
+
+                ((MidiPlayer) player).setTransposition(Integer.parseInt(line.substring(14)));
+            }
+        } else if (line.startsWith("groove ")) {
+            if (player != null && player instanceof MidiPlayer) {
+                writeLine("Setting groove");
+
+                ((MidiPlayer) player).setGroove(line.substring(7));
+            }
+        } else if (line.equals("next")) {
+            if (player != null) {
+                writeLine("Next Song");
+                player.abortPlay();
+            }
+        } else if (hasExitPermission && line.equals("quit")) {
+            writeLine("Quitting");
+            System.exit(0);
+        } else if (line.equals("help")) {
+            writeLine("");
+            showHelp(hasExitPermission);
+            writeLine("");
+        } else {
+            writeLine("Invalid command. Type \"help\" for help.");
+        }
+    }
+
+    /**
+     * Shows the help.
+     * 
+     * @param hasExitPermission flag indicating whether the user may call System.exit()
+     */
+    
+    private void showHelp(boolean hasExitPermission) {
+        writeLine("Available commands");
+        writeLine("------------------\n");
+        writeLine("bpm <value>             Sets the BPM. Example: \"bpm 140\"");
+        writeLine("skip <value>            Skips to the specified tick. Example: \"skip 1000\"");
+        writeLine("skip <value>%           Skips to the specified tick percentage. Example: \"skip 50.8%\"");
+        writeLine("skip #<value>           Skips to the specified chord section. "
+                + "Example: \"skip #3.5\" (skips to the middle of chord section 3)");
+        writeLine("skip +                  Skips to the first tick of the next chord section. "
+                + "Example: \"skip +\". Short form: \"+\"");
+        writeLine("transposition <value>   Sets the transposition. Example: \"transposition 70\"");
+        writeLine("groove <value>          Sets the groove pattern. Example: \"groove 130,70\" or \"groove 120,80\"");
+        writeLine("next                    Aborts playing and starts the next song. Example: \"next\"");
+        if (hasExitPermission) {
+            writeLine("quit                    Quits. Example: \"quit\"");
         }
     }
 

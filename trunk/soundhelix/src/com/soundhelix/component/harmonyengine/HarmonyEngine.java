@@ -48,6 +48,8 @@ public interface HarmonyEngine extends Component {
      * Renders a harmony.
      *
      * @param songContext the song context
+     * 
+     * @return the harmony
      */
 
     Harmony render(SongContext songContext);

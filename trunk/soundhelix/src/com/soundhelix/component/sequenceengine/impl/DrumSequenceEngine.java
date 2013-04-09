@@ -40,17 +40,19 @@ import com.soundhelix.util.XMLUtils;
 
 public class DrumSequenceEngine extends AbstractSequenceEngine {
 
-    /** Conditional pattern add mode. */
-    private static final int MODE_ADD = 0;
-
-    /** Conditional pattern replace mode. */
-    private static final int MODE_REPLACE = 1;
+    /** The conditional modes. */
+    private enum Mode {
+        /** The add mode. */
+        ADD,
+        /** The replace mode. */
+        REPLACE
+    }
 
     /** The drum entries. */
     private DrumEntry[] drumEntries;
 
     /** The conditional entries. */
-    private ConditionalEntry[] conditionalEntries;
+    private ConditionalDrumEntry[] conditionalEntries;
 
     /** The random generator. */
     private Random random;
@@ -63,7 +65,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
         this.drumEntries = drumEntries;
     }
 
-    public void setConditionalEntries(ConditionalEntry[] conditionalEntries) {
+    public void setConditionalEntries(ConditionalDrumEntry[] conditionalEntries) {
         this.conditionalEntries = conditionalEntries;
     }
 
@@ -88,9 +90,9 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
     /**
      * Process all non-conditional patterns.
      *
+     * @param songContext the song context
      * @param activityVectors the array of activity vectors
      * @param seqs the array of sequences
-     * @param structure the structure
      */
 
     private void processPatterns(SongContext songContext, ActivityVector[] activityVectors, Sequence[] seqs) {
@@ -138,6 +140,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
     /**
      * Process all conditional patterns.
      *
+     * @param songContext the song context
      * @param activityVectors the array of activity vectors
      * @param seqs the array of sequences
      * @param structure the structure
@@ -163,7 +166,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
             list.add(i);
         }
 
-        for (ConditionalEntry entry : conditionalEntries) {
+        for (ConditionalDrumEntry entry : conditionalEntries) {
             if (entry.preCondition == null) {
                 entry.preCondition = getConditionPattern(map, drumEntries.length, entry.preConditionString);
                 entry.postCondition = getConditionPattern(map, drumEntries.length, entry.postConditionString);
@@ -224,7 +227,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
                             tick -= patternTicks;
 
                             int[] targets = conditionalEntries[i].targets;
-                            int mode = conditionalEntries[i].mode;
+                            Mode mode = conditionalEntries[i].mode;
 
                             logger.debug("Applying conditional pattern " + i + " with length " + patternTicks + " for targets "
                                     + Arrays.toString(targets) + " at ticks " + tick + "-" + (tick + patternTicks - 1));
@@ -243,7 +246,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
                                                 tick,
                                                 new Sequence.SequenceEntry(basePitch + entry.getPitch(), entry.getVelocity(), entry.getTicks(), entry
                                                         .isLegato()));
-                                    } else if (mode == MODE_REPLACE) {
+                                    } else if (mode == Mode.REPLACE) {
                                         seq.replaceEntry(tick,
                                                 new Sequence.SequenceEntry(Integer.MIN_VALUE, (short) -1, entry.getTicks(), entry.isLegato()));
                                     }
@@ -334,7 +337,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
         nodeList = XMLUtils.getNodeList("conditionalPattern", node);
         patterns = nodeList.getLength();
 
-        ConditionalEntry[] conditionalEntries = new ConditionalEntry[patterns];
+        ConditionalDrumEntry[] conditionalEntries = new ConditionalDrumEntry[patterns];
 
         for (int i = 0; i < patterns; i++) {
             String targetString = XMLUtils.parseString(random, "target", nodeList.item(i));
@@ -374,12 +377,12 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
             }
 
             String modeString = XMLUtils.parseString(random, "mode", nodeList.item(i));
-            int mode;
+            Mode mode;
 
             if (modeString.equals("add")) {
-                mode = MODE_ADD;
+                mode = Mode.ADD;
             } else if (modeString.equals("replace")) {
-                mode = MODE_REPLACE;
+                mode = Mode.REPLACE;
             } else {
                 throw new RuntimeException("Unknown mode \"" + modeString + "\"");
             }
@@ -421,10 +424,10 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
             Pattern pattern = patternEngine.render(songContext, "");
 
             if (preCondition != null) {
-                conditionalEntries[i] = new ConditionalEntry(pattern, preCondition, postCondition, mode, targets, probability, skipWhenApplied,
+                conditionalEntries[i] = new ConditionalDrumEntry(pattern, preCondition, postCondition, mode, targets, probability, skipWhenApplied,
                         skipWhenNotApplied);
             } else {
-                conditionalEntries[i] = new ConditionalEntry(pattern, preConditionString, postConditionString, mode, targets, probability,
+                conditionalEntries[i] = new ConditionalDrumEntry(pattern, preConditionString, postConditionString, mode, targets, probability,
                         skipWhenApplied, skipWhenNotApplied);
             }
         }
@@ -484,29 +487,79 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
         return java.util.regex.Pattern.compile(sb.toString());
     }
 
+    /**
+     * Represents a normal drum entry.
+     */
+    
     private static final class DrumEntry {
+        /** The pattern. */
         private final Pattern pattern;
+        
+        /** The pitch. */
         private final int pitch;
 
+        /**
+         * Constructor.
+         * 
+         * @param pattern the pattern
+         * @param pitch the pitch
+         */
+        
         private DrumEntry(Pattern pattern, int pitch) {
             this.pattern = pattern;
             this.pitch = pitch;
         }
     }
 
-    private static final class ConditionalEntry {
+     /**
+      * Represents a conditional drum entry.
+      */
+     
+    private static final class ConditionalDrumEntry {
+        /** The pattern. */
         private final Pattern pattern;
+        
+        /** The precondition as a regular expression. */
         private java.util.regex.Pattern preCondition;
+        
+        /** The postcondition as a regular expression. */
         private java.util.regex.Pattern postCondition;
+        
+        /** The precondition as a string. */
         private final String preConditionString;
+        
+        /** The postcondition as a string. */
         private final String postConditionString;
-        private final int mode;
+        
+        /** The mode. */
+        private final Mode mode;
+        
+        /** The array of targets. */
         private final int[] targets;
+        
+        /** The probability for being applied if it could be applied. */
         private final double probability;
+        
+        /** The number of entries to skip after applying. */
         private final int skipWhenApplied;
+        
+        /** The number of entries to skip after not applying. */
         private final int skipWhenNotApplied;
 
-        private ConditionalEntry(Pattern pattern, java.util.regex.Pattern preCondition, java.util.regex.Pattern postCondition, int mode,
+        /**
+         * Constructor.
+         * 
+         * @param pattern the pattern
+         * @param preCondition the precondition
+         * @param postCondition the postcondition
+         * @param mode the mode
+         * @param targets the targets
+         * @param probability the probability
+         * @param skipWhenApplied the number of items to skip after applying
+         * @param skipWhenNotApplied the number of items to skip after not applying
+         */
+        
+        private ConditionalDrumEntry(Pattern pattern, java.util.regex.Pattern preCondition, java.util.regex.Pattern postCondition, Mode mode,
                 int[] targets, double probability, int skipWhenApplied, int skipWhenNotApplied) {
             this.pattern = pattern;
             this.preConditionString = null;
@@ -520,7 +573,22 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
             this.skipWhenNotApplied = skipWhenNotApplied;
         }
 
-        private ConditionalEntry(Pattern pattern, String preConditionString, String postConditionString, int mode,
+        /**
+         * Constructor.
+         * 
+         * @param pattern the pattern
+         * @param preCondition the precondition
+         * @param postCondition the postcondition
+         * @param preConditionString the precondition string
+         * @param postConditionString the postcondition string
+         * @param mode the mode
+         * @param targets the targets
+         * @param probability the probability
+         * @param skipWhenApplied the number of items to skip after applying
+         * @param skipWhenNotApplied the number of items to skip after not applying
+         */
+        
+        private ConditionalDrumEntry(Pattern pattern, String preConditionString, String postConditionString, Mode mode,
                 int[] targets, double probability, int skipWhenApplied, int skipWhenNotApplied) {
             this.pattern = pattern;
             this.preConditionString = preConditionString;

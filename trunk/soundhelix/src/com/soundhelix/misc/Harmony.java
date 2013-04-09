@@ -1,7 +1,8 @@
 package com.soundhelix.misc;
 
 /**
- * Represents a harmony. A harmony defines the chord sections and the chords to use for every tick.
+ * Represents a harmony. A harmony defines the chord sections and the chords to use for every tick. Instances of this class must consistently return
+ * their results.
  * 
  * @author Thomas Schuerger (thomas@schuerger.com)
  */

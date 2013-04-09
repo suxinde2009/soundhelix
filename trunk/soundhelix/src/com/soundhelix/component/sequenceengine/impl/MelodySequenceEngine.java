@@ -236,6 +236,8 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
     /**
      * Creates a melody for each distinct chord section and returns a map mapping chord section strings to melody patterns.
      * 
+     * @param songContext the song context
+     * 
      * @return a map mapping chord section strings to melody patterns
      */
 

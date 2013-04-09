@@ -10,6 +10,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.soundhelix.misc.Chord;
+import com.soundhelix.misc.Harmony;
 import com.soundhelix.misc.SongContext;
 import com.soundhelix.misc.Structure;
 import com.soundhelix.util.NoteUtils;
@@ -60,51 +61,46 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
     public PatternHarmonyEngine() {
         super();
     }
-
+    
     @Override
-    public Chord getChord(int tick) {
-        if (chords == null) {
-            parsePattern();
-        }
+    public Harmony render(final SongContext songContext) {
+        parsePattern(songContext);
+        
+        return new Harmony() {
+            @Override
+            public Chord getChord(int tick) {
+                if (tick >= 0 && tick < songContext.getStructure().getTicks()) {
+                    return chords[tick];
+                } else {
+                    return null;
+                }
+            }
 
-        if (tick >= 0 && tick < songContext.getStructure().getTicks()) {
-            return chords[tick];
-        } else {
-            return null;
-        }
+            @Override
+            public int getChordTicks(int tick) {
+                if (tick >= 0 && tick < songContext.getStructure().getTicks()) {
+                    return chordTicks[tick];
+                } else {
+                    return 0;
+                }
+            }
+
+            @Override
+            public int getChordSectionTicks(int tick) {
+                if (tick >= 0 && tick < songContext.getStructure().getTicks()) {
+                    return sectionTicks[tick];
+                } else {
+                    return 0;
+                }
+            }
+        };
     }
-
-    @Override
-    public int getChordTicks(int tick) {
-        if (chords == null) {
-            parsePattern();
-        }
-
-        if (tick >= 0 && tick < songContext.getStructure().getTicks()) {
-            return chordTicks[tick];
-        } else {
-            return 0;
-        }
-    }
-
-    @Override
-    public int getChordSectionTicks(int tick) {
-        if (chords == null) {
-            parsePattern();
-        }
-
-        if (tick >= 0 && tick < songContext.getStructure().getTicks()) {
-            return sectionTicks[tick];
-        } else {
-            return 0;
-        }
-    }
-
+        
     /**
      * Parses the chord pattern.
      */
 
-    private void parsePattern() {
+    private void parsePattern(SongContext songContext) {
         Structure structure = songContext.getStructure();
         
         int ticks = structure.getTicks();
@@ -137,7 +133,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
         while (tick < ticks) {
             String[] p = c[pos % c.length].split("/");
 
-            int len = (int) (Double.parseDouble(p[1]) * (double) structure.getTicksPerBeat() + 0.5d);
+            int len = (int) (Double.parseDouble(p[1]) * structure.getTicksPerBeat() + 0.5d);
 
             String chordString = p[0];
 
@@ -171,7 +167,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
             pos++;
         }
 
-        mergeAdjacentChords();
+        mergeAdjacentChords(songContext);
 
         sectionVector.add(sTicks);
 
@@ -186,15 +182,13 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
                 tick++;
             }
         }
-
-        checkSanity();
     }
 
     /**
      * Merges all adjacent equal chords into one chord.
      */
 
-    private void mergeAdjacentChords() {
+    private void mergeAdjacentChords(SongContext songContext) {
         int ticks = songContext.getStructure().getTicks();
         int tick = 0;
 

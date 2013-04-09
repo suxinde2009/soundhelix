@@ -4,12 +4,12 @@ import java.security.AccessControlException;
 
 import org.apache.log4j.Logger;
 
-import com.soundhelix.component.harmonyengine.HarmonyEngine;
 import com.soundhelix.component.player.Player;
 import com.soundhelix.component.player.impl.MidiPlayer;
+import com.soundhelix.misc.Harmony;
 import com.soundhelix.misc.SongContext;
 import com.soundhelix.misc.Structure;
-import com.soundhelix.util.HarmonyEngineUtils;
+import com.soundhelix.util.HarmonyUtils;
 
 /**
  * Implements an abstract simple text-based remote control.
@@ -28,6 +28,7 @@ public abstract class AbstractTextRemoteControl implements TextRemoteControl {
      * Implements the main functionality of the remote control.
      */
 
+    @Override
     public void run() {
         boolean hasExitPermission = hasExitPermission(0);
 
@@ -36,7 +37,7 @@ public abstract class AbstractTextRemoteControl implements TextRemoteControl {
                 String line = readLine();
 
                 if (line != null && !line.equals("")) {
-                    HarmonyEngine harmonyEngine = songContext.getHarmonyEngine();
+                    Harmony harmony = songContext.getHarmony();
                     Player player = songContext.getPlayer();
                     
                     if (line.startsWith("bpm ")) {
@@ -58,7 +59,7 @@ public abstract class AbstractTextRemoteControl implements TextRemoteControl {
                                     tick = player.getCurrentTick();
 
                                     if (tick >= 0) {
-                                        tick += harmonyEngine.getChordSectionTicks(tick);
+                                        tick += harmony.getChordSectionTicks(tick);
                                     }
                                 } else if (line.charAt(5) == '#') {
                                     double chordSectionDouble = Double.parseDouble(line.substring(6));
@@ -67,10 +68,10 @@ public abstract class AbstractTextRemoteControl implements TextRemoteControl {
                                     double chordSectionFraction = chordSectionDouble - Math.floor(chordSectionDouble);
 
                                     // use the integer part to find the start of the chord section
-                                    tick = HarmonyEngineUtils.getChordSectionTick(songContext, chordSection);
+                                    tick = HarmonyUtils.getChordSectionTick(songContext, chordSection);
 
                                     // add the fractional part
-                                    tick += (int) (harmonyEngine.getChordSectionTicks(tick) * chordSectionFraction);
+                                    tick += (int) (harmony.getChordSectionTicks(tick) * chordSectionFraction);
                                 } else {
                                     tick = Integer.parseInt(line.substring(5));
                                 }
@@ -82,10 +83,10 @@ public abstract class AbstractTextRemoteControl implements TextRemoteControl {
                                 boolean success = player.skipToTick(tick);
 
                                 if (success) {
-                                    int chordSection = HarmonyEngineUtils.getChordSectionNumber(songContext, tick);
+                                    int chordSection = HarmonyUtils.getChordSectionNumber(songContext, tick);
 
                                     if (chordSection >= 0) {
-                                        int chordSectionTick = tick - HarmonyEngineUtils.getChordSectionTick(songContext, chordSection);
+                                        int chordSectionTick = tick - HarmonyUtils.getChordSectionTick(songContext, chordSection);
                                         writeLine("Skipping to tick " + tick + " (tick " + chordSectionTick + " of chord section " + chordSection + ")");
                                     } else {
                                         writeLine("Skipping to tick " + tick);
@@ -166,10 +167,12 @@ public abstract class AbstractTextRemoteControl implements TextRemoteControl {
         }
     }
 
+    @Override
     public SongContext getSongContext() {
         return songContext;
     }
 
+    @Override
     public void setSongContext(SongContext songContext) {
         this.songContext = songContext;
     }

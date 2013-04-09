@@ -11,10 +11,10 @@ import javax.xml.xpath.XPathException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.soundhelix.component.harmonyengine.HarmonyEngine;
 import com.soundhelix.component.patternengine.PatternEngine;
 import com.soundhelix.misc.ActivityVector;
 import com.soundhelix.misc.Chord;
+import com.soundhelix.misc.Harmony;
 import com.soundhelix.misc.Pattern;
 import com.soundhelix.misc.Pattern.PatternEntry;
 import com.soundhelix.misc.Sequence;
@@ -22,7 +22,7 @@ import com.soundhelix.misc.SongContext;
 import com.soundhelix.misc.Structure;
 import com.soundhelix.misc.Track;
 import com.soundhelix.misc.Track.TrackType;
-import com.soundhelix.util.HarmonyEngineUtils;
+import com.soundhelix.util.HarmonyUtils;
 import com.soundhelix.util.NoteUtils;
 import com.soundhelix.util.XMLUtils;
 
@@ -70,7 +70,7 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
     @Override
     public Track render(SongContext songContext, ActivityVector[] activityVectors) {
         Structure structure = songContext.getStructure();
-        HarmonyEngine harmonyEngine = songContext.getHarmonyEngine();
+        Harmony harmony = songContext.getHarmony();
         
         ActivityVector activityVector = activityVectors[0];
 
@@ -85,8 +85,8 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
         Map<String, Integer> melodyIndexMap = new HashMap<String, Integer>(melodyMap.size());
 
         while (tick < ticks) {
-            int len = harmonyEngine.getChordSectionTicks(tick);
-            String section = HarmonyEngineUtils.getChordSectionString(songContext, tick);
+            int len = harmony.getChordSectionTicks(tick);
+            String section = HarmonyUtils.getChordSectionString(songContext, tick);
             List<Pattern> patternList = melodyMap.get(section);
 
             Integer melodyIndex = melodyIndexMap.get(section);
@@ -241,7 +241,7 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
 
     private Map<String, List<Pattern>> createMelodies(SongContext songContext) {
         Structure structure = songContext.getStructure();
-        HarmonyEngine harmonyEngine = songContext.getHarmonyEngine();
+        Harmony harmony = songContext.getHarmony();
 
         int patternLength = pattern.size();
 
@@ -256,8 +256,8 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
         int pos = 0;
 
         while (tick < ticks) {
-            String section = HarmonyEngineUtils.getChordSectionString(songContext, tick);
-            int len = harmonyEngine.getChordSectionTicks(tick);
+            String section = HarmonyUtils.getChordSectionString(songContext, tick);
+            int len = harmony.getChordSectionTicks(tick);
 
             List<Pattern> patternList = melodyMap.get(section);
             int patterns;
@@ -286,7 +286,7 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
 
                 for (int i = 0; i < len;) {
                     PatternEntry entry = pattern.get(pos % patternLength);
-                    Chord chord = harmonyEngine.getChord(tick + i);
+                    Chord chord = harmony.getChord(tick + i);
                     int t = entry.getTicks();
 
                     if (entry.isPause()) {

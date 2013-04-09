@@ -12,9 +12,9 @@ import javax.xml.xpath.XPathException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.soundhelix.component.harmonyengine.HarmonyEngine;
 import com.soundhelix.component.patternengine.PatternEngine;
 import com.soundhelix.misc.ActivityVector;
+import com.soundhelix.misc.Harmony;
 import com.soundhelix.misc.Pattern;
 import com.soundhelix.misc.Pattern.PatternEntry;
 import com.soundhelix.misc.Sequence;
@@ -22,7 +22,7 @@ import com.soundhelix.misc.SongContext;
 import com.soundhelix.misc.Structure;
 import com.soundhelix.misc.Track;
 import com.soundhelix.misc.Track.TrackType;
-import com.soundhelix.util.HarmonyEngineUtils;
+import com.soundhelix.util.HarmonyUtils;
 import com.soundhelix.util.RandomUtils;
 import com.soundhelix.util.StringUtils;
 import com.soundhelix.util.XMLUtils;
@@ -67,6 +67,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
         this.conditionalEntries = conditionalEntries;
     }
 
+    @Override
     public Track render(SongContext songContext, ActivityVector[] activityVectors) {
         int drumEntryCount = drumEntries.length;
 
@@ -144,9 +145,9 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
 
     private void processConditionalPatterns(SongContext songContext, ActivityVector[] activityVectors, Sequence[] seqs) {
         Structure structure = songContext.getStructure();
-        HarmonyEngine harmonyEngine = songContext.getHarmonyEngine();
+        Harmony harmony = songContext.getHarmony();
         int ticks = structure.getTicks();
-        int chordSections = HarmonyEngineUtils.getChordSectionCount(songContext);
+        int chordSections = HarmonyUtils.getChordSectionCount(songContext);
         int conditionalEntryCount = conditionalEntries.length;
 
         Map<String, List<Integer>> map = new HashMap<String, List<Integer>>();
@@ -181,11 +182,11 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
 
         while (tick < ticks) {
             chordSectionActivity[x++] = getActivityString(tick, activityVectors);
-            tick += harmonyEngine.getChordSectionTicks(tick);
+            tick += harmony.getChordSectionTicks(tick);
         }
 
         // start with the second chord section
-        tick = harmonyEngine.getChordSectionTicks(0);
+        tick = harmony.getChordSectionTicks(0);
         int chordSection = 1;
 
         while (tick < ticks) {
@@ -203,11 +204,11 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
                     // fulfill the precondition
 
                     int mtick = tick - patternTicks;
-                    int cs = HarmonyEngineUtils.getChordSectionNumber(songContext, mtick);
+                    int cs = HarmonyUtils.getChordSectionNumber(songContext, mtick);
                     boolean preConditionMatched = true;
 
                     while (mtick < tick && preConditionMatched) {
-                        mtick += harmonyEngine.getChordSectionTicks(mtick);
+                        mtick += harmony.getChordSectionTicks(mtick);
                         if (!preCondition.matcher(chordSectionActivity[cs]).matches()) {
                             preConditionMatched = false;
                             break;
@@ -264,7 +265,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
                 }
             }
 
-            tick += harmonyEngine.getChordSectionTicks(tick);
+            tick += harmony.getChordSectionTicks(tick);
             chordSection++;
         }
     }
@@ -293,6 +294,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
         return sb.toString();
     }
 
+    @Override
     public int getActivityVectorCount() {
         return drumEntries.length;
     }

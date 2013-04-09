@@ -2,9 +2,9 @@ package com.soundhelix.component.sequenceengine.impl;
 
 import java.util.Random;
 
-import com.soundhelix.component.harmonyengine.HarmonyEngine;
 import com.soundhelix.misc.ActivityVector;
 import com.soundhelix.misc.Chord;
+import com.soundhelix.misc.Harmony;
 import com.soundhelix.misc.Pattern;
 import com.soundhelix.misc.Sequence;
 import com.soundhelix.misc.SongContext;
@@ -48,7 +48,7 @@ public abstract class AbstractMultiPatternSequenceEngine extends AbstractSequenc
     @Override
     public Track render(SongContext songContext, ActivityVector[] activityVectors) {
         Structure structure = songContext.getStructure();
-        HarmonyEngine harmonyEngine = songContext.getHarmonyEngine();
+        Harmony harmony = songContext.getHarmony();
 
         ActivityVector activityVector = activityVectors[0];
 
@@ -71,7 +71,7 @@ public abstract class AbstractMultiPatternSequenceEngine extends AbstractSequenc
             int tick = 0;
 
             while (tick < ticks) {
-                Chord chord = harmonyEngine.getChord(tick);
+                Chord chord = harmony.getChord(tick);
 
                 if (isNormalizeChords) {
                     chord = chord.normalize();
@@ -101,7 +101,7 @@ public abstract class AbstractMultiPatternSequenceEngine extends AbstractSequenc
                         Chord nextChord;
 
                         if (t < ticks && activityVector.isActive(t)) {
-                            nextChord = harmonyEngine.getChord(t);
+                            nextChord = harmony.getChord(t);
                         } else {
                             // the next chord would either fall into
                             // an inactivity interval or be at the end

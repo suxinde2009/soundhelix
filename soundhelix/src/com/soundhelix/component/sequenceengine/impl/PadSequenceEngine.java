@@ -11,9 +11,9 @@ import javax.xml.xpath.XPathException;
 
 import org.w3c.dom.Node;
 
-import com.soundhelix.component.harmonyengine.HarmonyEngine;
 import com.soundhelix.misc.ActivityVector;
 import com.soundhelix.misc.Chord;
+import com.soundhelix.misc.Harmony;
 import com.soundhelix.misc.Sequence;
 import com.soundhelix.misc.SongContext;
 import com.soundhelix.misc.Track;
@@ -80,7 +80,10 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
         this.velocity = velocity;
     }
 
+    @Override
     public Track render(SongContext songContext, ActivityVector[] activityVectors) {
+        Harmony harmony = songContext.getHarmony();
+
         ActivityVector activityVector = activityVectors[0];
 
         Track track = new Track(TrackType.MELODIC);
@@ -89,22 +92,20 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
             track.add(new Sequence());
         }
 
-        HarmonyEngine harmonyEngine = songContext.getHarmonyEngine();
-
         int tick = 0;
         int ticks = songContext.getStructure().getTicks();
         
         while (tick < ticks) {
-            Chord chord = harmonyEngine.getChord(tick);
+            Chord chord = harmony.getChord(tick);
 
             if (isNormalizeChords) {
                 chord = chord.normalize();
             }
 
-            int len = Math.min(harmonyEngine.getChordTicks(tick), activityVector.getIntervalLength(tick));
+            int len = Math.min(harmony.getChordTicks(tick), activityVector.getIntervalLength(tick));
 
             if (obeyChordSections) {
-                len = Math.min(len, harmonyEngine.getChordSectionTicks(tick));
+                len = Math.min(len, harmony.getChordSectionTicks(tick));
             }
 
             if (activityVector.isActive(tick)) {

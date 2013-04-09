@@ -14,6 +14,7 @@ import org.w3c.dom.NodeList;
 
 import com.soundhelix.component.RandomSeedable;
 import com.soundhelix.component.XMLConfigurable;
+import com.soundhelix.misc.SongContext;
 
 /**
  * Implements some static methods for parsing XML data.
@@ -438,7 +439,7 @@ public final class XMLUtils {
      * @throws IllegalAccessException if the class cannot be instantiated
      */
 
-    public static <T> T getInstance(Class<T> superclazz, Node node, long parentRandomSeed, int salt) throws InstantiationException,
+    public static <T> T getInstance(SongContext songContext, Class<T> superclazz, Node node, long parentRandomSeed, int salt) throws InstantiationException,
             XPathException, IllegalAccessException, ClassNotFoundException {
         if (node == null) {
             throw new IllegalArgumentException("Node is null");
@@ -520,7 +521,7 @@ public final class XMLUtils {
         // configure instance if it is XML-configurable
 
         if (instance instanceof XMLConfigurable) {
-            ((XMLConfigurable) instance).configure(node);
+            ((XMLConfigurable) instance).configure(songContext, node);
         }
 
         return instance;

@@ -7,6 +7,8 @@ import com.soundhelix.misc.ActivityVector;
 import com.soundhelix.misc.Chord;
 import com.soundhelix.misc.Pattern;
 import com.soundhelix.misc.Sequence;
+import com.soundhelix.misc.SongContext;
+import com.soundhelix.misc.Structure;
 import com.soundhelix.misc.Track;
 import com.soundhelix.misc.Track.TrackType;
 import com.soundhelix.util.NoteUtils;
@@ -44,10 +46,11 @@ public abstract class AbstractMultiPatternSequenceEngine extends AbstractSequenc
     }
 
     @Override
-    public Track render(ActivityVector[] activityVectors) {
-        ActivityVector activityVector = activityVectors[0];
+    public Track render(SongContext songContext, ActivityVector[] activityVectors) {
+        Structure structure = songContext.getStructure();
+        HarmonyEngine harmonyEngine = songContext.getHarmonyEngine();
 
-        HarmonyEngine harmonyEngine = structure.getHarmonyEngine();
+        ActivityVector activityVector = activityVectors[0];
 
         int ticks = structure.getTicks();
         int patternCount = patterns.length;

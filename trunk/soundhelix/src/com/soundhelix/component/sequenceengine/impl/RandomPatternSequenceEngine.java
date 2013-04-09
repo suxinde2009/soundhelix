@@ -17,6 +17,8 @@ import com.soundhelix.misc.Chord;
 import com.soundhelix.misc.Pattern;
 import com.soundhelix.misc.Pattern.PatternEntry;
 import com.soundhelix.misc.Sequence;
+import com.soundhelix.misc.SongContext;
+import com.soundhelix.misc.Structure;
 import com.soundhelix.misc.Track;
 import com.soundhelix.misc.Track.TrackType;
 import com.soundhelix.util.HarmonyEngineUtils;
@@ -48,20 +50,22 @@ public class RandomPatternSequenceEngine extends AbstractSequenceEngine {
         setPattern(patternString);
     }
 
-    public Track render(ActivityVector[] activityVectors) {
+    public Track render(SongContext songContext, ActivityVector[] activityVectors) {
+        Structure structure = songContext.getStructure();
+        
         ActivityVector activityVector = activityVectors[0];
 
         Sequence seq = new Sequence();
-        HarmonyEngine harmonyEngine = structure.getHarmonyEngine();
+        HarmonyEngine harmonyEngine = songContext.getHarmonyEngine();
 
         int tick = 0;
         int ticks = structure.getTicks();
 
-        Map<String, Pattern> melodyHashtable = createMelodies();
+        Map<String, Pattern> melodyHashtable = createMelodies(songContext);
 
         while (tick < ticks) {
             int len = harmonyEngine.getChordSectionTicks(tick);
-            Pattern p = melodyHashtable.get(HarmonyEngineUtils.getChordSectionString(structure, tick));
+            Pattern p = melodyHashtable.get(HarmonyEngineUtils.getChordSectionString(songContext, tick));
             int pos = 0;
 
             for (int i = 0; i < len;) {
@@ -98,15 +102,17 @@ public class RandomPatternSequenceEngine extends AbstractSequenceEngine {
      * @return a hashtable mapping chord section strings to pitch patterns
      */
 
-    private Map<String, Pattern> createMelodies() {
-        HarmonyEngine he = structure.getHarmonyEngine();
+    private Map<String, Pattern> createMelodies(SongContext songContext) {
+        Structure structure = songContext.getStructure();
+        
+        HarmonyEngine he = songContext.getHarmonyEngine();
 
         Map<String, Pattern> sectionMap = new HashMap<String, Pattern>();
 
         int tick = 0;
 
         while (tick < structure.getTicks()) {
-            String section = HarmonyEngineUtils.getChordSectionString(structure, tick);
+            String section = HarmonyEngineUtils.getChordSectionString(songContext, tick);
             int len = he.getChordSectionTicks(tick);
 
             if (!sectionMap.containsKey(section)) {
@@ -149,7 +155,7 @@ public class RandomPatternSequenceEngine extends AbstractSequenceEngine {
         return sectionMap;
     }
 
-    public void configure(Node node) throws XPathException {
+    public void configure(SongContext songContext, Node node) throws XPathException {
         random = new Random(randomSeed);
 
         NodeList nodeList = XMLUtils.getNodeList("pattern", node);

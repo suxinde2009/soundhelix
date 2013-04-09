@@ -9,6 +9,7 @@ import org.w3c.dom.Node;
 
 import com.soundhelix.misc.Pattern;
 import com.soundhelix.misc.Pattern.PatternEntry;
+import com.soundhelix.misc.SongContext;
 import com.soundhelix.util.RandomUtils;
 import com.soundhelix.util.XMLUtils;
 
@@ -46,7 +47,7 @@ public class CrescendoPatternEngine extends StringPatternEngine {
     private String suffixPatternString;
 
     @Override
-    public void configure(Node node) throws XPathException {
+    public void configure(SongContext songContext, Node node) throws XPathException {
         random = new Random(randomSeed);
         
         try {

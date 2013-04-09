@@ -10,6 +10,7 @@ import javax.xml.xpath.XPathException;
 
 import org.w3c.dom.Node;
 
+import com.soundhelix.misc.SongContext;
 import com.soundhelix.util.RandomUtils;
 import com.soundhelix.util.XMLUtils;
 
@@ -76,7 +77,7 @@ public class RandomPatternEngine extends StringPatternEngine {
     private double velocityExponent = 3.0d;
 
     @Override
-    public void configure(Node node) throws XPathException {
+    public void configure(SongContext songContext, Node node) throws XPathException {
         random = new Random(randomSeed);
 
         setPatternTicks(XMLUtils.parseInteger(random, "patternTicks", node));

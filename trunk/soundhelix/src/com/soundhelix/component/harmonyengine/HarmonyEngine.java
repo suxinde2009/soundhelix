@@ -2,7 +2,7 @@ package com.soundhelix.component.harmonyengine;
 
 import com.soundhelix.component.Component;
 import com.soundhelix.misc.Chord;
-import com.soundhelix.misc.Structure;
+import com.soundhelix.misc.SongContext;
 
 /**
  * Interface for song harmony generators. Normally, song harmonies are a sequence of chords (often with the same length) with a certain pattern. The
@@ -45,12 +45,12 @@ import com.soundhelix.misc.Structure;
 public interface HarmonyEngine extends Component {
 
     /**
-     * Sets the song structure.
+     * Sets the song context
      *
-     * @param structure the structure
+     * @param structure the song context
      */
 
-    void setSongStructure(Structure structure);
+    void setSongContext(SongContext songContext);
 
     /**
      * Returns the chord to use at the specified point in time. Within the valid tick interval this must be non-null (each tick must define a chord).

@@ -11,6 +11,7 @@ import javax.xml.xpath.XPathException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.soundhelix.misc.SongContext;
 import com.soundhelix.util.StringUtils;
 import com.soundhelix.util.XMLUtils;
 
@@ -50,7 +51,7 @@ public class CFGSongNameEngine extends AbstractSongNameEngine {
     }
 
     @Override
-    public void configure(Node node) throws XPathException {
+    public void configure(SongContext songContext, Node node) throws XPathException {
         Random random = new Random(randomSeed);
 
         NodeList nodeList = XMLUtils.getNodeList("variable", node);

@@ -12,6 +12,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.soundhelix.misc.Pattern;
+import com.soundhelix.misc.SongContext;
 import com.soundhelix.util.XMLUtils;
 
 /**
@@ -46,7 +47,7 @@ public class RandomFragmentPatternEngine extends StringPatternEngine {
     private Map<Character, String[]> patternStringMap;
 
     @Override
-    public void configure(Node node) throws XPathException {
+    public void configure(SongContext songContext, Node node) throws XPathException {
         random = new Random(randomSeed);
 
         setPatternTicks(XMLUtils.parseInteger(random, "patternTicks", node));

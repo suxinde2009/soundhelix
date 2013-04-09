@@ -1,6 +1,7 @@
 package com.soundhelix.component.lfo.impl;
 
 import com.soundhelix.component.lfo.LFO;
+import com.soundhelix.misc.SongContext;
 
 /**
  * This class implements the basic methods for setting the mode and speed of the LFO as well as the minimum and maximum amplitude and value to return.
@@ -16,6 +17,9 @@ public abstract class AbstractLFO implements LFO {
     /** Two times Pi. */
     protected static final double TWO_PI = 2.0d * Math.PI;
 
+    /** The song context. */
+    protected SongContext songContext;
+    
     /** The random seed. */
     protected long randomSeed;
 
@@ -126,5 +130,10 @@ public abstract class AbstractLFO implements LFO {
     @Override
     public long getRandomSeed() {
         return randomSeed;
+    }
+
+    @Override
+    public void setSongContext(SongContext songContext) {
+        this.songContext = songContext;
     }
 }

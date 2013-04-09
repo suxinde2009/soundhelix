@@ -1,6 +1,7 @@
 package com.soundhelix.component.lfo;
 
 import com.soundhelix.component.Component;
+import com.soundhelix.misc.SongContext;
 
 /**
  * Represents a low frequency oscillator (LFO). The oscillator can run in one of four modes: synchronized to time (e.g, a full rotation every 5
@@ -101,4 +102,12 @@ public interface LFO extends Component {
      */
 
     void setMaxAmplitude(int maxAmplitude);
+    
+    /**
+     * Sets the song context.
+     * 
+     * @param songContext the song context
+     */
+    
+    void setSongContext(SongContext songContext);    
 }

@@ -2,6 +2,7 @@ package com.soundhelix.component.player;
 
 import com.soundhelix.component.Component;
 import com.soundhelix.misc.Arrangement;
+import com.soundhelix.misc.SongContext;
 
 /**
  * Represents an interface for playing Arrangements. A player's task usually is to play the arrangement in real-time.
@@ -19,27 +20,11 @@ public interface Player extends Component {
     void open();
 
     /**
-     * Gets the arrangement to play.
-     *
-     * @return the arrangement
-     */
-
-    Arrangement getArrangement();
-
-    /**
-     * Sets the arrangement to play.
-     *
-     * @param arrangement the arrangement
-     */
-
-    void setArrangement(Arrangement arrangement);
-
-    /**
      * Plays the arrangement last set by setArrangement(). The method will return as soon as playing has finished. The method open() must have been
      * called once prior to calling this method.
      */
 
-    void play();
+    void play(SongContext songContext);
 
     /**
      * Closes all required resources. The method play() must not be called after resources have been closed, unless open() has been called after that.

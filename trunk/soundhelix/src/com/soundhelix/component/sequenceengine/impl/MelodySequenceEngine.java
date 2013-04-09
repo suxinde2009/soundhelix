@@ -18,6 +18,8 @@ import com.soundhelix.misc.Chord;
 import com.soundhelix.misc.Pattern;
 import com.soundhelix.misc.Pattern.PatternEntry;
 import com.soundhelix.misc.Sequence;
+import com.soundhelix.misc.SongContext;
+import com.soundhelix.misc.Structure;
 import com.soundhelix.misc.Track;
 import com.soundhelix.misc.Track.TrackType;
 import com.soundhelix.util.HarmonyEngineUtils;
@@ -66,23 +68,25 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
     }
 
     @Override
-    public Track render(ActivityVector[] activityVectors) {
+    public Track render(SongContext songContext, ActivityVector[] activityVectors) {
+        Structure structure = songContext.getStructure();
+        HarmonyEngine harmonyEngine = songContext.getHarmonyEngine();
+        
         ActivityVector activityVector = activityVectors[0];
 
         Sequence seq = new Sequence();
-        HarmonyEngine harmonyEngine = structure.getHarmonyEngine();
 
         int tick = 0;
         int ticks = structure.getTicks();
 
-        Map<String, List<Pattern>> melodyMap = createMelodies();
+        Map<String, List<Pattern>> melodyMap = createMelodies(songContext);
 
         // maps chord sections to the current melody index
         Map<String, Integer> melodyIndexMap = new HashMap<String, Integer>(melodyMap.size());
 
         while (tick < ticks) {
             int len = harmonyEngine.getChordSectionTicks(tick);
-            String section = HarmonyEngineUtils.getChordSectionString(structure, tick);
+            String section = HarmonyEngineUtils.getChordSectionString(songContext, tick);
             List<Pattern> patternList = melodyMap.get(section);
 
             Integer melodyIndex = melodyIndexMap.get(section);
@@ -235,8 +239,9 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
      * @return a map mapping chord section strings to melody patterns
      */
 
-    private Map<String, List<Pattern>> createMelodies() {
-        HarmonyEngine he = structure.getHarmonyEngine();
+    private Map<String, List<Pattern>> createMelodies(SongContext songContext) {
+        Structure structure = songContext.getStructure();
+        HarmonyEngine harmonyEngine = songContext.getHarmonyEngine();
 
         int patternLength = pattern.size();
 
@@ -251,8 +256,8 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
         int pos = 0;
 
         while (tick < ticks) {
-            String section = HarmonyEngineUtils.getChordSectionString(structure, tick);
-            int len = he.getChordSectionTicks(tick);
+            String section = HarmonyEngineUtils.getChordSectionString(songContext, tick);
+            int len = harmonyEngine.getChordSectionTicks(tick);
 
             List<Pattern> patternList = melodyMap.get(section);
             int patterns;
@@ -281,7 +286,7 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
 
                 for (int i = 0; i < len;) {
                     PatternEntry entry = pattern.get(pos % patternLength);
-                    Chord chord = he.getChord(tick + i);
+                    Chord chord = harmonyEngine.getChord(tick + i);
                     int t = entry.getTicks();
 
                     if (entry.isPause()) {
@@ -315,7 +320,7 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
     }
 
     @Override
-    public void configure(Node node) throws XPathException {
+    public void configure(SongContext songContext, Node node) throws XPathException {
         random = new Random(randomSeed);
 
         try {
@@ -352,12 +357,12 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
 
         try {
             int i = random.nextInt(nodeList.getLength());
-            patternEngine = XMLUtils.getInstance(PatternEngine.class, nodeList.item(i), randomSeed, i);
+            patternEngine = XMLUtils.getInstance(songContext, PatternEngine.class, nodeList.item(i), randomSeed, i);
         } catch (Exception e) {
             throw new RuntimeException("Error instantiating PatternEngine", e);
         }
 
-        Pattern pattern = patternEngine.render("" + ON_CHORD + FREE + REPEAT);
+        Pattern pattern = patternEngine.render(songContext, "" + ON_CHORD + FREE + REPEAT);
         setPattern(pattern);
     }
 

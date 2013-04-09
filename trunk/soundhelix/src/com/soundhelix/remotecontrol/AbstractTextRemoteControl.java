@@ -4,8 +4,10 @@ import java.security.AccessControlException;
 
 import org.apache.log4j.Logger;
 
+import com.soundhelix.component.harmonyengine.HarmonyEngine;
 import com.soundhelix.component.player.Player;
 import com.soundhelix.component.player.impl.MidiPlayer;
+import com.soundhelix.misc.SongContext;
 import com.soundhelix.misc.Structure;
 import com.soundhelix.util.HarmonyEngineUtils;
 
@@ -20,7 +22,7 @@ public abstract class AbstractTextRemoteControl implements TextRemoteControl {
     private static final Logger LOGGER = Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
 
     /** The player. */
-    private Player player;
+    private SongContext songContext;
 
     /**
      * Implements the main functionality of the remote control.
@@ -34,8 +36,9 @@ public abstract class AbstractTextRemoteControl implements TextRemoteControl {
                 String line = readLine();
 
                 if (line != null && !line.equals("")) {
-                    Player player = this.player;
-
+                    HarmonyEngine harmonyEngine = songContext.getHarmonyEngine();
+                    Player player = songContext.getPlayer();
+                    
                     if (line.startsWith("bpm ")) {
                         if (player != null) {
                             writeLine("Setting BPM");
@@ -45,30 +48,32 @@ public abstract class AbstractTextRemoteControl implements TextRemoteControl {
                     } else if (line.startsWith("skip ") || line.equals("+")) {
                         if (player != null) {
                             int tick;
-                            Structure structure = player.getArrangement().getStructure();
+                            Structure structure = songContext.getStructure();
 
                             if (line.endsWith("%")) {
                                 double percentage = Double.parseDouble(line.substring(5, line.length() - 1));
                                 tick = (int) (percentage * structure.getTicks() / 100d);
-                            } else if (line.equals("+") || line.substring(5).equals("+")) {
-                                tick = player.getCurrentTick();
-
-                                if (tick >= 0) {
-                                    tick += structure.getHarmonyEngine().getChordSectionTicks(tick);
-                                }
-                            } else if (line.charAt(5) == '#') {
-                                double chordSectionDouble = Double.parseDouble(line.substring(6));
-
-                                int chordSection = (int) chordSectionDouble;
-                                double chordSectionFraction = chordSectionDouble - Math.floor(chordSectionDouble);
-
-                                // use the integer part to find the start of the chord section
-                                tick = HarmonyEngineUtils.getChordSectionTick(structure, chordSection);
-
-                                // add the fractional part
-                                tick += (int) (structure.getHarmonyEngine().getChordSectionTicks(tick) * chordSectionFraction);
                             } else {
-                                tick = Integer.parseInt(line.substring(5));
+                                if (line.equals("+") || line.substring(5).equals("+")) {
+                                    tick = player.getCurrentTick();
+
+                                    if (tick >= 0) {
+                                        tick += harmonyEngine.getChordSectionTicks(tick);
+                                    }
+                                } else if (line.charAt(5) == '#') {
+                                    double chordSectionDouble = Double.parseDouble(line.substring(6));
+
+                                    int chordSection = (int) chordSectionDouble;
+                                    double chordSectionFraction = chordSectionDouble - Math.floor(chordSectionDouble);
+
+                                    // use the integer part to find the start of the chord section
+                                    tick = HarmonyEngineUtils.getChordSectionTick(songContext, chordSection);
+
+                                    // add the fractional part
+                                    tick += (int) (harmonyEngine.getChordSectionTicks(tick) * chordSectionFraction);
+                                } else {
+                                    tick = Integer.parseInt(line.substring(5));
+                                }
                             }
 
                             if (tick < 0 || tick > structure.getTicks()) {
@@ -77,10 +82,10 @@ public abstract class AbstractTextRemoteControl implements TextRemoteControl {
                                 boolean success = player.skipToTick(tick);
 
                                 if (success) {
-                                    int chordSection = HarmonyEngineUtils.getChordSectionNumber(structure, tick);
+                                    int chordSection = HarmonyEngineUtils.getChordSectionNumber(songContext, tick);
 
                                     if (chordSection >= 0) {
-                                        int chordSectionTick = tick - HarmonyEngineUtils.getChordSectionTick(structure, chordSection);
+                                        int chordSectionTick = tick - HarmonyEngineUtils.getChordSectionTick(songContext, chordSection);
                                         writeLine("Skipping to tick " + tick + " (tick " + chordSectionTick + " of chord section " + chordSection + ")");
                                     } else {
                                         writeLine("Skipping to tick " + tick);
@@ -161,11 +166,11 @@ public abstract class AbstractTextRemoteControl implements TextRemoteControl {
         }
     }
 
-    public Player getPlayer() {
-        return player;
+    public SongContext getSongContext() {
+        return songContext;
     }
 
-    public void setPlayer(Player player) {
-        this.player = player;
+    public void setSongContext(SongContext songContext) {
+        this.songContext = songContext;
     }
 }

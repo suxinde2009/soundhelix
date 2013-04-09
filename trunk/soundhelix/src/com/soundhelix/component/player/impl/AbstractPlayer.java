@@ -20,9 +20,6 @@ public abstract class AbstractPlayer implements Player {
     /** The random seed. */
     protected long randomSeed;
 
-    /** The arrangement. */
-    protected Arrangement arrangement;
-
     public AbstractPlayer() {
         logger = Logger.getLogger(this.getClass());
     }
@@ -35,13 +32,5 @@ public abstract class AbstractPlayer implements Player {
     @Override
     public long getRandomSeed() {
         return randomSeed;
-    }
-
-    public void setArrangement(Arrangement arrangement) {
-        this.arrangement = arrangement;
-    }
-
-    public Arrangement getArrangement() {
-        return arrangement;
     }
 }

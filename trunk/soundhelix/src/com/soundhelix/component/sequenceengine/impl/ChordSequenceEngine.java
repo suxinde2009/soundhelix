@@ -9,6 +9,7 @@ import org.w3c.dom.NodeList;
 
 import com.soundhelix.component.patternengine.PatternEngine;
 import com.soundhelix.misc.Pattern;
+import com.soundhelix.misc.SongContext;
 import com.soundhelix.util.XMLUtils;
 
 /**
@@ -23,7 +24,7 @@ public class ChordSequenceEngine extends MultiPatternSequenceEngine {
         super();
     }
 
-    public void configure(Node node) throws XPathException {
+    public void configure(SongContext songContext, Node node) throws XPathException {
         random = new Random(randomSeed);
 
         String offsetString = XMLUtils.parseString(random, "offsets", node);
@@ -61,13 +62,13 @@ public class ChordSequenceEngine extends MultiPatternSequenceEngine {
 
         try {
             int i = random.nextInt(nodeList.getLength());
-            patternEngine = XMLUtils.getInstance(PatternEngine.class, nodeList.item(i), randomSeed, i);
+            patternEngine = XMLUtils.getInstance(songContext, PatternEngine.class, nodeList.item(i), randomSeed, i);
         } catch (Exception e) {
             throw new RuntimeException("Error instantiating PatternEngine", e);
         }
 
         // render base pattern
-        Pattern pattern = patternEngine.render("");
+        Pattern pattern = patternEngine.render(songContext, "");
 
         // transpose base pattern once for each offset
 

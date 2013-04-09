@@ -5,6 +5,8 @@ import java.util.Random;
 import com.soundhelix.misc.ActivityVector;
 import com.soundhelix.misc.Pattern;
 import com.soundhelix.misc.Sequence;
+import com.soundhelix.misc.SongContext;
+import com.soundhelix.misc.Structure;
 import com.soundhelix.misc.Track;
 import com.soundhelix.misc.Track.TrackType;
 
@@ -35,7 +37,9 @@ public abstract class AbstractFreeMultiPatternSequenceEngine extends AbstractSeq
     }
 
     @Override
-    public Track render(ActivityVector[] activityVectors) {
+    public Track render(SongContext songContext, ActivityVector[] activityVectors) {
+        Structure structure = songContext.getStructure();
+
         ActivityVector activityVector = activityVectors[0];
 
         int ticks = structure.getTicks();

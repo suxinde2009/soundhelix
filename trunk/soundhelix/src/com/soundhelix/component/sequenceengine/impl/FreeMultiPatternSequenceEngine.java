@@ -9,6 +9,7 @@ import org.w3c.dom.NodeList;
 
 import com.soundhelix.component.patternengine.PatternEngine;
 import com.soundhelix.misc.Pattern;
+import com.soundhelix.misc.SongContext;
 import com.soundhelix.util.XMLUtils;
 
 /**
@@ -27,7 +28,7 @@ import com.soundhelix.util.XMLUtils;
 public class FreeMultiPatternSequenceEngine extends AbstractFreeMultiPatternSequenceEngine {
     
     @Override
-    public void configure(Node node) throws XPathException {
+    public void configure(SongContext songContext, Node node) throws XPathException {
         random = new Random(randomSeed);
 
         NodeList patternsList = XMLUtils.getNodeList("patternEngines", node);
@@ -50,12 +51,12 @@ public class FreeMultiPatternSequenceEngine extends AbstractFreeMultiPatternSequ
             PatternEngine patternEngine;
             
             try {
-                patternEngine = XMLUtils.getInstance(PatternEngine.class, patternList.item(i), randomSeed, i);
+                patternEngine = XMLUtils.getInstance(songContext, PatternEngine.class, patternList.item(i), randomSeed, i);
             } catch (Exception e) {
                 throw new RuntimeException("Error instantiating PatternEngine", e);
             }
         
-            patterns[i] = patternEngine.render("");
+            patterns[i] = patternEngine.render(songContext, "");
         }
         
         setPatterns(patterns);

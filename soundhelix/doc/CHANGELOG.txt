@@ -8,7 +8,9 @@ Change log
 ----------
 
 
-0.6:
+0.6u:
+
+    - Refactored and cleaned up lots of SoundHelix' internals. This also affects the API of several externally-exposed interfaces.
 
     - The MidiPlayer now supports setting arbitrary MIDI controller values at the beginning of the song, using the "controllerValue"
       tag. This allows, for example, to set relative MIDI volumes, panning, etc., per MIDI channel.

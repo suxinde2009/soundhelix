@@ -6,6 +6,7 @@ import javax.xml.xpath.XPathException;
 
 import org.w3c.dom.Node;
 
+import com.soundhelix.misc.SongContext;
 import com.soundhelix.util.XMLUtils;
 
 /**
@@ -43,7 +44,7 @@ public class LinearRandomLFO extends AbstractLFO {
     }
 
     @Override
-    public final void configure(Node node) throws XPathException {
+    public final void configure(SongContext songContext, Node node) throws XPathException {
         random = new Random(randomSeed);
         
         int values = XMLUtils.parseInteger(random, "valueCount", node);

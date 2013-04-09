@@ -27,6 +27,7 @@ import com.soundhelix.misc.Arrangement;
 import com.soundhelix.misc.Arrangement.ArrangementEntry;
 import com.soundhelix.misc.Sequence;
 import com.soundhelix.misc.Sequence.SequenceEntry;
+import com.soundhelix.misc.SongContext;
 import com.soundhelix.misc.Structure;
 import com.soundhelix.misc.Track;
 import com.soundhelix.misc.Track.TrackType;
@@ -139,6 +140,9 @@ public class MidiPlayer extends AbstractPlayer {
 
     /** The template for MIDI filenames. */
     private String midiFilename;
+    
+    /** The song context (only valid while playing). */
+    private SongContext songContext;
 
     /**
      * Contains the pitch used when the last note was played by a voice of an arrangement entry. This is used to be able to change the
@@ -368,19 +372,21 @@ public class MidiPlayer extends AbstractPlayer {
     }
 
     @Override
-    public void play() {
+    public void play(SongContext songContext) {
         if (!opened) {
             throw new IllegalStateException("Must call open() first");
         }
 
-        Arrangement arrangement = this.arrangement;
-
         try {
+            this.songContext = songContext;
+            
+            Arrangement arrangement = songContext.getArrangement();
+            
             if (midiFilename != null) {
-                saveMidiFiles(arrangement);
+                saveMidiFiles();
             }
 
-            Structure structure = arrangement.getStructure();
+            Structure structure = songContext.getStructure();
             int ticksPerBeat = structure.getTicksPerBeat();
             int ticks = structure.getTicks();
 
@@ -392,7 +398,7 @@ public class MidiPlayer extends AbstractPlayer {
                         + CLOCK_SYNCHRONIZATION_TICKS_PER_BEAT + " for MIDI clock synchronization");
             }
 
-            initializeControllerLFOs(arrangement);
+            initializeControllerLFOs();
             muteAllChannels();
             setChannelPrograms();
             sendControllerValues();
@@ -453,7 +459,7 @@ public class MidiPlayer extends AbstractPlayer {
                         break;
                     }
 
-                    playTick(arrangement, tick);
+                    playTick(tick);
                     tickReferenceTime += getTickNanos(tick, ticksPerBeat);
 
                     currentTick++;
@@ -495,6 +501,8 @@ public class MidiPlayer extends AbstractPlayer {
             }
         } catch (Exception e) {
             throw new RuntimeException("Playback error", e);
+        } finally {
+            this.songContext = null;
         }
     }
 
@@ -617,10 +625,12 @@ public class MidiPlayer extends AbstractPlayer {
      * @throws IOException in case of an I/O problem
      */
     
-    private void saveMidiFiles(Arrangement arrangement) throws InvalidMidiDataException, IOException {
-        initializeControllerLFOs(arrangement);
+    private void saveMidiFiles() throws InvalidMidiDataException, IOException {
+        Arrangement arrangement = songContext.getArrangement();
+        
+        initializeControllerLFOs();
 
-        Structure structure = arrangement.getStructure();
+        Structure structure = songContext.getStructure();
         int ticksPerBeat = structure.getTicksPerBeat();
         int ticks = structure.getTicks();
 
@@ -641,7 +651,7 @@ public class MidiPlayer extends AbstractPlayer {
             metaTrack.add(new MidiEvent(mt, 0L));
 
             mt = new MetaMessage();
-            bt = structure.getSongName().getBytes("ISO-8859-1");
+            bt = songContext.getSongName().getBytes("ISO-8859-1");
             mt.setMessage(0x01, bt, bt.length);
             metaTrack.add(new MidiEvent(mt, 0L));
 
@@ -652,7 +662,6 @@ public class MidiPlayer extends AbstractPlayer {
         }
 
         Map<DeviceChannel, Boolean> map = new HashMap<DeviceChannel, Boolean>();
-        Iterator<DeviceChannel> i = channelMap.values().iterator();
 
         for (DeviceChannel dc : channelMap.values()) {
             if (dc.program != -1 && !map.containsKey(dc)) {
@@ -798,13 +807,13 @@ public class MidiPlayer extends AbstractPlayer {
      * @throws InvalidMidiDataException in case of invalid MIDI data
      */
 
-    private void playTick(Arrangement arrangement, int tick) throws InvalidMidiDataException {
-        Structure structure = arrangement.getStructure();
-        int ticksPerBar = structure.getTicksPerBar();
+    private void playTick(int tick) throws InvalidMidiDataException {
+        Arrangement arrangement = songContext.getArrangement();
+        Structure structure = songContext.getStructure();
 
-        if (tick == 0 || arrangement.getStructure().getHarmonyEngine().getChordSectionTicks(tick - 1) == 1) {
+        if (tick == 0 || songContext.getHarmonyEngine().getChordSectionTicks(tick - 1) == 1) {
             logger.debug(String.format("Tick: %5d   Chord section: %3d   Seconds: %4d   Progress: %5.1f %%", tick,
-                    HarmonyEngineUtils.getChordSectionNumber(arrangement.getStructure(), tick), tick * 60 * 1000
+                    HarmonyEngineUtils.getChordSectionNumber(songContext, tick), tick * 60 * 1000
                             / (structure.getTicksPerBeat() * milliBPM),
                     (double) tick * 100 / structure.getTicks()));
         }
@@ -902,7 +911,7 @@ public class MidiPlayer extends AbstractPlayer {
     private void playSilentTick() {
         int k = 0;
 
-        for (ArrangementEntry entry : arrangement) {
+        for (ArrangementEntry entry : songContext.getArrangement()) {
             Track track = entry.getTrack();
 
             int[] t = tickList.get(k);
@@ -934,8 +943,9 @@ public class MidiPlayer extends AbstractPlayer {
      * @param arrangement the arrangement
      */
 
-    private void initializeControllerLFOs(Arrangement arrangement) {
-        Structure structure = arrangement.getStructure();
+    private void initializeControllerLFOs() {
+        Structure structure = songContext.getStructure();
+        Arrangement arrangement = songContext.getArrangement();
 
         for (ControllerLFO clfo : controllerLFOs) {
             if (clfo.rotationUnit.equals("song")) {
@@ -1362,13 +1372,12 @@ public class MidiPlayer extends AbstractPlayer {
      */
 
     private String replacePlaceholders(String string, Map<String, String> auxMap) {
-        Structure structure = arrangement.getStructure();
-        String songName = structure.getSongName();
+        String songName = songContext.getSongName();
 
         string = string.replace("${songName}", songName);
         string = string.replace("${safeSongName}", UNSAFE_CHARACTER_PATTERN.matcher(songName).replaceAll("_"));
-        string = string.replace("${randomSeed}", String.valueOf(structure.getRandomSeed()));
-        string = string.replace("${safeRandomSeed}", String.valueOf(structure.getRandomSeed()));
+        string = string.replace("${randomSeed}", String.valueOf(songContext.getRandomSeed()));
+        string = string.replace("${safeRandomSeed}", String.valueOf(songContext.getRandomSeed()));
 
         if (auxMap != null) {
             for (Map.Entry<String, String> entry : auxMap.entrySet()) {
@@ -1382,7 +1391,7 @@ public class MidiPlayer extends AbstractPlayer {
     }
 
     @Override
-    public final void configure(Node node) throws XPathException {
+    public final void configure(SongContext songContext, Node node) throws XPathException {
         random = new Random(randomSeed);
 
         setMidiFilename(XMLUtils.parseString(random, XMLUtils.getNode("midiFilename", node)));
@@ -1549,11 +1558,12 @@ public class MidiPlayer extends AbstractPlayer {
             LFO lfo;
 
             try {
-                lfo = XMLUtils.getInstance(LFO.class, lfoNode, randomSeed, i);
+                lfo = XMLUtils.getInstance(songContext, LFO.class, lfoNode, randomSeed, i);
             } catch (Exception e) {
                 throw new RuntimeException("Could not instantiate LFO", e);
             }
 
+            lfo.setSongContext(songContext);
             lfo.setMinAmplitude(minAmplitude);
             lfo.setMaxAmplitude(maxAmplitude);
             lfo.setMinValue(minValue);
@@ -1637,7 +1647,7 @@ public class MidiPlayer extends AbstractPlayer {
      */
 
     public boolean skipToTick(int tick) {
-        if (tick < 0 || tick > arrangement.getStructure().getTicks()) {
+        if (tick < 0 || tick > songContext.getStructure().getTicks()) {
             return false;
         } else {
             this.skipToTick = tick;

@@ -28,6 +28,7 @@ import com.soundhelix.component.player.Player;
 import com.soundhelix.component.songnameengine.SongNameEngine;
 import com.soundhelix.constants.BuildConstants;
 import com.soundhelix.misc.Arrangement;
+import com.soundhelix.misc.SongContext;
 import com.soundhelix.misc.Structure;
 
 /**
@@ -64,7 +65,7 @@ public final class SongUtils {
      * @throws Exception in case of a problem
      */
 
-    public static Player generateSong(URL url, long randomSeed) throws Exception {
+    public static SongContext generateSong(URL url, long randomSeed) throws Exception {
         return createPlayer(parseDocument(url), randomSeed);
     }
 
@@ -80,7 +81,7 @@ public final class SongUtils {
      * @throws Exception in case of a problem
      */
 
-    public static Player generateSong(InputStream inputStream, String systemId, long randomSeed) throws Exception {
+    public static SongContext generateSong(InputStream inputStream, String systemId, long randomSeed) throws Exception {
         return createPlayer(parseDocument(inputStream, systemId), randomSeed);
     }
 
@@ -95,7 +96,7 @@ public final class SongUtils {
      * @throws Exception in case of a problem
      */
 
-    public static Player generateSong(URL url, String songName) throws Exception {
+    public static SongContext generateSong(URL url, String songName) throws Exception {
         return createPlayer(parseDocument(url), songName);
     }
 
@@ -111,7 +112,7 @@ public final class SongUtils {
      * @throws Exception in case of a problem
      */
 
-    public static Player generateSong(InputStream inputStream, String systemId, String songName) throws Exception {
+    public static SongContext generateSong(InputStream inputStream, String systemId, String songName) throws Exception {
         return createPlayer(parseDocument(inputStream, systemId), songName);
     }
 
@@ -129,21 +130,21 @@ public final class SongUtils {
      * @throws XPathException in case of an XPath error
      */
 
-    private static Player createPlayer(Document doc, long randomSeed) throws InstantiationException, IllegalAccessException,
+    private static SongContext createPlayer(Document doc, long randomSeed) throws InstantiationException, IllegalAccessException,
             ClassNotFoundException, XPathException {
         Node rootNode = XMLUtils.getNode("/*", doc);
         checkVersion(rootNode);
 
         Node songNameEngineNode = XMLUtils.getNode("songNameEngine", rootNode);
-        SongNameEngine songNameEngine = XMLUtils.getInstance(SongNameEngine.class, songNameEngineNode, randomSeed, -1);
+        SongNameEngine songNameEngine = XMLUtils.getInstance(null, SongNameEngine.class, songNameEngineNode, randomSeed, -1);
 
         String songName = songNameEngine.createSongName();
         LOGGER.info("Song name: \"" + songName + "\"");
-        Player player = generateSong(doc, getSongRandomSeed(songName));
-
-        // store the song name
-        player.getArrangement().getStructure().setSongName(songName);
-        return player;
+        SongContext songContext = generateSongInternal(doc, getSongRandomSeed(songName));
+        songContext.setRandomSeed(randomSeed);
+        songContext.setSongName(songName);
+        
+        return songContext;
     }
 
     /**
@@ -160,16 +161,15 @@ public final class SongUtils {
      * @throws XPathException in case of an XPath error
      */
 
-    private static Player createPlayer(Document doc, String songName) throws InstantiationException, IllegalAccessException,
+    private static SongContext createPlayer(Document doc, String songName) throws InstantiationException, IllegalAccessException,
             ClassNotFoundException, XPathException {
         checkVersion(doc);
 
         LOGGER.info("Song name: \"" + songName + "\"");
-        Player player = generateSong(doc, getSongRandomSeed(songName));
-
-        // store the song name
-        player.getArrangement().getStructure().setSongName(songName);
-        return player;
+        SongContext songContext = generateSongInternal(doc, getSongRandomSeed(songName));
+        songContext.setSongName(songName);
+        
+        return songContext;
     }
 
     /**
@@ -187,7 +187,7 @@ public final class SongUtils {
      * @throws ClassNotFoundException if a class cannot be found
      */
 
-    private static Player generateSong(Document doc, long randomSeed) throws InstantiationException, IllegalAccessException,
+    private static SongContext generateSongInternal(Document doc, long randomSeed) throws InstantiationException, IllegalAccessException,
             ClassNotFoundException, XPathException {
 
         LOGGER.debug("Rendering new song with random seed " + randomSeed);
@@ -202,25 +202,29 @@ public final class SongUtils {
 
         Random random = new Random(randomSeed);
 
+        SongContext songContext = new SongContext();
+
         Structure structure = parseStructure(random.nextLong(), structureNode, null);
-        structure.setRandomSeed(randomSeed);
+        songContext.setStructure(structure);
 
-        HarmonyEngine harmonyEngine = XMLUtils.getInstance(HarmonyEngine.class, harmonyEngineNode, randomSeed, 0);
-        structure.setHarmonyEngine(harmonyEngine);
-
-        ArrangementEngine arrangementEngine = XMLUtils.getInstance(ArrangementEngine.class, arrangementEngineNode, randomSeed, 1);
-        arrangementEngine.setStructure(structure);
+        HarmonyEngine harmonyEngine = XMLUtils.getInstance(songContext, HarmonyEngine.class, harmonyEngineNode, randomSeed, 0);
+        songContext.setHarmonyEngine(harmonyEngine);
+        harmonyEngine.setSongContext(songContext);
+        
+        ArrangementEngine arrangementEngine = XMLUtils.getInstance(songContext, ArrangementEngine.class, arrangementEngineNode, randomSeed, 1);
         long startTime = System.nanoTime();
-        Arrangement arrangement = arrangementEngine.render();
+        Arrangement arrangement = arrangementEngine.render(songContext);
+        songContext.setArrangement(arrangement);
         long time = System.nanoTime() - startTime;
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Rendering took " + (time / 1000000) + " ms");
         }
 
-        Player player = XMLUtils.getInstance(Player.class, playerNode, randomSeed, 2);
-        player.setArrangement(arrangement);
-        return player;
+        Player player = XMLUtils.getInstance(songContext, Player.class, playerNode, randomSeed, 2);
+        songContext.setPlayer(player);
+        
+        return songContext;
     }
 
     /**
@@ -308,7 +312,7 @@ public final class SongUtils {
             throw new RuntimeException("Number of ticks per beat must be > 0");
         }
 
-        Structure structure = new Structure(bars, beatsPerBar, ticksPerBeat, songName);
+        Structure structure = new Structure(bars, beatsPerBar, ticksPerBeat);
 
         return structure;
     }

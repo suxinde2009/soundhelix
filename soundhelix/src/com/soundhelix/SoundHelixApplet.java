@@ -35,6 +35,7 @@ import org.apache.log4j.spi.LoggingEvent;
 
 import com.soundhelix.component.player.Player;
 import com.soundhelix.component.player.impl.MidiPlayer;
+import com.soundhelix.misc.SongContext;
 import com.soundhelix.remotecontrol.SwingRemoteControl;
 import com.soundhelix.remotecontrol.TextRemoteControl;
 import com.soundhelix.util.SongUtils;
@@ -93,8 +94,8 @@ public class SoundHelixApplet extends JApplet implements Runnable {
     /** The song name of the next song. */
     private String nextSongName;
 
-    /** The player. */
-    private Player player;
+    /** The song context. */
+    private SongContext songContext;
 
     /** The URL of the XML file. */
     private String urlString;
@@ -179,7 +180,7 @@ public class SoundHelixApplet extends JApplet implements Runnable {
 
                     if (!songName.equals("")) {
                         nextSongName = songName;
-                        player.abortPlay();
+                        songContext.getPlayer().abortPlay();
                         commandTextField.requestFocusInWindow();
                     }
                 }
@@ -340,6 +341,8 @@ public class SoundHelixApplet extends JApplet implements Runnable {
     @Override
     public void stop() {
         try {
+            Player player = songContext.getPlayer();
+
             if (player != null) {
                 player.abortPlay();
 
@@ -435,30 +438,30 @@ public class SoundHelixApplet extends JApplet implements Runnable {
         for (;;) {
             try {
                 URL url = new URL(getDocumentBase(), urlString);
-                Player player;
+                SongContext songContext;
 
                 if (nextSongName != null) {
-                    player = SongUtils.generateSong(url, nextSongName);
+                    songContext = SongUtils.generateSong(url, nextSongName);
                     nextSongName = null;
                 } else {
-                    player = SongUtils.generateSong(url, random.nextLong());
+                    songContext = SongUtils.generateSong(url, random.nextLong());
                 }
 
-                this.player = player;
+                Player player = songContext.getPlayer();
 
                 if (isInvisible) {
                     player.open();
-                    player.play();
+                    player.play(songContext);
                     player.close();
                 } else {
-                    this.currentSongName = player.getArrangement().getStructure().getSongName();
+                    this.currentSongName = songContext.getSongName();
                     songNameTextField.setText(this.currentSongName);
                     setFrameTitle("SoundHelix Song \"" + this.currentSongName + "\"");
 
                     player.open();
-                    remoteControl.setPlayer(player);
-                    player.play();
-                    remoteControl.setPlayer(null);
+                    remoteControl.setSongContext(songContext);
+                    player.play(songContext);
+                    remoteControl.setSongContext(null);
                     player.close();
                 }
             } catch (Exception e) {

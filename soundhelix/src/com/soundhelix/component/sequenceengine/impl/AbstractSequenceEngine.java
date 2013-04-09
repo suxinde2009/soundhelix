@@ -11,20 +11,14 @@ package com.soundhelix.component.sequenceengine.impl;
 import org.apache.log4j.Logger;
 
 import com.soundhelix.component.sequenceengine.SequenceEngine;
-import com.soundhelix.misc.Structure;
 
 public abstract class AbstractSequenceEngine implements SequenceEngine {
     protected final Logger logger;
 
-    protected Structure structure;
     protected long randomSeed;
 
     public AbstractSequenceEngine() {
         logger = Logger.getLogger(this.getClass());
-    }
-
-    public void setStructure(Structure structure) {
-        this.structure = structure;
     }
 
     /**

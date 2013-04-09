@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 
 import com.soundhelix.component.harmonyengine.HarmonyEngine;
 import com.soundhelix.misc.Chord;
-import com.soundhelix.misc.Structure;
+import com.soundhelix.misc.SongContext;
 
 /**
  * Implements an abstract HarmonyEngine with some basic functionality.
@@ -18,12 +18,12 @@ public abstract class AbstractHarmonyEngine implements HarmonyEngine {
     /** The logger. */
     protected final Logger logger;
 
-    /** The structure. */
-    protected Structure structure;
-
     /** The random seed. */
     protected long randomSeed;
 
+    /** The song context. */
+    protected SongContext songContext;
+    
     /**
      * Constructor.
      */
@@ -32,8 +32,8 @@ public abstract class AbstractHarmonyEngine implements HarmonyEngine {
         logger = Logger.getLogger(getClass());
     }
 
-    public void setSongStructure(Structure structure) {
-        this.structure = structure;
+    public void setSongContext(SongContext songContext) {
+        this.songContext = songContext;
     }
 
     /**
@@ -41,11 +41,12 @@ public abstract class AbstractHarmonyEngine implements HarmonyEngine {
      */
 
     public void dumpChords() {
-        int tick = 0;
-
         StringBuilder sb = new StringBuilder();
 
-        while (tick < structure.getTicks()) {
+        int tick = 0;
+        int ticks = songContext.getStructure().getTicks();
+        
+        while (tick < ticks) {
             Chord chord = getChord(tick);
             int len = getChordTicks(tick);
 
@@ -70,7 +71,7 @@ public abstract class AbstractHarmonyEngine implements HarmonyEngine {
         int lastChordTicks = 1;
         int lastChordSectionTicks = 1;
 
-        int ticks = structure.getTicks();
+        int ticks = songContext.getStructure().getTicks();
 
         for (int tick = 0; tick < ticks; tick++) {
             Chord chord = getChord(tick);

@@ -8,6 +8,7 @@ import java.util.Map;
 import com.soundhelix.component.harmonyengine.HarmonyEngine;
 import com.soundhelix.misc.ActivityVector;
 import com.soundhelix.misc.Chord;
+import com.soundhelix.misc.SongContext;
 import com.soundhelix.misc.Structure;
 
 /**
@@ -28,9 +29,9 @@ public final class HarmonyEngineUtils {
      * @return the total number of chord sections
      */
 
-    public static int getChordSectionCount(Structure structure) {
-        HarmonyEngine harmonyEngine = structure.getHarmonyEngine();
-        int ticks = structure.getTicks();
+    public static int getChordSectionCount(SongContext songContext) {
+        HarmonyEngine harmonyEngine = songContext.getHarmonyEngine();
+        int ticks = songContext.getStructure().getTicks();
 
         // skip through the chord sections
         // and count how many are available
@@ -54,14 +55,15 @@ public final class HarmonyEngineUtils {
      * @return a chord section string (or null if the tick parameter is invalid)
      */
 
-    public static String getChordSectionString(Structure structure, int tick) {
+    public static String getChordSectionString(SongContext songContext, int tick) {
+        Structure structure = songContext.getStructure();
+        HarmonyEngine harmonyEngine = songContext.getHarmonyEngine();
+        
         if (tick < 0 || tick >= structure.getTicks()) {
             return null;
         }
 
         StringBuilder sb = new StringBuilder();
-        HarmonyEngine harmonyEngine = structure.getHarmonyEngine();
-
         int tickEnd = tick + harmonyEngine.getChordSectionTicks(tick);
 
         while (tick < tickEnd) {
@@ -94,7 +96,10 @@ public final class HarmonyEngineUtils {
      * @return the chord section number (or -1)
      */
 
-    public static int getChordSectionNumber(Structure structure, int tick) {
+    public static int getChordSectionNumber(SongContext songContext, int tick) {
+        Structure structure = songContext.getStructure();
+        HarmonyEngine harmonyEngine = songContext.getHarmonyEngine();
+
         if (tick < 0 || tick >= structure.getTicks()) {
             return -1;
         }
@@ -103,8 +108,6 @@ public final class HarmonyEngineUtils {
             // quick win
             return 0;
         }
-
-        HarmonyEngine harmonyEngine = structure.getHarmonyEngine();
 
         int count = -1;
         int t = 0;
@@ -127,7 +130,10 @@ public final class HarmonyEngineUtils {
      * @return the tick (or -1)
      */
 
-    public static int getChordSectionTick(Structure structure, int chordSection) {
+    public static int getChordSectionTick(SongContext songContext, int chordSection) {
+        Structure structure = songContext.getStructure();
+        HarmonyEngine harmonyEngine = songContext.getHarmonyEngine();
+
         if (chordSection < 0 || structure.getTicks() == 0) {
             return -1;
         }
@@ -136,8 +142,6 @@ public final class HarmonyEngineUtils {
             // quick win
             return 0;
         }
-
-        HarmonyEngine harmonyEngine = structure.getHarmonyEngine();
 
         int ticks = structure.getTicks();
         int tick = 0;
@@ -164,14 +168,16 @@ public final class HarmonyEngineUtils {
      * @return the number of distinct chord sections
      */
 
-    public static int getDistinctChordSectionCount(Structure structure) {
-        HarmonyEngine harmonyEngine = structure.getHarmonyEngine();
+    public static int getDistinctChordSectionCount(SongContext songContext) {
+        Structure structure = songContext.getStructure();
+        HarmonyEngine harmonyEngine = songContext.getHarmonyEngine();
+
         int ticks = structure.getTicks();
 
         Map<String, Boolean> ht = new HashMap<String, Boolean>();
 
         for (int tick = 0; tick < ticks; tick += harmonyEngine.getChordSectionTicks(tick)) {
-            ht.put(getChordSectionString(structure, tick), true);
+            ht.put(getChordSectionString(songContext, tick), true);
         }
 
         return ht.size();
@@ -186,10 +192,11 @@ public final class HarmonyEngineUtils {
      * @return a list of start ticks for all chord sections
      */
 
-    public static List<Integer> getChordSectionStartTicks(Structure structure) {
-        HarmonyEngine harmonyEngine = structure.getHarmonyEngine();
-        List<Integer> list = new ArrayList<Integer>();
+    public static List<Integer> getChordSectionStartTicks(SongContext songContext) {
+        Structure structure = songContext.getStructure();
+        HarmonyEngine harmonyEngine = songContext.getHarmonyEngine();
 
+        List<Integer> list = new ArrayList<Integer>();
         int ticks = structure.getTicks();
 
         for (int tick = 0; tick < ticks; tick += harmonyEngine.getChordSectionTicks(tick)) {
@@ -211,8 +218,10 @@ public final class HarmonyEngineUtils {
      *         null
      */
 
-    public static int[] getMinMaxSegmentLengths(Structure structure, ActivityVector av) {
-        HarmonyEngine harmonyEngine = structure.getHarmonyEngine();
+    public static int[] getMinMaxSegmentLengths(SongContext songContext, ActivityVector av) {
+        Structure structure = songContext.getStructure();
+        HarmonyEngine harmonyEngine = songContext.getHarmonyEngine();
+
         int ticks = structure.getTicks();
         boolean isActive = false;
 

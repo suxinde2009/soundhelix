@@ -4,6 +4,8 @@ import javax.xml.xpath.XPathException;
 
 import org.w3c.dom.Node;
 
+import com.soundhelix.misc.SongContext;
+
 /**
  * Simple interface that adds XML-configurability to a class. XML configuration is based on DOM and XPath.
  * 
@@ -18,10 +20,11 @@ public interface XMLConfigurable {
      * same). XML configuration can also be a recursive process, if XML settings contain nodes that require XML configuration themselves, but this is
      * up to the implementation of this method. The method should (but need not) use XPath to access the node's tags.
      * 
+     * @param songContext the song context
      * @param node the parent XML node of the configuration tags
      * 
      * @throws XPathException in case of an XPath problem
      */
 
-    void configure(Node node) throws XPathException;
+    void configure(SongContext songContext, Node node) throws XPathException;
 }

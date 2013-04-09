@@ -18,6 +18,7 @@ import com.soundhelix.misc.ActivityVector;
 import com.soundhelix.misc.Pattern;
 import com.soundhelix.misc.Pattern.PatternEntry;
 import com.soundhelix.misc.Sequence;
+import com.soundhelix.misc.SongContext;
 import com.soundhelix.misc.Structure;
 import com.soundhelix.misc.Track;
 import com.soundhelix.misc.Track.TrackType;
@@ -66,7 +67,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
         this.conditionalEntries = conditionalEntries;
     }
 
-    public Track render(ActivityVector[] activityVectors) {
+    public Track render(SongContext songContext, ActivityVector[] activityVectors) {
         int drumEntryCount = drumEntries.length;
 
         Track track = new Track(TrackType.RHYTHMIC);
@@ -77,8 +78,8 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
             track.add(seqs[i]);
         }
 
-        processPatterns(activityVectors, seqs, structure);
-        processConditionalPatterns(activityVectors, seqs, structure);
+        processPatterns(songContext, activityVectors, seqs);
+        processConditionalPatterns(songContext, activityVectors, seqs);
 
         return track;
     }
@@ -91,8 +92,8 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
      * @param structure the structure
      */
 
-    private void processPatterns(ActivityVector[] activityVectors, Sequence[] seqs, Structure structure) {
-        int ticks = structure.getTicks();
+    private void processPatterns(SongContext songContext, ActivityVector[] activityVectors, Sequence[] seqs) {
+        int ticks = songContext.getStructure().getTicks();
         int drumEntryCount = drumEntries.length;
 
         for (int i = 0; i < drumEntryCount; i++) {
@@ -141,10 +142,11 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
      * @param structure the structure
      */
 
-    private void processConditionalPatterns(ActivityVector[] activityVectors, Sequence[] seqs, Structure structure) {
-        HarmonyEngine harmonyEngine = structure.getHarmonyEngine();
+    private void processConditionalPatterns(SongContext songContext, ActivityVector[] activityVectors, Sequence[] seqs) {
+        Structure structure = songContext.getStructure();
+        HarmonyEngine harmonyEngine = songContext.getHarmonyEngine();
         int ticks = structure.getTicks();
-        int chordSections = HarmonyEngineUtils.getChordSectionCount(structure);
+        int chordSections = HarmonyEngineUtils.getChordSectionCount(songContext);
         int conditionalEntryCount = conditionalEntries.length;
 
         Map<String, List<Integer>> map = new HashMap<String, List<Integer>>();
@@ -201,7 +203,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
                     // fulfill the precondition
 
                     int mtick = tick - patternTicks;
-                    int cs = HarmonyEngineUtils.getChordSectionNumber(structure, mtick);
+                    int cs = HarmonyEngineUtils.getChordSectionNumber(songContext, mtick);
                     boolean preConditionMatched = true;
 
                     while (mtick < tick && preConditionMatched) {
@@ -296,7 +298,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
     }
 
     @Override
-    public void configure(Node node) throws XPathException {
+    public void configure(SongContext songContext, Node node) throws XPathException {
         random = new Random(randomSeed);
 
         NodeList nodeList = XMLUtils.getNodeList("pattern", node);
@@ -316,12 +318,12 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
             PatternEngine patternEngine;
 
             try {
-                patternEngine = XMLUtils.getInstance(PatternEngine.class, patternEngineNode, randomSeed, i);
+                patternEngine = XMLUtils.getInstance(songContext, PatternEngine.class, patternEngineNode, randomSeed, i);
             } catch (Exception e) {
                 throw new RuntimeException("Error instantiating PatternEngine", e);
             }
 
-            Pattern pattern = patternEngine.render("");
+            Pattern pattern = patternEngine.render(songContext, "");
             drumEntries[i] = new DrumEntry(pattern, pitch);
         }
 
@@ -409,12 +411,12 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
             PatternEngine patternEngine;
 
             try {
-                patternEngine = XMLUtils.getInstance(PatternEngine.class, patternEngineNode, randomSeed, -i - 1);
+                patternEngine = XMLUtils.getInstance(songContext, PatternEngine.class, patternEngineNode, randomSeed, -i - 1);
             } catch (Exception e) {
                 throw new RuntimeException("Error instantiating PatternEngine", e);
             }
 
-            Pattern pattern = patternEngine.render("");
+            Pattern pattern = patternEngine.render(songContext, "");
 
             if (preCondition != null) {
                 conditionalEntries[i] = new ConditionalEntry(pattern, preCondition, postCondition, mode, targets, probability, skipWhenApplied,

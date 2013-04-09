@@ -8,6 +8,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.soundhelix.misc.Pattern;
+import com.soundhelix.misc.SongContext;
 import com.soundhelix.util.XMLUtils;
 
 /**
@@ -20,11 +21,11 @@ public class StringPatternEngine extends AbstractPatternEngine {
     /** The pattern string. */
     private String patternString;
 
-    public Pattern render(String wildcardString) {
+    public Pattern render(SongContext songContext, String wildcardString) {
         return Pattern.parseString(patternString, wildcardString);
     }
 
-    public void configure(Node node) throws XPathException {
+    public void configure(SongContext songContext, Node node) throws XPathException {
         Random random = new Random(randomSeed);
 
         NodeList nodeList = XMLUtils.getNodeList("string", node);

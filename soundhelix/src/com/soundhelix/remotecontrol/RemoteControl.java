@@ -1,6 +1,6 @@
 package com.soundhelix.remotecontrol;
 
-import com.soundhelix.component.player.Player;
+import com.soundhelix.misc.SongContext;
 
 /**
  * Interface for remote-controlling a player.
@@ -10,18 +10,18 @@ import com.soundhelix.component.player.Player;
 
 public interface RemoteControl extends Runnable {
     /**
-     * Sets the player that is to be remote-controlled.
+     * Gets the song context to be remote-controlled.
      * 
-     * @param player the player
+     * @return the song context
      */
 
-    void setPlayer(Player player);
+    SongContext getSongContext();
 
     /**
-     * Gets the player that is to be remote-controlled.
+     * Sets the song context to be remote-controlled.
      * 
-     * @return the player
+     * @param songContext the song context
      */
 
-    Player getPlayer();
+    void setSongContext(SongContext songContext);
 }

@@ -15,6 +15,8 @@ import com.soundhelix.misc.ActivityVector;
 import com.soundhelix.misc.Chord;
 import com.soundhelix.misc.Pattern;
 import com.soundhelix.misc.Sequence;
+import com.soundhelix.misc.SongContext;
+import com.soundhelix.misc.Structure;
 import com.soundhelix.misc.Track;
 import com.soundhelix.misc.Track.TrackType;
 import com.soundhelix.util.XMLUtils;
@@ -54,10 +56,11 @@ public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
     }
 
     @Override
-    public Track render(ActivityVector[] activityVectors) {
+    public Track render(SongContext songContext, ActivityVector[] activityVectors) {
+        Structure structure = songContext.getStructure();
+        HarmonyEngine harmonyEngine = songContext.getHarmonyEngine();
+        
         ActivityVector activityVector = activityVectors[0];
-
-        HarmonyEngine harmonyEngine = structure.getHarmonyEngine();
 
         int tick = 0;
 
@@ -164,7 +167,7 @@ public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
     }
 
     @Override
-    public void configure(Node node) throws XPathException {
+    public void configure(SongContext songContext, Node node) throws XPathException {
         Random random = new Random(randomSeed);
 
         NodeList patternEnginesNodes = XMLUtils.getNodeList("patternEngines", node);
@@ -209,12 +212,12 @@ public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
             PatternEngine patternEngine;
 
             try {
-                patternEngine = XMLUtils.getInstance(PatternEngine.class, nodeList.item(i), randomSeed, i);
+                patternEngine = XMLUtils.getInstance(songContext, PatternEngine.class, nodeList.item(i), randomSeed, i);
             } catch (Exception e) {
                 throw new RuntimeException("Error instantiating PatternEngine", e);
             }
 
-            patterns[i] = patternEngine.render("");
+            patterns[i] = patternEngine.render(songContext, "");
             int ticks = patterns[i].getTicks();
 
             if (patternLengthMap.containsKey(ticks)) {

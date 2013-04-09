@@ -20,14 +20,10 @@ import java.util.zip.GZIPOutputStream;
  */
 
 public class Arrangement implements Iterable<Arrangement.ArrangementEntry> {
-    /** The structure. */
-    private final Structure structure;
-
     /** The list of arrangement entries. */
     private final List<ArrangementEntry> entryList = new ArrayList<ArrangementEntry>();
 
-    public Arrangement(Structure structure) {
-        this.structure = structure;
+    public Arrangement() {
     }
 
     /**
@@ -51,10 +47,6 @@ public class Arrangement implements Iterable<Arrangement.ArrangementEntry> {
 
     public ArrangementEntry get(int index) {
         return entryList.get(index);
-    }
-
-    public Structure getStructure() {
-        return structure;
     }
 
     /**

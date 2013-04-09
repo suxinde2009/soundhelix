@@ -10,6 +10,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.soundhelix.misc.Chord;
+import com.soundhelix.misc.SongContext;
+import com.soundhelix.misc.Structure;
 import com.soundhelix.util.NoteUtils;
 import com.soundhelix.util.XMLUtils;
 
@@ -65,7 +67,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
             parsePattern();
         }
 
-        if (tick >= 0 && tick < structure.getTicks()) {
+        if (tick >= 0 && tick < songContext.getStructure().getTicks()) {
             return chords[tick];
         } else {
             return null;
@@ -78,7 +80,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
             parsePattern();
         }
 
-        if (tick >= 0 && tick < structure.getTicks()) {
+        if (tick >= 0 && tick < songContext.getStructure().getTicks()) {
             return chordTicks[tick];
         } else {
             return 0;
@@ -91,7 +93,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
             parsePattern();
         }
 
-        if (tick >= 0 && tick < structure.getTicks()) {
+        if (tick >= 0 && tick < songContext.getStructure().getTicks()) {
             return sectionTicks[tick];
         } else {
             return 0;
@@ -103,6 +105,8 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
      */
 
     private void parsePattern() {
+        Structure structure = songContext.getStructure();
+        
         int ticks = structure.getTicks();
 
         chords = new Chord[ticks];
@@ -191,7 +195,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
      */
 
     private void mergeAdjacentChords() {
-        int ticks = structure.getTicks();
+        int ticks = songContext.getStructure().getTicks();
         int tick = 0;
 
         while (tick < ticks) {
@@ -332,7 +336,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
     }
 
     @Override
-    public void configure(Node node) throws XPathException {
+    public void configure(SongContext songContext, Node node) throws XPathException {
         random = new Random(randomSeed);
 
         try {

@@ -15,6 +15,7 @@ import com.soundhelix.component.harmonyengine.HarmonyEngine;
 import com.soundhelix.misc.ActivityVector;
 import com.soundhelix.misc.Chord;
 import com.soundhelix.misc.Sequence;
+import com.soundhelix.misc.SongContext;
 import com.soundhelix.misc.Track;
 import com.soundhelix.misc.Track.TrackType;
 import com.soundhelix.util.XMLUtils;
@@ -79,7 +80,7 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
         this.velocity = velocity;
     }
 
-    public Track render(ActivityVector[] activityVectors) {
+    public Track render(SongContext songContext, ActivityVector[] activityVectors) {
         ActivityVector activityVector = activityVectors[0];
 
         Track track = new Track(TrackType.MELODIC);
@@ -88,11 +89,12 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
             track.add(new Sequence());
         }
 
-        HarmonyEngine harmonyEngine = structure.getHarmonyEngine();
+        HarmonyEngine harmonyEngine = songContext.getHarmonyEngine();
 
         int tick = 0;
-
-        while (tick < structure.getTicks()) {
+        int ticks = songContext.getStructure().getTicks();
+        
+        while (tick < ticks) {
             Chord chord = harmonyEngine.getChord(tick);
 
             if (isNormalizeChords) {
@@ -174,7 +176,7 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
     }
 
     @Override
-    public void configure(Node node) throws XPathException {
+    public void configure(SongContext songContext, Node node) throws XPathException {
         random = new Random();
 
         String offsetString = XMLUtils.parseString(random, "offsets", node);

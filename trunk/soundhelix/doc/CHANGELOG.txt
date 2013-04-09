@@ -10,6 +10,9 @@ Change log
 
 0.6u:
 
+    - Added the new LFO synchronization mode "segmentPair", which synchronizes an LFO to the activity and pause segments of a
+      given ActivityVector. 
+
     - Refactored and cleaned up lots of SoundHelix' internals. This also affects the API of several externally-exposed interfaces.
 
     - The MidiPlayer now supports setting arbitrary MIDI controller values at the beginning of the song, using the "controllerValue"

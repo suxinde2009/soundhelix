@@ -987,6 +987,9 @@ public class MidiPlayer extends AbstractPlayer {
 
                 clfo.lfo.setPhase(clfo.phase);
                 clfo.lfo.setActivitySpeed(clfo.speed, startTick, endTick);
+            } else if (clfo.rotationUnit.equals("segmentPair")) {
+                clfo.lfo.setPhase(clfo.phase);
+                clfo.lfo.setSegmentPairSpeed(clfo.speed, clfo.activityVector);
             } else if (clfo.rotationUnit.equals("beat")) {
                 clfo.lfo.setPhase(clfo.phase);
                 clfo.lfo.setBeatSpeed(clfo.speed, structure.getTicksPerBeat());
@@ -1551,12 +1554,13 @@ public class MidiPlayer extends AbstractPlayer {
             String rotationUnit = XMLUtils.parseString(random, "rotationUnit", nodeList.item(i));
 
             double phase = 0.0d;
-            String instrument = null;
 
             try {
                 phase = XMLUtils.parseDouble(random, XMLUtils.getNode("phase", nodeList.item(i)));
             } catch (Exception e) {
             }
+
+            String instrument = null;
 
             try {
                 instrument = XMLUtils.parseString(random, "instrument", nodeList.item(i));
@@ -1565,6 +1569,17 @@ public class MidiPlayer extends AbstractPlayer {
 
             if (rotationUnit.equals("activity") && (instrument == null || instrument.equals(""))) {
                 throw new RuntimeException("Rotation unit \"activity\" requires an instrument");
+            }
+
+            String activityVector = null;
+
+            try {
+                activityVector = XMLUtils.parseString(random, "activityVector", nodeList.item(i));
+            } catch (Exception e) {
+            }
+
+            if (rotationUnit.equals("segmentPair") && (activityVector == null || activityVector.equals(""))) {
+                throw new RuntimeException("Rotation unit \"segmentPair\" requires an ActivityVector");
             }
 
             Node lfoNode = XMLUtils.getNode("lfo", nodeList.item(i));
@@ -1583,7 +1598,7 @@ public class MidiPlayer extends AbstractPlayer {
             lfo.setMinValue(minValue);
             lfo.setMaxValue(maxValue);
 
-            controllerLFOs[i] = new ControllerLFO(lfo, device, channel, controller, instrument, speed, rotationUnit, phase);
+            controllerLFOs[i] = new ControllerLFO(lfo, device, channel, controller, activityVector, instrument, speed, rotationUnit, phase);
         }
 
         setControllerLFOs(controllerLFOs);
@@ -1848,6 +1863,9 @@ public class MidiPlayer extends AbstractPlayer {
         /** The name of the MIDI controller. */
         private String controller;
 
+        /** The ActivityVector. */
+        private String activityVector;
+
         /** The instrument. */
         private String instrument;
 
@@ -1863,12 +1881,13 @@ public class MidiPlayer extends AbstractPlayer {
         /** The value last sent to the MIDI controller. */
         private int lastSentValue;
 
-        public ControllerLFO(LFO lfo, String deviceName, int channel, String controller, String instrument, double speed, String rotationUnit,
+        public ControllerLFO(LFO lfo, String deviceName, int channel, String controller, String activityVector, String instrument, double speed, String rotationUnit,
                 double phase) {
             this.lfo = lfo;
             this.deviceName = deviceName;
             this.channel = channel;
             this.controller = controller;
+            this.activityVector = activityVector;
             this.instrument = instrument;
             this.speed = speed;
             this.rotationUnit = rotationUnit;

@@ -1,7 +1,7 @@
 package com.soundhelix.misc;
 
 /**
- * Defines the logical structure of a song. The logical structure consists of the song's signature (internal note quantization) and the HarmonyEngine.
+ * Defines the immutable logical structure of a song. The logical structure consists of the song's signature details (internal note quantization, song length, etc.).
  * 
  * The main unit is a beat. Beats are divided into ticks (usually 4 ticks form a beat), and beats are grouped into bars (usually 4 beats form a bar),
  * and an integer number of bars forms the song. Ticks are the smallest units of a song.

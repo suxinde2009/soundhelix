@@ -66,7 +66,7 @@ public final class SongUtils {
      */
 
     public static SongContext generateSong(URL url, long randomSeed) throws Exception {
-        return createPlayer(parseDocument(url), randomSeed);
+        return generateSong(parseDocument(url), randomSeed);
     }
 
     /**
@@ -82,7 +82,7 @@ public final class SongUtils {
      */
 
     public static SongContext generateSong(InputStream inputStream, String systemId, long randomSeed) throws Exception {
-        return createPlayer(parseDocument(inputStream, systemId), randomSeed);
+        return generateSong(parseDocument(inputStream, systemId), randomSeed);
     }
 
     /**
@@ -97,7 +97,7 @@ public final class SongUtils {
      */
 
     public static SongContext generateSong(URL url, String songName) throws Exception {
-        return createPlayer(parseDocument(url), songName);
+        return generateSong(parseDocument(url), songName);
     }
 
     /**
@@ -113,7 +113,7 @@ public final class SongUtils {
      */
 
     public static SongContext generateSong(InputStream inputStream, String systemId, String songName) throws Exception {
-        return createPlayer(parseDocument(inputStream, systemId), songName);
+        return generateSong(parseDocument(inputStream, systemId), songName);
     }
 
     /**
@@ -130,7 +130,7 @@ public final class SongUtils {
      * @throws XPathException in case of an XPath error
      */
 
-    private static SongContext createPlayer(Document doc, long randomSeed) throws InstantiationException, IllegalAccessException,
+    private static SongContext generateSong(Document doc, long randomSeed) throws InstantiationException, IllegalAccessException,
             ClassNotFoundException, XPathException {
         Node rootNode = XMLUtils.getNode("/*", doc);
         checkVersion(rootNode);
@@ -161,7 +161,7 @@ public final class SongUtils {
      * @throws XPathException in case of an XPath error
      */
 
-    private static SongContext createPlayer(Document doc, String songName) throws InstantiationException, IllegalAccessException,
+    private static SongContext generateSong(Document doc, String songName) throws InstantiationException, IllegalAccessException,
             ClassNotFoundException, XPathException {
         checkVersion(doc);
 
@@ -208,8 +208,7 @@ public final class SongUtils {
         songContext.setStructure(structure);
 
         HarmonyEngine harmonyEngine = XMLUtils.getInstance(songContext, HarmonyEngine.class, harmonyEngineNode, randomSeed, 0);
-        songContext.setHarmonyEngine(harmonyEngine);
-        harmonyEngine.setSongContext(songContext);
+        songContext.setHarmony(harmonyEngine.render(songContext));
         
         ArrangementEngine arrangementEngine = XMLUtils.getInstance(songContext, ArrangementEngine.class, arrangementEngineNode, randomSeed, 1);
         long startTime = System.nanoTime();

@@ -15,9 +15,22 @@ public class ConsistentRandom {
     /** The main random seed. */
     private long constantSeed;
 
-    // pertubation seed for booleans;nanoTime() and currentTimeMillis() are correlated, but this should be fine for our purposes
-    private long millis = System.currentTimeMillis();
+    /** The variable random seed. */
+    private long variableSeed = System.currentTimeMillis() ^ System.nanoTime();
 
+    /**
+     * Private constructor.
+     */
+    
+    private ConsistentRandom() {
+    }
+
+    /**
+     * Constructor.
+     * 
+     * @param randomSeed the random seed
+     */
+    
     public ConsistentRandom(long randomSeed) {
         this.constantSeed = randomSeed;
     }
@@ -60,7 +73,7 @@ public class ConsistentRandom {
      */
 
     public boolean getBoolean(long seed) {
-        Random r = new Random(millis + constantSeed + seed);
+        Random r = new Random(variableSeed + constantSeed + seed);
         return r.nextBoolean();
     }
 

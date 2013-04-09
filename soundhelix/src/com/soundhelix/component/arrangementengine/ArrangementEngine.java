@@ -14,8 +14,10 @@ public interface ArrangementEngine extends Component {
     /**
      * Renders and returns an Arrangement.
      *
+     * @param songContext songContext
+     *
      * @return the rendered arrangement
      */
 
-    Arrangement render(SongContext context);
+    Arrangement render(SongContext songContext);
 }

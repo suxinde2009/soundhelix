@@ -98,6 +98,8 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
         
     /**
      * Parses the chord pattern.
+     * 
+     * @param songContext the song context
      */
 
     private void parsePattern(SongContext songContext) {
@@ -186,6 +188,8 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 
     /**
      * Merges all adjacent equal chords into one chord.
+     * 
+     * @param songContext the song context
      */
 
     private void mergeAdjacentChords(SongContext songContext) {
@@ -335,7 +339,8 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 
         try {
             crossoverPitch = XMLUtils.parseInteger(random, "crossoverPitch", node);
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
 
         NodeList nodeList = XMLUtils.getNodeList("chordPattern", node);
         ChordPattern[] chordPatterns = new ChordPattern[nodeList.getLength()];

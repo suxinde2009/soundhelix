@@ -6,9 +6,9 @@ import java.util.List;
 
 /**
  * Represents a track. A track consists of an arbitrary number of sequences and a type. The type can either be MELODIC, which means that the sequences
- * contain melodic notes which are subject for transposition, or it can be RHYTHMIC, which means the sequences contain rhythm notes which must never be
- * transposed. For example, for drum machines, RHYTHMIC must be used, because each pitch of a sequence selects a drum sample to play (c' might be the
- * base drum, c#' might be the snare and so on) rather than a frequency of a tone to play.
+ * contain melodic notes which are subject for transposition, or it can be RHYTHMIC, which means the sequences contain rhythm notes which must never
+ * be transposed. For example, for drum machines, RHYTHMIC must be used, because each pitch of a sequence selects a drum sample to play (c' might be
+ * the base drum, c#' might be the snare and so on) rather than a frequency of a tone to play.
  * 
  * Only a whole track can be assigned to an instrument, so all contained sequences use the same instrument for playback. If different instruments are
  * needed, the sequences must each be put into a track individually. The assignment of a whole track to an instrument is also the reason why it

@@ -22,6 +22,8 @@ public interface Player extends Component {
     /**
      * Plays the arrangement last set by setArrangement(). The method will return as soon as playing has finished. The method open() must have been
      * called once prior to calling this method.
+     * 
+     * @param songContext the song context
      */
 
     void play(SongContext songContext);

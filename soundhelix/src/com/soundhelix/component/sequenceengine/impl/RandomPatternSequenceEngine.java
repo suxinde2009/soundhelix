@@ -100,6 +100,8 @@ public class RandomPatternSequenceEngine extends AbstractSequenceEngine {
     /**
      * Creates a pitch pattern for each distinct chord section and returns a hashtable mapping chord section strings to pitch patterns.
      * 
+     * @param songContext the song context
+     * 
      * @return a hashtable mapping chord section strings to pitch patterns
      */
 

@@ -419,12 +419,14 @@ public final class XMLUtils {
 
     /**
      * Tries to instantiate an instance from the class defined by the node's attribute "class" by calling its nullary (empty) constructor. If the
-     * given class name is not fully qualified (i.e., contains no dot), the package of the given superclass plus "." is prefixed to the class name (unless 
-     * the given superclass is an interface, then the package plus ".impl." is prefixed to the class name).  The class must be a subclass of the given class
-     * (or implement the interface) to succeed. If the class defines the interface RandomSeedable, it is random-seeded by creating a random seed based on the
-     * specified random seed, the class name and the specified modifier. If the class defines the interface XMLConfigurable, it is configured by calling
-     * configure() with the node as the configuration root. The given salt value can be overridden by using a "salt" or "seed" attribute.
+     * given class name is not fully qualified (i.e., contains no dot), the package of the given superclass plus "." is prefixed to the class name
+     * (unless the given superclass is an interface, then the package plus ".impl." is prefixed to the class name).  The class must be a subclass of
+     * the given class (or implement the interface) to succeed. If the class defines the interface RandomSeedable, it is random-seeded by creating a
+     * random seed based on the specified random seed, the class name and the specified modifier. If the class defines the interface XMLConfigurable,
+     * it is configured by calling configure() with the node as the configuration root. The given salt value can be overridden by using a "salt" or
+     * "seed" attribute.
      *
+     * @param songContext the song context
      * @param superclazz the superclass
      * @param node the node to use for configuration
      * @param parentRandomSeed the random seed origin to use (the random seed of the parent component)
@@ -439,8 +441,8 @@ public final class XMLUtils {
      * @throws IllegalAccessException if the class cannot be instantiated
      */
 
-    public static <T> T getInstance(SongContext songContext, Class<T> superclazz, Node node, long parentRandomSeed, int salt) throws InstantiationException,
-            XPathException, IllegalAccessException, ClassNotFoundException {
+    public static <T> T getInstance(SongContext songContext, Class<T> superclazz, Node node, long parentRandomSeed, int salt)
+            throws InstantiationException, XPathException, IllegalAccessException, ClassNotFoundException {
         if (node == null) {
             throw new IllegalArgumentException("Node is null");
         }

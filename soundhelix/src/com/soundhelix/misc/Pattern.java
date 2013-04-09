@@ -129,7 +129,8 @@ public class Pattern implements Iterable<PatternEntry> {
             int t = b.length > 1 ? Integer.parseInt(b[1]) : 1;
 
             if (((t * currentTPB) % targetTPB) != 0) {
-                throw new RuntimeException("Tick value " + t + " in pattern \"" + patternString + "\" can't be scaled by a ratio of " + currentTPB + ":" + targetTPB);
+                throw new RuntimeException("Tick value " + t + " in pattern \"" + patternString + "\" can't be scaled by a ratio of " + currentTPB
+                        + ":" + targetTPB);
             } else {
                 t = (t * currentTPB) / targetTPB;
             }
@@ -422,10 +423,12 @@ public class Pattern implements Iterable<PatternEntry> {
             private PatternEntry[] array = pattern;
             private int pos;
 
+            @Override
             public boolean hasNext() {
                 return pos < array.length;
             }
 
+            @Override
             public PatternEntry next() {
                 if (hasNext()) {
                     return array[pos++];
@@ -434,6 +437,7 @@ public class Pattern implements Iterable<PatternEntry> {
                 }
             }
 
+            @Override
             public void remove() {
                 throw new UnsupportedOperationException();
             }

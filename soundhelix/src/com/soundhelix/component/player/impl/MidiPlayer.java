@@ -174,6 +174,7 @@ public class MidiPlayer extends AbstractPlayer {
      * Opens all MIDI devices.
      */
 
+    @Override
     public void open() {
         if (opened) {
             throw new IllegalStateException("open() already called");
@@ -195,6 +196,7 @@ public class MidiPlayer extends AbstractPlayer {
      * Closes all MIDI devices.
      */
 
+    @Override
     public final void close() {
         if (devices != null && opened) {
             try {
@@ -245,6 +247,7 @@ public class MidiPlayer extends AbstractPlayer {
      * @return the number of millibeats per minute
      */
 
+    @Override
     public int getMilliBPM() {
         return milliBPM;
     }
@@ -255,6 +258,7 @@ public class MidiPlayer extends AbstractPlayer {
      * @param milliBPM the number of millibeats per minute
      */
 
+    @Override
     public void setMilliBPM(int milliBPM) {
         if (milliBPM <= 0) {
             throw new IllegalArgumentException("BPM must be > 0");
@@ -398,16 +402,13 @@ public class MidiPlayer extends AbstractPlayer {
                         + CLOCK_SYNCHRONIZATION_TICKS_PER_BEAT + " for MIDI clock synchronization");
             }
 
-            initializeControllerLFOs();
-            muteAllChannels();
-            setChannelPrograms();
-            sendControllerValues();
+            setupMidiDevices();
 
             int clockTimingsPerTick = useClockSynchronization ? CLOCK_SYNCHRONIZATION_TICKS_PER_BEAT / structure.getTicksPerBeat() : 1;
 
             if (logger.isDebugEnabled()) {
                 logger.debug("Song length: " + ticks + " ticks (" + (ticks * 60000L / (structure.getTicksPerBeat() * milliBPM)) + " seconds @ "
-                        + ((double) milliBPM / 1000d) + " BPM)");
+                        + (milliBPM / 1000d) + " BPM)");
             }
 
             runBeforePlayCommands();
@@ -504,6 +505,19 @@ public class MidiPlayer extends AbstractPlayer {
         } finally {
             this.songContext = null;
         }
+    }
+
+    /**
+     * Sets up the MIDI devices.
+     * 
+     * @throws InvalidMidiDataException in case of invalid MIDI data
+     */
+    
+    private void setupMidiDevices() throws InvalidMidiDataException {
+        initializeControllerLFOs();
+        muteAllChannels();
+        setChannelPrograms();
+        sendControllerValues();
     }
 
     /**
@@ -620,7 +634,6 @@ public class MidiPlayer extends AbstractPlayer {
     /**
      * Saves the arrangement as one or more MIDI files.
      * 
-     * @param arrangement the arrangement
      * @throws InvalidMidiDataException in case of a MIDI data problem
      * @throws IOException in case of an I/O problem
      */
@@ -759,7 +772,8 @@ public class MidiPlayer extends AbstractPlayer {
 
                             if (se.isNote()) {
                                 int pitch = (track.getType() == TrackType.MELODIC ? transposition : 0) + se.getPitch();
-                                sendMidiMessage(trackMap.get(channel.device), tick, channel.channel, ShortMessage.NOTE_ON, pitch, getMidiVelocity(se.getVelocity()));
+                                sendMidiMessage(trackMap.get(channel.device), tick, channel.channel, ShortMessage.NOTE_ON, pitch,
+                                        getMidiVelocity(se.getVelocity()));
                                 pitches[j] = pitch;
                             }
 
@@ -1413,7 +1427,7 @@ public class MidiPlayer extends AbstractPlayer {
         afterPlayCommands = XMLUtils.parseString(random, "afterPlayCommands", node);
 
         setDevices(devices);
-        setMilliBPM((int) (1000 * XMLUtils.parseInteger(random, "bpm", node)));
+        setMilliBPM(1000 * XMLUtils.parseInteger(random, "bpm", node));
         setTransposition(XMLUtils.parseInteger(random, "transposition", node));
         setGroove(XMLUtils.parseString(random, "groove", node));
         setBeforePlayWaitTicks(XMLUtils.parseInteger(random, "beforePlayWaitTicks", node));
@@ -1610,7 +1624,8 @@ public class MidiPlayer extends AbstractPlayer {
         device.receiver.send(sm, -1);
     }
 
-    private void sendMidiMessage(javax.sound.midi.Track track, int tick, int channel, int status, int data1, int data2) throws InvalidMidiDataException {
+    private void sendMidiMessage(javax.sound.midi.Track track, int tick, int channel, int status, int data1, int data2)
+        throws InvalidMidiDataException {
         ShortMessage sm = new ShortMessage();
         sm.setMessage(status, channel, data1, data2);
         track.add(new MidiEvent(sm, (long) tick + 1));
@@ -1646,6 +1661,7 @@ public class MidiPlayer extends AbstractPlayer {
      * @return true if skipping was successful, false otherwise
      */
 
+    @Override
     public boolean skipToTick(int tick) {
         if (tick < 0 || tick > songContext.getStructure().getTicks()) {
             return false;
@@ -1656,6 +1672,7 @@ public class MidiPlayer extends AbstractPlayer {
         }
     }
 
+    @Override
     public void abortPlay() {
         this.isAborted = true;
     }
@@ -1668,6 +1685,7 @@ public class MidiPlayer extends AbstractPlayer {
         this.afterPlayWaitTicks = postWaitTicks;
     }
 
+    @Override
     public int getCurrentTick() {
         return currentTick;
     }

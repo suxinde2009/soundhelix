@@ -28,11 +28,12 @@ import com.soundhelix.component.player.Player;
 import com.soundhelix.component.songnameengine.SongNameEngine;
 import com.soundhelix.constants.BuildConstants;
 import com.soundhelix.misc.Arrangement;
+import com.soundhelix.misc.Harmony;
 import com.soundhelix.misc.SongContext;
 import com.soundhelix.misc.Structure;
 
 /**
- * Provides static convenience methods for creating a song.
+ * Provides static convenience methods for creating songs.
  *
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
@@ -167,6 +168,7 @@ public final class SongUtils {
 
         LOGGER.info("Song name: \"" + songName + "\"");
         SongContext songContext = generateSongInternal(doc, getSongRandomSeed(songName));
+        // no random seed is set here
         songContext.setSongName(songName);
         
         return songContext;
@@ -208,7 +210,9 @@ public final class SongUtils {
         songContext.setStructure(structure);
 
         HarmonyEngine harmonyEngine = XMLUtils.getInstance(songContext, HarmonyEngine.class, harmonyEngineNode, randomSeed, 0);
-        songContext.setHarmony(harmonyEngine.render(songContext));
+        Harmony harmony = harmonyEngine.render(songContext);
+        songContext.setHarmony(harmony);
+        HarmonyUtils.checkSanity(songContext);
         
         ArrangementEngine arrangementEngine = XMLUtils.getInstance(songContext, ArrangementEngine.class, arrangementEngineNode, randomSeed, 1);
         long startTime = System.nanoTime();

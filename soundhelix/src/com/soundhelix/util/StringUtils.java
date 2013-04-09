@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Implements some static methods for random numbers. All methods need a random generator as a parameter.
+ * Implements some static methods for strings.
  * 
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
@@ -94,7 +94,7 @@ public final class StringUtils {
 
     /**
      * Version of the usual String.hashCode() method that computes a long hash code instead of an int hash code, using the same algorithm as the
-     * orignal method. Using a rough estimation, the String.hashCode() method wraps around after roughly 7 characters, whereas this method wraps
+     * original method. Using a rough estimation, the String.hashCode() method wraps around after roughly 7 characters, whereas this method wraps
      * around after roughly 13 characters.
      * 
      * @param string the string

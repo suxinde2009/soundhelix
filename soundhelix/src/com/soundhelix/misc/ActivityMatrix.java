@@ -10,8 +10,8 @@ import com.soundhelix.util.HarmonyUtils;
 
 /**
  * Container for ActivityVectors.
+ * 
  * @author thomas.schuerger
- *
  */
 
 public class ActivityMatrix implements Iterable<ActivityVector> {
@@ -50,7 +50,7 @@ public class ActivityMatrix implements Iterable<ActivityVector> {
     /**
      * Dumps the activity vectors as an activity matrix to the log with level DEBUG.
      *
-     * @param SongContext the song context
+     * @param songContext the song context
      */
 
     public void dump(SongContext songContext) {
@@ -60,7 +60,7 @@ public class ActivityMatrix implements Iterable<ActivityVector> {
 
         Structure structure = songContext.getStructure();
         
-        StringBuilder sb = new StringBuilder("Activity matrix:\n");
+        StringBuilder sb = new StringBuilder("Song's activity matrix:\n");
 
         int chordSections = HarmonyUtils.getChordSectionCount(songContext);
 

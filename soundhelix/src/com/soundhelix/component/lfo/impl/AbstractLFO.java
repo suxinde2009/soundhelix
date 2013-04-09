@@ -1,6 +1,7 @@
 package com.soundhelix.component.lfo.impl;
 
 import com.soundhelix.component.lfo.LFO;
+import com.soundhelix.misc.ActivityVector;
 import com.soundhelix.misc.SongContext;
 
 /**
@@ -17,12 +18,24 @@ public abstract class AbstractLFO implements LFO {
     /** Two times Pi. */
     protected static final double TWO_PI = 2.0d * Math.PI;
 
+    /** The LFO mode. */
+    private enum Mode {
+        /** Constant angular speed. */
+        CONSTANT_SPEED,
+        
+        /** Synchronized to segment pairs. */
+        SYNC_TO_SEGMENT_PAIRS
+    }
+    
     /** The song context. */
     protected SongContext songContext;
     
     /** The random seed. */
     protected long randomSeed;
 
+    /** The LFO mode. */
+    private Mode mode;
+    
     /** The minimum amplitude value. */
     private int minValue = Integer.MIN_VALUE;
 
@@ -37,6 +50,15 @@ public abstract class AbstractLFO implements LFO {
 
     /** The number of rotations per tick. */
     private double rotationsPerTick;
+
+    /** The number of rotations per activity segment pair. */
+    private double rotationsPerSegmentPair;
+
+    /** The name of the activity vector. */
+    private String activityVectorName;
+
+    /** The segment lengths of the ActivityVector. */
+    private int[] segmentLengths;
 
     /** The start phase in number of rotations. */
     private double phase;
@@ -60,7 +82,16 @@ public abstract class AbstractLFO implements LFO {
             throw new RuntimeException("LFO speed not set yet");
         }
 
-        double angle = TWO_PI * ((double) tick * rotationsPerTick + phase);
+        double angle;
+        
+        if (mode == Mode.CONSTANT_SPEED) {
+            angle = TWO_PI * (tick * rotationsPerTick + phase);
+        } else if (mode == Mode.SYNC_TO_SEGMENT_PAIRS) {
+            angle = getSegmentAngle(tick);
+        } else {
+            throw new RuntimeException("Invalid mode");
+        }
+        
         int value = minAmplitude + (int) (0.5d + (maxAmplitude - minAmplitude) * getValue(angle));
 
         if (value > maxValue) {
@@ -72,28 +103,90 @@ public abstract class AbstractLFO implements LFO {
         }
     }
 
+    private double getSegmentAngle(int tick) {
+        if (segmentLengths == null) {
+            ActivityVector av = songContext.getActivityMatrix().get(activityVectorName);
+            
+            if (av == null) {
+                throw new RuntimeException("Unknown ActivityVector \"" + activityVectorName + "\"");
+            }
+            
+            segmentLengths = av.getSegmentLengths();
+        }
+        
+        // identify which type of segment the tick is in and determine the tick's position relative to the segment start
+        // as well as the length of that segment
+        
+        int currentTick = 0;
+        
+        int tickInSegment = 0;
+        int segmentLength = 0;
+        
+        for (int length : segmentLengths) {
+            if (length > 0) {
+                if (tick < currentTick + length) {
+                    tickInSegment = tick - currentTick;
+                    segmentLength = length;
+                    break;
+                }
+                
+                currentTick += length;
+            } else {
+                // length is negative
+                if (tick < currentTick - length) {
+                    tickInSegment = tick - currentTick;
+                    segmentLength = length;
+                    break;
+                }
+                
+                // length is negative
+                currentTick -= length;
+            }
+        }
+        
+        if (segmentLength > 0) {
+            // first half (0 to pi)
+            return TWO_PI * (0.5d * tickInSegment / segmentLength * rotationsPerSegmentPair + phase);
+        } else {
+            // second half (pi to 2*pi)
+            return TWO_PI * (0.5d + 0.5d * tickInSegment / (-segmentLength) * rotationsPerSegmentPair + phase);
+        }
+    }
+    
     @Override
     public void setBeatSpeed(double rotationsPerBeat, int ticksPerBeat) {
-        this.rotationsPerTick = rotationsPerBeat / (double) ticksPerBeat;
+        this.rotationsPerTick = rotationsPerBeat / ticksPerBeat;
+        this.mode = Mode.CONSTANT_SPEED;
         isConfigured = true;
     }
 
     @Override
     public void setSongSpeed(double rotationsPerSong, int ticksPerSong) {
-        this.rotationsPerTick = rotationsPerSong / (double) ticksPerSong;
+        this.rotationsPerTick = rotationsPerSong / ticksPerSong;
+        this.mode = Mode.CONSTANT_SPEED;
         isConfigured = true;
     }
 
     @Override
     public void setActivitySpeed(double rotationsPerActivity, int startTick, int endTick) {
-        this.rotationsPerTick = rotationsPerActivity / (double) (endTick - startTick);
-        this.phase -= rotationsPerTick * (double) startTick;
+        this.rotationsPerTick = rotationsPerActivity / (endTick - startTick);
+        this.phase -= rotationsPerTick * startTick;
+        this.mode = Mode.CONSTANT_SPEED;
         isConfigured = true;
     }
 
     @Override
     public void setTimeSpeed(double rotationsPerSecond, int ticksPerBeat, double bpm) {
-        this.rotationsPerTick = rotationsPerSecond * 60.0d / bpm / (double) ticksPerBeat;
+        this.rotationsPerTick = rotationsPerSecond * 60.0d / bpm / ticksPerBeat;
+        this.mode = Mode.CONSTANT_SPEED;
+        isConfigured = true;
+    }
+
+    @Override
+    public void setSegmentPairSpeed(double rotationsPerSegmentPair, String activityVectorName) {
+        this.rotationsPerSegmentPair = rotationsPerSegmentPair;
+        this.activityVectorName = activityVectorName;
+        this.mode = Mode.SYNC_TO_SEGMENT_PAIRS;
         isConfigured = true;
     }
 

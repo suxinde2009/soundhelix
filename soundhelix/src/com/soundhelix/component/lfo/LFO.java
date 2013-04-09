@@ -54,6 +54,15 @@ public interface LFO extends Component {
     void setActivitySpeed(double rotationsPerActivity, int startTick, int endTick);
 
     /**
+     * Makes this LFO synchronized to an ActivityVector's activity and pause segments.
+     *
+     * @param rotationsPerSegmentPair the number of rotations per segment pair
+     * @param activityVectorName the activity vector name
+     */
+
+    void setSegmentPairSpeed(double rotationsPerSegmentPair, String activityVectorName);
+
+    /**
      * Makes this LFO synchronized to time and sets the parameters.
      *
      * @param rotationsPerSecond the number of rotations per second

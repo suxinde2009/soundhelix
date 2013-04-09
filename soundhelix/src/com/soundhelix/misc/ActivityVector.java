@@ -1,6 +1,8 @@
 package com.soundhelix.misc;
 
+import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.List;
 
 /**
  * Represents a bit vector specifying for each tick whether a voice should be active or not. The bit vector grows dynamically as needed. This vector
@@ -239,7 +241,7 @@ public class ActivityVector {
      * @return the number of activity segments
      */
 
-    public int getSegmentCount() {
+    public int getActivitySegmentCount() {
         int segments = 0;
         int pos = -1;
 
@@ -286,5 +288,46 @@ public class ActivityVector {
         }
 
         return sb.toString();
+    }
+    
+    /**
+     * Returns an array that contains all activity and pause segment lengths in ticks, sorted by starting tick number.
+     * Every activity segment will have a positive length, every pause segment will have a negative length.
+     * 
+     * @return the array containing the segment lengths
+     */
+    
+    public int[] getSegmentLengths() {
+        List<Integer> list = new ArrayList<Integer>();
+        
+        int tick = 0;
+
+        while (tick < totalTicks) {
+            if (bitSet.get(tick)) {
+                int nextTick = bitSet.nextClearBit(tick);
+                list.add(nextTick - tick);
+                tick = nextTick;
+            } else {
+                int nextTick = bitSet.nextSetBit(tick);
+
+                if (nextTick == -1) {
+                    nextTick = totalTicks;
+                }
+                
+                list.add(tick - nextTick);
+                tick = nextTick;
+            }
+        }
+        
+        // convert list to int array
+        
+        int size = list.size();
+        int[] result = new int[size];
+
+        for (int i = 0; i < size; i++) {
+            result[i] = list.get(i);
+        }
+
+        return result;
     }
 }

@@ -1,6 +1,7 @@
 package com.soundhelix.component.lfo;
 
 import com.soundhelix.component.Component;
+import com.soundhelix.misc.ActivityVector;
 import com.soundhelix.misc.SongContext;
 
 /**
@@ -57,10 +58,10 @@ public interface LFO extends Component {
      * Makes this LFO synchronized to an ActivityVector's activity and pause segments.
      *
      * @param rotationsPerSegmentPair the number of rotations per segment pair
-     * @param activityVectorName the activity vector name
+     * @param activityVector the activity vector
      */
 
-    void setSegmentPairSpeed(double rotationsPerSegmentPair, String activityVectorName);
+    void setSegmentPairSpeed(double rotationsPerSegmentPair, ActivityVector activityVector);
 
     /**
      * Makes this LFO synchronized to time and sets the parameters.

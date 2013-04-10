@@ -54,8 +54,8 @@ public abstract class AbstractLFO implements LFO {
     /** The number of rotations per activity segment pair. */
     private double rotationsPerSegmentPair;
 
-    /** The name of the activity vector. */
-    private String activityVectorName;
+    /** The activity vector. */
+    private ActivityVector activityVector;
 
     /** The segment lengths of the ActivityVector. */
     private int[] segmentLengths;
@@ -87,7 +87,7 @@ public abstract class AbstractLFO implements LFO {
         if (mode == Mode.CONSTANT_SPEED) {
             angle = TWO_PI * (tick * rotationsPerTick + phase);
         } else if (mode == Mode.SYNC_TO_SEGMENT_PAIRS) {
-            angle = getSegmentAngle(tick);
+            angle = getSegmentPairAngle(tick);
         } else {
             throw new RuntimeException("Invalid mode");
         }
@@ -103,35 +103,45 @@ public abstract class AbstractLFO implements LFO {
         }
     }
 
-    private double getSegmentAngle(int tick) {
+    /**
+     * Returns the LFO angle, depending on the segment pair.
+     * @param tick the tick
+     * @return the angle in radians
+     */
+    
+    private double getSegmentPairAngle(int tick) {
         if (segmentLengths == null) {
-            ActivityVector av = songContext.getActivityMatrix().get(activityVectorName);
-            
-            if (av == null) {
-                throw new RuntimeException("Unknown ActivityVector \"" + activityVectorName + "\"");
-            }
-            
-            segmentLengths = av.getSegmentLengths();
+            segmentLengths = activityVector.getSegmentLengths();
         }
         
         // identify which type of segment the tick is in and determine the tick's position relative to the segment start
         // as well as the length of that segment
         
+        // this is not very efficient, but the number of segments is usually pretty small
+        // we could use a modified version using binary search instead
+        
         int currentTick = 0;
         
+        int segmentPair = -1;
         int tickInSegment = 0;
         int segmentLength = 0;
         
         for (int length : segmentLengths) {
             if (length > 0) {
+                segmentPair++;
+                
                 if (tick < currentTick + length) {
                     tickInSegment = tick - currentTick;
                     segmentLength = length;
                     break;
                 }
-                
+
                 currentTick += length;
             } else {
+                if (segmentPair == -1) {
+                    segmentPair = 0;
+                }
+                
                 // length is negative
                 if (tick < currentTick - length) {
                     tickInSegment = tick - currentTick;
@@ -145,11 +155,11 @@ public abstract class AbstractLFO implements LFO {
         }
         
         if (segmentLength > 0) {
-            // first half (0 to pi)
-            return TWO_PI * (0.5d * tickInSegment / segmentLength * rotationsPerSegmentPair + phase);
+            // first half (0 to pi within the segment pair)
+            return TWO_PI * (0.5d * tickInSegment / segmentLength * rotationsPerSegmentPair + phase + segmentPair);
         } else {
-            // second half (pi to 2*pi)
-            return TWO_PI * (0.5d + 0.5d * tickInSegment / (-segmentLength) * rotationsPerSegmentPair + phase);
+            // second half (pi to 2*pi within the segment pair)
+            return TWO_PI * (0.5d + 0.5d * tickInSegment / (-segmentLength) * rotationsPerSegmentPair + phase + segmentPair);
         }
     }
     
@@ -183,9 +193,9 @@ public abstract class AbstractLFO implements LFO {
     }
 
     @Override
-    public void setSegmentPairSpeed(double rotationsPerSegmentPair, String activityVectorName) {
+    public void setSegmentPairSpeed(double rotationsPerSegmentPair, ActivityVector activityVector) {
         this.rotationsPerSegmentPair = rotationsPerSegmentPair;
-        this.activityVectorName = activityVectorName;
+        this.activityVector = activityVector;
         this.mode = Mode.SYNC_TO_SEGMENT_PAIRS;
         isConfigured = true;
     }

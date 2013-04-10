@@ -23,6 +23,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.soundhelix.component.lfo.LFO;
+import com.soundhelix.misc.ActivityVector;
 import com.soundhelix.misc.Arrangement;
 import com.soundhelix.misc.Arrangement.ArrangementEntry;
 import com.soundhelix.misc.Sequence;
@@ -989,7 +990,13 @@ public class MidiPlayer extends AbstractPlayer {
                 clfo.lfo.setActivitySpeed(clfo.speed, startTick, endTick);
             } else if (clfo.rotationUnit.equals("segmentPair")) {
                 clfo.lfo.setPhase(clfo.phase);
-                clfo.lfo.setSegmentPairSpeed(clfo.speed, clfo.activityVector);
+                ActivityVector av = songContext.getActivityMatrix().get(clfo.activityVector);
+                
+                if (av == null) {
+                    throw new RuntimeException("ActivityVector \"" + clfo.activityVector + "\" for LFO not found");
+                }
+                
+                clfo.lfo.setSegmentPairSpeed(clfo.speed, av);
             } else if (clfo.rotationUnit.equals("beat")) {
                 clfo.lfo.setPhase(clfo.phase);
                 clfo.lfo.setBeatSpeed(clfo.speed, structure.getTicksPerBeat());

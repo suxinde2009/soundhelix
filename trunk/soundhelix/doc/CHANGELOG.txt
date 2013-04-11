@@ -10,10 +10,12 @@ Change log
 
 0.6u:
 
-    - Added the new LFO synchronization mode "segmentPair", which synchronizes an LFO to the activity and pause segments of a
-      given ActivityVector. 
+    - Added new greedy constraint mode to the SimpleArrangement engine, which only approximates the ActivityVector constraints, but
+      is much faster and can be used for large numbers of ActivityVectors. Added tag "constraintMode", which can be set to "exact"
+      for the existing backtracking-based algorithm and to "greedy" for the new greedy algorithm.
 
-    - Refactored and cleaned up lots of SoundHelix' internals. This also affects the API of several externally-exposed interfaces.
+    - Added the new LFO synchronization mode "segmentPair", which synchronizes an LFO to the activity and pause segments of any
+      given ActivityVector. 
 
     - The MidiPlayer now supports setting arbitrary MIDI controller values at the beginning of the song, using the "controllerValue"
       tag. This allows, for example, to set relative MIDI volumes, panning, etc., per MIDI channel.
@@ -22,6 +24,8 @@ Change log
       SequenceEngines will be taken at random for the track.
 
     - Fixed applet to include the SoundHelix XML file URL in Facebook and Twitter URLs.
+
+    - Refactored and cleaned up lots of SoundHelix' internals. This also affects the API of several externally-exposed interfaces.
 
     - Added new example SoundHelix-Percussion.xml.
 

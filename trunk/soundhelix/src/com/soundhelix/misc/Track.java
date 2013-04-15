@@ -33,6 +33,12 @@ public class Track {
     /** The track type. */
     private final TrackType type;
 
+    /**
+     * Constructor.
+     * 
+     * @param type the type
+     */
+    
     public Track(TrackType type) {
         this.type = type;
     }

@@ -21,14 +21,26 @@ public class SwingRemoteControl extends AbstractTextRemoteControl {
     /** The queue for entered texts lines. */
     private BlockingQueue<String> textQueue = new LinkedBlockingQueue<String>();
 
+    /**
+     * Constructor.
+     */
+    
     @SuppressWarnings("unused")
     private SwingRemoteControl() {
     }
 
+    /**
+     * Constructor.
+     * 
+     * @param inputTextField the input text field
+     * @param outputTextArea the output text field
+     */
+    
     public SwingRemoteControl(JTextField inputTextField, JTextArea outputTextArea) {
         this.outputTextArea = outputTextArea;
 
         inputTextField.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 JTextField inputTextField = (JTextField) e.getSource();
                 textQueue.add(inputTextField.getText());

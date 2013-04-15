@@ -21,10 +21,12 @@ public class StringPatternEngine extends AbstractPatternEngine {
     /** The pattern string. */
     private String patternString;
 
+    @Override
     public Pattern render(SongContext songContext, String wildcardString) {
         return Pattern.parseString(patternString, wildcardString);
     }
 
+    @Override
     public void configure(SongContext songContext, Node node) throws XPathException {
         Random random = new Random(randomSeed);
 

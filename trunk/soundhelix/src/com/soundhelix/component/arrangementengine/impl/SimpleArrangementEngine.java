@@ -90,7 +90,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
     /** The array of start activity counts. */
     private int[] startActivityCounts;
     
-    /** The array of stop activity counts, */
+    /** The array of stop activity counts. */
     private int[] stopActivityCounts;
 
     /** The arrangement entries. */
@@ -216,7 +216,8 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         }
     }
 
-    private ActivityMatrix createExactConstrainedActivityVectors(SongContext songContext, ActivityVectorConfiguration[] activityVectorConfigurations) {
+    private ActivityMatrix createExactConstrainedActivityVectors(SongContext songContext,
+            ActivityVectorConfiguration[] activityVectorConfigurations) {
 
         int sections = HarmonyUtils.getChordSectionCount(songContext);
         int vectors = activityVectorConfigurations.length;
@@ -496,7 +497,8 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         return convertBitSetsToActivityVectors(songContext, activityVectorConfigurations, bitSets);
     }
 
-    private ActivityMatrix createGreedyConstrainedActivityVectors(SongContext songContext, ActivityVectorConfiguration[] activityVectorConfigurations) {
+    private ActivityMatrix createGreedyConstrainedActivityVectors(SongContext songContext,
+            ActivityVectorConfiguration[] activityVectorConfigurations) {
 
         int sections = HarmonyUtils.getChordSectionCount(songContext);
         int vectors = activityVectorConfigurations.length;
@@ -1215,6 +1217,22 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         this.maxIterations = maxIterations;
     }
 
+    public ConstraintMode getConstraintMode() {
+        return constraintMode;
+    }
+
+    public void setConstraintMode(ConstraintMode constraintMode) {
+        this.constraintMode = constraintMode;
+    }
+    
+    public void setStartActivityCounts(int[] startActivityCounts) {
+        this.startActivityCounts = startActivityCounts;
+    }
+
+    public void setStopActivityCounts(int[] stopActivityCounts) {
+        this.stopActivityCounts = stopActivityCounts;
+    }
+
     private static final class ArrangementEntry {
         /** The instrument name. */
         private final String instrument;
@@ -1344,21 +1362,5 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
             this.segmentLength = state.segmentLength;
             this.activeInStopInterval = state.activeInStopInterval;
         }
-    }
-
-    public ConstraintMode getConstraintMode() {
-        return constraintMode;
-    }
-
-    public void setConstraintMode(ConstraintMode constraintMode) {
-        this.constraintMode = constraintMode;
-    }
-    
-    public void setStartActivityCounts(int[] startActivityCounts) {
-        this.startActivityCounts = startActivityCounts;
-    }
-
-    public void setStopActivityCounts(int[] stopActivityCounts) {
-        this.stopActivityCounts = stopActivityCounts;
     }
 }

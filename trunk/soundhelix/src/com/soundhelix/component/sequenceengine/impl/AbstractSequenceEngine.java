@@ -1,5 +1,9 @@
 package com.soundhelix.component.sequenceengine.impl;
 
+import org.apache.log4j.Logger;
+
+import com.soundhelix.component.sequenceengine.SequenceEngine;
+
 /**
  * Implements an abstract SequenceEngine with some basic functionality.
  *
@@ -8,15 +12,17 @@ package com.soundhelix.component.sequenceengine.impl;
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
-import org.apache.log4j.Logger;
-
-import com.soundhelix.component.sequenceengine.SequenceEngine;
-
 public abstract class AbstractSequenceEngine implements SequenceEngine {
+    /** The logger. */
     protected final Logger logger;
 
+    /** The random seed. */
     protected long randomSeed;
 
+    /**
+     * Constructor.
+     */
+    
     public AbstractSequenceEngine() {
         logger = Logger.getLogger(this.getClass());
     }
@@ -28,14 +34,17 @@ public abstract class AbstractSequenceEngine implements SequenceEngine {
      * @return the number of ActivityVectors
      */
 
+    @Override
     public int getActivityVectorCount() {
         return 1;
     }
 
+    @Override
     public void setRandomSeed(long randomSeed) {
         this.randomSeed = randomSeed;
     }
 
+    @Override
     public long getRandomSeed() {
         return randomSeed;
     }

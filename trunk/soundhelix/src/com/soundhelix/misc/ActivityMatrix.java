@@ -11,7 +11,7 @@ import com.soundhelix.util.HarmonyUtils;
 /**
  * Container for ActivityVectors.
  * 
- * @author thomas.schuerger
+ * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public class ActivityMatrix implements Iterable<ActivityVector> {
@@ -19,7 +19,7 @@ public class ActivityMatrix implements Iterable<ActivityVector> {
     private static final Logger LOGGER = Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
  
     /** The map that maps from names to ActivityVectors. */
-    Map<String, ActivityVector> map = new LinkedHashMap<String, ActivityVector>();
+    private Map<String, ActivityVector> map = new LinkedHashMap<String, ActivityVector>();
 
     /**
      * Adds the given ActivityVector. If an ActivityVector with the same name already exists, it will be replaced in its current position.

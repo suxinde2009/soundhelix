@@ -66,6 +66,7 @@ import com.soundhelix.util.XMLUtils;
  */
 
 public class SimpleArrangementEngine extends AbstractArrangementEngine {
+    /** The constraint mode for ActivityMatrix generation. */
     public enum ConstraintMode  {
         /** Exact mode using backtracking. */
         EXACT,

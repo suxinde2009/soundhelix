@@ -18,9 +18,19 @@ public class SawtoothLFO extends AbstractLFO {
     /** Flag indicating whether the LFO is an ascending or a descending sawtooth. */
     private boolean up;
     
+    /**
+     * Constructor.
+     */
+    
     public SawtoothLFO() {
         this(true);
     }
+
+    /**
+     * Constructor.
+     *
+     * @param up if true, uses ascending mode, otherwise descending mode
+     */
     
     public SawtoothLFO(boolean up) {
         this.up = up;

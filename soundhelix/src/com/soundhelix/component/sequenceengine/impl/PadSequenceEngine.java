@@ -51,6 +51,10 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
     /** The velocity to use. */
     private short velocity = Short.MAX_VALUE;
 
+    /*
+     * Constructor.
+     */
+    
     public PadSequenceEngine() {
         super();
     }

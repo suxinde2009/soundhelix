@@ -23,6 +23,10 @@ public class Arrangement implements Iterable<Arrangement.ArrangementEntry> {
     /** The list of arrangement entries. */
     private final List<ArrangementEntry> entryList = new ArrayList<ArrangementEntry>();
 
+    /**
+     * Constructor.
+     */
+    
     public Arrangement() {
     }
 
@@ -37,14 +41,29 @@ public class Arrangement implements Iterable<Arrangement.ArrangementEntry> {
         entryList.add(new ArrangementEntry(track, instrument));
     }
 
+    @Override
     public Iterator<ArrangementEntry> iterator() {
         return entryList.iterator();
     }
 
+    /**
+     * Returns the number of arrangement entries.
+     * 
+     * @return the number of entries
+     */
+    
     public int size() {
         return entryList.size();
     }
 
+    /**
+     * Returns the arrangement entry with the given index.
+     * 
+     * @param index the index (starting with 0)
+     *
+     * @return the arrangement entry
+     */
+    
     public ArrangementEntry get(int index) {
         return entryList.get(index);
     }
@@ -102,6 +121,13 @@ public class Arrangement implements Iterable<Arrangement.ArrangementEntry> {
         /** The instrument. */
         private final String instrument;
 
+        /**
+         * Constructor.
+         * 
+         * @param track the track
+         * @param instrument the instrument
+         */
+        
         private ArrangementEntry(Track track, String instrument) {
             this.track = track;
             this.instrument = instrument;

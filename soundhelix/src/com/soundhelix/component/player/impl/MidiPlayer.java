@@ -823,7 +823,6 @@ public class MidiPlayer extends AbstractPlayer {
     /**
      * Plays a tick, sending NOTE_OFF messages for notes that should be muted and NOTE_ON messages for notes that should be started.
      *
-     * @param arrangement the arrangement
      * @param tick the tick
      *
      * @throws InvalidMidiDataException in case of invalid MIDI data
@@ -961,8 +960,6 @@ public class MidiPlayer extends AbstractPlayer {
 
     /**
      * Initializes all controller LFOs of the arrangement.
-     *
-     * @param arrangement the arrangement
      */
 
     private void initializeControllerLFOs() {
@@ -1927,8 +1924,8 @@ public class MidiPlayer extends AbstractPlayer {
         /** The value last sent to the MIDI controller. */
         private int lastSentValue;
 
-        public ControllerLFO(LFO lfo, String deviceName, int channel, String controller, String activityVector, String instrument, double speed, String rotationUnit,
-                double phase) {
+        public ControllerLFO(LFO lfo, String deviceName, int channel, String controller, String activityVector, String instrument, double speed,
+                String rotationUnit, double phase) {
             this.lfo = lfo;
             this.deviceName = deviceName;
             this.channel = channel;

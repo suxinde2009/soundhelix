@@ -20,10 +20,15 @@ import com.soundhelix.util.XMLUtils;
 
 public class ChordSequenceEngine extends MultiPatternSequenceEngine {
 
+    /**
+     * Constructor.
+     */
+
     public ChordSequenceEngine() {
         super();
     }
 
+    @Override
     public void configure(SongContext songContext, Node node) throws XPathException {
         random = new Random(randomSeed);
 

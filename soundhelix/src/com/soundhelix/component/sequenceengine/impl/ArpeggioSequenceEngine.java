@@ -43,6 +43,10 @@ public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
     /** The array of patterns. */
     private Pattern[] patterns;
 
+    /**
+     * Constructor.
+     */
+    
     public ArpeggioSequenceEngine() {
         super();
     }

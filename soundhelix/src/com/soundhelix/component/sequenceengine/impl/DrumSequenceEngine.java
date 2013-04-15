@@ -143,7 +143,6 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
      * @param songContext the song context
      * @param activityVectors the array of activity vectors
      * @param seqs the array of sequences
-     * @param structure the structure
      */
 
     private void processConditionalPatterns(SongContext songContext, ActivityVector[] activityVectors, Sequence[] seqs) {
@@ -577,8 +576,6 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
          * Constructor.
          * 
          * @param pattern the pattern
-         * @param preCondition the precondition
-         * @param postCondition the postcondition
          * @param preConditionString the precondition string
          * @param postConditionString the postcondition string
          * @param mode the mode

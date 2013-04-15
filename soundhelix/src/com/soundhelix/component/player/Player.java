@@ -1,13 +1,10 @@
 package com.soundhelix.component.player;
 
 import com.soundhelix.component.Component;
-import com.soundhelix.misc.Arrangement;
 import com.soundhelix.misc.SongContext;
 
 /**
  * Represents an interface for playing Arrangements. A player's task usually is to play the arrangement in real-time.
- *
- * @see Arrangement
  *
  * @author Thomas Schuerger (thomas@schuerger.com)
  */

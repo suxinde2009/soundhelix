@@ -10,6 +10,11 @@ import java.util.List;
  */
 
 public final class StringUtils {
+    
+    /**
+     * Constructor.
+     */
+
     private StringUtils() {
     }
 

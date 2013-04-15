@@ -17,14 +17,20 @@ public abstract class AbstractPatternEngine implements PatternEngine {
     /** The random seed. */
     protected long randomSeed;
 
+    /**
+     * Constructor.
+     */
+    
     public AbstractPatternEngine() {
         logger = Logger.getLogger(this.getClass());
     }
 
+    @Override
     public long getRandomSeed() {
         return randomSeed;
     }
 
+    @Override
     public void setRandomSeed(long randomSeed) {
         this.randomSeed = randomSeed;
     }

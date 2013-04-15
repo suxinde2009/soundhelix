@@ -23,6 +23,10 @@ import com.soundhelix.util.XMLUtils;
 
 public class PatternSequenceEngine extends AbstractMultiPatternSequenceEngine {
 
+    /**
+     * Constructor.
+     */
+    
     public PatternSequenceEngine() {
         super();
     }

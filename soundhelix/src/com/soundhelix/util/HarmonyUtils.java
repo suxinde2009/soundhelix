@@ -59,7 +59,6 @@ public final class HarmonyUtils {
      * This is done by listing all the chords and their lengths until the next chord section starts or the song ends.
      * 
      * @param songContext the song context
-     * @param structure the structure
      * @param tick the starting tick
      * 
      * @return a chord section string (or null if the tick parameter is invalid)
@@ -198,7 +197,6 @@ public final class HarmonyUtils {
      * list entries always equals getChordSectionCount(structure).
      * 
      * @param songContext the song context
-     * @param structure the structure
      * 
      * @return a list of start ticks for all chord sections
      */

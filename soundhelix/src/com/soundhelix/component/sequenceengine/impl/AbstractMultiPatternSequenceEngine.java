@@ -37,6 +37,10 @@ public abstract class AbstractMultiPatternSequenceEngine extends AbstractSequenc
     /** The array of patterns. */
     private Pattern[] patterns;
 
+    /**
+     * Constructor.
+     */
+    
     public AbstractMultiPatternSequenceEngine() {
         super();
     }

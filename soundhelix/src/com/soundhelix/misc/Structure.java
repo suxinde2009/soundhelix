@@ -35,6 +35,14 @@ public class Structure {
     /** The number of ticks (derived). */
     private int ticks;
 
+    /**
+     * Constructor.
+     *
+     * @param bars the number of bars
+     * @param beatsPerBar the number of beats per bar
+     * @param ticksPerBeat the number of ticks per beat
+     */
+    
     public Structure(int bars, int beatsPerBar, int ticksPerBeat) {
         this.bars = bars;
         this.beatsPerBar = beatsPerBar;

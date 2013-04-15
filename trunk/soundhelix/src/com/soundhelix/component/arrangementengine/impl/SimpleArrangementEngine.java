@@ -87,10 +87,16 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
     /** The constraintMode. */
     private ConstraintMode constraintMode;
     
-    private String startActivityCountsString;
-    private String stopActivityCountsString;
+    /** The array of start activity counts. */
+    private int[] startActivityCounts;
+    
+    /** The array of stop activity counts, */
+    private int[] stopActivityCounts;
 
+    /** The arrangement entries. */
     private ArrangementEntry[] arrangementEntries;
+    
+    /** The map that maps from activity vector names to activity vector configurations. */
     private Map<String, ActivityVectorConfiguration> activityVectorConfigurationHashMap;
 
     /** The maximum number of iterations before failing. */
@@ -229,8 +235,8 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
             maxActivityVectors = getActivityVectorMaximum(vectors, 0.40, 0.2);
         }
 
-        int[] startActivityCounts = parseActivityCounts(startActivityCountsString, vectors);
-        int[] stopActivityCounts = parseActivityCounts(stopActivityCountsString, vectors);
+        int[] startActivityCounts = processActivityCounts(this.startActivityCounts, vectors);
+        int[] stopActivityCounts = processActivityCounts(this.stopActivityCounts, vectors);
 
         int increaseTill = Math.min(sections / 2, startActivityCounts.length) - 1;
         int decreaseFrom = sections - Math.min(sections / 2, stopActivityCounts.length + 1);
@@ -509,8 +515,8 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
             maxActivityVectors = getActivityVectorMaximum(vectors, 0.40, 0.2);
         }
 
-        int[] startActivityCounts = parseActivityCounts(startActivityCountsString, vectors);
-        int[] stopActivityCounts = parseActivityCounts(stopActivityCountsString, vectors);
+        int[] startActivityCounts = processActivityCounts(this.startActivityCounts, vectors);
+        int[] stopActivityCounts = processActivityCounts(this.stopActivityCounts, vectors);
 
         int increaseTill = Math.min(sections / 2, startActivityCounts.length) - 1;
         int decreaseFrom = sections - Math.min(sections / 2, stopActivityCounts.length + 1);
@@ -534,7 +540,6 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
         long startTime = System.nanoTime();
 
-    nextSection:
         while (section < sections) {
             BitSet previousBitSet;
 
@@ -552,8 +557,6 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
             
             List<BitSet> minBitSetList = new ArrayList<BitSet>();
             List<ActivityVectorState[]> minStatesList = new ArrayList<ActivityVectorState[]>();
-            
-            //Set<BitSet> hashSet = new HashSet<BitSet>();
             
             while (tries++ < 1000) {
                 int wantedCount = getWantedActivityVectorCount(section, sections, maxActivityVectors, lastWantedCount, increaseTill, decreaseFrom,
@@ -611,68 +614,52 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
                     }
 
                     if (section >= 5 && (!c.allowInactive || state.activeCount > 0) && 100.0d * state.activeCount / (section + 1) < c.minActive) {
-                        //System.out.println("minActive violated");
-                        error += c.minActive - 100.0d * state.activeCount / (section + 1);
+                        error += 10 * (c.minActive - 100.0d * state.activeCount / (section + 1));
                     }
 
                     if (section >= 5 && 100.0d * state.activeCount / (section + 1) > c.maxActive) {
-                        //System.out.println("maxActive violated");
-                        error += 100.0d * state.activeCount / (section + 1) - c.maxActive;
+                        error += 10 * (100.0d * state.activeCount / (section + 1) - c.maxActive);
                     }
 
                     if (state.segments > c.maxSegmentCount) {
-                        //System.out.println("maxSegmentCount violated");
-                        error += 100;
+                        error += 300 * (state.segments - c.maxSegmentCount);
                     }
 
                     if (state.segments + (remainingSections + (isActive ? 0 : 1)) / 2 < c.minSegmentCount) {
-                        //System.out.println("minSegmentCount violated");
                         error += 100;
                     }
 
                     if (isActive) {
                         if (state.segmentLength > c.maxSegmentLength) {
-                            //System.out.println("maxSegmentLength violated");
-                            error += 100;
+                            error += 100 * (state.segmentLength - state.segmentLength);
                         }
 
                         if (state.segmentLength + remainingSections < c.minSegmentLength) {
-                            //System.out.println("minSegmentLength violated");
                             error += 100;
                         }
                     }
 
                     if (!isActive && state.segmentLength > c.maxPauseLength) {
-                        //System.out.println("maxPauseLength violated");
-                        error += 100;
+                        error += 100 * (state.segmentLength - c.maxPauseLength);
                     }
 
                     if (isActive && state.activeCount == 1 && section > c.startBeforeSection - 1) {
-                        //System.out.println("startBeforeSection violated");
-                        error += 100;
+                        error += 100 * (section - c.startBeforeSection + 1);
                     }
 
                     if (state.activeCount > 0 && section < c.startAfterSection + 1) {
-                        //System.out.println("startAfterSection violated");
-                        error += 100;
+                        error += 100 * (c.startAfterSection + 1 - section);
                     }
 
                     if (isActive && remainingSections < c.stopBeforeSection + 1) {
-                        //System.out.println("stopBeforeSection violated");
-                        error += 100;
+                        error += 100 * (c.stopBeforeSection + 1 - remainingSections);
                     }
 
                     if (state.activeCount > 0 && remainingSections < c.stopBeforeSection + 1 && !state.activeInStopInterval) {
-                        //System.out.println("stopBeforeSection violated");
-                        error += 100;
+                        error += 100 * (c.stopBeforeSection + 1 - remainingSections);
                     }
-                    
-                    //System.out.println("Error after step " + i + ": " + error);
                 }
                 
-                //hashSet.add(bitSet);
-                
-               // System.out.println("Error: " + error + "  prevBitSet: " + previousBitSet + ", BitSet: " + bitSet);
                 if (error < minError) {
                     minBitSetList.clear();
                     minStatesList.clear();
@@ -683,23 +670,13 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
                     if (!minBitSetList.contains(bitSet)) {
                         minStatesList.add(states.clone());
                         minBitSetList.add(bitSet);
-                        //System.out.println("New min for section " + section + ": " + error + "   Count: " + minStatesList.size());
-                    } else {
-                        //System.out.println("Bitset contained");
                     }
                 }
-                
-                //if (error == 0) {
-                //    break;
-                //}
             }
 
-            //System.out.println("Distinct BitSets: " + hashSet.size());
-            
             int offset = random.nextInt(minBitSetList.size());
             bitSets[section] = minBitSetList.get(offset);
             allStates[section] = minStatesList.get(offset);
-            
 
             section++;
             remainingSections--;
@@ -913,14 +890,6 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         this.arrangementEntries = arrangementEntries;
     }
 
-    public void setStartActivityCountsString(String startActivityCountsString) {
-        this.startActivityCountsString = startActivityCountsString;
-    }
-
-    public void setStopActivityCountsString(String stopActivityCountsString) {
-        this.stopActivityCountsString = stopActivityCountsString;
-    }
-
     @Override
     public void configure(SongContext songContext, Node node) throws XPathException {
         random = new Random(randomSeed);
@@ -949,21 +918,21 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
         setMaxIterations(maxIterations);
 
-        String activityString = XMLUtils.parseString(random, "startActivityCounts", node);
+        int[] startActivityCounts = XMLUtils.parseIntegerListString(random, "startActivityCounts", node);
 
-        if (activityString == null) {
-            activityString = "1,2,3";
+        if (startActivityCounts == null) {
+            startActivityCounts = new int[] {1, 2, 3};
         }
 
-        setStartActivityCountsString(activityString);
+        setStartActivityCounts(startActivityCounts);
 
-        activityString = XMLUtils.parseString(random, "stopActivityCounts", node);
+        int[] stopActivityCounts = XMLUtils.parseIntegerListString(random, "stopActivityCounts", node);
 
-        if (activityString == null) {
-            activityString = "3,2,1";
+        if (stopActivityCounts == null) {
+            stopActivityCounts = new int[] {3, 2, 1};
         }
-
-        setStopActivityCountsString(activityString);
+        
+        setStopActivityCounts(stopActivityCounts);
 
         int minActivityCount = XMLUtils.parseInteger(random, "minActivityCount", node);
         setMinActivityCount(minActivityCount);
@@ -1163,26 +1132,27 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
     public void setActivityVectorConfiguration(Map<String, ActivityVectorConfiguration> activityVectorConfigurationHashMap) {
         this.activityVectorConfigurationHashMap = activityVectorConfigurationHashMap;
     }
+    
+    /**
+     * Processes the activity counts.
+     * 
+     * @param activityCounts the activity counts
+     * @param maxCount the maximum count
+     * @return the processed activity counts
+     */
+    
+    private int[] processActivityCounts(int[] activityCounts, int maxCount) {
+        int[] newActivityCounts = new int[activityCounts.length];
 
-    private int[] parseActivityCounts(String string, int maxCount) {
-        String[] c = string.split(",");
-        int[] activityCounts = new int[c.length];
-
-        for (int i = 0; i < c.length; i++) {
-            try {
-                activityCounts[i] = Integer.parseInt(c[i]);
-            } catch (NumberFormatException e) {
-                throw new RuntimeException("Element \"" + c[i] + "\" in activity count string \"" + string + "\" is not a number");
-            }
-
+        for (int i = 0; i < activityCounts.length; i++) {
             if (activityCounts[i] <= 0) {
-                throw new RuntimeException("Element \"" + activityCounts[i] + "\" in activity count string \"" + string + "\" is not positive");
-            } else if (activityCounts[i] > maxCount) {
-                activityCounts[i] = maxCount;
+                throw new RuntimeException("All activity counts must be positive");
+            } else {
+                newActivityCounts[i] = Math.min(activityCounts[i], maxCount);
             }
         }
 
-        return activityCounts;
+        return newActivityCounts;
     }
 
     public void setMinActivityCount(int minActiveCount) {
@@ -1328,5 +1298,13 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
     public void setConstraintMode(ConstraintMode constraintMode) {
         this.constraintMode = constraintMode;
+    }
+    
+    public void setStartActivityCounts(int[] startActivityCounts) {
+        this.startActivityCounts = startActivityCounts;
+    }
+
+    public void setStopActivityCounts(int[] stopActivityCounts) {
+        this.stopActivityCounts = stopActivityCounts;
     }
 }

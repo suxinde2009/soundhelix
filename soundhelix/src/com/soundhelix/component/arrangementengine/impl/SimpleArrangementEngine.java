@@ -633,33 +633,33 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
                     }
 
                     if (section >= 5 && (!c.allowInactive || state.activeCount > 0) && 100.0d * state.activeCount / (section + 1) < c.minActive) {
-                        error += 10 * (c.minActive - 100.0d * state.activeCount / (section + 1));
+                        error += 15 * (c.minActive - 100.0d * state.activeCount / (section + 1));
                     }
 
                     if (section >= 5 && 100.0d * state.activeCount / (section + 1) > c.maxActive) {
-                        error += 10 * (100.0d * state.activeCount / (section + 1) - c.maxActive);
+                        error += 15 * (100.0d * state.activeCount / (section + 1) - c.maxActive);
                     }
 
                     if (state.segments > c.maxSegmentCount) {
-                        error += 300 * (state.segments - c.maxSegmentCount);
+                        error += 400 * (state.segments - c.maxSegmentCount);
                     }
 
                     if (state.segments + (remainingSections + (isActive ? 0 : 1)) / 2 < c.minSegmentCount) {
-                        error += 100;
+                        error += 400;
                     }
 
                     if (isActive) {
                         if (state.segmentLength > c.maxSegmentLength) {
-                            error += 100 * (state.segmentLength - state.segmentLength);
+                            error += 250 * (state.segmentLength - c.maxSegmentLength);
                         }
 
                         if (state.segmentLength + remainingSections < c.minSegmentLength) {
-                            error += 100;
+                            error += 250;
                         }
                     }
 
                     if (!isActive && state.segmentLength > c.maxPauseLength) {
-                        error += 100 * (state.segmentLength - c.maxPauseLength);
+                        error += 250 * (state.segmentLength - c.maxPauseLength);
                     }
 
                     if (isActive && state.activeCount == 1 && section > c.startBeforeSection - 1) {

@@ -551,7 +551,6 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
             int lastWantedCount = previousBitSet.cardinality();
 
-
             int tries = 0;
             int minError = Integer.MAX_VALUE;
             
@@ -569,17 +568,29 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
                 BitSet bitSet = (BitSet) previousBitSet.clone();
                 bitSets[section] = bitSet;
 
+                int error = 0;
+
                 int d = diff;
 
                 if (d > 0) {
                     do {
                         int p = setRandomBit(bitSet, vectors);
+                        
+                        if (states[p].activeCount > 0 && states[p].segmentLength < activityVectorConfigurations[p].minPauseLength) {
+                            error += 250 * (activityVectorConfigurations[p].minPauseLength - states[p].segmentLength);
+                        }
+
                         states[p].segments++;
                         states[p].segmentLength = 0;
                     } while (--d > 0);
                 } else if (d < 0) {
                     do {
                         int p = clearRandomBit(bitSet);
+
+                        if (states[p].segmentLength < activityVectorConfigurations[p].minSegmentLength) {
+                            error += 250 * (activityVectorConfigurations[p].minSegmentLength - states[p].segmentLength);
+                        }
+                        
                         states[p].segmentLength = 0;
                     } while (++d < 0);
                 } else if (random.nextBoolean() && wantedCount < vectors) {
@@ -587,16 +598,24 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
                     // the previous if makes sure that we don't have the maximum number of AVs active already; in this
                     // case we will do nothing (i.e., don't change the activity)
                     int p = setRandomBit(bitSet, vectors);
+
+                    if (states[p].activeCount > 0 && states[p].segmentLength < activityVectorConfigurations[p].minPauseLength) {
+                        error += 250 * (activityVectorConfigurations[p].minPauseLength - states[p].segmentLength);
+                    }
+                    
                     states[p].segments++;
                     states[p].segmentLength = 0;
 
                     p = clearRandomBit(bitSet);
+
+                    if (states[p].segmentLength < activityVectorConfigurations[p].minSegmentLength) {
+                        error += 250 * (activityVectorConfigurations[p].minSegmentLength - states[p].segmentLength);
+                    }
+
                     states[p].segmentLength = 0;
                 }
 
                 // update states and check constraints
-
-                int error = 0;
 
                 for (int i = 0; i < vectors; i++) {
                     ActivityVectorState state = states[i];
@@ -668,7 +687,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
                 
                 if (error == minError) {
                     if (!minBitSetList.contains(bitSet)) {
-                        minStatesList.add(states.clone());
+                        minStatesList.add(cloneStates(states));
                         minBitSetList.add(bitSet);
                     }
                 }
@@ -778,7 +797,26 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
             target.activeInStopInterval = source.activeInStopInterval;
         }
     }
-
+    
+    /**
+     * Clones the given array of ActivityVectorStates.
+     * 
+     * @param states the states to clone
+     * 
+     * @return the cloned states
+     */
+    
+    private ActivityVectorState[] cloneStates(ActivityVectorState[] states) {
+        int len = states.length;
+        ActivityVectorState[] newStates = new ActivityVectorState[states.length];
+        
+        for (int i = 0; i < len; i++) {
+            newStates[i] = new ActivityVectorState(states[i]);
+        }
+        
+        return newStates;        
+    }
+    
     /**
      * Sets one random bit in the BitSet from false to true, if this is possible (i.e., if not all bits are set already). The number of the set bit is
      * returned or -1 if all bits were true.
@@ -1290,6 +1328,16 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
         /** Boolean indicating whether the activity vector is active within the stop interval. */
         private boolean activeInStopInterval;
+
+        public ActivityVectorState() {
+        }
+        
+        public ActivityVectorState(ActivityVectorState state) {
+            this.activeCount = state.activeCount;
+            this.segments = state.segments;
+            this.segmentLength = state.segmentLength;
+            this.activeInStopInterval = state.activeInStopInterval;
+        }
     }
 
     public ConstraintMode getConstraintMode() {

@@ -19,7 +19,7 @@
     <maxActivityCount>11</maxActivityCount>
     <maxActivityChangeCount>2</maxActivityChangeCount>
     <startActivityCounts>
-      <random list="1,2,3|2,3,4" />
+      <random list="1,2,3|2,3,4|3,4,5" />
     </startActivityCounts>
     <stopActivityCounts>
       <random list="4,3|5,3,2|5,4,2|5,4,3" />
@@ -383,7 +383,7 @@
 
   <player class="MidiPlayer">
     <bpm>
-      <random min="124" max="136" type="normal" variance="7" />
+      <random min="124" max="138" type="normal" variance="7" />
     </bpm>
     <transposition>65</transposition>
     <beforePlayWaitTicks>0</beforePlayWaitTicks>

@@ -557,7 +557,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
             List<BitSet> minBitSetList = new ArrayList<BitSet>();
             List<ActivityVectorState[]> minStatesList = new ArrayList<ActivityVectorState[]>();
             
-            while (tries++ < 1000) {
+            while (tries++ < maxIterations) {
                 int wantedCount = getWantedActivityVectorCount(section, sections, maxActivityVectors, lastWantedCount, increaseTill, decreaseFrom,
                         startActivityCounts, stopActivityCounts);
 
@@ -947,7 +947,13 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
         setConstraintMode(constraintMode);
 
-        int maxIterations = 1000000;
+        int maxIterations;
+        
+        if (constraintMode == ConstraintMode.EXACT) {
+            maxIterations = 1000000;
+        } else {
+            maxIterations = 1000;
+        }
 
         try {
             maxIterations = XMLUtils.parseInteger(random, "maxIterations", node);

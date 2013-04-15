@@ -970,8 +970,14 @@ public class MidiPlayer extends AbstractPlayer {
                 // if the instrument is inactive or not part of the song, we
                 // use the whole song as the length (this LFO is then a no-op)
 
-                int[] ticks = getInstrumentActivity(arrangement, clfo.instrument);
-
+                int[] ticks;
+                
+                if (clfo.instrument != null) {                
+                    ticks = getInstrumentActivity(arrangement, clfo.instrument);
+                } else {
+                    ticks = getActivityVectorActivity(clfo.activityVector);
+                }
+                
                 int startTick = 0;
                 int endTick = structure.getTicks();
 
@@ -1007,6 +1013,27 @@ public class MidiPlayer extends AbstractPlayer {
                 throw new RuntimeException("Invalid rotation unit \"" + clfo.rotationUnit + "\"");
             }
         }
+    }
+
+    private int[] getActivityVectorActivity(String activityVectorName) {
+        ActivityVector av = songContext.getActivityMatrix().get(activityVectorName);
+        
+        if (av == null) {
+            throw new RuntimeException("ActivityVector \"" + activityVectorName + "\" for LFO not found");
+        }
+
+        int[] ticks;
+
+        int start = av.getFirstActiveTick();
+        int end = av.getLastActiveTick() + 1;
+        
+        if (start >= 0) {
+            ticks = new int[] {start, end};
+        } else {
+            ticks = null;
+        }
+
+        return ticks;
     }
 
     /**
@@ -1317,13 +1344,13 @@ public class MidiPlayer extends AbstractPlayer {
 
     /**
      * Checks if the given instrument is part of the arrangement and if so, determines the tick of the first note and the tick of the end of the last
-     * note plus 1. The start and end ticks are returned as a two-dimensional int array. If the instrument is not found or the instrument's track
-     * contains no note, null is returned.
+     * note plus 1. All sequences of the instrument are checked, and the minimum and maximum accross all sequences are determined. The start and end
+     * ticks are returned as a two-element int array. If the instrument is not found or the instrument's track contains no note, null is returned.
      *
      * @param arrangement the arrangement
      * @param instrument the number of the instrument
      *
-     * @return a two-dimensional int array containing start and end tick (or null)
+     * @return a two-element int array containing start and end tick (or null)
      */
 
     private static int[] getInstrumentActivity(Arrangement arrangement, String instrument) {
@@ -1574,10 +1601,6 @@ public class MidiPlayer extends AbstractPlayer {
             } catch (Exception e) {
             }
 
-            if (rotationUnit.equals("activity") && (instrument == null || instrument.equals(""))) {
-                throw new RuntimeException("Rotation unit \"activity\" requires an instrument");
-            }
-
             String activityVector = null;
 
             try {
@@ -1585,8 +1608,17 @@ public class MidiPlayer extends AbstractPlayer {
             } catch (Exception e) {
             }
 
+            if (rotationUnit.equals("activity") && ((instrument == null || instrument.equals(""))
+                    && (activityVector == null || activityVector.equals("")))) {
+                throw new RuntimeException("Rotation unit \"activity\" requires an instrument or an ActivityVector");
+            }
+
             if (rotationUnit.equals("segmentPair") && (activityVector == null || activityVector.equals(""))) {
                 throw new RuntimeException("Rotation unit \"segmentPair\" requires an ActivityVector");
+            }
+            
+            if (instrument != null && activityVector != null) {
+                throw new RuntimeException("Either ActivityVector or instrument must be set, but not both");
             }
 
             Node lfoNode = XMLUtils.getNode("lfo", nodeList.item(i));

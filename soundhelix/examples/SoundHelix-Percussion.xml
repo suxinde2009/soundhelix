@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!-- Example XML file for SoundHelix. Author: Thomas Schuerger. -->
-<SoundHelix version="0.5+" xmlns:xi="http://www.w3.org/2001/XInclude">
+<SoundHelix version="0.6+" xmlns:xi="http://www.w3.org/2001/XInclude">
   <xi:include href="../includes/Standard-SongNameEngine.xml" />
   <structure>
     <bars>
@@ -15,7 +15,7 @@
   </harmonyEngine>
   <arrangementEngine class="SimpleArrangementEngine">
     <constraintMode>greedy</constraintMode>
-    <maxIterations>3000000</maxIterations>
+    <maxIterations>1000</maxIterations>
     <minActivityCount>4</minActivityCount>
     <maxActivityCount>11</maxActivityCount>
     <maxActivityChangeCount>2</maxActivityChangeCount>
@@ -386,6 +386,7 @@
     <bpm>
       <random min="124" max="138" type="normal" variance="7" />
     </bpm>
+    <!-- transposition is not relevant, because only percussion is used -->
     <transposition>65</transposition>
     <beforePlayWaitTicks>0</beforePlayWaitTicks>
     <afterPlayWaitTicks>16</afterPlayWaitTicks>

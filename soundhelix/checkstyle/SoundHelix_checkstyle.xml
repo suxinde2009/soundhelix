@@ -139,9 +139,11 @@ SoundHelix checkstyle configuration
     <module name="MultipleVariableDeclarations"/>
     <module name="NPathComplexity"/>
     <module name="NestedIfDepth">
-      <property name="max" value="3"/>
+      <property name="max" value="4"/>
     </module>
-    <module name="NestedTryDepth"/>
+    <module name="NestedTryDepth">
+      <property name="max" value="2"/>
+    </module>
     <module name="NoClone"/>
     <module name="NoFinalizer"/>
     <module name="PackageDeclaration"/>
@@ -225,7 +227,7 @@ SoundHelix checkstyle configuration
       <property name="severity" value="warning"/>
     </module>
     <module name="ClassDataAbstractionCoupling">
-      <property name="max" value="10"/>
+      <property name="max" value="15"/>
     </module>
     <module name="Indentation">
       <property name="severity" value="info"/>
@@ -238,6 +240,9 @@ SoundHelix checkstyle configuration
     <module name="MissingOverride">
       <property name="severity" value="warning"/>
       <property name="javaFiveCompatibility" value="true"/>
+    </module>
+    <module name="NestedForDepth">
+      <property name="max" value="4"/>
     </module>
   </module>
   <module name="JavadocPackage">

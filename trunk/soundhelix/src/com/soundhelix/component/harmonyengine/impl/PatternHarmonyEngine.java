@@ -58,6 +58,10 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
     /** The random generator. */
     private Random random;
 
+    /**
+     * Constructor.
+     */
+    
     public PatternHarmonyEngine() {
         super();
     }

@@ -297,6 +297,15 @@ public class Sequence {
         /** The legato flag. */
         private final boolean legato;
 
+        /**
+         * Constructor.
+         * 
+         * @param pitch the pitch
+         * @param velocity the velocity
+         * @param ticks the number of ticks
+         * @param legato the legato flag
+         */
+        
         public SequenceEntry(int pitch, short velocity, int ticks, boolean legato) {
             this.pitch = pitch;
             this.velocity = velocity;
@@ -328,6 +337,7 @@ public class Sequence {
             return legato;
         }
 
+        @Override
         public String toString() {
             return pitch + "/" + ticks + "/" + velocity;
         }

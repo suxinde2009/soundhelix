@@ -226,6 +226,16 @@ public final class XMLUtils {
         return Double.parseDouble(node.getTextContent());
     }
 
+    /**
+     * Searches for the element pointed to by path and tries to parse it as a boolean.
+     *
+     * @param random the random generator
+     * @param path the XPath expression relative to the node
+     * @param node the node
+     *
+     * @return the boolean
+     */
+
     public static boolean parseBoolean(Random random, String path, Node node) {
         try {
             Node node2 = XMLUtils.getNode(path, node);
@@ -397,6 +407,16 @@ public final class XMLUtils {
             throw new RuntimeException("Invalid element " + n.getNodeName());
         }
     }
+
+    /**
+     * Searches for the element pointed to by path and tries to parse it as an integer list.
+     *
+     * @param random the random generator
+     * @param path the XPath expression relative to the node
+     * @param node the node
+     *
+     * @return the integer array
+     */
 
     public static int[] parseIntegerListString(Random random, String path, Node node) {
         String string = XMLUtils.parseString(random, path, node);

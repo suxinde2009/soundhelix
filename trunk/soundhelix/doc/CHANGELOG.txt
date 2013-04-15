@@ -20,6 +20,8 @@ Change log
     - The MidiPlayer now supports setting arbitrary MIDI controller values at the beginning of the song, using the "controllerValue"
       tag. This allows, for example, to set relative MIDI volumes, panning, etc., per MIDI channel.
 
+    - The MidiPlayer now creates the configured output MIDI file directory if it doesn't exist.
+
     - The track configuration in the SimpleArrangementEngine now supports more than one "sequenceEngine" tag. One of the provided
       SequenceEngines will be taken at random for the track.
 

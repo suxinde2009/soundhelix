@@ -806,7 +806,14 @@ public class MidiPlayer extends AbstractPlayer {
             auxMap.put("deviceNumber", String.valueOf(number));
             String midiFilename = replacePlaceholders(this.midiFilename, auxMap);
 
-            File file = new File(midiFilename);
+            File file = new File(midiFilename);            
+            File directory = file.getParentFile();
+            
+            if (directory != null && !directory.exists()) {
+                logger.info("Creating MIDI file directory \"" + directory.getAbsolutePath() + "\"");
+                directory.mkdirs();
+            }
+                        
             MidiSystem.write(sequenceMap.get(device), 1, file);
             logger.debug("Wrote MIDI data for device \"" + device.name + "\" to MIDI file \"" + midiFilename + "\" (" + file.length() + " bytes)");
             number++;

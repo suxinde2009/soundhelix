@@ -4,7 +4,7 @@
   <xi:include href="../includes/Standard-SongNameEngine.xml" />
   <structure>
     <bars>
-      <random min="128" max="256" step="16" />
+      <random min="160" max="256" step="16" />
     </bars>
     <beatsPerBar>4</beatsPerBar>
     <ticksPerBeat>4</ticksPerBeat>
@@ -14,6 +14,7 @@
     <chordPattern>Am/32</chordPattern>
   </harmonyEngine>
   <arrangementEngine class="SimpleArrangementEngine">
+    <constraintMode>greedy</constraintMode>
     <maxIterations>3000000</maxIterations>
     <minActivityCount>4</minActivityCount>
     <maxActivityCount>11</maxActivityCount>
@@ -33,7 +34,7 @@
       <minActive>50</minActive>
       <maxActive>90</maxActive>
       <minSegmentLength>2</minSegmentLength>
-      <maxSegmentLength>8</maxSegmentLength>
+      <maxSegmentLength>7</maxSegmentLength>
       <maxPauseLength>3</maxPauseLength>
       <minSegmentCount>2</minSegmentCount>
       <maxSegmentCount>4</maxSegmentCount>

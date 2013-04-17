@@ -8,6 +8,9 @@ Change log
 ----------
 
 
+0.7u:
+
+
 0.6: 2013-04-17
 
     - Added new experimental greedy constraint mode to the SimpleArrangement engine, which only approximates the ActivityVector

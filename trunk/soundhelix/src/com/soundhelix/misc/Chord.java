@@ -17,8 +17,6 @@ import com.soundhelix.util.NoteUtils;
  * "C6" are normalized to "C"), if that is not already the case. Augmented chords cannot be normalized, because they don't have a unique root pitch
  * (e.g., the chords "Caug", "Eaug6" and "G#aug4" are not distinguishable if you look at their pitches).
  * 
- * The low and the high pitch must not be farther apart than 11 halftones.
- * 
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
@@ -241,6 +239,7 @@ public class Chord {
      * @return true if the two objects are equal, false otherwise
      */
 
+    @Override
     public boolean equals(Object other) {
         if (other == null || !(other instanceof Chord)) {
             return false;
@@ -286,6 +285,7 @@ public class Chord {
      * @return the string represenation
      */
 
+    @Override
     public String toString() {
         String name = CODE_TO_NAME_MAP.get(code);
 

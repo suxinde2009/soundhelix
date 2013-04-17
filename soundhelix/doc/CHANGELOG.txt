@@ -8,7 +8,7 @@ Change log
 ----------
 
 
-0.6u:
+0.6: 2013-04-17
 
     - Added new experimental greedy constraint mode to the SimpleArrangement engine, which only approximates the ActivityVector
       constraints, but is much faster and can be used for very large numbers of ActivityVectors and very long songs. Added tag

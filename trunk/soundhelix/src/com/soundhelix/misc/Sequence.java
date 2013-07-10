@@ -6,7 +6,7 @@ import java.util.List;
 
 /**
  * Represents a sequence, i.e., the notes and pauses of a single voice. A note consists of a pitch (with 0 being c', 1 being c#' and so on), a
- * velocity (between 0 and Short.MAX_VALUE) and a positive length in ticks. A pause is represented by an arbitrary pitch, a velocity of -1 and a
+ * velocity (between 0 and maxVelocity) and a positive length in ticks. A pause is represented by an arbitrary pitch, a velocity of -1 and a
  * positive length in ticks. The velocity can be used to represent a note's volume, but after all, it is up to the playback device how it interprets
  * the velocity. For example, a device might always play a note at its full volume and use the velocity to control filter cut-off instead.
  *
@@ -23,26 +23,50 @@ public class Sequence {
     /** Flag indicating whether the last note added was a pause. */
     private boolean lastWasPause;
 
+    /** The song context. */
+    private SongContext songContext;
+    
     /**
-     * Calls addNote(pitch,ticks,Short.MAX_VALUE).
+     * Constructor.
+     */
+    
+    private Sequence() {
+    }
+
+    /**
+     * Constructor.
+     * 
+     * @param songContext the song context
+     */
+    
+    public Sequence(SongContext songContext) {
+        if (songContext == null) {
+            throw new IllegalArgumentException("songContext must not be null");
+        }
+        
+        this.songContext = songContext;
+    }
+    
+    /**
+     * Calls addNote(pitch,ticks,maxVelocity).
      *
      * @param pitch the pitch
      * @param ticks the ticks
      */
 
     public void addNote(int pitch, int ticks) {
-        addNote(pitch, ticks, Short.MAX_VALUE);
+        addNote(pitch, ticks, songContext.getStructure().getMaxVelocity());
     }
 
     /**
-     * Calls addNote(pitch,Short.MAX_VALUE,ticks,false).
+     * Calls addNote(pitch,ticks,velocity,false).
      *
      * @param pitch the pitch
      * @param ticks the ticks
      * @param velocity the velocity
      */
 
-    public void addNote(int pitch, int ticks, short velocity) {
+    public void addNote(int pitch, int ticks, int velocity) {
         addNote(pitch, ticks, velocity, false);
     }
 
@@ -51,12 +75,16 @@ public class Sequence {
      * note-up afterwards. This method does nothing if ticks is 0. If velocity is 0, an equivalently sized pause is added.
      *
      * @param pitch the pitch
-     * @param velocity the velocity (between 0 and 32767)
+     * @param velocity the velocity (between 0 and maxVelocity)
      * @param ticks the ticks
      * @param legato the legato flag
      */
 
-    public void addNote(int pitch, int ticks, short velocity, boolean legato) {
+    public void addNote(int pitch, int ticks, int velocity, boolean legato) {
+        if (velocity < 0 || velocity > songContext.getStructure().getMaxVelocity()) {
+            throw new IllegalArgumentException("Velocity not in allowed range");
+        }
+        
         if (ticks > 0) {
             if (velocity == 0) {
                 addPause(ticks);
@@ -83,7 +111,7 @@ public class Sequence {
                 e.ticks += ticks;
             } else {
                 // add a new pause
-                sequence.add(new SequenceEntry(0, (short) -1, ticks, false));
+                sequence.add(new SequenceEntry(0, -1, ticks, false));
                 lastWasPause = true;
             }
 
@@ -235,7 +263,7 @@ public class Sequence {
                 return;
             } else if (diff < 0) {
                 sequence.add(offset, entry);
-                sequence.add(offset + 1, new SequenceEntry(0, (short) -1, -diff, false));
+                sequence.add(offset + 1, new SequenceEntry(0, -1, -diff, false));
                 return;
             } else {
                 sequence.add(offset, entry);
@@ -249,7 +277,7 @@ public class Sequence {
                 } while (diff > prevLength);
 
                 if (diff < prevLength) {
-                    sequence.add(offset, new SequenceEntry(0, (short) -1, prevLength - diff, false));
+                    sequence.add(offset, new SequenceEntry(0, -1, prevLength - diff, false));
                 }
                 return;
             }
@@ -262,7 +290,7 @@ public class Sequence {
                 sequence.set(offset, entry);
             } else if (diff < 0) {
                 sequence.set(offset, entry);
-                sequence.add(offset + 1, new SequenceEntry(0, (short) -1, -diff, false));
+                sequence.add(offset + 1, new SequenceEntry(0, -1, -diff, false));
             } else {
                 sequence.set(offset, entry);
 
@@ -274,7 +302,7 @@ public class Sequence {
                 } while (entry.ticks > prevLength);
 
                 if (entry.ticks < prevLength) {
-                    sequence.add(offset, new SequenceEntry(0, (short) -1, prevLength - entry.ticks, false));
+                    sequence.add(offset, new SequenceEntry(0, -1, prevLength - entry.ticks, false));
                 }
             }
         }
@@ -289,7 +317,7 @@ public class Sequence {
         private int pitch;
         
         /** The velocity. */
-        private final short velocity;
+        private final int velocity;
         
         /** The number of ticks. */
         private int ticks;
@@ -306,7 +334,7 @@ public class Sequence {
          * @param legato the legato flag
          */
         
-        public SequenceEntry(int pitch, short velocity, int ticks, boolean legato) {
+        public SequenceEntry(int pitch, int velocity, int ticks, boolean legato) {
             this.pitch = pitch;
             this.velocity = velocity;
             this.ticks = ticks;
@@ -317,7 +345,7 @@ public class Sequence {
             return pitch;
         }
 
-        public short getVelocity() {
+        public int getVelocity() {
             return velocity;
         }
 

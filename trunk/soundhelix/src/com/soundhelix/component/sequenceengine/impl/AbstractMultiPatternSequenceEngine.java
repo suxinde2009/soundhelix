@@ -62,7 +62,7 @@ public abstract class AbstractMultiPatternSequenceEngine extends AbstractSequenc
         Sequence[] seqs = new Sequence[patternCount];
 
         for (int i = 0; i < patternCount; i++) {
-            seqs[i] = new Sequence();
+            seqs[i] = new Sequence(songContext);
         }
 
         Track track = new Track(TrackType.MELODIC);
@@ -85,7 +85,7 @@ public abstract class AbstractMultiPatternSequenceEngine extends AbstractSequenc
                 int len = entry.getTicks();
 
                 if (activityVector.isActive(tick)) {
-                    short vel = entry.getVelocity();
+                    int vel = entry.getVelocity();
 
                     if (entry.isPause()) {
                         // add pause

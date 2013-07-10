@@ -60,8 +60,8 @@ public class Pattern implements Iterable<PatternEntry> {
      * @return the pattern
      */
 
-    public static Pattern parseString(String patternString) {
-        return parseString(patternString, null, 1, 1);
+    public static Pattern parseString(SongContext songContext, String patternString) {
+        return parseString(songContext, patternString, null, 1, 1);
     }
 
     /**
@@ -74,8 +74,8 @@ public class Pattern implements Iterable<PatternEntry> {
      * @return the pattern
      */
 
-    public static Pattern parseString(String patternString, int currentTPB, int targetTPB) {
-        return parseString(patternString, null, currentTPB, targetTPB);
+    public static Pattern parseString(SongContext songContext, String patternString, int currentTPB, int targetTPB) {
+        return parseString(songContext, patternString, null, currentTPB, targetTPB);
     }
 
     /**
@@ -87,8 +87,8 @@ public class Pattern implements Iterable<PatternEntry> {
      * @return the pattern
      */
 
-    public static Pattern parseString(String patternString, String wildcardString) {
-        return parseString(patternString, wildcardString, 1, 1);
+    public static Pattern parseString(SongContext songContext, String patternString, String wildcardString) {
+        return parseString(songContext, patternString, wildcardString, 1, 1);
     }
 
     /**
@@ -102,7 +102,7 @@ public class Pattern implements Iterable<PatternEntry> {
      * @return the pattern
      */
 
-    public static Pattern parseString(String patternString, String wildcardString, int currentTPB, int targetTPB) {
+    public static Pattern parseString(SongContext songContext, String patternString, String wildcardString, int currentTPB, int targetTPB) {
         patternString = expandPatternString(patternString, ',');
 
         if (patternString == null || patternString.equals("")) {
@@ -124,7 +124,7 @@ public class Pattern implements Iterable<PatternEntry> {
 
         for (int i = 0; i < len; i++) {
             String[] a = p[i].split(":");
-            short v = a.length > 1 ? Short.parseShort(a[1]) : Short.MAX_VALUE;
+            int v = a.length > 1 ? Integer.parseInt(a[1]) : songContext.getStructure().getMaxVelocity();
             String[] b = a[0].split("/");
             int t = b.length > 1 ? Integer.parseInt(b[1]) : 1;
 
@@ -453,7 +453,7 @@ public class Pattern implements Iterable<PatternEntry> {
         private int pitch;
 
         /** The velocity. */
-        private final short velocity;
+        private final int velocity;
 
         /** The number of ticks. */
         private final int ticks;
@@ -487,7 +487,7 @@ public class Pattern implements Iterable<PatternEntry> {
          * @param legato the legato flag
          */
 
-        public PatternEntry(int pitch, short velocity, int ticks, boolean legato) {
+        public PatternEntry(int pitch, int velocity, int ticks, boolean legato) {
             this.pitch = pitch;
             this.velocity = velocity;
             this.ticks = ticks;
@@ -503,7 +503,7 @@ public class Pattern implements Iterable<PatternEntry> {
          * @param legato the legato flag
          */
 
-        public PatternEntry(char wildcardCharacter, short velocity, int ticks, boolean legato) {
+        public PatternEntry(char wildcardCharacter, int velocity, int ticks, boolean legato) {
             this.velocity = velocity;
             this.ticks = ticks;
             this.wildcardCharacter = wildcardCharacter;
@@ -537,7 +537,7 @@ public class Pattern implements Iterable<PatternEntry> {
          * @return the velocity
          */
 
-        public short getVelocity() {
+        public int getVelocity() {
             return velocity;
         }
 
@@ -590,13 +590,12 @@ public class Pattern implements Iterable<PatternEntry> {
             return isLegato;
         }
 
-        @Override
-        public String toString() {
+        public String toString(SongContext songContext) {
             if (isPause()) {
                 return "-" + (ticks > 1 ? "/" + ticks : "");
             } else {
                 return (isWildcard ? "" + wildcardCharacter : "" + pitch) + (ticks > 1 ? "/" + ticks : "")
-                        + (velocity == Short.MAX_VALUE ? "" : ":" + velocity);
+                        + (velocity == songContext.getStructure().getMaxVelocity() ? "" : ":" + velocity);
             }
         }
     }

@@ -74,7 +74,7 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
         
         ActivityVector activityVector = activityVectors[0];
 
-        Sequence seq = new Sequence();
+        Sequence seq = new Sequence(songContext);
 
         int tick = 0;
         int ticks = structure.getTicks();

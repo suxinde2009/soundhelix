@@ -49,7 +49,7 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
     private int[] offsets;
 
     /** The velocity to use. */
-    private short velocity = Short.MAX_VALUE;
+    private int velocity;
 
     /*
      * Constructor.
@@ -80,7 +80,7 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
         this.voiceCount = offsets.length;
     }
 
-    public void setVelocity(short velocity) {
+    public void setVelocity(int velocity) {
         this.velocity = velocity;
     }
 
@@ -93,7 +93,7 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
         Track track = new Track(TrackType.MELODIC);
 
         for (int i = 0; i < voiceCount; i++) {
-            track.add(new Sequence());
+            track.add(new Sequence(songContext));
         }
 
         int tick = 0;
@@ -222,8 +222,9 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
         }
 
         try {
-            setVelocity((short) XMLUtils.parseInteger(random, "velocity", node));
+            setVelocity(XMLUtils.parseInteger(random, "velocity", node));
         } catch (Exception e) {
+            setVelocity(songContext.getStructure().getMaxVelocity());
         }
     }
 

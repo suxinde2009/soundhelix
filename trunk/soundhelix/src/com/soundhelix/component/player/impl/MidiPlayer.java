@@ -774,7 +774,7 @@ public class MidiPlayer extends AbstractPlayer {
                             if (se.isNote()) {
                                 int pitch = (track.getType() == TrackType.MELODIC ? transposition : 0) + se.getPitch();
                                 sendMidiMessage(trackMap.get(channel.device), tick, channel.channel, ShortMessage.NOTE_ON, pitch,
-                                        getMidiVelocity(se.getVelocity()));
+                                        getMidiVelocity(songContext, se.getVelocity()));
                                 pitches[j] = pitch;
                             }
 
@@ -903,7 +903,7 @@ public class MidiPlayer extends AbstractPlayer {
 
                         if (se.isNote()) {
                             int pitch = (track.getType() == TrackType.MELODIC ? transposition : 0) + se.getPitch();
-                            sendMidiMessage(channel, ShortMessage.NOTE_ON, pitch, getMidiVelocity(se.getVelocity()));
+                            sendMidiMessage(channel, ShortMessage.NOTE_ON, pitch, getMidiVelocity(songContext, se.getVelocity()));
                             pitches[j] = pitch;
                         }
 
@@ -1327,19 +1327,20 @@ public class MidiPlayer extends AbstractPlayer {
     }
 
     /**
-     * Converts our internal velocity (between 0 and Short.MAX_VALUE) to a MIDI velocity (between 0 and 127).
+     * Converts our internal velocity (between 0 and maxVelocity) to a MIDI velocity (between 0 and 127).
      *
+     * @param songContext the song context
      * @param velocity the velocity to convert
      *
      * @return the MIDI velocity
      */
 
-    private static int getMidiVelocity(short velocity) {
+    private static int getMidiVelocity(SongContext songContext, int velocity) {
         if (velocity == 0) {
             return 0;
         }
-
-        return 1 + (velocity - 1) * 126 / (Short.MAX_VALUE - 126);
+        
+        return 1 + (int) ((velocity - 1) * 126L / (songContext.getStructure().getMaxVelocity() - 1));
     }
 
     public final void setControllerLFOs(ControllerLFO[] controllerLFOs) {

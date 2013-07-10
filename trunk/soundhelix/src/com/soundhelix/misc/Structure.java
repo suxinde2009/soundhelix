@@ -35,6 +35,9 @@ public class Structure {
     /** The number of ticks (derived). */
     private int ticks;
 
+    /** The maximum velocity (must be > 0). */
+    private int maxVelocity;
+    
     /**
      * Constructor.
      *
@@ -43,10 +46,27 @@ public class Structure {
      * @param ticksPerBeat the number of ticks per beat
      */
     
-    public Structure(int bars, int beatsPerBar, int ticksPerBeat) {
+    public Structure(int bars, int beatsPerBar, int ticksPerBeat, int maxVelocity) {
+        if (bars <= 0) {
+            throw new IllegalArgumentException("bars must be positive");
+        }
+        
+        if (beatsPerBar <= 0) {
+            throw new IllegalArgumentException("beatsPerBar must be positive");
+        }
+
+        if (ticksPerBeat <= 0) {
+            throw new IllegalArgumentException("ticksPerBeat must be positive");
+        }
+
+        if (maxVelocity <= 0) {
+            throw new IllegalArgumentException("maxVelocity must be positive");
+        }
+        
         this.bars = bars;
         this.beatsPerBar = beatsPerBar;
         this.ticksPerBeat = ticksPerBeat;
+        this.maxVelocity = maxVelocity;
 
         this.ticksPerBar = beatsPerBar * ticksPerBeat;
         this.ticks = bars * ticksPerBar;
@@ -70,5 +90,9 @@ public class Structure {
 
     public int getBars() {
         return bars;
+    }
+    
+    public int getMaxVelocity() {
+        return maxVelocity;
     }
 }

@@ -68,7 +68,7 @@ public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
 
         int tick = 0;
 
-        Sequence seq = new Sequence();
+        Sequence seq = new Sequence(songContext);
         int ticks = structure.getTicks();
 
         while (tick < ticks) {
@@ -99,7 +99,7 @@ public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
                 }
 
                 if (activityVector.isActive(tick)) {
-                    short velocity = entry.getVelocity();
+                    int velocity = entry.getVelocity();
 
                     if (entry.isPause()) {
                         // add pause

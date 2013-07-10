@@ -99,7 +99,7 @@ public class RandomPatternEngine extends StringPatternEngine {
         } catch (Exception e) {
         }
 
-        super.setPatternString(generatePattern(patternString));
+        super.setPatternString(generatePattern(songContext, patternString));
     }
 
     /**
@@ -111,7 +111,7 @@ public class RandomPatternEngine extends StringPatternEngine {
      * @return the generated pattern
      */
 
-    private String generatePattern(String patternPattern) {
+    private String generatePattern(SongContext songContext, String patternPattern) {
         // maps base pattern characters (e.g., 'A') to patterns
         Map<Character, String> basePatternMap = new HashMap<Character, String>();
 
@@ -140,7 +140,7 @@ public class RandomPatternEngine extends StringPatternEngine {
 
                 if (basePattern == null) {
                     // no base pattern is found, create one and use it
-                    p = generateBasePattern();
+                    p = generateBasePattern(songContext);
                     basePatternMap.put(basePatternCharacter, p);
                 } else {
                     // we have a base pattern
@@ -183,7 +183,7 @@ public class RandomPatternEngine extends StringPatternEngine {
      * @return the random pattern
      */
 
-    private String generateBasePattern() {
+    private String generateBasePattern(SongContext songContext) {
         StringBuilder sb;
         int activeTicks = 0;
 
@@ -242,7 +242,7 @@ public class RandomPatternEngine extends StringPatternEngine {
                         }
                     }
 
-                    if (velocity != Short.MAX_VALUE) {
+                    if (velocity != songContext.getStructure().getMaxVelocity()) {
                         sb.append(length).append(':').append(velocity);
                     } else {
                         sb.append(length);
@@ -375,6 +375,7 @@ public class RandomPatternEngine extends StringPatternEngine {
         this.maxVelocity = maxVelocity;
     }
 
+    @Override
     public void setPatternString(String patternString) {
         this.patternString = patternString;
     }

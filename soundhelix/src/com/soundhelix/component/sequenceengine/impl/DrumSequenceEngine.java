@@ -77,7 +77,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
         Sequence[] seqs = new Sequence[drumEntryCount];
 
         for (int i = 0; i < drumEntryCount; i++) {
-            seqs[i] = new Sequence();
+            seqs[i] = new Sequence(songContext);
             track.add(seqs[i]);
         }
 
@@ -117,7 +117,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
                 int len = entry.getTicks();
 
                 if (activityVector.isActive(tick)) {
-                    short vel = entry.getVelocity();
+                    int vel = entry.getVelocity();
 
                     if (entry.isPause()) {
                         // add pause
@@ -247,7 +247,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
                                                         .isLegato()));
                                     } else if (mode == Mode.REPLACE) {
                                         seq.replaceEntry(tick,
-                                                new Sequence.SequenceEntry(Integer.MIN_VALUE, (short) -1, entry.getTicks(), entry.isLegato()));
+                                                new Sequence.SequenceEntry(Integer.MIN_VALUE, -1, entry.getTicks(), entry.isLegato()));
                                     }
                                 }
 

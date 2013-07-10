@@ -23,7 +23,7 @@ public class StringPatternEngine extends AbstractPatternEngine {
 
     @Override
     public Pattern render(SongContext songContext, String wildcardString) {
-        return Pattern.parseString(patternString, wildcardString);
+        return Pattern.parseString(songContext, patternString, wildcardString);
     }
 
     @Override

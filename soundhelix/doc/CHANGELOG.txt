@@ -10,6 +10,13 @@ Change log
 
 0.7u:
 
+    - Added support for setting the maximum velocity using the "maxVelocity" tag in the "structure" tag (defaults to 32767 for
+      backwards compatibility). This sets the default note velocity if no velocity is provided as well as the scaling factor when
+      converting SoundHelix velocities to MIDI velocities. For example, instead of the (somewhat cumbersome) maximum of 32767,
+      you could choose to to set it to 1000 instead, providing velocites as per mill values, or to 100 to use percent values.
+
+    - Removed obsolete classes RandomSequenceEngine and RandomPatternSequenceEngine.
+      
 
 0.6: 2013-04-17
 

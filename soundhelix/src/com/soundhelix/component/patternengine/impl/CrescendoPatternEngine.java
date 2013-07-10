@@ -86,7 +86,7 @@ public class CrescendoPatternEngine extends StringPatternEngine {
         }
 
         
-        super.setPatternString(generatePattern(patternString));
+        super.setPatternString(generatePattern(songContext, patternString));
     }
     
     /**
@@ -98,12 +98,12 @@ public class CrescendoPatternEngine extends StringPatternEngine {
      * @return the generated pattern
      */
     
-    private String generatePattern(String patternPattern) {
+    private String generatePattern(SongContext songContext, String patternPattern) {
         StringBuilder sb = new StringBuilder();
 
-        Pattern prefixPattern = Pattern.parseString(prefixPatternString);
-        Pattern pattern = Pattern.parseString(patternString);
-        Pattern suffixPattern = Pattern.parseString(suffixPatternString);
+        Pattern prefixPattern = Pattern.parseString(songContext, prefixPatternString);
+        Pattern pattern = Pattern.parseString(songContext, patternString);
+        Pattern suffixPattern = Pattern.parseString(songContext, suffixPatternString);
 
         int prefixPatternTicks = prefixPattern != null ? prefixPattern.getTicks() : 0;
         int patternTicks = pattern != null ? pattern.getTicks() : 0;
@@ -124,13 +124,13 @@ public class CrescendoPatternEngine extends StringPatternEngine {
                     + "contain at least 2 ticks");
         }
         
-        int tick = appendPattern(sb, prefixPattern, 0, totalTicks);
+        int tick = appendPattern(songContext, sb, prefixPattern, 0, totalTicks);
         
         for (int i = 0; i < repetitions; i++) {
-            tick = appendPattern(sb, pattern, tick, totalTicks);
+            tick = appendPattern(songContext, sb, pattern, tick, totalTicks);
         }
 
-        appendPattern(sb, suffixPattern, tick, totalTicks);
+        appendPattern(songContext, sb, suffixPattern, tick, totalTicks);
 
         logger.debug("Pattern: " + sb);
         
@@ -148,7 +148,7 @@ public class CrescendoPatternEngine extends StringPatternEngine {
      * @return the new number of ticks
      */
 
-    private int appendPattern(StringBuilder sb, Pattern pattern, int tick, int totalTicks) {
+    private int appendPattern(SongContext songContext, StringBuilder sb, Pattern pattern, int tick, int totalTicks) {
         if (pattern == null || pattern.getTicks() == 0) {
             // nothing to do
             return tick;
@@ -164,9 +164,9 @@ public class CrescendoPatternEngine extends StringPatternEngine {
             if (entry.isPause()) {
                 sb.append("-/").append(entry.getTicks());
             } else {
-                double v = (double) tick / (totalTicks - 1d);
+                double v = tick / (totalTicks - 1d);
                 int velocity = (int) (RandomUtils.getPowerDouble(v, minVelocity, maxVelocity, velocityExponent)
-                        * entry.getVelocity() / Short.MAX_VALUE);
+                        * entry.getVelocity() / songContext.getStructure().getMaxVelocity());
 
                 if (velocity < 1 && minVelocity >= 1) {
                     // this will make sure that a note is not converted to a pause
@@ -187,7 +187,7 @@ public class CrescendoPatternEngine extends StringPatternEngine {
                     }
                 }
 
-                if (velocity != Short.MAX_VALUE) {
+                if (velocity != songContext.getStructure().getMaxVelocity()) {
                     sb.append(entry.getTicks()).append(':').append(velocity); 
                 } else {
                     sb.append(entry.getTicks());
@@ -200,6 +200,7 @@ public class CrescendoPatternEngine extends StringPatternEngine {
         return tick;
     }
     
+    @Override
     public void setPatternString(String patternString) {
         this.patternString = patternString;
     }

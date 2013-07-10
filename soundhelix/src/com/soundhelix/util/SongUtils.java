@@ -315,9 +315,15 @@ public final class SongUtils {
             throw new RuntimeException("Number of ticks per beat must be > 0");
         }
 
-        Structure structure = new Structure(bars, beatsPerBar, ticksPerBeat);
-
-        return structure;
+        // default value for backwards compatibility
+        int maxVelocity = 32767;
+        
+        try {
+            maxVelocity = XMLUtils.parseInteger(random, "maxVelocity", node);
+        } catch (Exception e) {
+        }
+        
+        return new Structure(bars, beatsPerBar, ticksPerBeat, maxVelocity);
     }
 
     /**

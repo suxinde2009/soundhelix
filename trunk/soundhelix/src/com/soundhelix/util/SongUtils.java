@@ -350,25 +350,16 @@ public final class SongUtils {
 
     private static void checkVersion(Node rootNode) throws XPathExpressionException {
         if (BuildConstants.VERSION.equals("???")) {
+            // undefined build version is always OK
             return;
         }
 
         String version = XMLUtils.parseString(null, "attribute::version", rootNode);
 
         if (version != null && !version.equals("")) {
-            if (version.endsWith("+")) {
-                // strip off "+" character
-                version = version.substring(0, version.length() - 1);
-
-                if (VersionUtils.compareVersions(BuildConstants.VERSION, version) < 0) {
-                    throw new RuntimeException("Document requires at least version " + version + ", but application version is "
-                            + BuildConstants.VERSION);
-                }
-            } else {
-                if (VersionUtils.compareVersions(BuildConstants.VERSION, version) != 0) {
-                    throw new RuntimeException("Document requires exactly version " + version + ", but application version is "
-                            + BuildConstants.VERSION);
-                }
+            if (!VersionUtils.checkVersion(BuildConstants.VERSION, version)) {
+                throw new RuntimeException("Application version " + BuildConstants.VERSION + " does not match allowed version(s) \""
+                        + version + "\""); 
             }
         }
     }

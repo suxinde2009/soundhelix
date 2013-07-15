@@ -15,6 +15,10 @@ Change log
       converting SoundHelix velocities to MIDI velocities. For example, instead of the (somewhat cumbersome) maximum of 32767,
       you could choose to to set it to 1000 instead, providing velocites as per mill values, or to 100 to use percent values.
 
+    - Added support for using version ranges in the "version" tag. Now a comma-separated list of version specifications can
+      be provided (each either "<version>", "<version>+" or "<version1>-<version2>" for application version checks in XML files.
+
+
     - Removed obsolete classes RandomSequenceEngine and RandomPatternSequenceEngine.
       
 

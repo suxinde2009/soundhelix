@@ -220,8 +220,10 @@ public class MidiPlayer extends AbstractPlayer {
                 for (Device device : devices) {
                     device.close();
                 }
-                
-                syncDevice.close();
+
+                if (syncDevice != null) {
+                    syncDevice.close();
+                }
             } catch (Exception e) {
                 throw new RuntimeException("Could not close MIDI devices");
             }

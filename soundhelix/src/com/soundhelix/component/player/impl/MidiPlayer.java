@@ -176,6 +176,7 @@ public class MidiPlayer extends AbstractPlayer {
         midiControllerMap.put("releaseTime", new MidiController(ShortMessage.CONTROL_CHANGE, 72, 1));
         midiControllerMap.put("attackTime", new MidiController(ShortMessage.CONTROL_CHANGE, 73, 1));
         midiControllerMap.put("brightness", new MidiController(ShortMessage.CONTROL_CHANGE, 74, 1));
+        midiControllerMap.put("controlSoundController10", new MidiController(ShortMessage.CONTROL_CHANGE, 79, 1));
     }
 
     /**

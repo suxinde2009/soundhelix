@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Random;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.regex.Pattern;
 
 import javax.sound.midi.InvalidMidiDataException;
@@ -152,6 +152,10 @@ public class MidiPlayer extends AbstractPlayer {
     /** The song context (only valid while playing). */
     private SongContext songContext;
 
+    private boolean waitForStart = false;
+    
+    private boolean running = false;
+    
     /**
      * Contains the pitch used when the last note was played by a voice of an arrangement entry. This is used to be able to change the
      * transposition while playing and still being able to send the correct NOTE_OFF pitches.
@@ -444,13 +448,22 @@ public class MidiPlayer extends AbstractPlayer {
 
             runBeforePlayCommands();
 
-            if (useClockSynchronization) {
-                sendMidiMessageToClockSynchronized(ShortMessage.START);
-            }
-
-            resetPlayerState(arrangement);
-
             long referenceTime = System.nanoTime();
+            running = true;
+            
+            if (syncDevice != null) {
+                if (waitForStart) {
+                    System.out.println("Waiting");
+                    running = false;
+                    
+                    while (!running) {
+                        referenceTime = waitTicks(referenceTime, 1, clockTimingsPerTick, structure.getTicksPerBeat());
+                    }
+                }
+            }
+            
+            sendMidiMessageToClockSynchronized(ShortMessage.START);
+            resetPlayerState(arrangement);
 
             if (beforePlayWaitTicks > 0) {
                 if (logger.isDebugEnabled()) {
@@ -483,6 +496,7 @@ public class MidiPlayer extends AbstractPlayer {
                     if (useClockSynchronization) {
                         sendMidiMessageToClockSynchronized(ShortMessage.TIMING_CLOCK);
                     }
+
                     timingTickReferenceTime += getTimingTickNanos(clockTimingsPerTick, ticksPerBeat);
                 }
 
@@ -1315,13 +1329,15 @@ public class MidiPlayer extends AbstractPlayer {
      */
 
     private void sendMidiMessageToClockSynchronized(int status) throws InvalidMidiDataException {
-        Iterator<Device> iter = deviceMap.values().iterator();
+        if (useClockSynchronization) {
+            Iterator<Device> iter = deviceMap.values().iterator();
 
-        while (iter.hasNext()) {
-            Device device = iter.next();
+            while (iter.hasNext()) {
+                Device device = iter.next();
 
-            if (device.useClockSynchronization) {
-                sendMidiMessage(device, status);
+                if (device.useClockSynchronization) {
+                    sendMidiMessage(device, status);
+                }
             }
         }
     }
@@ -1500,6 +1516,8 @@ public class MidiPlayer extends AbstractPlayer {
             String syncDeviceName = XMLUtils.parseString(random, "synchronizationDevice", node);
             syncDevice = new SyncDevice(syncDeviceName);
             this.syncDevice = syncDevice;
+            boolean waitForStart = XMLUtils.parseBoolean(random, "synchronizationDevice/@waitForStart", node);
+            this.waitForStart = waitForStart;
         } catch(Exception e) {}
         
         beforePlayCommands = XMLUtils.parseString(random, "beforePlayCommands", node);
@@ -1914,6 +1932,8 @@ public class MidiPlayer extends AbstractPlayer {
             // the underlying receiver is closed automatically if the MIDI device is closed
 
             if (midiDevice != null) {
+                transmitter.getReceiver().close();
+                transmitter.close();
                 midiDevice.close();
                 logger.debug("Successfully closed MIDI sync device \"" + midiName + "\"");
                 midiDevice = null;
@@ -2057,8 +2077,8 @@ public class MidiPlayer extends AbstractPlayer {
     }
     
     /**
-     * Implements a receiver for MIDI clock messages. The obtained timing is averaged across a number of timing ticks,
-     * and the resulting BPM are set for the player.
+     * Implements a receiver for MIDI clock messages. The obtained timing is averaged across a number of timing ticks using
+     * a moving average, and the resulting BPM are set for the player.
      */
     
     private class MidiClockReceiver implements Receiver {
@@ -2072,26 +2092,28 @@ public class MidiPlayer extends AbstractPlayer {
         long sum = 0;
         
         /** The queue of time differences. */
-        Queue<Long> timeQueue = new LinkedBlockingQueue<Long>();
+        Queue<Long> timeQueue = new ArrayBlockingQueue<Long>(24);
 
         /** The number of ticks received so far. */
         int count = 0;
         
         @Override
         public void send(MidiMessage message, long timeStamp) {
-            if (message.getStatus() == ShortMessage.TIMING_CLOCK) {
+            int status = message.getStatus();
+            if (status == ShortMessage.TIMING_CLOCK) {
                 long time = System.nanoTime();
                 
                 if (!firstTick) {
                     long diff = time - lastTime;
-                    timeQueue.add(diff);
-                    sum += diff;
-                    
-                    if (timeQueue.size() > 48) {
+
+                    if (timeQueue.size() >= 24) {
                         // keep queue size constant
                         long oldDiff = timeQueue.remove();
                         sum -= oldDiff;
                     }
+
+                    timeQueue.add(diff);
+                    sum += diff;
                     
                     long milliBPM = 60000000000000L / 24L * timeQueue.size() / sum;
                     setMilliBPM((int) milliBPM);
@@ -2105,6 +2127,15 @@ public class MidiPlayer extends AbstractPlayer {
                 if ((count % 24) == 0) {
                     logger.trace("Milli BPM from MIDI sync: " + milliBPM);
                 }
+            } else if (status == ShortMessage.START || status == ShortMessage.CONTINUE) {
+                System.out.println("*** RECEIVED start/continue");
+                firstTick = true;
+                timeQueue.clear();
+                running = true;
+                sum = 0;
+            } else if (message.getStatus() == ShortMessage.STOP) {
+                System.out.println("*** RECEIVED stop");
+                running = false;
             }
         }
         

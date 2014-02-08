@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!-- Example XML file for SoundHelix. Author: Thomas Schuerger. -->
-<SoundHelix version="0.6+" xmlns:xi="http://www.w3.org/2001/XInclude">
+<SoundHelix version="0.7u+" xmlns:xi="http://www.w3.org/2001/XInclude">
   <xi:include href="../includes/Standard-SongNameEngine.xml" />
   <structure>
     <bars>
@@ -8,6 +8,7 @@
     </bars>
     <beatsPerBar>4</beatsPerBar>
     <ticksPerBeat>4</ticksPerBeat>
+    <maxVelocity>1000</maxVelocity>
   </structure>
   <harmonyEngine class="PatternHarmonyEngine">
     <!-- we're not using chords anywhere, this just defines the length of each chord section in # of beats -->
@@ -148,7 +149,7 @@
             <patternTicks>16</patternTicks>
             <patternString><random list="A1,B1,A1,B2|A1,B1,A1,B2,A1,B1,A1,B3|A1,A1,A1,B1,A1,A1,A1,B2,A1,A1,A1,B1,A1,A1,A1,B3|C1,A1,C1,B1,C1,A1,C1,B2"/></patternString>
             <pattern group="A">-/12,0,-/3</pattern>
-            <pattern group="B">-/11,0:16384,0,-/3|-/12,0,0,-/2|-/12,0,0,-,0|-/9,0,-,-,0,-/3|-/9,0,-,-,0,-,0,-</pattern>
+            <pattern group="B">-/11,0:500,0,-/3|-/12,0,0,-/2|-/12,0,0,-,0|-/9,0,-,-,0,-/3|-/9,0,-,-,0,-,0,-</pattern>
             <pattern group="C">-/16</pattern>
           </patternEngine>
         </pattern>
@@ -158,7 +159,7 @@
           <patternEngine class="RandomFragmentPatternEngine">
             <patternTicks>4</patternTicks>
             <patternString>A1,A2,A1,A3,A1,A2,A1,A4</patternString>
-            <pattern group="A">0:26000,0:26000,0:26000,0:26000|0:26000,0:26000,-,0:26000|0:26000,-,-,-|0:26000,-,0:26000,-|0:26000,0:26000,0:26000,-</pattern>
+            <pattern group="A">0:800,0:800,0:800,0:800|0:800,0:800,-,0:800|0:800,-,-,-|0:800,-,0:800,-|0:800,0:800,0:800,-</pattern>
           </patternEngine>
         </pattern>
         <pattern>
@@ -167,8 +168,8 @@
           <patternEngine class="RandomFragmentPatternEngine">
             <patternTicks>8</patternTicks>
             <patternString><random list="A1,B1,A1,B2,A1,B1,A1,B3|A1,A1,A1,B1,A1,A1,A1,B2|A1,A1,A1,B1,A1,A1,A1,B2,A1,A1,A1,B1,A1,A1,A1,B3"/></patternString>
-            <pattern group="A">-,-,0:20000,-,-,-,0:20000,-</pattern>
-            <pattern group="B">-,-,0:20000,-,-,-,0:20000,-|-,-,0:20000,-,-,-,-,0:20000|-,-,0:20000,-,-,0:20000,-,0:20000</pattern>
+            <pattern group="A">-,-,0:600,-,-,-,0:600,-</pattern>
+            <pattern group="B">-,-,0:600,-,-,-,0:600,-|-,-,0:600,-,-,-,-,0:600|-,-,0:600,-,-,0:600,-,0:600</pattern>
           </patternEngine>
         </pattern>
         <pattern>
@@ -187,8 +188,8 @@
             <patternString><random list="A1,A2,A1,A3|A1,A2,A1,A3,A1,A2,A1,A4"/></patternString>
             <noteProbability>70</noteProbability>
             <legatoProbability>0</legatoProbability>
-            <minVelocity>15000</minVelocity>
-            <maxVelocity>28000</maxVelocity>
+            <minVelocity>450</minVelocity>
+            <maxVelocity>850</maxVelocity>
             <minActiveTicks>5</minActiveTicks>
             <maxActiveTicks>11</maxActiveTicks>
             <offsets>0</offsets>
@@ -206,8 +207,8 @@
             <patternString><random list="A1,A2,A1,A3|A1,A2,A1,A3,A1,A2,A1,A4"/></patternString>
             <noteProbability>70</noteProbability>
             <legatoProbability>0</legatoProbability>
-            <minVelocity>15000</minVelocity>
-            <maxVelocity>28000</maxVelocity>
+            <minVelocity>450</minVelocity>
+            <maxVelocity>850</maxVelocity>
             <minActiveTicks>5</minActiveTicks>
             <maxActiveTicks>11</maxActiveTicks>
             <offsets>0</offsets>
@@ -225,8 +226,8 @@
             <patternString><random list="A1,A2,A1,A3|A1,A2,A1,A3,A1,A2,A1,A4"/></patternString>
             <noteProbability>60</noteProbability>
             <legatoProbability>0</legatoProbability>
-            <minVelocity>20000</minVelocity>
-            <maxVelocity>28000</maxVelocity>
+            <minVelocity>600</minVelocity>
+            <maxVelocity>850</maxVelocity>
             <minActiveTicks>5</minActiveTicks>
             <maxActiveTicks>10</maxActiveTicks>
             <offsets>0</offsets>
@@ -245,8 +246,8 @@
             <patternString><random list="A1,A2,A1,A3|A1,A2,A1,A3,A1,A2,A1,A4"/></patternString>
             <noteProbability>60</noteProbability>
             <legatoProbability>0</legatoProbability>
-            <minVelocity>20000</minVelocity>
-            <maxVelocity>28000</maxVelocity>
+            <minVelocity>600</minVelocity>
+            <maxVelocity>850</maxVelocity>
             <minActiveTicks>6</minActiveTicks>
             <maxActiveTicks>11</maxActiveTicks>
             <offsets>0,2,2,2</offsets>
@@ -265,8 +266,8 @@
             <patternString><random list="A1,A2,A1,A3|A1,A2,A1,A3,A1,A2,A1,A4"/></patternString>
             <noteProbability>70</noteProbability>
             <legatoProbability>0</legatoProbability>
-            <minVelocity>20000</minVelocity>
-            <maxVelocity>32767</maxVelocity>
+            <minVelocity>600</minVelocity>
+            <maxVelocity>1000</maxVelocity>
             <minActiveTicks>6</minActiveTicks>
             <maxActiveTicks>13</maxActiveTicks>
             <offsets>0,0,0,0,0,2,3,3,3,3,3,5</offsets>
@@ -284,8 +285,8 @@
             <patternString><random list="A1,A2,A1,A3|A1,A2,A1,A3,A1,A2,A1,A4"/></patternString>
             <noteProbability>70</noteProbability>
             <legatoProbability>0</legatoProbability>
-            <minVelocity>20000</minVelocity>
-            <maxVelocity>28000</maxVelocity>
+            <minVelocity>600</minVelocity>
+            <maxVelocity>850</maxVelocity>
             <minActiveTicks>6</minActiveTicks>
             <maxActiveTicks>13</maxActiveTicks>
             <offsets>0</offsets>
@@ -303,8 +304,8 @@
             <patternString><random list="A1,A2,A1,A3|A1,A2,A1,A3,A1,A2,A1,A4"/></patternString>
             <noteProbability>70</noteProbability>
             <legatoProbability>0</legatoProbability>
-            <minVelocity>20000</minVelocity>
-            <maxVelocity>28000</maxVelocity>
+            <minVelocity>600</minVelocity>
+            <maxVelocity>850</maxVelocity>
             <minActiveTicks>6</minActiveTicks>
             <maxActiveTicks>13</maxActiveTicks>
             <offsets>0</offsets>
@@ -331,8 +332,8 @@
             <patternString><random list="A1,A2,A1,A3|A1,A2,A1,A3,A1,A2,A1,B1"/></patternString>
             <noteProbability>60</noteProbability>
             <legatoProbability>0</legatoProbability>
-            <minVelocity>18000</minVelocity>
-            <maxVelocity>24000</maxVelocity>
+            <minVelocity>550</minVelocity>
+            <maxVelocity>750</maxVelocity>
             <minActiveTicks>7</minActiveTicks>
             <maxActiveTicks>12</maxActiveTicks>
             <offsets>0,0,1,1,1,1,1,2,2,2,2</offsets>
@@ -351,8 +352,8 @@
             <patternString><random list="A1,A2,A1,A3|A1,A2,A1,A3,A1,A2,A1,B1"/></patternString>
             <noteProbability>60</noteProbability>
             <legatoProbability>0</legatoProbability>
-            <minVelocity>12000</minVelocity>
-            <maxVelocity>20000</maxVelocity>
+            <minVelocity>350</minVelocity>
+            <maxVelocity>600</maxVelocity>
             <minActiveTicks>9</minActiveTicks>
             <maxActiveTicks>14</maxActiveTicks>
             <offsets>0,1</offsets>
@@ -396,6 +397,7 @@
     <!-- uncomment the following line if you want to write all generated songs as MIDI files in the subdirectory "midifiles" -->
     <!-- <midiFilename>midifiles/SoundHelix-Percussion_-_${safeSongName}.mid</midiFilename> -->
     <device name="device1" clockSynchronization="true">Microsoft GS Wavetable Synth,Microsoft GS Wavetable SW Synth,Gervill,Java Sound Synthesizer</device>
+    <!-- <synchronizationDevice waitForStart="true">timingport</synchronizationDevice> -->
     <map instrument="percussion" device="device1" channel="10" />
   </player>
 </SoundHelix>

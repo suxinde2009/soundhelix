@@ -10,6 +10,11 @@ Change log
 
 0.7u:
 
+    - The MidiPlayer now supports receiving synchronization from an external MIDI device using the "synchronizationDevice" tag.
+      The synchronization device can supply MIDI timing ticks for remote-controlling SoundHelix' BPM speed. It can also provide
+      START/CONTINUE and STOP messages for starting/stopping playback remotely. SoundHelix will wait for a START message if the
+      "waitForStart" attribute is set to true, otherwise it will start playing automatically as before.
+
     - Added support for setting the maximum velocity using the "maxVelocity" tag in the "structure" tag (defaults to 32767 for
       backwards compatibility). This sets the default note velocity if no velocity is provided as well as the scaling factor when
       converting SoundHelix velocities to MIDI velocities. For example, instead of the (somewhat cumbersome) maximum of 32767,

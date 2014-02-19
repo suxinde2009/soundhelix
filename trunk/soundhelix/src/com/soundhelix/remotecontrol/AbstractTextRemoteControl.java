@@ -55,6 +55,11 @@ public abstract class AbstractTextRemoteControl implements TextRemoteControl {
      */
     
     private void handleCommand(String line, boolean hasExitPermission) {
+        if (songContext == null) {
+            writeLine("Song context not initialized yet");
+            return;
+        }
+        
         Harmony harmony = songContext.getHarmony();
         Player player = songContext.getPlayer();
         

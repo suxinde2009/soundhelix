@@ -132,6 +132,10 @@ public class SongContext {
      */
     
     public Object getAttribute(String name) {
+        if (attributeMap == null) {
+            return null;
+        }
+        
         return getAttributeMap().get(name);
     }
 
@@ -155,6 +159,10 @@ public class SongContext {
      */
     
     public boolean hasAttribute(String name) {
+        if (attributeMap == null) {
+            return false;
+        }
+        
         return getAttributeMap().containsKey(name);
     }
 
@@ -165,6 +173,10 @@ public class SongContext {
      */
     
     public void removeAttribute(String name) {
+        if (attributeMap == null) {
+            return;
+        }
+
         getAttributeMap().remove(name);
     }
 

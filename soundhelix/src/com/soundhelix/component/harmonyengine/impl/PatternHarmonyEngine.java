@@ -1,8 +1,10 @@
 package com.soundhelix.component.harmonyengine.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import javax.xml.xpath.XPathException;
 
@@ -28,7 +30,7 @@ import com.soundhelix.util.XMLUtils;
  * beats" and could result in the chord sequence "Am/4,F/4,G/4,F/4" (given suitable random tables). Normally, each chord pattern is an individual
  * chord section. A pattern can be split into two or more chord sections by using "+" signs directly before a chord/length combination (e.g.,
  * "Am/4,F/4,G/4,C/4,+Am/4,F/4,G/4,Em/4").
- *
+ * 
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
@@ -61,15 +63,15 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
     /**
      * Constructor.
      */
-    
+
     public PatternHarmonyEngine() {
         super();
     }
-    
+
     @Override
     public Harmony render(final SongContext songContext) {
         parsePattern(songContext);
-        
+
         return new Harmony() {
             @Override
             public Chord getChord(int tick) {
@@ -97,18 +99,34 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
                     return 0;
                 }
             }
+
+            @Override
+            public Set<String> getTags(int tick) {
+                return Collections.emptySet();
+            }
+
+            @Override
+            public int getTagTicks(int tick) {
+                if (tick >= 0 && tick < songContext.getStructure().getTicks()) {
+                    return songContext.getStructure().getTicks() - tick;
+                } else {
+                    return 0;
+                }
+            }
+
         };
     }
-        
+
     /**
      * Parses the chord pattern.
      * 
-     * @param songContext the song context
+     * @param songContext
+     *            the song context
      */
 
     private void parsePattern(SongContext songContext) {
         Structure structure = songContext.getStructure();
-        
+
         int ticks = structure.getTicks();
 
         chords = new Chord[ticks];
@@ -193,7 +211,8 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
     /**
      * Merges all adjacent equal chords into one chord.
      * 
-     * @param songContext the song context
+     * @param songContext
+     *            the song context
      */
 
     private void mergeAdjacentChords(SongContext songContext) {
@@ -235,7 +254,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 
     /**
      * Creates a pattern that can be parsed using parsePattern().
-     *
+     * 
      * @return a pattern
      */
 
@@ -313,10 +332,9 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
                             // try again
                             return createPattern();
                         }
-                    } while (Chord.parseChord(chord, crossoverPitch).equalsNormalized(Chord.parseChord(
-                            prevChord, crossoverPitch)) || i == count - 1 && chord.equals(firstChord)
-                            || notrefnum >= 0 && Chord.parseChord(chord, crossoverPitch).equalsNormalized(
-                                Chord.parseChord(chordList.get(notrefnum), crossoverPitch)));
+                    } while (Chord.parseChord(chord, crossoverPitch).equalsNormalized(Chord.parseChord(prevChord, crossoverPitch)) || i == count - 1
+                            && chord.equals(firstChord) || notrefnum >= 0
+                            && Chord.parseChord(chord, crossoverPitch).equalsNormalized(Chord.parseChord(chordList.get(notrefnum), crossoverPitch)));
                 } else {
                     // we have a note, take the note (include 'm' suffix, if present)
                     chord = spec[0];

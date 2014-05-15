@@ -1,5 +1,7 @@
 package com.soundhelix.misc;
 
+import java.util.Set;
+
 /**
  * Represents a harmony. A harmony defines the chord sections and the chords to use for every tick. Instances of this class must consistently return
  * their results.
@@ -21,6 +23,17 @@ public interface Harmony {
     Chord getChord(int tick);
 
     /**
+     * Returns the set of tag for the given tick. Within the valid tick interval this must be non-null. If a tick doesn't define any tags, an empty
+     * must be returned.
+     *
+     * @param tick the tick
+     *
+     * @return the set of tags
+     */
+
+    Set<String> getTags(int tick);
+
+    /**
      * Returns the number of ticks the current chord will be played from the given tick position before the chord will change or the song will end
      * (whichever happens first). This requirement is strict, i.e., the chord must not change before the returned number of ticks and it must change
      * directly afterwards or the song must end. For a valid tick parameter, the return value must always be positive.
@@ -31,6 +44,18 @@ public interface Harmony {
      */
 
     int getChordTicks(int tick);
+
+    /**
+     * Returns the number of ticks the current set of tags stays constant until the set of tags changes or the song will end (whichever happens
+     * first). This requirement is strict, i.e., the set of tags must not change before the returned number of ticks and it must change
+     * directly afterwards or the song must end. For a valid tick parameter, the return value must always be positive.
+     *
+     * @param tick the tick
+     *
+     * @return the number of ticks before the next change of tags
+     */
+
+    int getTagTicks(int tick);
 
     /**
      * Returns the number of ticks the current chord section will be played from the given tick position before the next chord section will begin or

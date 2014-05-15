@@ -131,6 +131,12 @@ public class MidiPlayer extends AbstractPlayer {
     /** True if playing has been aborted. */
     private boolean isAborted;
 
+    /** The minimum window size for MIDI sync BPM calculation. */
+    private int minWindowSize;
+    
+    /** The maximum window size for MIDI sync BPM calculation. */
+    private int maxWindowSize;
+    
     /** The current tick number. */
     private int currentTick;
 
@@ -152,6 +158,7 @@ public class MidiPlayer extends AbstractPlayer {
     /** The song context (only valid while playing). */
     private SongContext songContext;
 
+    /** If true, then the player will wait before playing until the first BPM calculation has been done. */
     private boolean waitForStart = false;
     
     private boolean running = false;
@@ -453,7 +460,7 @@ public class MidiPlayer extends AbstractPlayer {
             
             if (syncDevice != null) {
                 if (waitForStart) {
-                    logger.debug("Waiting for first MIDI clock message");
+                    logger.info("Waiting for START MIDI message");
                     running = false;
                     
                     while (!running) {
@@ -466,8 +473,8 @@ public class MidiPlayer extends AbstractPlayer {
             resetPlayerState(arrangement);
 
             if (beforePlayWaitTicks > 0) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Waiting " + beforePlayWaitTicks + " ticks before playing");
+                if (logger.isInfoEnabled()) {
+                    logger.info("Waiting " + beforePlayWaitTicks + " ticks before playing");
                 }
 
                 // wait specified number of ticks before starting playing, sending timing ticks if configured
@@ -533,8 +540,8 @@ public class MidiPlayer extends AbstractPlayer {
             muteActiveChannels(arrangement);
 
             if (afterPlayWaitTicks > 0) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Waiting " + afterPlayWaitTicks + " ticks after playing");
+                if (logger.isInfoEnabled()) {
+                    logger.info("Waiting " + afterPlayWaitTicks + " ticks after playing");
                 }
 
                 waitTicks(referenceTime, afterPlayWaitTicks, clockTimingsPerTick, structure.getTicksPerBeat());
@@ -1516,12 +1523,31 @@ public class MidiPlayer extends AbstractPlayer {
             String syncDeviceName = XMLUtils.parseString(random, "synchronizationDevice", node);
             syncDevice = new SyncDevice(syncDeviceName);
             this.syncDevice = syncDevice;
-            boolean waitForStart = XMLUtils.parseBoolean(random, "synchronizationDevice/@waitForStart", node);
-            this.waitForStart = waitForStart;
+        } catch (Exception e) {}
+        
+        boolean waitForStart = true;
+        
+        try {
+            waitForStart = XMLUtils.parseBoolean(random, "synchronizationDevice/@waitForStart", node);
+        } catch (Exception e) {}
+
+        int minWindowSize = 24;
+        
+        try {
+            minWindowSize = XMLUtils.parseInteger(random, "synchronizationDevice/@minWindowSize", node);
+        } catch (Exception e) {}
+
+        int maxWindowSize = 24;
+
+        try {
+            maxWindowSize = XMLUtils.parseInteger(random, "synchronizationDevice/@maxWindowSize", node);
         } catch(Exception e) {}
+
+        setWaitForStart(waitForStart);
+        setMinWindowSize(minWindowSize);
+        setMaxWindowSize(maxWindowSize);
         
         beforePlayCommands = XMLUtils.parseString(random, "beforePlayCommands", node);
-
         afterPlayCommands = XMLUtils.parseString(random, "afterPlayCommands", node);
 
         setDevices(devices);
@@ -1813,6 +1839,18 @@ public class MidiPlayer extends AbstractPlayer {
         this.controllerValues = controllerValues;
     }
 
+    public void setMinWindowSize(int minWindowSize) {
+        this.minWindowSize = minWindowSize;
+    }
+
+    public void setMaxWindowSize(int maxWindowSize) {
+        this.maxWindowSize = maxWindowSize;
+    }
+
+    public void setWaitForStart(boolean waitForStart) {
+        this.waitForStart = waitForStart;
+    }
+
     /**
      * Container for a MIDI device.
      */
@@ -1917,7 +1955,7 @@ public class MidiPlayer extends AbstractPlayer {
 
                 midiDevice.open();
                 transmitter = midiDevice.getTransmitter();
-                transmitter.setReceiver(new MidiClockReceiver());
+                transmitter.setReceiver(new MidiClockReceiver(minWindowSize, maxWindowSize));
                 logger.debug("Successfully opened MIDI sync device (using \"" + midiDevice.getDeviceInfo().getName() + "\")");
             } catch (Exception e) {
                 throw new RuntimeException("Error opening MIDI device", e);
@@ -2086,16 +2124,41 @@ public class MidiPlayer extends AbstractPlayer {
         private boolean firstTick = true;
         
         /** The last time a tick was received. */
-        long lastTime;
+        private long lastTime;
         
         /** The sum of the time differences of the queue. */
-        long sum = 0;
+        private long sum;
         
         /** The queue of time differences. */
-        Queue<Long> timeQueue = new ArrayBlockingQueue<Long>(24);
+        private final Queue<Long> timeQueue;
 
         /** The number of ticks received so far. */
-        int count = 0;
+        private int count;
+
+        /** The minimum window size for BPM calculation. */
+        private int minWindowSize = 12;
+
+        /** The maximum window size for BPM calculation. */
+        private int maxWindowSize = 24;
+        
+        public MidiClockReceiver(int minWindowSize, int maxWindowSize) {
+            if (minWindowSize < 1) {
+                throw new IllegalArgumentException("minWindowSize must be >= 1");
+            }
+
+            if (maxWindowSize < 1) {
+                throw new IllegalArgumentException("maxWindowSize must be >= 1");
+            }
+
+            if (maxWindowSize < minWindowSize) {
+                throw new IllegalArgumentException("maxWindowSize must be >= minWindowSize");
+            }
+            
+            this.minWindowSize = minWindowSize;
+            this.maxWindowSize = maxWindowSize;
+            timeQueue = new ArrayBlockingQueue<Long>(maxWindowSize);
+        }
+        
         
         @Override
         public void send(MidiMessage message, long timeStamp) {
@@ -2106,17 +2169,18 @@ public class MidiPlayer extends AbstractPlayer {
                 if (!firstTick) {
                     long diff = time - lastTime;
 
-                    if (timeQueue.size() >= 24) {
+                    if (timeQueue.size() >= maxWindowSize) {
                         // keep queue size constant
-                        long oldDiff = timeQueue.remove();
-                        sum -= oldDiff;
+                        sum -= timeQueue.remove();
                     }
 
                     timeQueue.add(diff);
                     sum += diff;
                     
-                    long milliBPM = 60000000000000L / 24L * timeQueue.size() / sum;
-                    setMilliBPM((int) milliBPM);
+                    if (timeQueue.size() >= minWindowSize) {                    
+                        long milliBPM = 60000000000000L / 24L * timeQueue.size() / sum;
+                        setMilliBPM((int) milliBPM);
+                    }
                 } else {
                     firstTick = false;
                 }
@@ -2124,7 +2188,7 @@ public class MidiPlayer extends AbstractPlayer {
                 lastTime = time;
                 count++;
                 
-                if ((count % 24) == 0) {
+                if ((count % maxWindowSize) == 0) {
                     logger.trace("Milli BPM from MIDI sync: " + milliBPM);
                 }
             } else if (status == ShortMessage.START || status == ShortMessage.CONTINUE) {

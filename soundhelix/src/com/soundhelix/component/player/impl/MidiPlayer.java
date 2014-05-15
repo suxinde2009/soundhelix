@@ -441,8 +441,8 @@ public class MidiPlayer extends AbstractPlayer {
 
             int clockTimingsPerTick = useClockSynchronization ? CLOCK_SYNCHRONIZATION_TICKS_PER_BEAT / structure.getTicksPerBeat() : 1;
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("Song length: " + ticks + " ticks (" + (ticks * 60000L / (structure.getTicksPerBeat() * milliBPM)) + " seconds @ "
+            if (logger.isInfoEnabled()) {
+                logger.info("Song length: " + ticks + " ticks (" + (ticks * 60000L / (structure.getTicksPerBeat() * milliBPM)) + " seconds @ "
                         + (milliBPM / 1000d) + " BPM)");
             }
 
@@ -453,7 +453,7 @@ public class MidiPlayer extends AbstractPlayer {
             
             if (syncDevice != null) {
                 if (waitForStart) {
-                    System.out.println("Waiting");
+                    logger.debug("Waiting for first MIDI clock message");
                     running = false;
                     
                     while (!running) {
@@ -877,7 +877,7 @@ public class MidiPlayer extends AbstractPlayer {
         Structure structure = songContext.getStructure();
 
         if (tick == 0 || songContext.getHarmony().getChordSectionTicks(tick - 1) == 1) {
-            logger.debug(String.format("Tick: %5d   Chord section: %3d   Seconds: %4d   Progress: %5.1f %%", tick,
+            logger.info(String.format("Tick: %5d   Chord section: %3d   Seconds: %4d   Progress: %5.1f %%", tick,
                     HarmonyUtils.getChordSectionNumber(songContext, tick), tick * 60 * 1000
                             / (structure.getTicksPerBeat() * milliBPM),
                     (double) tick * 100 / structure.getTicks()));
@@ -2128,13 +2128,13 @@ public class MidiPlayer extends AbstractPlayer {
                     logger.trace("Milli BPM from MIDI sync: " + milliBPM);
                 }
             } else if (status == ShortMessage.START || status == ShortMessage.CONTINUE) {
-                System.out.println("*** RECEIVED start/continue");
+                logger.debug("Received START/CONTINUE MIDI message");
                 firstTick = true;
                 timeQueue.clear();
                 running = true;
                 sum = 0;
             } else if (message.getStatus() == ShortMessage.STOP) {
-                System.out.println("*** RECEIVED stop");
+                logger.debug("Received STOP MIDI message");
                 running = false;
             }
         }

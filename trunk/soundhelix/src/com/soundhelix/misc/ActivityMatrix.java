@@ -54,7 +54,7 @@ public class ActivityMatrix implements Iterable<ActivityVector> {
      */
 
     public void dump(SongContext songContext) {
-        if (!LOGGER.isDebugEnabled()) {
+        if (!LOGGER.isInfoEnabled()) {
             return;
         }
 
@@ -141,6 +141,6 @@ public class ActivityMatrix implements Iterable<ActivityVector> {
             }
         }
 
-        LOGGER.debug(sb.toString());
+        LOGGER.info(sb.toString());
     }    
 }

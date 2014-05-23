@@ -8,12 +8,16 @@ Change log
 ----------
 
 
-0.7u:
+0.7: 2014-05-24
 
-    - The MidiPlayer now supports receiving synchronization from an external MIDI device using the "synchronizationDevice" tag.
-      The synchronization device can supply MIDI timing ticks for remote-controlling SoundHelix' BPM speed. It can also provide
-      START/CONTINUE and STOP messages for starting/stopping playback remotely. SoundHelix will wait for a START message if the
-      "waitForStart" attribute is set to true, otherwise it will start playing automatically as before.
+    - Added support for function evaluation in pattern strings. The first function added is E(pulses, steps, on-fragment,
+      off-fragment), which expands to the Euclidean rhythm given by the given number of pulses and steps. See the Basics documentation
+      for details about pattern function evaluation.
+
+    - The MidiPlayer now supports receiving synchronization messages from an external MIDI device using the
+      "synchronizationDevice" tag. The synchronization device can supply MIDI timing ticks for remote-controlling SoundHelix'
+      BPM speed. It can also provide START/CONTINUE and STOP messages for starting/stopping playback remotely. SoundHelix will
+      wait for a START message if the "waitForStart" attribute is set to true, otherwise it will start playing automatically as before.
 
     - Added support for setting the maximum velocity using the "maxVelocity" tag in the "structure" tag (defaults to 32767 for
       backwards compatibility). This sets the default note velocity if no velocity is provided as well as the scaling factor when
@@ -23,9 +27,12 @@ Change log
     - Added support for using version ranges in the "version" tag. Now a comma-separated list of version specifications can
       be provided (each either "<version>", "<version>+" or "<version1>-<version2>" for application version checks in XML files.
 
+      Improved percussion example to use Euclidean rhythms.
+    
+    - Improved logging. Now the default log level is INFO, where the most important details (song title, etc.) are logged.
 
     - Removed obsolete classes RandomSequenceEngine and RandomPatternSequenceEngine.
-      
+    
 
 0.6: 2013-04-17
 

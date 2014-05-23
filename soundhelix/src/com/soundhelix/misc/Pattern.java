@@ -131,8 +131,7 @@ public class Pattern implements Iterable<PatternEntry> {
      */
 
     public static Pattern parseString(SongContext songContext, String patternString, String wildcardString, int currentTPB, int targetTPB) {
-        patternString = evaluateFunctions(patternString);
-        patternString = expandPatternString(patternString, ',');
+        patternString = expand(patternString);
 
         if (patternString == null || patternString.equals("")) {
             return null;
@@ -332,7 +331,7 @@ public class Pattern implements Iterable<PatternEntry> {
      */
 
     public static int getStringTicks(String patternString) {
-        patternString = expandPatternString(patternString, ',');
+        patternString = expand(patternString);
 
         String[] p = patternString.split(",");
         int len = p.length;
@@ -348,6 +347,20 @@ public class Pattern implements Iterable<PatternEntry> {
         }
 
         return ticks;
+    }
+
+    /**
+     * Expands the pattern string.
+     * 
+     * @param patternString
+     *            the pattern string
+     * @return the expanded pattern strings
+     */
+
+    private static String expand(String patternString) {
+        patternString = evaluateFunctions(patternString);
+        patternString = expandPatternString(patternString, ',');
+        return patternString;
     }
 
     /**

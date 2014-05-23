@@ -92,6 +92,8 @@
         </jar>
     </target>
 
+    <target name="all" depends="jar" description="generate the JAR"/>
+
     <target name="javadoc" depends="-createBuildConstants" description="generate javadoc">
         <delete dir="${javadoc}"/>
         <condition property="javadoc-version" value="${version} (r${revision})" else="${version}">

@@ -392,7 +392,7 @@ public class MidiPlayer extends AbstractPlayer {
         for (String name : deviceNames) {
             List<MidiDevice.Info> deviceInfos = map.get(name);
 
-            if (infos != null) {
+            if (deviceInfos != null) {
                 for (MidiDevice.Info info : deviceInfos) {
                     // device was found, try to create an instance
 

@@ -8,6 +8,14 @@ Change log
 ----------
 
 
+0.7.1u:
+
+    - The option "--show-midi-devices" (alias "-m") now also shows devices with MIDI IN in additon to devices with MIDI OUT.
+
+    - Fixed a stupid bug that made the MIDI device detection fail if the first MIDI device in the <device> tag of the MidiPlayer is
+      not available in the system. A workaround is to put just the available MIDI device in the list.
+     
+
 0.7: 2014-05-24
 
     - Added support for function evaluation in pattern strings. The first function added is E(pulses, steps, on-fragment,

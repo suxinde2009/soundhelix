@@ -1,1 +1,1 @@
-version=1.0u
+version=0.7.1u

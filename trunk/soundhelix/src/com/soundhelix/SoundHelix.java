@@ -318,18 +318,56 @@ public class SoundHelix implements Runnable {
      */
 
     private static void showMidiDevices() {
-        System.out.println("Available MIDI devices with MIDI IN:");
+        System.out.println("\nAvailable MIDI devices with MIDI IN (can be used for playback):");
         System.out.println();
 
+        String[] array = getMidiDevices(true);
+        
+        if (array.length > 0) {
+            int num = 0;
+            for (String device : array) {
+                System.out.println("Device " + (++num) + ": \"" + device + "\"");
+            }
+        } else {
+            System.out.println("None");
+        }
+        
+        System.out.println("\nAvailable MIDI devices with MIDI OUT (can be used for remote-controlling SoundHelix):");
+        System.out.println();
+        array = getMidiDevices(false);
+
+        if (array.length > 0) {
+            int num = 0;
+            for (String device : array) {
+                System.out.println("Device " + (++num) + ": \"" + device + "\"");
+            }
+        } else  {
+            System.out.println("None");
+        }
+            
+    }
+
+    /**
+     * Gets the available MIDI device names. If midiIn is true, devices with MIDI IN are returned, otherwise
+     * devices with MIDI OUT are returned. The device names are returned as a sorted string array.
+     * 
+     * @param midiIn if true, MIDI in is returned, otherwise MIDI OUT is returned
+     * 
+     * @return the list of MIDI devices
+     */
+
+    private static String[] getMidiDevices(boolean midiIn) {
         List<String> list = new ArrayList<String>();
         MidiDevice.Info[] infos = MidiSystem.getMidiDeviceInfo();
 
         for (MidiDevice.Info info : infos) {
             try {
                 MidiDevice device = MidiSystem.getMidiDevice(info);
-
-                if (device != null && device.getReceiver() != null) {
-                    list.add(info.getName());
+                
+                if (device != null) {
+                    if (midiIn && device.getReceiver() != null || !midiIn && device.getTransmitter() != null) {
+                        list.add(info.getName());
+                    }
                 }
             } catch (Exception e) {
             }
@@ -337,13 +375,9 @@ public class SoundHelix implements Runnable {
 
         String[] array = new String[list.size()];
         Arrays.sort(list.toArray(array));
-
-        int num = 0;
-        for (String device : array) {
-            System.out.println("Device " + (++num) + ": \"" + device + "\"");
-        }
+        return array;
     }
-
+    
     /**
      * Implements a simple shutdown hook that can be run when the JVM exits. The hook currently mutes all channels if the current player is a MIDI
      * player. Note that shutdown hooks are only run when the JVM exits normally, e.g., by pressing CTRL+C, calls to System.exit() or uncaught

@@ -8,7 +8,7 @@ Change log
 ----------
 
 
-0.7.1u:
+0.7.1: 2014-05-31
 
     - The option "--show-midi-devices" (alias "-m") now also shows devices with MIDI IN in additon to devices with MIDI OUT.
 

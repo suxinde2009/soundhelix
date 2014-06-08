@@ -4,10 +4,8 @@ import java.util.Arrays;
 
 /**
  * Implements the Bjorklund algorithm (due to E. Bjorklund), which is the basis for generating Euclidean rhythms, as mentioned in the paper
- * "The Euclidean Algorithm Generates Traditional Musical Rhythms" by Godfried Toussaint. It generates all mentioned patterns in the paper correctly.
- * It may look like it does not generate E(5, 16) correctly, but actually this is a mistake in the paper (the mentioned pattern in the paper contains
- * 17 steps instead of 16; it ends with an additional pause). The correct pattern for E(5, 16) is "x..x..x..x..x...". The original paper can be found
- * at http://archive.bridgesmathart.org/2005/bridges2005-47.pdf.
+ * "The Euclidean Algorithm Generates Traditional Musical Rhythms" by Godfried Toussaint. The original paper can be found at
+ * http://archive.bridgesmathart.org/2005/bridges2005-47.pdf.
  * 
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
@@ -135,6 +133,7 @@ public class EuclideanRhythmGenerator {
         test(5, 9, "x.x.x.x.x");
         test(5, 11, "x.x.x.x.x..");
         test(5, 12, "x..x.x..x.x.");
+        // E(5,16): corrected expected result from the paper (it was missing the last dot)
         test(5, 16, "x..x..x..x..x...");
         test(7, 8, "x.xxxxxx");
         test(7, 12, "x.xx.x.xx.x.");

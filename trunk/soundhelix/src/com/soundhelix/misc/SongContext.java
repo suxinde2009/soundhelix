@@ -6,8 +6,8 @@ import java.util.Map;
 import com.soundhelix.component.player.Player;
 
 /**
- * Defines the context of a song. During song generation, the context is enriched with information.
- * Each of the fields can only be set to at most once.
+ * Defines the context of a song. During song generation, the context is enriched with information. Each of the fields can only be set to at most
+ * once.
  * 
  * Custom attributes can be set in the song context to pass custom data along between components.
  * 
@@ -32,13 +32,13 @@ public class SongContext {
 
     /** The arrangement. */
     private Arrangement arrangement;
-    
+
     /** The player. */
     private Player player;
 
     /** The attribute map (initialized lazily). */
     private Map<String, Object> attributeMap;
-    
+
     public Long getRandomSeed() {
         return randomSeed;
     }
@@ -47,7 +47,7 @@ public class SongContext {
         if (this.randomSeed != null) {
             throw new IllegalArgumentException("randomSeed already set");
         }
-        
+
         this.randomSeed = randomSeed;
     }
 
@@ -59,7 +59,7 @@ public class SongContext {
         if (this.songName != null) {
             throw new IllegalArgumentException("songName already set");
         }
-        
+
         this.songName = songName;
     }
 
@@ -107,7 +107,7 @@ public class SongContext {
         if (this.arrangement != null) {
             throw new IllegalArgumentException("arrangement already set");
         }
-        
+
         this.arrangement = arrangement;
     }
 
@@ -122,20 +122,20 @@ public class SongContext {
 
         this.player = player;
     }
-    
+
     /**
      * Returns the attribute with the given name. If the attribute doesn't exist or it's value is null, null is returned.
      * 
      * @param name the attribute name
-     *
+     * 
      * @return the attribute value
      */
-    
+
     public Object getAttribute(String name) {
         if (attributeMap == null) {
             return null;
         }
-        
+
         return getAttributeMap().get(name);
     }
 
@@ -145,7 +145,7 @@ public class SongContext {
      * @param name the attribute name
      * @param value the attribute value
      */
-    
+
     public void setAttribute(String name, Object value) {
         getAttributeMap().put(name, value);
     }
@@ -154,15 +154,15 @@ public class SongContext {
      * Checks if the given attribute has been set. Can be used to distinguish null values from non-existing values.
      * 
      * @param name the attribute name
-     *
+     * 
      * @return true if the attribute is set, false otherwise
      */
-    
+
     public boolean hasAttribute(String name) {
         if (attributeMap == null) {
             return false;
         }
-        
+
         return getAttributeMap().containsKey(name);
     }
 
@@ -171,7 +171,7 @@ public class SongContext {
      * 
      * @param name the attribute name
      */
-    
+
     public void removeAttribute(String name) {
         if (attributeMap == null) {
             return;
@@ -185,12 +185,12 @@ public class SongContext {
      * 
      * @return the attribute map
      */
-    
+
     private Map<String, Object> getAttributeMap() {
         if (attributeMap == null) {
             attributeMap = new HashMap<String, Object>();
         }
-        
+
         return attributeMap;
-    }    
+    }
 }

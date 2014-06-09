@@ -1,4 +1,3 @@
-
 package com.soundhelix.component.lfo.impl;
 
 import javax.xml.xpath.XPathException;

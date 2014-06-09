@@ -45,7 +45,7 @@ public class LFOSequenceLFO extends AbstractLFO {
     public double getRawTickValue(int tick) {
         return lfoSequence.getValue(tick);
     }
-    
+
     @Override
     public void configure(SongContext songContext, Node node) throws XPathException {
         // this is an internal LFO, it cannot be XML-configured

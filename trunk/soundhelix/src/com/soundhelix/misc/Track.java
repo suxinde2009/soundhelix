@@ -37,13 +37,13 @@ public class Track {
 
     /** The map that maps LFO sequence names to LFO sequences. */
     private Map<String, LFOSequence> lfoSequenceMap = new HashMap<String, LFOSequence>();
-    
+
     /**
      * Constructor.
      * 
      * @param type the type
      */
-    
+
     public Track(TrackType type) {
         this.type = type;
     }
@@ -74,11 +74,11 @@ public class Track {
      * @param name the LFO sequence name.
      * @return the LFO sequence or null
      */
-    
+
     public LFOSequence getLFOSequence(String name) {
         return lfoSequenceMap.get(name);
-    }    
-    
+    }
+
     /**
      * Returns the number of sequences this track contains.
      * 

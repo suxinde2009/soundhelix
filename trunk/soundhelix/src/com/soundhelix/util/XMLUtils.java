@@ -18,7 +18,7 @@ import com.soundhelix.misc.SongContext;
 
 /**
  * Implements some static methods for parsing XML data.
- *
+ * 
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
@@ -31,26 +31,27 @@ public final class XMLUtils {
 
     /** The ThreadLocal for XPath instances. Makes sure that every thread uses its own XPath instance, as XPath instances are not thread-safe. */
     private static final ThreadLocal<XPath> XPATH = new ThreadLocal<XPath>() {
-        @Override protected XPath initialValue() {
+        @Override
+        protected XPath initialValue() {
             return XPathFactory.newInstance().newXPath();
         }
     };
-    
+
     /**
      * Private constructor.
      */
 
     private XMLUtils() {
     }
-    
+
     /**
      * Returns the node found at the given path.
-     *
+     * 
      * @param path the XPath expression relative to the node
      * @param node the node
-     *
+     * 
      * @return the node list
-     *
+     * 
      * @throws XPathExpressionException in case of an XPath expression problem
      */
 
@@ -60,12 +61,12 @@ public final class XMLUtils {
 
     /**
      * Returns the node list found at the given path.
-     *
+     * 
      * @param path the XPath expression relative to the node
      * @param node the node
-     *
+     * 
      * @return the node list
-     *
+     * 
      * @throws XPathExpressionException in case of an XPath expression problem
      */
 
@@ -75,9 +76,9 @@ public final class XMLUtils {
 
     /**
      * Returns the first child of the given node that is an element node. If such node doesn't exist, null is returned.
-     *
+     * 
      * @param node the node
-     *
+     * 
      * @return the first element child node
      */
 
@@ -88,7 +89,7 @@ public final class XMLUtils {
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 return node;
             }
-            
+
             node = node.getNextSibling();
         }
 
@@ -97,11 +98,11 @@ public final class XMLUtils {
 
     /**
      * Searches for the element pointed to by path and tries to parse it as an integer.
-     *
+     * 
      * @param random the random generator
      * @param path the XPath expression relative to the node
      * @param node the node
-     *
+     * 
      * @return the integer
      */
 
@@ -122,21 +123,20 @@ public final class XMLUtils {
     /**
      * Tries to parse the text content of the given node as an integer. If it is an integer, the integer is returned. Otherwise, the node is checked
      * for valid subelements, which are then evaluated.
-     *
+     * 
      * @param random the random generator
      * @param node the node to parse
-     *
+     * 
      * @return the integer
      */
 
     public static int parseInteger(Random random, Node node) {
         try {
             return Integer.parseInt(node.getTextContent());
-        } catch (RuntimeException e) {
-        }
+        } catch (RuntimeException e) {}
 
         XPath xpath = XPATH.get();
-        
+
         Node n = getFirstElementChild(node);
 
         if (n.getNodeName().equals("random")) {
@@ -158,8 +158,7 @@ public final class XMLUtils {
 
                         try {
                             step = Integer.parseInt(xpath.evaluate("attribute::step", n));
-                        } catch (NumberFormatException e) {
-                        }
+                        } catch (NumberFormatException e) {}
 
                         return RandomUtils.getUniformInteger(random, min, max, step);
                     } else if (type.equals("normal")) {
@@ -190,11 +189,11 @@ public final class XMLUtils {
 
     /**
      * Searches for the element pointed to by path and tries to parse it as an integer.
-     *
+     * 
      * @param random the random generator
      * @param path the XPath expression relative to the node
      * @param node the node
-     *
+     * 
      * @return the integer
      */
 
@@ -215,10 +214,10 @@ public final class XMLUtils {
     /**
      * Tries to parse the text content of the given node as an integer. If it is an integer, the integer is returned. Otherwise, the node is checked
      * for valid subelements, which are then evaluated.
-     *
+     * 
      * @param random the random generator
      * @param node the node to parse
-     *
+     * 
      * @return the integer
      */
 
@@ -228,11 +227,11 @@ public final class XMLUtils {
 
     /**
      * Searches for the element pointed to by path and tries to parse it as a boolean.
-     *
+     * 
      * @param random the random generator
      * @param path the XPath expression relative to the node
      * @param node the node
-     *
+     * 
      * @return the boolean
      */
 
@@ -253,10 +252,10 @@ public final class XMLUtils {
     /**
      * Tries to parse the text content of the given node as a boolean. If it is a boolean, the boolean. Otherwise, the node is checked for valid
      * subelements, which are then evaluated.
-     *
+     * 
      * @param random the random generator
      * @param node the node to parse
-     *
+     * 
      * @return the boolean
      */
 
@@ -287,11 +286,11 @@ public final class XMLUtils {
 
     /**
      * Searches for the element pointed to by path and tries to parse it as a string.
-     *
+     * 
      * @param random the random generator
      * @param path the XPath expression relative to the node
      * @param node the node
-     *
+     * 
      * @return the integer
      */
 
@@ -306,12 +305,12 @@ public final class XMLUtils {
 
     /**
      * Searches for the element pointed to by path and tries to parse it as a string list, split by the given separator character.
-     *
+     * 
      * @param random the random generator
      * @param path the XPath expression relative to the node
      * @param node the node
      * @param separatorChar the separator character
-     *
+     * 
      * @return the integer
      */
 
@@ -331,10 +330,10 @@ public final class XMLUtils {
 
     /**
      * Tries to parse the given node as a string.
-     *
+     * 
      * @param random the random generator
      * @param node the node
-     *
+     * 
      * @return the string (or null)
      */
 
@@ -370,11 +369,11 @@ public final class XMLUtils {
 
     /**
      * Tries to parse the given node as a string.
-     *
+     * 
      * @param random the random generator
      * @param node the node
      * @param separatorChar the separator character
-     *
+     * 
      * @return the string (or null)
      */
 
@@ -410,11 +409,11 @@ public final class XMLUtils {
 
     /**
      * Searches for the element pointed to by path and tries to parse it as an integer list.
-     *
+     * 
      * @param random the random generator
      * @param path the XPath expression relative to the node
      * @param node the node
-     *
+     * 
      * @return the integer array
      */
 
@@ -440,21 +439,21 @@ public final class XMLUtils {
     /**
      * Tries to instantiate an instance from the class defined by the node's attribute "class" by calling its nullary (empty) constructor. If the
      * given class name is not fully qualified (i.e., contains no dot), the package of the given superclass plus "." is prefixed to the class name
-     * (unless the given superclass is an interface, then the package plus ".impl." is prefixed to the class name).  The class must be a subclass of
+     * (unless the given superclass is an interface, then the package plus ".impl." is prefixed to the class name). The class must be a subclass of
      * the given class (or implement the interface) to succeed. If the class defines the interface RandomSeedable, it is random-seeded by creating a
      * random seed based on the specified random seed, the class name and the specified modifier. If the class defines the interface XMLConfigurable,
      * it is configured by calling configure() with the node as the configuration root. The given salt value can be overridden by using a "salt" or
      * "seed" attribute.
-     *
+     * 
      * @param songContext the song context
      * @param superclazz the superclass
      * @param node the node to use for configuration
      * @param parentRandomSeed the random seed origin to use (the random seed of the parent component)
      * @param salt the random salt (each instance created by the parent should use a different salt value)
      * @param <T> the type
-     *
+     * 
      * @return the instance
-     *
+     * 
      * @throws InstantiationException if the class cannot be instantiated
      * @throws XPathException in case of an XPath problem
      * @throws ClassNotFoundException if the class cannot be found
@@ -466,7 +465,7 @@ public final class XMLUtils {
         if (node == null) {
             throw new IllegalArgumentException("Node is null");
         }
-        
+
         XPath xpath = XPATH.get();
 
         String className = xpath.evaluate("attribute::class", node);
@@ -551,11 +550,11 @@ public final class XMLUtils {
 
     /**
      * Returns a derived random seed that is based on the parent random seed, the class name and the modifier.
-     *
+     * 
      * @param parentRandomSeed the parent random seed
      * @param className the class name
      * @param modifier the modifier
-     *
+     * 
      * @return the derived random seed
      */
 
@@ -566,9 +565,9 @@ public final class XMLUtils {
     /**
      * Returns the hash code the given string as a long. This method works like String.hashCode(), but uses a long internally and returns a long as
      * the result.
-     *
+     * 
      * @param str the string
-     *
+     * 
      * @return the hash code as a long
      */
 

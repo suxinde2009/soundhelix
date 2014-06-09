@@ -20,7 +20,7 @@ public abstract class AbstractPlayer implements Player {
     /**
      * Constructor.
      */
-    
+
     public AbstractPlayer() {
         logger = Logger.getLogger(this.getClass());
     }

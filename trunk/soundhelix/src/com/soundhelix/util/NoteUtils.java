@@ -13,10 +13,10 @@ import com.soundhelix.misc.Chord;
 
 public final class NoteUtils {
     /** Array of notes that are on the C/Am scale, starting with C. */
-    private static final boolean[] SCALE_TABLE = new boolean[] {true, false, true, false, true, true, false, true, false, true, false, true};
+    private static final boolean[] SCALE_TABLE = new boolean[] { true, false, true, false, true, true, false, true, false, true, false, true };
 
     /** The list of all note names, starting with C. */
-    private static String[] noteNames = {"c", "c#", "d", "d#", "e", "f", "f#", "g", "g#", "a", "a#", "b"};
+    private static String[] noteNames = { "c", "c#", "d", "d#", "e", "f", "f#", "g", "g#", "a", "a#", "b" };
 
     /** Maps note names to normalized pitches. */
     private static Map<String, Integer> h = new HashMap<String, Integer>();
@@ -31,7 +31,7 @@ public final class NoteUtils {
     /**
      * Private constructor.
      */
-    
+
     private NoteUtils() {
     }
 

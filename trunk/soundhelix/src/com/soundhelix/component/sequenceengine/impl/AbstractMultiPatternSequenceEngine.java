@@ -40,7 +40,7 @@ public abstract class AbstractMultiPatternSequenceEngine extends AbstractSequenc
     /**
      * Constructor.
      */
-    
+
     public AbstractMultiPatternSequenceEngine() {
         super();
     }

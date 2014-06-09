@@ -30,7 +30,7 @@ import com.soundhelix.util.VersionUtils;
  * Implements the main class. The main() method determines the configuration file and then waits for the next generated song and plays it. The
  * configuration parsing and generation of songs is done in a separate thread to guarantee seamless playing. The thread priority for the song
  * generator is set to a low value, the priority of the playing thread is set to a high value.
- *
+ * 
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
@@ -104,7 +104,6 @@ public class SoundHelix implements Runnable {
                 default:
             }
         }
-
 
         int count = 0;
 
@@ -276,16 +275,15 @@ public class SoundHelix implements Runnable {
 
             try {
                 Thread.sleep(1000);
-            } catch (InterruptedException e) {
-            }
+            } catch (InterruptedException e) {}
         }
     }
 
     /**
      * Removes and returns the next SongContext from the queue. This method will block until an entry is available.
-     *
+     * 
      * @return the next SongContext
-     *
+     * 
      * @throws InterruptedException if interrupted
      */
 
@@ -295,23 +293,19 @@ public class SoundHelix implements Runnable {
 
     /**
      * Parse command-line parameters and return a Getopt instance.
-     *
+     * 
      * @param args the command-line parameters
-     *
+     * 
      * @return the Getopt instance
      */
 
     private static Getopt parseParameters(String[] args) {
-        LongOpt[] longopts = new LongOpt[] {
-            new LongOpt("help", LongOpt.NO_ARGUMENT, null, 'h'),
-            new LongOpt("version", LongOpt.NO_ARGUMENT, null, 'v'),
-            new LongOpt("song-name", LongOpt.REQUIRED_ARGUMENT, null, 's'),
-            new LongOpt("show-midi-devices", LongOpt.NO_ARGUMENT, null, 'm'),
-        };
+        LongOpt[] longopts = new LongOpt[] { new LongOpt("help", LongOpt.NO_ARGUMENT, null, 'h'),
+                new LongOpt("version", LongOpt.NO_ARGUMENT, null, 'v'), new LongOpt("song-name", LongOpt.REQUIRED_ARGUMENT, null, 's'),
+                new LongOpt("show-midi-devices", LongOpt.NO_ARGUMENT, null, 'm'), };
 
         return new Getopt("SoundHelix", args, "-hvs:m", longopts);
     }
-
 
     /**
      * Prints all available MIDI devices.
@@ -322,7 +316,7 @@ public class SoundHelix implements Runnable {
         System.out.println();
 
         String[] array = getMidiDevices(true);
-        
+
         if (array.length > 0) {
             int num = 0;
             for (String device : array) {
@@ -331,7 +325,7 @@ public class SoundHelix implements Runnable {
         } else {
             System.out.println("None");
         }
-        
+
         System.out.println("\nAvailable MIDI devices with MIDI OUT (can be used for remote-controlling SoundHelix):");
         System.out.println();
         array = getMidiDevices(false);
@@ -341,15 +335,15 @@ public class SoundHelix implements Runnable {
             for (String device : array) {
                 System.out.println("Device " + (++num) + ": \"" + device + "\"");
             }
-        } else  {
+        } else {
             System.out.println("None");
         }
-            
+
     }
 
     /**
-     * Gets the available MIDI device names. If midiIn is true, devices with MIDI IN are returned, otherwise
-     * devices with MIDI OUT are returned. The device names are returned as a sorted string array.
+     * Gets the available MIDI device names. If midiIn is true, devices with MIDI IN are returned, otherwise devices with MIDI OUT are returned. The
+     * device names are returned as a sorted string array.
      * 
      * @param midiIn if true, MIDI in is returned, otherwise MIDI OUT is returned
      * 
@@ -363,21 +357,20 @@ public class SoundHelix implements Runnable {
         for (MidiDevice.Info info : infos) {
             try {
                 MidiDevice device = MidiSystem.getMidiDevice(info);
-                
+
                 if (device != null) {
                     if (midiIn && device.getReceiver() != null || !midiIn && device.getTransmitter() != null) {
                         list.add(info.getName());
                     }
                 }
-            } catch (Exception e) {
-            }
+            } catch (Exception e) {}
         }
 
         String[] array = new String[list.size()];
         Arrays.sort(list.toArray(array));
         return array;
     }
-    
+
     /**
      * Implements a simple shutdown hook that can be run when the JVM exits. The hook currently mutes all channels if the current player is a MIDI
      * player. Note that shutdown hooks are only run when the JVM exits normally, e.g., by pressing CTRL+C, calls to System.exit() or uncaught

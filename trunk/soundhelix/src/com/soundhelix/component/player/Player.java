@@ -5,7 +5,7 @@ import com.soundhelix.misc.SongContext;
 
 /**
  * Represents an interface for playing Arrangements. A player's task usually is to play the arrangement in real-time.
- *
+ * 
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
@@ -33,7 +33,7 @@ public interface Player extends Component {
 
     /**
      * Gets the playback speed in milli-BPM.
-     *
+     * 
      * @return the speed in milli-BPM
      */
 
@@ -41,7 +41,7 @@ public interface Player extends Component {
 
     /**
      * Sets the playback speed in milli-BPM. Setting the BPM speed should be possible while the player is playing an arrangement.
-     *
+     * 
      * @param milliBPM the speed in milli-BPM
      */
 
@@ -52,9 +52,9 @@ public interface Player extends Component {
      * support skipping at all or may not support skipping backwards. In this case, the player must ignore the skip request and must return false.
      * This method should return immediately, even if skipping takes a while to complete. Skipping to a different tick while in the midst of skipping
      * to a different tick may or may not be supported by the player.
-     *
+     * 
      * @param tick the tick to skip to
-     *
+     * 
      * @return true if skipping was successful
      */
 
@@ -63,7 +63,7 @@ public interface Player extends Component {
     /**
      * Returns the current tick of the player. If the player is not yet playing, if it is in the warm-up phase or in the cool-down phase or playing
      * has finished, -1 will be returned.
-     *
+     * 
      * @return the current tick (or -1)
      */
 

@@ -14,8 +14,7 @@ import com.soundhelix.util.RandomUtils;
 import com.soundhelix.util.XMLUtils;
 
 /**
- * Implements pattern engine that generates a pattern by repeating a given pattern while changing the velocity of each
- * pattern entry.
+ * Implements pattern engine that generates a pattern by repeating a given pattern while changing the velocity of each pattern entry.
  * 
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
@@ -30,10 +29,10 @@ public class CrescendoPatternEngine extends StringPatternEngine {
 
     /** The minimum velocity. */
     private double minVelocity;
-    
+
     /** The maximum velocity. */
     private double maxVelocity;
-    
+
     /** The velocity exponent. */
     private double velocityExponent;
 
@@ -49,55 +48,47 @@ public class CrescendoPatternEngine extends StringPatternEngine {
     @Override
     public void configure(SongContext songContext, Node node) throws XPathException {
         random = new Random(randomSeed);
-        
+
         try {
             setPatternTicks(XMLUtils.parseInteger(random, "patternTicks", node));
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
 
         try {
             setMinVelocity(XMLUtils.parseInteger(random, "minVelocity", node));
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
 
         try {
             setMaxVelocity(XMLUtils.parseInteger(random, "maxVelocity", node));
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
 
         try {
             setVelocityExponent(XMLUtils.parseDouble(random, "velocityExponent", node));
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
 
         try {
             setPrefixPatternString(XMLUtils.parseString(random, "prefixPattern", node));
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
 
         try {
             setPatternString(XMLUtils.parseString(random, "pattern", node));
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
 
         try {
             setSuffixPatternString(XMLUtils.parseString(random, "suffixPattern", node));
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
 
-        
         super.setPatternString(generatePattern(songContext, patternString));
     }
-    
+
     /**
-     * Generates a pattern that is based on the given pattern of patterns. Each element of the pattern pattern
-     * represents a variation of the base pattern specified by the first character each.
+     * Generates a pattern that is based on the given pattern of patterns. Each element of the pattern pattern represents a variation of the base
+     * pattern specified by the first character each.
      * 
      * @param patternPattern the string of pattern characters (comma-separated)
      * 
      * @return the generated pattern
      */
-    
+
     private String generatePattern(SongContext songContext, String patternPattern) {
         StringBuilder sb = new StringBuilder();
 
@@ -108,24 +99,23 @@ public class CrescendoPatternEngine extends StringPatternEngine {
         int prefixPatternTicks = prefixPattern != null ? prefixPattern.getTicks() : 0;
         int patternTicks = pattern != null ? pattern.getTicks() : 0;
         int suffixPatternTicks = suffixPattern != null ? suffixPattern.getTicks() : 0;
-        
+
         if (prefixPatternTicks + suffixPatternTicks > this.patternTicks) {
             throw new RuntimeException("Prefix pattern and suffix pattern are longer than patternTicks");
         }
 
         int repetitions = (this.patternTicks - prefixPatternTicks - suffixPatternTicks) / patternTicks;
-        
+
         logger.debug("Repetitions: " + repetitions);
-        
+
         int totalTicks = prefixPatternTicks + repetitions * patternTicks + suffixPatternTicks;
 
         if (totalTicks < 2) {
-            throw new RuntimeException("Concatenated pattern (prefix pattern + n * pattern + suffix pattern) must "
-                    + "contain at least 2 ticks");
+            throw new RuntimeException("Concatenated pattern (prefix pattern + n * pattern + suffix pattern) must " + "contain at least 2 ticks");
         }
-        
+
         int tick = appendPattern(songContext, sb, prefixPattern, 0, totalTicks);
-        
+
         for (int i = 0; i < repetitions; i++) {
             tick = appendPattern(songContext, sb, pattern, tick, totalTicks);
         }
@@ -133,18 +123,18 @@ public class CrescendoPatternEngine extends StringPatternEngine {
         appendPattern(songContext, sb, suffixPattern, tick, totalTicks);
 
         logger.debug("Pattern: " + sb);
-        
+
         return sb.toString();
     }
-    
+
     /**
      * Appends the given pattern to the given StringBuilder.
-     *
+     * 
      * @param sb the StringBuilder
      * @param pattern the pattern
      * @param tick the current tick
      * @param totalTicks the total number of ticks
-     *
+     * 
      * @return the new number of ticks
      */
 
@@ -153,10 +143,10 @@ public class CrescendoPatternEngine extends StringPatternEngine {
             // nothing to do
             return tick;
         }
-        
+
         for (Iterator<PatternEntry> it = pattern.iterator(); it.hasNext();) {
             PatternEntry entry = it.next();
- 
+
             if (sb.length() > 0) {
                 sb.append(',');
             }
@@ -165,8 +155,8 @@ public class CrescendoPatternEngine extends StringPatternEngine {
                 sb.append("-/").append(entry.getTicks());
             } else {
                 double v = tick / (totalTicks - 1d);
-                int velocity = (int) (RandomUtils.getPowerDouble(v, minVelocity, maxVelocity, velocityExponent)
-                        * entry.getVelocity() / songContext.getStructure().getMaxVelocity());
+                int velocity = (int) (RandomUtils.getPowerDouble(v, minVelocity, maxVelocity, velocityExponent) * entry.getVelocity() / songContext
+                        .getStructure().getMaxVelocity());
 
                 if (velocity < 1 && minVelocity >= 1) {
                     // this will make sure that a note is not converted to a pause
@@ -188,18 +178,18 @@ public class CrescendoPatternEngine extends StringPatternEngine {
                 }
 
                 if (velocity != songContext.getStructure().getMaxVelocity()) {
-                    sb.append(entry.getTicks()).append(':').append(velocity); 
+                    sb.append(entry.getTicks()).append(':').append(velocity);
                 } else {
                     sb.append(entry.getTicks());
-                }                               
+                }
             }
-                
+
             tick += entry.getTicks();
         }
-        
+
         return tick;
     }
-    
+
     @Override
     public void setPatternString(String patternString) {
         this.patternString = patternString;

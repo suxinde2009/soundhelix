@@ -54,9 +54,9 @@ public class RandomPatternEngine extends StringPatternEngine {
     /** The list of offsets to choose from. The list may contain values more than once for extra weight. */
     private PatternEntry[] offsets = {};
     /** The list of note lengths to choose from. The list may contain values more than once for extra weight. */
-    private int[] noteLengths = {1, 2, 3, 2, 1, 1};
+    private int[] noteLengths = { 1, 2, 3, 2, 1, 1 };
     /** The list of pause lengths to choose from. The list may contain values more than once for extra weight. */
-    private int[] pauseLengths = {1, 2, 3, 2, 1, 1};
+    private int[] pauseLengths = { 1, 2, 3, 2, 1, 1 };
     /** The minimum number of active ticks. */
     private int minActiveTicks = 1;
     /** The maximum number of active ticks. */
@@ -96,8 +96,7 @@ public class RandomPatternEngine extends StringPatternEngine {
 
         try {
             setUniquePatternParts(XMLUtils.parseBoolean(random, "uniquePatternParts", node));
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
 
         super.setPatternString(generatePattern(songContext, patternString));
     }
@@ -221,8 +220,8 @@ public class RandomPatternEngine extends StringPatternEngine {
                     PatternEntry entry = offsets[random.nextInt(offsets.length)];
                     boolean isWildcard = entry.isWildcard;
 
-                    double v = (1.0d - pitchVelocityCorrelation) * random.nextDouble() + (pitchDiff == 0 ? 0 : pitchVelocityCorrelation
-                            * ((isWildcard ? previousPitch : entry.offset) - minPitch) / pitchDiff);
+                    double v = (1.0d - pitchVelocityCorrelation) * random.nextDouble()
+                            + (pitchDiff == 0 ? 0 : pitchVelocityCorrelation * ((isWildcard ? previousPitch : entry.offset) - minPitch) / pitchDiff);
 
                     int velocity = (int) RandomUtils.getPowerDouble(v, minVelocity, maxVelocity, velocityExponent);
 
@@ -435,7 +434,7 @@ public class RandomPatternEngine extends StringPatternEngine {
     /**
      * Immutable container for pattern entries.
      */
-    
+
     private static final class PatternEntry {
         /** The offset. */
         private int offset;

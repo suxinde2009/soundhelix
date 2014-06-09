@@ -34,7 +34,7 @@ import com.soundhelix.misc.Structure;
 
 /**
  * Provides static convenience methods for creating songs.
- *
+ * 
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
@@ -57,12 +57,12 @@ public final class SongUtils {
 
     /**
      * Parses the XML file provided by the given input stream, creates an arrangement and a player and configures the player to use this arrangement.
-     *
+     * 
      * @param url the URL
      * @param randomSeed the random seed
-     *
+     * 
      * @return the player
-     *
+     * 
      * @throws Exception in case of a problem
      */
 
@@ -72,13 +72,13 @@ public final class SongUtils {
 
     /**
      * Parses the XML file provided by the given input stream, creates an arrangement and a player and configures the player to use this arrangement.
-     *
+     * 
      * @param inputStream the input stream
      * @param systemId the system ID specifying the source of the input stream
      * @param randomSeed the random seed
-     *
+     * 
      * @return the player
-     *
+     * 
      * @throws Exception in case of a problem
      */
 
@@ -88,12 +88,12 @@ public final class SongUtils {
 
     /**
      * Parses the XML file provided by the given input stream, creates an arrangement and a player and configures the player to use this arrangement.
-     *
+     * 
      * @param url the URL
      * @param songName the song name
-     *
+     * 
      * @return the player
-     *
+     * 
      * @throws Exception in case of a problem
      */
 
@@ -103,13 +103,13 @@ public final class SongUtils {
 
     /**
      * Parses the XML file provided by the given input stream, creates an arrangement and a player and configures the player to use this arrangement.
-     *
+     * 
      * @param inputStream the input stream
      * @param systemId the system ID specifying the source of the input stream
      * @param songName the song name
-     *
+     * 
      * @return the player
-     *
+     * 
      * @throws Exception in case of a problem
      */
 
@@ -119,12 +119,12 @@ public final class SongUtils {
 
     /**
      * Creates a SongNameEngine, generates a song and creates a Player from it.
-     *
+     * 
      * @param doc the parsed document
      * @param randomSeed the random seed
-     *
+     * 
      * @return the player
-     *
+     * 
      * @throws ClassNotFoundException if the class cannot be found
      * @throws IllegalAccessException if access is illegal
      * @throws InstantiationException if the class cannot be instantiated
@@ -144,18 +144,18 @@ public final class SongUtils {
         SongContext songContext = generateSongInternal(doc, getSongRandomSeed(songName));
         songContext.setRandomSeed(randomSeed);
         songContext.setSongName(songName);
-        
+
         return songContext;
     }
 
     /**
      * Creates a player using the specified song name.
-     *
+     * 
      * @param doc the parsed document
      * @param songName the song name
-     *
+     * 
      * @return the player
-     *
+     * 
      * @throws ClassNotFoundException if the class cannot be found
      * @throws IllegalAccessException if access is illegal
      * @throws InstantiationException if the class cannot be instantiated
@@ -170,19 +170,19 @@ public final class SongUtils {
         SongContext songContext = generateSongInternal(doc, getSongRandomSeed(songName));
         // no random seed is set here
         songContext.setSongName(songName);
-        
+
         return songContext;
     }
 
     /**
-     *
+     * 
      * Generates a new song based on the given document and random seed and returns the pre-configured player that can be used to play the song.
-     *
+     * 
      * @param doc the document
      * @param randomSeed the random seed
-     *
+     * 
      * @return the player
-     *
+     * 
      * @throws InstantiationException if a class cannot be instantiated
      * @throws XPathException in case of an XPath problem
      * @throws IllegalAccessException if an illegal class access is made
@@ -213,7 +213,7 @@ public final class SongUtils {
         Harmony harmony = harmonyEngine.render(songContext);
         songContext.setHarmony(harmony);
         HarmonyUtils.checkSanity(songContext);
-        
+
         ArrangementEngine arrangementEngine = XMLUtils.getInstance(songContext, ArrangementEngine.class, arrangementEngineNode, randomSeed, 1);
         long startTime = System.nanoTime();
         Arrangement arrangement = arrangementEngine.render(songContext);
@@ -226,18 +226,18 @@ public final class SongUtils {
 
         Player player = XMLUtils.getInstance(songContext, Player.class, playerNode, randomSeed, 2);
         songContext.setPlayer(player);
-        
+
         return songContext;
     }
 
     /**
      * Parses the XML document provided by the given URL. The URL is used as the system ID (i.e., base URL) of the document, so relative URLs
      * referenced in the XML document (e.g., for XInclude inclusion), will use the document URL as the base.
-     *
+     * 
      * @param url the URL
-     *
+     * 
      * @return the parsed document
-     *
+     * 
      * @throws ParserConfigurationException in case of a parsing exception
      * @throws SAXException if a SAX exception occurs
      * @throws IOException in case of an I/O problem
@@ -251,12 +251,12 @@ public final class SongUtils {
     /**
      * Parses the XML document provided by the input stream. The system ID is used as the base URL of the document, so relative URLs referenced in the
      * XML document (e.g., for XInclude inclusion), will use the document URL as the base.
-     *
+     * 
      * @param inputStream the input stream
      * @param systemId the system ID of the XML content
-     *
+     * 
      * @return the parsed document
-     *
+     * 
      * @throws ParserConfigurationException in case of a parsing exception
      * @throws SAXException if a SAX exception occurs
      * @throws IOException in case of an I/O problem
@@ -288,11 +288,11 @@ public final class SongUtils {
 
     /**
      * Parses the structure tag and creates a Structure instance. Note that no HarmonyEngine is set yet.
-     *
+     * 
      * @param randomSeed the random seed
      * @param node the node of the tag
      * @param songName the song name
-     *
+     * 
      * @return a Structure
      */
 
@@ -317,34 +317,33 @@ public final class SongUtils {
 
         // default value for backwards compatibility
         int maxVelocity = 32767;
-        
+
         try {
             maxVelocity = XMLUtils.parseInteger(random, "maxVelocity", node);
-        } catch (Exception e) {
-        }
-        
+        } catch (Exception e) {}
+
         return new Structure(bars, beatsPerBar, ticksPerBeat, maxVelocity);
     }
 
     /**
      * Determines the root node and calls checkVersion().
-     *
+     * 
      * @param doc the parsed document
-     *
+     * 
      * @throws XPathExpressionException in case of an XPath expression problem
      */
 
     private static void checkVersion(Document doc) throws XPathExpressionException {
         Node rootNode = XMLUtils.getNode("/*", doc);
-        checkVersion(rootNode);        
+        checkVersion(rootNode);
     }
 
     /**
      * Checks if the version of the XML document is compatible with the application version. If the versions are not compatible a RuntimeException
      * will be thrown with an appropriate message. If the application version is undefined ("???"), the check is skipped.
-     *
+     * 
      * @param rootNode the root node
-     *
+     * 
      * @throws XPathExpressionException in case of an XPath expression problem
      */
 
@@ -358,17 +357,16 @@ public final class SongUtils {
 
         if (version != null && !version.equals("")) {
             if (!VersionUtils.checkVersion(BuildConstants.VERSION, version)) {
-                throw new RuntimeException("Application version " + BuildConstants.VERSION + " does not match allowed version(s) \""
-                        + version + "\""); 
+                throw new RuntimeException("Application version " + BuildConstants.VERSION + " does not match allowed version(s) \"" + version + "\"");
             }
         }
     }
 
     /**
      * Returns the random seed for the song title.
-     *
+     * 
      * @param title the song tile
-     *
+     * 
      * @return the random seed
      */
 

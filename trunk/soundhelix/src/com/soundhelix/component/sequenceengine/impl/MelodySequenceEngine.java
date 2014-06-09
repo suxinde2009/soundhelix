@@ -52,10 +52,10 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
     private int maxPitch = 12;
 
     /** The number of melodies to generate per distinct chord section. */
-    private int[] melodies = {1};
+    private int[] melodies = { 1 };
 
     /** The pitch distances. */
-    private int[] pitchDistances = new int[] {-2, -1, 0, 1, 2};
+    private int[] pitchDistances = new int[] { -2, -1, 0, 1, 2 };
 
     /** The input pattern for melodies. */
     private Pattern pattern;
@@ -71,7 +71,7 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
     public Track render(SongContext songContext, ActivityVector[] activityVectors) {
         Structure structure = songContext.getStructure();
         Harmony harmony = songContext.getHarmony();
-        
+
         ActivityVector activityVector = activityVectors[0];
 
         Sequence seq = new Sequence(songContext);
@@ -327,23 +327,19 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
 
         try {
             setPitchDistances(XMLUtils.parseIntegerListString(random, "pitchDistances", node));
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
 
         try {
             setMelodies(XMLUtils.parseIntegerListString(random, "melodies", node));
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
 
         try {
             setMinPitch(XMLUtils.parseInteger(random, "minPitch", node));
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
 
         try {
             setMaxPitch(XMLUtils.parseInteger(random, "maxPitch", node));
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
 
         if (maxPitch - minPitch < 5) {
             throw new RuntimeException("minPitch and maxPitch must be at least 5 halftones apart");

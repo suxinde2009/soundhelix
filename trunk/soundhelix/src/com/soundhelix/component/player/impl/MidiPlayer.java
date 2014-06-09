@@ -30,6 +30,7 @@ import com.soundhelix.component.lfo.LFO;
 import com.soundhelix.misc.ActivityVector;
 import com.soundhelix.misc.Arrangement;
 import com.soundhelix.misc.Arrangement.ArrangementEntry;
+import com.soundhelix.misc.LFOSequence;
 import com.soundhelix.misc.Sequence;
 import com.soundhelix.misc.Sequence.SequenceEntry;
 import com.soundhelix.misc.SongContext;
@@ -122,6 +123,9 @@ public class MidiPlayer extends AbstractPlayer {
     /** The array of controller LFOs. */
     private ControllerLFO[] controllerLFOs;
 
+    /** The array of instrument controller LFOs. */
+    private InstrumentControllerLFO[] instrumentControllerLFOs;
+
     /** True if open() has been called, false otherwise. */
     private boolean opened;
 
@@ -159,9 +163,10 @@ public class MidiPlayer extends AbstractPlayer {
     private SongContext songContext;
 
     /** If true, then the player will wait before playing until the first BPM calculation has been done. */
-    private boolean waitForStart = false;
+    private boolean waitForStart;
     
-    private boolean running = false;
+    /** If true, then the player is running, otherwise it is stopped. */
+    private boolean running;
     
     /**
      * Contains the pitch used when the last note was played by a voice of an arrangement entry. This is used to be able to change the
@@ -1101,8 +1106,57 @@ public class MidiPlayer extends AbstractPlayer {
      */
 
     private void sendControllerLFOMessages(int tick) throws InvalidMidiDataException {
+        // handle controller LFOs
+        
         for (ControllerLFO clfo : controllerLFOs) {
             int value = clfo.lfo.getTickValue(tick);
+
+            if (tick == 0 || value != clfo.lastSentValue) {
+                // value has changed or is the first value, send message
+
+                String controller = clfo.controller;
+                Device device = deviceMap.get(clfo.deviceName);
+
+                if (controller.equals("milliBPM")) {
+                    this.milliBPM = value;
+                } else {
+                    MidiController midiController = midiControllerMap.get(controller);
+
+                    if (midiController != null) {
+                        if (midiController.parameter == -1 && midiController.byteCount == 2) {
+                            sendMidiMessage(device, clfo.channel, midiController.status, value % 128, value / 128);
+                        } else if (midiController.parameter >= 0 && midiController.byteCount == 1) {
+                            sendMidiMessage(device, clfo.channel, midiController.status, midiController.parameter, value);
+                        } else {
+                            throw new RuntimeException("Error in LFO MIDI controller \"" + controller + "\"");
+                        }
+                    } else {
+                        throw new RuntimeException("Invalid LFO MIDI controller \"" + controller + "\"");
+                    }
+                }
+
+                clfo.lastSentValue = value;
+            }
+        }
+
+        // handle instrument controller LFOs
+        
+        for (InstrumentControllerLFO clfo : instrumentControllerLFOs) {
+            String instrument = clfo.instrument;
+            Track track = songContext.getArrangement().get(instrument).getTrack();
+            
+            if (track == null) {
+                throw new RuntimeException("Unvalid instrument \"" + instrument + "\" for instrument controller LFO");
+            }
+            
+            String lfoName = clfo.lfoName;
+            LFOSequence lfoSequence = track.getLFOSequence(lfoName);
+            
+            if (lfoSequence == null) {
+                throw new RuntimeException("Unvalid LFO \"" + lfoName + "\" for instrument \"" + instrument + "\" for instrument controller LFO");
+            }
+            
+            int value = lfoSequence.getValue(tick);
 
             if (tick == 0 || value != clfo.lastSentValue) {
                 // value has changed or is the first value, send message
@@ -1182,6 +1236,46 @@ public class MidiPlayer extends AbstractPlayer {
                 clfo.lastSentValue = value;
             }
         }
+
+        for (InstrumentControllerLFO clfo : instrumentControllerLFOs) {
+            int value = songContext.getArrangement().get(clfo.instrument).getTrack().getLFOSequence(clfo.lfoName).getValue(tick);
+
+            if (tick == 0 || value != clfo.lastSentValue) {
+                // value has changed or is the first value, send message
+
+                String controller = clfo.controller;
+                Device device = deviceMap.get(clfo.deviceName);
+                javax.sound.midi.Track track = trackMap.get(device);
+
+                if (controller.equals("milliBPM")) {
+                    long mpqn = 60000000000L / value;
+                    MetaMessage mt = new MetaMessage();
+                    byte[] bt = {(byte) ((mpqn / 65536) & 0xFF), (byte) ((mpqn / 256) & 0xFF), (byte) (mpqn & 0xFF)};
+                    mt.setMessage(0x51, bt, 3);
+
+                    for (Device d : devices) {
+                        trackMap.get(d).add(new MidiEvent(mt, (long) tick + 1));
+                    }
+                } else {
+                    MidiController midiController = midiControllerMap.get(controller);
+
+                    if (midiController != null) {
+                        if (midiController.parameter == -1 && midiController.byteCount == 2) {
+                            sendMidiMessage(track, tick, clfo.channel, midiController.status, value % 128, value / 128);
+                        } else if (midiController.parameter >= 0 && midiController.byteCount == 1) {
+                            sendMidiMessage(track, tick, clfo.channel, midiController.status, midiController.parameter, value);
+                        } else {
+                            throw new RuntimeException("Error in LFO MIDI controller \"" + controller + "\"");
+                        }
+                    } else {
+                        throw new RuntimeException("Invalid LFO MIDI controller \"" + controller + "\"");
+                    }
+                }
+
+                clfo.lastSentValue = value;
+            }
+        }
+
     }
 
     /**
@@ -1398,6 +1492,10 @@ public class MidiPlayer extends AbstractPlayer {
 
     public final void setControllerLFOs(ControllerLFO[] controllerLFOs) {
         this.controllerLFOs = controllerLFOs;
+    }
+
+    public final void setInstrumentControllerLFOs(InstrumentControllerLFO[] instrumentControllerLFOs) {
+        this.instrumentControllerLFOs = instrumentControllerLFOs;
     }
 
     /**
@@ -1728,6 +1826,29 @@ public class MidiPlayer extends AbstractPlayer {
         }
 
         setControllerLFOs(controllerLFOs);
+        
+        nodeList = XMLUtils.getNodeList("instrumentControllerLFO", node);
+        entries = nodeList.getLength();
+        InstrumentControllerLFO[] instrumentControllerLFOs = new InstrumentControllerLFO[entries];
+
+        for (int i = 0; i < entries; i++) {
+            String controller = XMLUtils.parseString(random, "controller", nodeList.item(i));
+
+            String device = null;
+            int channel = -1;
+
+            if (!controller.equals("milliBPM")) {
+                device = XMLUtils.parseString(random, "device", nodeList.item(i));
+                channel = XMLUtils.parseInteger(random, "channel", nodeList.item(i)) - 1;
+            }
+
+            String instrument = XMLUtils.parseString(random, "instrument", nodeList.item(i));
+            String lfoName = XMLUtils.parseString(random, "lfoName", nodeList.item(i));
+
+            instrumentControllerLFOs[i] = new InstrumentControllerLFO(device, channel, controller, instrument, lfoName);
+        }
+
+        setInstrumentControllerLFOs(instrumentControllerLFOs);
     }
 
     /**
@@ -2039,6 +2160,38 @@ public class MidiPlayer extends AbstractPlayer {
             this.channel = channel;
             this.controller = controller;
             this.value = value;
+        }
+    }
+    
+    /**
+     * Container for LFO configuration.
+     */
+
+    private static class InstrumentControllerLFO {
+        /** The device name. */
+        private final String deviceName;
+
+        /** The MIDI channel. */
+        private int channel;
+
+        /** The name of the MIDI controller. */
+        private String controller;
+
+        /** The instrument. */
+        private String instrument;
+
+        /** The LFO name if that instrument. */
+        private String lfoName;
+        
+        /** The value last sent to the MIDI controller. */
+        private int lastSentValue;
+
+        public InstrumentControllerLFO(String deviceName, int channel, String controller, String instrument, String lfoName) {
+            this.deviceName = deviceName;
+            this.channel = channel;
+            this.controller = controller;
+            this.instrument = instrument;
+            this.lfoName = lfoName;
         }
     }
 

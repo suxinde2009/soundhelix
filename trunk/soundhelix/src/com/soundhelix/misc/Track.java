@@ -1,8 +1,10 @@
 package com.soundhelix.misc;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Represents a track. A track consists of an arbitrary number of sequences and a type. The type can either be MELODIC, which means that the sequences
@@ -33,6 +35,9 @@ public class Track {
     /** The track type. */
     private final TrackType type;
 
+    /** The map that maps LFO sequence names to LFO sequences. */
+    private Map<String, LFOSequence> lfoSequenceMap = new HashMap<String, LFOSequence>();
+    
     /**
      * Constructor.
      * 
@@ -53,6 +58,27 @@ public class Track {
         sequences.add(sequence);
     }
 
+    /**
+     * Adds the given sequence to this track.
+     * 
+     * @param sequence the sequence to add
+     */
+
+    public void add(LFOSequence sequence, String name) {
+        lfoSequenceMap.put(name, sequence);
+    }
+
+    /**
+     * Returns the LFO sequence with the given name. IF no such LFO sequence exists, null is returned.
+     * 
+     * @param name the LFO sequence name.
+     * @return the LFO sequence or null
+     */
+    
+    public LFOSequence getLFOSequence(String name) {
+        return lfoSequenceMap.get(name);
+    }    
+    
     /**
      * Returns the number of sequences this track contains.
      * 

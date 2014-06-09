@@ -1,3 +1,4 @@
+
 package com.soundhelix.component.sequenceengine.impl;
 
 import java.util.ArrayList;
@@ -12,9 +13,11 @@ import javax.xml.xpath.XPathException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.soundhelix.component.lfo.LFO;
 import com.soundhelix.component.patternengine.PatternEngine;
 import com.soundhelix.misc.ActivityVector;
 import com.soundhelix.misc.Harmony;
+import com.soundhelix.misc.LFOSequence;
 import com.soundhelix.misc.Pattern;
 import com.soundhelix.misc.Pattern.PatternEntry;
 import com.soundhelix.misc.Sequence;
@@ -31,10 +34,13 @@ import com.soundhelix.util.XMLUtils;
  * Implements a sequence engine for drum machines. Drum machines normally play a certain sample (e.g., a base drum or a snare) when a certain pitch is
  * played. This class supports an arbitrary number of combinations of patterns, pitches and activity vectors. Each pattern acts as a voice for a
  * certain pitch.
- *
+ * 
  * Conditional patterns allow the modification of the generated sequences when certain conditions are met, e.g., for generating fill-ins, crescendos,
  * etc. when monitored ActivityVectors become active or inactive.
- *
+ * 
+ * Conditional LFOs allow the creation of LFO sequences certain conditions are met, e.g., for generating fill-ins, crescendos, etc. when monitored
+ * ActivityVectors become active or inactive.
+ * 
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
@@ -51,8 +57,11 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
     /** The drum entries. */
     private DrumEntry[] drumEntries;
 
-    /** The conditional entries. */
-    private ConditionalDrumEntry[] conditionalEntries;
+    /** The conditional pattern entries. */
+    private ConditionalPatternDrumEntry[] conditionalPatternEntries;
+
+    /** The conditional LFO entries. */
+    private ConditionalLFODrumEntry[] conditionalLFOEntries;
 
     /** The random generator. */
     private Random random;
@@ -65,8 +74,12 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
         this.drumEntries = drumEntries;
     }
 
-    public void setConditionalEntries(ConditionalDrumEntry[] conditionalEntries) {
-        this.conditionalEntries = conditionalEntries;
+    public void setConditionalPatternEntries(ConditionalPatternDrumEntry[] conditionalPatternEntries) {
+        this.conditionalPatternEntries = conditionalPatternEntries;
+    }
+
+    public void setConditionalLFOEntries(ConditionalLFODrumEntry[] conditionalLFOEntries) {
+        this.conditionalLFOEntries = conditionalLFOEntries;
     }
 
     @Override
@@ -83,13 +96,14 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
 
         processPatterns(songContext, activityVectors, seqs);
         processConditionalPatterns(songContext, activityVectors, seqs);
+        processConditionalLFOs(songContext, activityVectors, track);
 
         return track;
     }
 
     /**
      * Process all non-conditional patterns.
-     *
+     * 
      * @param songContext the song context
      * @param activityVectors the array of activity vectors
      * @param seqs the array of sequences
@@ -139,7 +153,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
 
     /**
      * Process all conditional patterns.
-     *
+     * 
      * @param songContext the song context
      * @param activityVectors the array of activity vectors
      * @param seqs the array of sequences
@@ -150,7 +164,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
         Harmony harmony = songContext.getHarmony();
         int ticks = structure.getTicks();
         int chordSections = HarmonyUtils.getChordSectionCount(songContext);
-        int conditionalEntryCount = conditionalEntries.length;
+        int conditionalPatternEntryCount = conditionalPatternEntries.length;
 
         Map<String, List<Integer>> map = new HashMap<String, List<Integer>>();
 
@@ -165,7 +179,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
             list.add(i);
         }
 
-        for (ConditionalDrumEntry entry : conditionalEntries) {
+        for (ConditionalPatternDrumEntry entry : conditionalPatternEntries) {
             if (entry.preCondition == null) {
                 entry.preCondition = getConditionPattern(map, drumEntries.length, entry.preConditionString);
                 entry.postCondition = getConditionPattern(map, drumEntries.length, entry.postConditionString);
@@ -174,7 +188,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
 
         // the tick where each pattern was applied last (last tick of the pattern + 1), initially 0
         // (used to avoid overlapping application of patterns)
-        int[] lastMatchedTick = new int[conditionalEntryCount];
+        int[] lastMatchedTick = new int[conditionalPatternEntryCount];
 
         // get all chord section activities
 
@@ -194,12 +208,13 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
         while (tick < ticks) {
             String activity = chordSectionActivity[chordSection];
 
-            for (int i = 0; i < conditionalEntryCount; i++) {
-                Pattern pattern = conditionalEntries[i].pattern;
+            for (int i = 0; i < conditionalPatternEntryCount; i++) {
+                ConditionalPatternDrumEntry conditionalEntry = conditionalPatternEntries[i];
+                Pattern pattern = conditionalEntry.pattern;
                 int patternTicks = pattern.getTicks();
-                double probability = conditionalEntries[i].probability;
-                java.util.regex.Pattern preCondition = conditionalEntries[i].preCondition;
-                java.util.regex.Pattern postCondition = conditionalEntries[i].postCondition;
+                double probability = conditionalEntry.probability;
+                java.util.regex.Pattern preCondition = conditionalEntry.preCondition;
+                java.util.regex.Pattern postCondition = conditionalEntry.postCondition;
 
                 if (tick - patternTicks >= 0 && postCondition.matcher(activity).matches()) {
                     // check if all chord section boundaries crossed by the pattern (including the current one)
@@ -225,8 +240,8 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
                             // jump back to where the pattern will start
                             tick -= patternTicks;
 
-                            int[] targets = conditionalEntries[i].targets;
-                            Mode mode = conditionalEntries[i].mode;
+                            int[] targets = conditionalEntry.targets;
+                            Mode mode = conditionalEntry.mode;
 
                             logger.debug("Applying conditional pattern " + i + " with length " + patternTicks + " for targets "
                                     + Arrays.toString(targets) + " at ticks " + tick + "-" + (tick + patternTicks - 1));
@@ -241,13 +256,10 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
                                     int basePitch = drumEntries[targets[j]].pitch;
 
                                     if (entry.isNote()) {
-                                        seq.replaceEntry(
-                                                tick,
-                                                new Sequence.SequenceEntry(basePitch + entry.getPitch(), entry.getVelocity(), entry.getTicks(), entry
-                                                        .isLegato()));
+                                        seq.replaceEntry(tick, new Sequence.SequenceEntry(basePitch + entry.getPitch(), entry.getVelocity(), entry
+                                                .getTicks(), entry.isLegato()));
                                     } else if (mode == Mode.REPLACE) {
-                                        seq.replaceEntry(tick,
-                                                new Sequence.SequenceEntry(Integer.MIN_VALUE, -1, entry.getTicks(), entry.isLegato()));
+                                        seq.replaceEntry(tick, new Sequence.SequenceEntry(Integer.MIN_VALUE, -1, entry.getTicks(), entry.isLegato()));
                                     }
                                 }
 
@@ -256,12 +268,12 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
 
                             lastMatchedTick[i] = tick;
 
-                            i += conditionalEntries[i].skipWhenApplied;
+                            i += conditionalEntry.skipWhenApplied;
                         } else {
                             // either the pattern would have overlapped or the random generator didn't agree to apply
                             // the pattern
 
-                            i += conditionalEntries[i].skipWhenNotApplied;
+                            i += conditionalEntry.skipWhenNotApplied;
                         }
                     }
                 }
@@ -273,12 +285,157 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
     }
 
     /**
+     * Process all conditional LFOs.
+     * 
+     * @param songContext the song context
+     */
+
+    private void processConditionalLFOs(SongContext songContext, ActivityVector[] activityVectors, Track track) {
+        Structure structure = songContext.getStructure();
+        Harmony harmony = songContext.getHarmony();
+        int ticks = structure.getTicks();
+        int chordSections = HarmonyUtils.getChordSectionCount(songContext);
+        int conditionalLFOEntryCount = conditionalLFOEntries.length;
+
+        Map<String, List<Integer>> map = new HashMap<String, List<Integer>>();
+
+        for (int i = 0; i < activityVectors.length; i++) {
+            ActivityVector av = activityVectors[i];
+            List<Integer> list = map.get(av.getName());
+            if (list == null) {
+                list = new ArrayList<Integer>();
+                map.put(av.getName(), list);
+            }
+
+            list.add(i);
+        }
+
+        for (ConditionalLFODrumEntry entry : conditionalLFOEntries) {
+            entry.preCondition = getConditionPattern(map, drumEntries.length, entry.preConditionString);
+            entry.postCondition = getConditionPattern(map, drumEntries.length, entry.postConditionString);
+
+            // generate LFO sequence and attach to track (will be filled during processing)
+            LFOSequence seq = new LFOSequence(songContext);
+            entry.lfoSequence = seq;
+            track.add(seq, entry.lfoName);
+        }
+
+        // the tick where each conditional LFO was applied last (last tick of the pattern + 1), initially 0
+        // (used to avoid overlapping application of LFOs)
+        int[] lastMatchedTick = new int[conditionalLFOEntryCount];
+
+        // get all chord section activities
+
+        String[] chordSectionActivity = new String[chordSections];
+        int tick = 0;
+        int x = 0;
+
+        while (tick < ticks) {
+            chordSectionActivity[x++] = getActivityString(tick, activityVectors);
+            tick += harmony.getChordSectionTicks(tick);
+        }
+
+        // start with the second chord section
+        tick = harmony.getChordSectionTicks(0);
+        int chordSection = 1;
+
+        while (tick < ticks) {
+            String activity = chordSectionActivity[chordSection];
+
+            for (int i = 0; i < conditionalLFOEntryCount; i++) {
+                ConditionalLFODrumEntry conditionalEntry = conditionalLFOEntries[i];
+                int patternTicks = conditionalEntry.ticks;
+                double probability = conditionalEntry.probability;
+                java.util.regex.Pattern preCondition = conditionalEntry.preCondition;
+                java.util.regex.Pattern postCondition = conditionalEntry.postCondition;
+
+                if (tick - patternTicks >= 0 && postCondition.matcher(activity).matches()) {
+                    // check if all chord section boundaries crossed by the pattern (including the current one)
+                    // fulfill the precondition
+
+                    int mtick = tick - patternTicks;
+                    int cs = HarmonyUtils.getChordSectionNumber(songContext, mtick);
+                    boolean preConditionMatched = true;
+
+                    while (mtick < tick && preConditionMatched) {
+                        mtick += harmony.getChordSectionTicks(mtick);
+                        if (!preCondition.matcher(chordSectionActivity[cs]).matches()) {
+                            preConditionMatched = false;
+                            break;
+                        }
+                        cs++;
+                    }
+
+                    if (preConditionMatched) {
+                        if (tick - patternTicks >= lastMatchedTick[i] && RandomUtils.getBoolean(random, probability)) {
+                            // all conditions met, apply pattern
+
+                            // jump back to where the pattern will start
+                            tick -= patternTicks;
+
+                            logger.info("Applying conditional LFO \"" + conditionalEntry.lfoName + "\" with length " + patternTicks + " for ticks "
+                                    + tick + "-" + (tick + patternTicks - 1));
+
+                            LFOSequence seq = conditionalEntry.lfoSequence;
+                            // fill up the LFO sequence with the default value from the current size of the LFO sequence to the current tick
+                            conditionalEntry.lfoSequence.addValue(conditionalEntry.defaultValue, tick - conditionalEntry.lfoSequence.getTicks());
+
+                            LFO lfo = conditionalEntry.lfo;
+
+                            if (conditionalEntry.rotationUnit.equals("beat")) {
+                                lfo.setPhase(conditionalEntry.phase);
+                                lfo.setBeatSpeed(conditionalEntry.speed, structure.getTicksPerBeat());
+                            } else if (conditionalEntry.rotationUnit.equals("range")) {
+                                lfo.setPhase(conditionalEntry.phase);
+                                lfo.setActivitySpeed(conditionalEntry.speed, tick, tick + patternTicks);
+                            } else {
+                                throw new RuntimeException("Invalid rotation unit \"" + conditionalEntry.rotationUnit + "\"");
+                            }
+
+                            for (int k = 0; k < patternTicks; k++) {
+                                seq.addValue(lfo.getTickValue(tick++));
+                            }
+
+                            lastMatchedTick[i] = tick;
+
+                            i += conditionalEntry.skipWhenApplied;
+                        } else {
+                            // either the pattern would have overlapped or the random generator didn't agree to apply
+                            // the pattern
+
+                            i += conditionalEntry.skipWhenNotApplied;
+                        }
+                    }
+                }
+            }
+
+            tick += harmony.getChordSectionTicks(tick);
+            chordSection++;
+        }
+
+        // fill up all LFO sequences with the default value from the current size of the LFO sequence to the end of the song
+
+        for (int i = 0; i < conditionalLFOEntryCount; i++) {
+            ConditionalLFODrumEntry conditionalEntry = conditionalLFOEntries[i];
+            LFOSequence seq = conditionalEntry.lfoSequence;
+            seq.addValue(conditionalEntry.defaultValue, ticks - seq.getTicks());
+
+//            StringBuilder sb = new StringBuilder();
+//            for (int k = 0; k < seq.getTicks(); k++) {
+//                sb.append(seq.getValue(k)).append(',');
+//            }
+//            logger.info("LFO: " + sb);
+
+        }
+    }
+
+    /**
      * Returns the activity string of the given tick. The activity string is a concatenation of '0' and '1' characters specifying whether the
      * ActivityVectors from the list are active or not. If the tick is negative, the returned string consists of only '0' characters.
-     *
+     * 
      * @param tick the tick to check
      * @param activityVectors the array of ActivityVectors
-     *
+     * 
      * @return the activity string
      */
 
@@ -336,7 +493,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
         nodeList = XMLUtils.getNodeList("conditionalPattern", node);
         patterns = nodeList.getLength();
 
-        ConditionalDrumEntry[] conditionalEntries = new ConditionalDrumEntry[patterns];
+        ConditionalPatternDrumEntry[] conditionalPatternEntries = new ConditionalPatternDrumEntry[patterns];
 
         for (int i = 0; i < patterns; i++) {
             String targetString = XMLUtils.parseString(random, "target", nodeList.item(i));
@@ -351,8 +508,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
 
             try {
                 conditionString = XMLUtils.parseString(random, "condition", nodeList.item(i));
-            } catch (Exception e) {
-            }
+            } catch (Exception e) {}
 
             java.util.regex.Pattern preCondition = null;
             java.util.regex.Pattern postCondition = null;
@@ -392,8 +548,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
 
             try {
                 skipWhenApplied = XMLUtils.parseInteger(random, "skipWhenApplied", nodeList.item(i));
-            } catch (Exception e) {
-            }
+            } catch (Exception e) {}
 
             if (i + 1 + skipWhenApplied > patterns || i + 1 + skipWhenApplied < 0) {
                 throw new RuntimeException("Skip value \"" + skipWhenApplied + "\" would skip out of conditional pattern range");
@@ -403,8 +558,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
 
             try {
                 skipWhenNotApplied = XMLUtils.parseInteger(random, "skipWhenNotApplied", nodeList.item(i));
-            } catch (Exception e) {
-            }
+            } catch (Exception e) {}
 
             if (i + 1 + skipWhenNotApplied > patterns || i + 1 + skipWhenNotApplied < 0) {
                 throw new RuntimeException("Skip value \"" + skipWhenNotApplied + "\" would skip out of conditonal pattern range");
@@ -423,25 +577,125 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
             Pattern pattern = patternEngine.render(songContext, "");
 
             if (preCondition != null) {
-                conditionalEntries[i] = new ConditionalDrumEntry(pattern, preCondition, postCondition, mode, targets, probability, skipWhenApplied,
-                        skipWhenNotApplied);
-            } else {
-                conditionalEntries[i] = new ConditionalDrumEntry(pattern, preConditionString, postConditionString, mode, targets, probability,
+                conditionalPatternEntries[i] = new ConditionalPatternDrumEntry(pattern, preCondition, postCondition, mode, targets, probability,
                         skipWhenApplied, skipWhenNotApplied);
+            } else {
+                conditionalPatternEntries[i] = new ConditionalPatternDrumEntry(pattern, preConditionString, postConditionString, mode, targets,
+                        probability, skipWhenApplied, skipWhenNotApplied);
             }
         }
 
-        setConditionalEntries(conditionalEntries);
+        setConditionalPatternEntries(conditionalPatternEntries);
+
+        nodeList = XMLUtils.getNodeList("conditionalLFO", node);
+        patterns = nodeList.getLength();
+
+        ConditionalLFODrumEntry[] conditionalLFOEntries = new ConditionalLFODrumEntry[patterns];
+
+        for (int i = 0; i < patterns; i++) {
+            String lfoName = XMLUtils.parseString(random, "name", nodeList.item(i));
+            int ticks = XMLUtils.parseInteger(random, XMLUtils.getNode("ticks", nodeList.item(i)));
+
+            int minValue = Integer.MIN_VALUE;
+            int maxValue = Integer.MAX_VALUE;
+            int minAmplitude = 0;
+            int maxAmplitude = 0;
+
+            try {
+                minAmplitude = XMLUtils.parseInteger(random, "minAmplitude", nodeList.item(i));
+            } catch (Exception e) {}
+
+            try {
+                maxAmplitude = XMLUtils.parseInteger(random, "maxAmplitude", nodeList.item(i));
+            } catch (Exception e) {}
+
+            if (minAmplitude > maxAmplitude) {
+                throw new RuntimeException("minAmplitude must be <= maxAmplitude");
+            }
+
+            try {
+                minValue = XMLUtils.parseInteger(random, "minValue", nodeList.item(i));
+            } catch (Exception e) {}
+
+            try {
+                maxValue = XMLUtils.parseInteger(random, "maxValue", nodeList.item(i));
+            } catch (Exception e) {}
+
+            if (minValue > maxValue) {
+                throw new RuntimeException("minValue must be <= maxValue");
+            }
+
+            double speed = XMLUtils.parseDouble(random, XMLUtils.getNode("speed", nodeList.item(i)));
+
+            String rotationUnit = XMLUtils.parseString(random, "rotationUnit", nodeList.item(i));
+
+            double phase = 0.0d;
+
+            try {
+                phase = XMLUtils.parseDouble(random, XMLUtils.getNode("phase", nodeList.item(i)));
+            } catch (Exception e) {}
+
+            int defaultValue = XMLUtils.parseInteger(random, XMLUtils.getNode("defaultValue", nodeList.item(i)));
+
+            String preConditionString = XMLUtils.parseString(random, "precondition", nodeList.item(i));
+            String postConditionString = XMLUtils.parseString(random, "postcondition", nodeList.item(i));
+
+            double probability = XMLUtils.parseDouble(random, "probability", nodeList.item(i)) / 100.0d;
+
+            int skipWhenApplied = 0;
+
+            try {
+                skipWhenApplied = XMLUtils.parseInteger(random, "skipWhenApplied", nodeList.item(i));
+            } catch (Exception e) {}
+
+            if (i + 1 + skipWhenApplied > patterns || i + 1 + skipWhenApplied < 0) {
+                throw new RuntimeException("Skip value \"" + skipWhenApplied + "\" would skip out of conditional pattern range");
+            }
+
+            int skipWhenNotApplied = 0;
+
+            try {
+                skipWhenNotApplied = XMLUtils.parseInteger(random, "skipWhenNotApplied", nodeList.item(i));
+            } catch (Exception e) {}
+
+            if (i + 1 + skipWhenNotApplied > patterns || i + 1 + skipWhenNotApplied < 0) {
+                throw new RuntimeException("Skip value \"" + skipWhenNotApplied + "\" would skip out of conditonal pattern range");
+            }
+
+            Node lfoNode = XMLUtils.getNode("lfo", nodeList.item(i));
+
+            LFO lfo;
+
+            try {
+                lfo = XMLUtils.getInstance(songContext, LFO.class, lfoNode, randomSeed, i);
+            } catch (Exception e) {
+                throw new RuntimeException("Could not instantiate LFO", e);
+            }
+
+            lfo.setSongContext(songContext);
+            lfo.setMinAmplitude(minAmplitude);
+            lfo.setMaxAmplitude(maxAmplitude);
+            lfo.setMinValue(minValue);
+            lfo.setMaxValue(maxValue);
+
+            conditionalLFOEntries[i] = new ConditionalLFODrumEntry(lfo, lfoName, ticks, speed, rotationUnit, phase, defaultValue, preConditionString,
+                    postConditionString, probability, skipWhenApplied, skipWhenNotApplied);
+        }
+
+        logger.info("Conditional LFOs: " + conditionalLFOEntries.length);
+
+        setConditionalLFOEntries(conditionalLFOEntries);
+
     }
 
     /**
      * Parses the given condition string and returns a pattern representing the condition. The condition string is given as a comma-separated list of
      * ActivityVector names, which are each prefixed by either "+" or "-".
-     *
+     * 
      * @param map the map that maps ActivityVector names to lists of offsets
      * @param vectors the total number of ActivityVectors
      * @param string the condition string
-     *
+     * 
      * @return the condition pattern
      */
 
@@ -489,11 +743,11 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
     /**
      * Represents a normal drum entry.
      */
-    
+
     private static final class DrumEntry {
         /** The pattern. */
         private final Pattern pattern;
-        
+
         /** The pitch. */
         private final int pitch;
 
@@ -503,45 +757,45 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
          * @param pattern the pattern
          * @param pitch the pitch
          */
-        
+
         private DrumEntry(Pattern pattern, int pitch) {
             this.pattern = pattern;
             this.pitch = pitch;
         }
     }
 
-     /**
-      * Represents a conditional drum entry.
-      */
-     
-    private static final class ConditionalDrumEntry {
+    /**
+     * Represents a conditional pattern drum entry.
+     */
+
+    private static final class ConditionalPatternDrumEntry {
         /** The pattern. */
         private final Pattern pattern;
-        
+
         /** The precondition as a regular expression. */
         private java.util.regex.Pattern preCondition;
-        
+
         /** The postcondition as a regular expression. */
         private java.util.regex.Pattern postCondition;
-        
+
         /** The precondition as a string. */
         private final String preConditionString;
-        
+
         /** The postcondition as a string. */
         private final String postConditionString;
-        
+
         /** The mode. */
         private final Mode mode;
-        
+
         /** The array of targets. */
         private final int[] targets;
-        
+
         /** The probability for being applied if it could be applied. */
         private final double probability;
-        
+
         /** The number of entries to skip after applying. */
         private final int skipWhenApplied;
-        
+
         /** The number of entries to skip after not applying. */
         private final int skipWhenNotApplied;
 
@@ -557,8 +811,8 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
          * @param skipWhenApplied the number of items to skip after applying
          * @param skipWhenNotApplied the number of items to skip after not applying
          */
-        
-        private ConditionalDrumEntry(Pattern pattern, java.util.regex.Pattern preCondition, java.util.regex.Pattern postCondition, Mode mode,
+
+        private ConditionalPatternDrumEntry(Pattern pattern, java.util.regex.Pattern preCondition, java.util.regex.Pattern postCondition, Mode mode,
                 int[] targets, double probability, int skipWhenApplied, int skipWhenNotApplied) {
             this.pattern = pattern;
             this.preConditionString = null;
@@ -584,14 +838,95 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
          * @param skipWhenApplied the number of items to skip after applying
          * @param skipWhenNotApplied the number of items to skip after not applying
          */
-        
-        private ConditionalDrumEntry(Pattern pattern, String preConditionString, String postConditionString, Mode mode,
-                int[] targets, double probability, int skipWhenApplied, int skipWhenNotApplied) {
+
+        private ConditionalPatternDrumEntry(Pattern pattern, String preConditionString, String postConditionString, Mode mode, int[] targets,
+                double probability, int skipWhenApplied, int skipWhenNotApplied) {
             this.pattern = pattern;
             this.preConditionString = preConditionString;
             this.postConditionString = postConditionString;
             this.mode = mode;
             this.targets = targets;
+            this.probability = probability;
+            this.skipWhenApplied = skipWhenApplied;
+            this.skipWhenNotApplied = skipWhenNotApplied;
+        }
+    }
+
+    /**
+     * Represents a conditional pattern drum entry.
+     */
+
+    private static final class ConditionalLFODrumEntry {
+        /** The LFO. */
+        private LFO lfo;
+
+        /** The LFO name. */
+        private String lfoName;
+
+        /** The number of ticks. */
+        private int ticks;
+
+        /** The LFO speed in radians. */
+        private double speed;
+
+        /** The LFO rotation unit. */
+        private String rotationUnit;
+
+        /** The LFO phase in radians. */
+        private double phase;
+
+        /** The LFO default value. */
+        private int defaultValue;
+
+        /** The precondition as a regular expression. */
+        private java.util.regex.Pattern preCondition;
+
+        /** The postcondition as a regular expression. */
+        private java.util.regex.Pattern postCondition;
+
+        /** The precondition as a string. */
+        private final String preConditionString;
+
+        /** The postcondition as a string. */
+        private final String postConditionString;
+
+        /** The probability for being applied if it could be applied. */
+        private final double probability;
+
+        /** The number of entries to skip after applying. */
+        private final int skipWhenApplied;
+
+        /** The number of entries to skip after not applying. */
+        private final int skipWhenNotApplied;
+
+        /** The LFO sequence. */
+        private LFOSequence lfoSequence;
+
+        /**
+         * Constructor.
+         * 
+         * @param lfo the lfo
+         * @param speed the speed
+         * @param rotationUnit the rotation unit
+         * @param phase the phase
+         * @param preConditionString the precondition
+         * @param postConditionString the postcondition
+         * @param probability the probability
+         * @param skipWhenApplied the number of items to skip after applying
+         * @param skipWhenNotApplied the number of items to skip after not applying
+         */
+
+        private ConditionalLFODrumEntry(LFO lfo, String lfoName, int ticks, double speed, String rotationUnit, double phase, int defaultValue,
+                String preConditionString, String postConditionString, double probability, int skipWhenApplied, int skipWhenNotApplied) {
+            this.lfo = lfo;
+            this.lfoName = lfoName;
+            this.ticks = ticks;
+            this.speed = speed;
+            this.rotationUnit = rotationUnit;
+            this.phase = phase;
+            this.defaultValue = defaultValue;
+            this.preConditionString = preConditionString;
+            this.postConditionString = postConditionString;
             this.probability = probability;
             this.skipWhenApplied = skipWhenApplied;
             this.skipWhenNotApplied = skipWhenNotApplied;

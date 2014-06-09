@@ -33,21 +33,24 @@ public abstract class AbstractLFO implements LFO {
     /** The random seed. */
     protected long randomSeed;
 
+    /** The minimum amplitude value. */
+    protected int minValue = Integer.MIN_VALUE;
+
+    /** The maximum amplitude value. */
+    protected int maxValue = Integer.MAX_VALUE;
+
+    /** The minimum amplitude value. */
+    protected int minAmplitude;
+
+    /** The maximum amplitude value. */
+    protected int maxAmplitude;
+
+    /** True if one of the set...Speed() methods has been called. */
+    protected boolean isConfigured;
+
     /** The LFO mode. */
     private Mode mode;
     
-    /** The minimum amplitude value. */
-    private int minValue = Integer.MIN_VALUE;
-
-    /** The maximum amplitude value. */
-    private int maxValue = Integer.MAX_VALUE;
-
-    /** The minimum amplitude value. */
-    private int minAmplitude;
-
-    /** The maximum amplitude value. */
-    private int maxAmplitude;
-
     /** The number of rotations per tick. */
     private double rotationsPerTick;
 
@@ -62,9 +65,6 @@ public abstract class AbstractLFO implements LFO {
 
     /** The start phase in number of rotations. */
     private double phase;
-
-    /** True if one of the set...Speed() methods has been called. */
-    private boolean isConfigured;
 
     /**
      * Returns the LFO's value of the given angle as a double. The returned value must be between 0 and 1 (both inclusive).
@@ -82,17 +82,7 @@ public abstract class AbstractLFO implements LFO {
             throw new RuntimeException("LFO speed not set yet");
         }
 
-        double angle;
-        
-        if (mode == Mode.CONSTANT_SPEED) {
-            angle = TWO_PI * (tick * rotationsPerTick + phase);
-        } else if (mode == Mode.SYNC_TO_SEGMENT_PAIRS) {
-            angle = getSegmentPairAngle(tick);
-        } else {
-            throw new RuntimeException("Invalid mode");
-        }
-        
-        int value = minAmplitude + (int) (0.5d + (maxAmplitude - minAmplitude) * getValue(angle));
+        int value = minAmplitude + (int) (0.5d + (maxAmplitude - minAmplitude) * getRawTickValue(tick));
 
         if (value > maxValue) {
             return maxValue;
@@ -103,6 +93,36 @@ public abstract class AbstractLFO implements LFO {
         }
     }
 
+    @Override
+    public double getRawTickValue(int tick) {
+        if (!isConfigured) {
+            throw new RuntimeException("LFO speed not set yet");
+        }
+
+        double angle = getAngle(tick);        
+        return getValue(angle);
+    }
+
+    /**
+     * Converts the given tick into an angle in radians.
+     * 
+     * @param tick the tick
+     * @return the angle in radians
+     */
+    
+    private double getAngle(int tick) {
+        double angle;
+        
+        if (mode == Mode.CONSTANT_SPEED) {
+            angle = TWO_PI * (tick * rotationsPerTick + phase);
+        } else if (mode == Mode.SYNC_TO_SEGMENT_PAIRS) {
+            angle = getSegmentPairAngle(tick);
+        } else {
+            throw new RuntimeException("Invalid mode");
+        }
+        return angle;
+    }
+ 
     /**
      * Returns the LFO angle, depending on the segment pair.
      * @param tick the tick

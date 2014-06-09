@@ -18,13 +18,23 @@ import com.soundhelix.misc.SongContext;
 
 public interface LFO extends Component {
     /**
-     * Returns the LFO's value of the given tick.
+     * Returns the LFO's value at the given tick as an integer, taking scaling (via minAmplitude and maxAmplitude) and cut-off (via minValue and
+     * maxValue) into account.
      *
      * @param tick the tick (non-negative)
      *
      * @return the LFO's value
      */
     int getTickValue(int tick);
+
+    /**
+     * Returns the LFO's raw value (between 0 and 1) at the given tick, without any scaling or cut-off.
+     *
+     * @param tick the tick (non-negative)
+     *
+     * @return the LFO's value
+     */
+    double getRawTickValue(int tick);
 
     /**
      * Makes this LFO synchronized to beats and sets the parameters.

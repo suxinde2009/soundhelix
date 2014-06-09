@@ -7,6 +7,15 @@ Author: Thomas Schürger (thomas@schuerger.com)
 Change log
 ----------
 
+0.8u:
+
+    - Added support for conditional LFOs in the DrumSequenceEngine and the MidiPlayer. Similar to conditional patterns, a condition
+      can now trigger the usage of an LFO for creating an LFO sequence, which can be used in the MidiPlayer for remote-controlling
+      MIDI controllers. In the DrumSequenceEngine, a conditional LFO can be configured via the "conditionalLFO" tag, which can be
+      mapped to a MIDI controller in the MidiPlayer via the "instrumentControllerLFO" tag.
+
+    - Cleaned up all code.
+
 
 0.7.1: 2014-05-31
 

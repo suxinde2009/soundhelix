@@ -173,6 +173,7 @@ public class SoundHelixApplet extends JApplet implements Runnable {
             commandTextField.requestFocusInWindow();
 
             songNameTextField.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     JTextField textField = (JTextField) e.getSource();
 
@@ -193,6 +194,7 @@ public class SoundHelixApplet extends JApplet implements Runnable {
 
             // launch console thread with normal priority
             Thread consoleThread = new Thread(new Runnable() {
+                @Override
                 public void run() {
                     remoteControl.run();
                 }
@@ -256,6 +258,7 @@ public class SoundHelixApplet extends JApplet implements Runnable {
     private void addUrlActionListener(final JButton button, final boolean needsCurrentSongName) {
         if (button != null) {
             button.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     if (desktop != null && (!needsCurrentSongName || currentSongName != null)) {
                         try {
@@ -427,6 +430,7 @@ public class SoundHelixApplet extends JApplet implements Runnable {
      * Implements the player thread functionality.
      */
 
+    @Override
     public void run() {
         VersionUtils.logVersion();
 

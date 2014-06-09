@@ -36,7 +36,7 @@ public class LinearRandomLFO extends AbstractLFO {
         // normalize angle into the range [0,2*Pi[
         angle = ((angle % TWO_PI) + TWO_PI) % TWO_PI;
 
-        double index = angle / TWO_PI * (double) valueCount;
+        double index = angle / TWO_PI * valueCount;
         double fraction = index - Math.floor(index);
         int intIndex = (int) index;
 

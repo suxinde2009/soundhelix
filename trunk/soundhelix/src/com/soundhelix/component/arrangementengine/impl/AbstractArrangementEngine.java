@@ -31,6 +31,7 @@ public abstract class AbstractArrangementEngine implements ArrangementEngine {
      * @param randomSeed the random seed
      */
 
+    @Override
     public void setRandomSeed(long randomSeed) {
         this.randomSeed = randomSeed;
     }
@@ -41,6 +42,7 @@ public abstract class AbstractArrangementEngine implements ArrangementEngine {
      * @return the random seed
      */
 
+    @Override
     public long getRandomSeed() {
         return randomSeed;
     }

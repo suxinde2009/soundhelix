@@ -33,20 +33,20 @@ public abstract class AbstractLFO implements LFO {
     /** The random seed. */
     protected long randomSeed;
 
-    /** The minimum amplitude value. */
-    protected int minValue = Integer.MIN_VALUE;
-
-    /** The maximum amplitude value. */
-    protected int maxValue = Integer.MAX_VALUE;
-
-    /** The minimum amplitude value. */
-    protected int minAmplitude;
-
-    /** The maximum amplitude value. */
-    protected int maxAmplitude;
-
     /** True if one of the set...Speed() methods has been called. */
     protected boolean isConfigured;
+
+    /** The minimum amplitude value. */
+    private int minValue = Integer.MIN_VALUE;
+
+    /** The maximum amplitude value. */
+    private int maxValue = Integer.MAX_VALUE;
+
+    /** The minimum amplitude value. */
+    private int minAmplitude;
+
+    /** The maximum amplitude value. */
+    private int maxAmplitude;
 
     /** The LFO mode. */
     private Mode mode;
@@ -180,7 +180,7 @@ public abstract class AbstractLFO implements LFO {
             return TWO_PI * (0.5d * tickInSegment / segmentLength * rotationsPerSegmentPair + phase + segmentPair);
         } else {
             // second half (pi to 2*pi within the segment pair)
-            return TWO_PI * (0.5d + 0.5d * tickInSegment / (-segmentLength) * rotationsPerSegmentPair + phase + segmentPair);
+            return TWO_PI * (0.5d + 0.5d * tickInSegment / -segmentLength * rotationsPerSegmentPair + phase + segmentPair);
         }
     }
 

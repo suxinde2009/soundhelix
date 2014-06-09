@@ -641,10 +641,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
                     postConditionString, probability, skipWhenApplied, skipWhenNotApplied);
         }
 
-        logger.info("Conditional LFOs: " + conditionalLFOEntries.length);
-
         setConditionalLFOEntries(conditionalLFOEntries);
-
     }
 
     /**

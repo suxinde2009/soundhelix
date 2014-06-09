@@ -12,10 +12,10 @@ import java.io.InputStreamReader;
 public class ConsoleRemoteControl extends AbstractTextRemoteControl {
     /** The console reader. */
     private BufferedReader consoleReader;
-    
+
     /**
      * Constructor.
-     */    
+     */
     public ConsoleRemoteControl() {
         try {
             consoleReader = new BufferedReader(new InputStreamReader(System.in));
@@ -23,7 +23,7 @@ public class ConsoleRemoteControl extends AbstractTextRemoteControl {
             throw new RuntimeException("Could not open console");
         }
     }
-    
+
     @Override
     public String readLine() {
         try {
@@ -32,7 +32,7 @@ public class ConsoleRemoteControl extends AbstractTextRemoteControl {
             return null;
         }
     }
-    
+
     @Override
     public void writeLine(String line) {
         System.out.println(line);

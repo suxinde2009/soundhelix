@@ -17,7 +17,7 @@ import com.soundhelix.util.XMLUtils;
 
 /**
  * Implements a flexible song name engine based on a context-free grammar.
- *
+ * 
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
@@ -84,11 +84,11 @@ public class CFGSongNameEngine extends AbstractSongNameEngine {
 
     /**
      * Recursively replaces all variables in the given string by a randomly chosen value from the corresponding variable map values.
-     *
+     * 
      * @param string the string to perform replacements in
      * @param variableMap the variable map
      * @param random the random generator to use
-     *
+     * 
      * @return the string with all variables replaced
      */
 
@@ -143,7 +143,7 @@ public class CFGSongNameEngine extends AbstractSongNameEngine {
 
         /**
          * Constructor.
-         *
+         * 
          * @param strings the array of strings
          * @param selectOnce true if each string should be returned once
          */
@@ -156,7 +156,7 @@ public class CFGSongNameEngine extends AbstractSongNameEngine {
 
         /**
          * Returns the number of random strings.
-         *
+         * 
          * @return the number of random strings
          */
 
@@ -166,8 +166,9 @@ public class CFGSongNameEngine extends AbstractSongNameEngine {
 
         /**
          * Returns the next random string.
+         * 
          * @param random the random generator
-         *
+         * 
          * @return the next random string
          */
 

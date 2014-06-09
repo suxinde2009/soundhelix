@@ -6,7 +6,7 @@ import com.soundhelix.component.harmonyengine.HarmonyEngine;
 
 /**
  * Implements an abstract HarmonyEngine with some basic functionality.
- *
+ * 
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 

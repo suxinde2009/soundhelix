@@ -6,10 +6,10 @@ import java.util.List;
 
 /**
  * Represents a sequence, i.e., the notes and pauses of a single voice. A note consists of a pitch (with 0 being c', 1 being c#' and so on), a
- * velocity (between 0 and maxVelocity) and a positive length in ticks. A pause is represented by an arbitrary pitch, a velocity of -1 and a
- * positive length in ticks. The velocity can be used to represent a note's volume, but after all, it is up to the playback device how it interprets
- * the velocity. For example, a device might always play a note at its full volume and use the velocity to control filter cut-off instead.
- *
+ * velocity (between 0 and maxVelocity) and a positive length in ticks. A pause is represented by an arbitrary pitch, a velocity of -1 and a positive
+ * length in ticks. The velocity can be used to represent a note's volume, but after all, it is up to the playback device how it interprets the
+ * velocity. For example, a device might always play a note at its full volume and use the velocity to control filter cut-off instead.
+ * 
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
@@ -25,11 +25,11 @@ public class Sequence {
 
     /** The song context. */
     private SongContext songContext;
-    
+
     /**
      * Constructor.
      */
-    
+
     private Sequence() {
     }
 
@@ -38,18 +38,18 @@ public class Sequence {
      * 
      * @param songContext the song context
      */
-    
+
     public Sequence(SongContext songContext) {
         if (songContext == null) {
             throw new IllegalArgumentException("songContext must not be null");
         }
-        
+
         this.songContext = songContext;
     }
-    
+
     /**
      * Calls addNote(pitch,ticks,maxVelocity).
-     *
+     * 
      * @param pitch the pitch
      * @param ticks the ticks
      */
@@ -60,7 +60,7 @@ public class Sequence {
 
     /**
      * Calls addNote(pitch,ticks,velocity,false).
-     *
+     * 
      * @param pitch the pitch
      * @param ticks the ticks
      * @param velocity the velocity
@@ -73,7 +73,7 @@ public class Sequence {
     /**
      * Appends a new note with the given pitch, velocity and number of ticks, which logically means a note-down for the given number of ticks and a
      * note-up afterwards. This method does nothing if ticks is 0. If velocity is 0, an equivalently sized pause is added.
-     *
+     * 
      * @param pitch the pitch
      * @param velocity the velocity (between 0 and maxVelocity)
      * @param ticks the ticks
@@ -84,7 +84,7 @@ public class Sequence {
         if (velocity < 0 || velocity > songContext.getStructure().getMaxVelocity()) {
             throw new IllegalArgumentException("Velocity not in allowed range");
         }
-        
+
         if (ticks > 0) {
             if (velocity == 0) {
                 addPause(ticks);
@@ -99,7 +99,7 @@ public class Sequence {
     /**
      * Appends a pause with the given number of ticks. If the previous sequence entry already was a pause, that pause is extended by the number of
      * ticks instead of adding another pause. The method does nothing if ticks is 0.
-     *
+     * 
      * @param ticks the ticks
      */
 
@@ -122,7 +122,7 @@ public class Sequence {
     /**
      * Extends the previous sequence entry (which must be note) by the given number of ticks. An IllegalStateException will be thrown if the sequence
      * is empty or if the previous entry is not a note.
-     *
+     * 
      * @param ticks the number of ticks
      */
 
@@ -147,9 +147,9 @@ public class Sequence {
 
     /**
      * Returns the total number of ticks this sequence spans.
-     *
+     * 
      * @see #size()
-     *
+     * 
      * @return the number of ticks
      */
 
@@ -159,9 +159,9 @@ public class Sequence {
 
     /**
      * Returns the sequence entry with the given index.
-     *
+     * 
      * @param index the index
-     *
+     * 
      * @return the sequence entry at that index
      */
 
@@ -171,9 +171,9 @@ public class Sequence {
 
     /**
      * Returns the number of sequence entries this sequence contains.
-     *
+     * 
      * @return the size of the sequence
-     *
+     * 
      * @see #getTicks()
      */
 
@@ -211,7 +211,7 @@ public class Sequence {
 
     /**
      * Transposes all notes of this sequence up by the given number of halftones.
-     *
+     * 
      * @param halftones the number of halftones (positive or negative)
      */
 
@@ -235,7 +235,7 @@ public class Sequence {
     /**
      * Replaces the entry at the given tick by the given entry. The tick can be any tick within the sequence and any note can be given. Note that this
      * is an expensive operation, because the runtime grows linearly with the number of entries in the sequence.
-     *
+     * 
      * @param tick the tick where the replacement should take place
      * @param entry the SequenceEntry to insert
      */
@@ -315,13 +315,13 @@ public class Sequence {
     public static class SequenceEntry {
         /** The pitch. */
         private int pitch;
-        
+
         /** The velocity. */
         private final int velocity;
-        
+
         /** The number of ticks. */
         private int ticks;
-        
+
         /** The legato flag. */
         private final boolean legato;
 
@@ -333,7 +333,7 @@ public class Sequence {
          * @param ticks the number of ticks
          * @param legato the legato flag
          */
-        
+
         public SequenceEntry(int pitch, int velocity, int ticks, boolean legato) {
             this.pitch = pitch;
             this.velocity = velocity;

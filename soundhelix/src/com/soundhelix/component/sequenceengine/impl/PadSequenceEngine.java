@@ -54,7 +54,7 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
     /*
      * Constructor.
      */
-    
+
     public PadSequenceEngine() {
         super();
     }
@@ -98,7 +98,7 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
 
         int tick = 0;
         int ticks = songContext.getStructure().getTicks();
-        
+
         while (tick < ticks) {
             Chord chord = harmony.getChord(tick);
 
@@ -203,23 +203,19 @@ public class PadSequenceEngine extends AbstractSequenceEngine {
         try {
             setNormalizeChords(!XMLUtils.parseBoolean(random, "obeyChordSubtype", node));
             logger.warn("The tag \"obeyChordSubtype\" has been deprecated. Use \"normalizeChords\" with inverted value instead.");
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
 
         try {
             setNormalizeChords(XMLUtils.parseBoolean(random, "normalizeChords", node));
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
 
         try {
             setObeyChordSections(XMLUtils.parseBoolean(random, "obeyChordSections", node));
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
 
         try {
             setRetriggerPitches(XMLUtils.parseBoolean(random, "retriggerPitches", node));
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
 
         try {
             setVelocity(XMLUtils.parseInteger(random, "velocity", node));

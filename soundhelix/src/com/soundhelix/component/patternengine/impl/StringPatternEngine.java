@@ -13,7 +13,7 @@ import com.soundhelix.util.XMLUtils;
 
 /**
  * Implements a PatternEngine that reads the pattern directly from a string.
- *
+ * 
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 

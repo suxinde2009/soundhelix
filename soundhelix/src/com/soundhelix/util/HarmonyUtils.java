@@ -26,7 +26,7 @@ public final class HarmonyUtils {
     /**
      * Private constructor.
      */
-    
+
     private HarmonyUtils() {
     }
 
@@ -67,7 +67,7 @@ public final class HarmonyUtils {
     public static String getChordSectionString(SongContext songContext, int tick) {
         Structure structure = songContext.getStructure();
         Harmony harmony = songContext.getHarmony();
-        
+
         if (tick < 0 || tick >= structure.getTicks()) {
             return null;
         }
@@ -224,7 +224,7 @@ public final class HarmonyUtils {
      * @param av the ActivityVector
      * 
      * @return a 4-element int array containing the minimum and the maximum segment length and the minimum and maximum pause length (in this order) or
-     *         null
+     * null
      */
 
     public static int[] getMinMaxSegmentLengths(SongContext songContext, ActivityVector av) {
@@ -291,10 +291,10 @@ public final class HarmonyUtils {
         if (maxSegmentLength == 0) {
             return null;
         } else {
-            return new int[] {minSegmentLength, maxSegmentLength, minPauseLength < Integer.MAX_VALUE ? minPauseLength : 0, maxPauseLength};
+            return new int[] { minSegmentLength, maxSegmentLength, minPauseLength < Integer.MAX_VALUE ? minPauseLength : 0, maxPauseLength };
         }
     }
-    
+
     /**
      * Dumps all chords and their lengths in ticks.
      * 
@@ -305,15 +305,15 @@ public final class HarmonyUtils {
         if (!LOGGER.isDebugEnabled()) {
             return;
         }
-        
+
         Structure structure = songContext.getStructure();
         Harmony harmony = songContext.getHarmony();
-        
+
         StringBuilder sb = new StringBuilder();
 
         int tick = 0;
         int ticks = structure.getTicks();
-        
+
         while (tick < ticks) {
             Chord chord = harmony.getChord(tick);
             int len = harmony.getChordTicks(tick);
@@ -329,13 +329,13 @@ public final class HarmonyUtils {
 
         LOGGER.debug(sb.toString());
     }
-    
+
     /**
      * Checks the sanity of the song's harmony. An exception with details will be thrown if the sanity check has failed.
      * 
      * @param songContext the song context
      */
-    
+
     public static void checkSanity(SongContext songContext) {
         Structure structure = songContext.getStructure();
         Harmony harmony = songContext.getHarmony();
@@ -394,6 +394,5 @@ public final class HarmonyUtils {
             throw new RuntimeException("Chord section ticks is not 1 at last tick");
         }
     }
-
 
 }

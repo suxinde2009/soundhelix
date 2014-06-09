@@ -6,9 +6,9 @@ import com.soundhelix.component.sequenceengine.SequenceEngine;
 
 /**
  * Implements an abstract SequenceEngine with some basic functionality.
- *
+ * 
  * @see SequenceEngine
- *
+ * 
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
@@ -22,7 +22,7 @@ public abstract class AbstractSequenceEngine implements SequenceEngine {
     /**
      * Constructor.
      */
-    
+
     public AbstractSequenceEngine() {
         logger = Logger.getLogger(this.getClass());
     }
@@ -30,7 +30,7 @@ public abstract class AbstractSequenceEngine implements SequenceEngine {
     /**
      * Returns the required number of ActivityVectors. For most implementations, this will be 1, but certain implementations, like for
      * multi-instrument sequences, more than 1 might be required. Subclasses should override this.
-     *
+     * 
      * @return the number of ActivityVectors
      */
 

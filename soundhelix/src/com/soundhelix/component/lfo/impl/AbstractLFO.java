@@ -22,14 +22,14 @@ public abstract class AbstractLFO implements LFO {
     private enum Mode {
         /** Constant angular speed. */
         CONSTANT_SPEED,
-        
+
         /** Synchronized to segment pairs. */
         SYNC_TO_SEGMENT_PAIRS
     }
-    
+
     /** The song context. */
     protected SongContext songContext;
-    
+
     /** The random seed. */
     protected long randomSeed;
 
@@ -50,7 +50,7 @@ public abstract class AbstractLFO implements LFO {
 
     /** The LFO mode. */
     private Mode mode;
-    
+
     /** The number of rotations per tick. */
     private double rotationsPerTick;
 
@@ -99,7 +99,7 @@ public abstract class AbstractLFO implements LFO {
             throw new RuntimeException("LFO speed not set yet");
         }
 
-        double angle = getAngle(tick);        
+        double angle = getAngle(tick);
         return getValue(angle);
     }
 
@@ -109,10 +109,10 @@ public abstract class AbstractLFO implements LFO {
      * @param tick the tick
      * @return the angle in radians
      */
-    
+
     private double getAngle(int tick) {
         double angle;
-        
+
         if (mode == Mode.CONSTANT_SPEED) {
             angle = TWO_PI * (tick * rotationsPerTick + phase);
         } else if (mode == Mode.SYNC_TO_SEGMENT_PAIRS) {
@@ -122,34 +122,35 @@ public abstract class AbstractLFO implements LFO {
         }
         return angle;
     }
- 
+
     /**
      * Returns the LFO angle, depending on the segment pair.
+     * 
      * @param tick the tick
      * @return the angle in radians
      */
-    
+
     private double getSegmentPairAngle(int tick) {
         if (segmentLengths == null) {
             segmentLengths = activityVector.getSegmentLengths();
         }
-        
+
         // identify which type of segment the tick is in and determine the tick's position relative to the segment start
         // as well as the length of that segment
-        
+
         // this is not very efficient, but the number of segments is usually pretty small
         // we could use a modified version using binary search instead
-        
+
         int currentTick = 0;
-        
+
         int segmentPair = -1;
         int tickInSegment = 0;
         int segmentLength = 0;
-        
+
         for (int length : segmentLengths) {
             if (length > 0) {
                 segmentPair++;
-                
+
                 if (tick < currentTick + length) {
                     tickInSegment = tick - currentTick;
                     segmentLength = length;
@@ -161,19 +162,19 @@ public abstract class AbstractLFO implements LFO {
                 if (segmentPair == -1) {
                     segmentPair = 0;
                 }
-                
+
                 // length is negative
                 if (tick < currentTick - length) {
                     tickInSegment = tick - currentTick;
                     segmentLength = length;
                     break;
                 }
-                
+
                 // length is negative
                 currentTick -= length;
             }
         }
-        
+
         if (segmentLength > 0) {
             // first half (0 to pi within the segment pair)
             return TWO_PI * (0.5d * tickInSegment / segmentLength * rotationsPerSegmentPair + phase + segmentPair);
@@ -182,7 +183,7 @@ public abstract class AbstractLFO implements LFO {
             return TWO_PI * (0.5d + 0.5d * tickInSegment / (-segmentLength) * rotationsPerSegmentPair + phase + segmentPair);
         }
     }
-    
+
     @Override
     public void setBeatSpeed(double rotationsPerBeat, int ticksPerBeat) {
         this.rotationsPerTick = rotationsPerBeat / ticksPerBeat;

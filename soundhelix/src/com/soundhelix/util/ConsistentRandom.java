@@ -21,7 +21,7 @@ public class ConsistentRandom {
     /**
      * Private constructor.
      */
-    
+
     private ConsistentRandom() {
     }
 
@@ -30,7 +30,7 @@ public class ConsistentRandom {
      * 
      * @param randomSeed the random seed
      */
-    
+
     public ConsistentRandom(long randomSeed) {
         this.constantSeed = randomSeed;
     }

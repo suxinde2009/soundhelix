@@ -6,7 +6,7 @@ import com.soundhelix.component.patternengine.PatternEngine;
 
 /**
  * Implements abstract PatternEngine functionality.
- *
+ * 
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
@@ -20,7 +20,7 @@ public abstract class AbstractPatternEngine implements PatternEngine {
     /**
      * Constructor.
      */
-    
+
     public AbstractPatternEngine() {
         logger = Logger.getLogger(this.getClass());
     }

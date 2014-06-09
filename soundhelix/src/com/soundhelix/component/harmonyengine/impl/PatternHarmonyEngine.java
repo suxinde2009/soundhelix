@@ -120,8 +120,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
     /**
      * Parses the chord pattern.
      * 
-     * @param songContext
-     *            the song context
+     * @param songContext the song context
      */
 
     private void parsePattern(SongContext songContext) {
@@ -211,8 +210,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
     /**
      * Merges all adjacent equal chords into one chord.
      * 
-     * @param songContext
-     *            the song context
+     * @param songContext the song context
      */
 
     private void mergeAdjacentChords(SongContext songContext) {
@@ -361,8 +359,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 
         try {
             crossoverPitch = XMLUtils.parseInteger(random, "crossoverPitch", node);
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
 
         NodeList nodeList = XMLUtils.getNodeList("chordPattern", node);
         ChordPattern[] chordPatterns = new ChordPattern[nodeList.getLength()];
@@ -374,8 +371,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
             try {
                 boolean b = XMLUtils.parseBoolean(random, "attribute::minimizeChordDistance", nodeList.item(i));
                 minimizeChordDistance = b ? 1 : 0;
-            } catch (Exception e) {
-            }
+            } catch (Exception e) {}
 
             chordPatterns[i] = new ChordPattern(pattern, minimizeChordDistance);
         }
@@ -392,8 +388,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 
         try {
             setMinimizeChordDistance(XMLUtils.parseBoolean(random, "minimizeChordDistance", node));
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
 
         setChordRandomTables(chordRandomTables);
     }

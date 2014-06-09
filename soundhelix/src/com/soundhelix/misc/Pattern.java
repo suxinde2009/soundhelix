@@ -46,8 +46,7 @@ public class Pattern implements Iterable<PatternEntry> {
     /**
      * Constructor.
      * 
-     * @param pattern
-     *            the pattern
+     * @param pattern the pattern
      */
 
     public Pattern(PatternEntry[] pattern) {
@@ -65,10 +64,8 @@ public class Pattern implements Iterable<PatternEntry> {
     /**
      * Parses the given pattern string using no wildcards.
      * 
-     * @param songContext
-     *            the song context
-     * @param patternString
-     *            the pattern string
+     * @param songContext the song context
+     * @param patternString the pattern string
      * 
      * @return the pattern
      */
@@ -80,14 +77,10 @@ public class Pattern implements Iterable<PatternEntry> {
     /**
      * Parses the given pattern string using no wildcards.
      * 
-     * @param songContext
-     *            the song context
-     * @param patternString
-     *            the pattern string
-     * @param currentTPB
-     *            the ticks per beat of the song
-     * @param targetTPB
-     *            the ticks per beat the pattern is for
+     * @param songContext the song context
+     * @param patternString the pattern string
+     * @param currentTPB the ticks per beat of the song
+     * @param targetTPB the ticks per beat the pattern is for
      * 
      * @return the pattern
      */
@@ -99,12 +92,9 @@ public class Pattern implements Iterable<PatternEntry> {
     /**
      * Parses the given pattern string using the given wildcard string.
      * 
-     * @param songContext
-     *            the song context
-     * @param patternString
-     *            the pattern string
-     * @param wildcardString
-     *            the wildcard string
+     * @param songContext the song context
+     * @param patternString the pattern string
+     * @param wildcardString the wildcard string
      * 
      * @return the pattern
      */
@@ -116,16 +106,11 @@ public class Pattern implements Iterable<PatternEntry> {
     /**
      * Parses the given pattern string using the given wildcard string.
      * 
-     * @param songContext
-     *            the song context
-     * @param patternString
-     *            the pattern string
-     * @param wildcardString
-     *            the wildcard string
-     * @param currentTPB
-     *            the ticks per beat of the song
-     * @param targetTPB
-     *            the ticks per beat the pattern is for
+     * @param songContext the song context
+     * @param patternString the pattern string
+     * @param wildcardString the wildcard string
+     * @param currentTPB the ticks per beat of the song
+     * @param targetTPB the ticks per beat the pattern is for
      * 
      * @return the pattern
      */
@@ -187,10 +172,8 @@ public class Pattern implements Iterable<PatternEntry> {
      * replaces this with the string concatenated count times using the separator character in between. These constructs can be nested. The
      * replacement starts with the innermost occurence.
      * 
-     * @param patternString
-     *            the pattern string
-     * @param separator
-     *            the separator character for pattern entries
+     * @param patternString the pattern string
+     * @param separator the separator character for pattern entries
      * 
      * @return the expanded pattern string
      */
@@ -230,8 +213,7 @@ public class Pattern implements Iterable<PatternEntry> {
     /**
      * Evaluates all functions given in the pattern string and replaces them with their results.
      * 
-     * @param patternString
-     *            the pattern string
+     * @param patternString the pattern string
      * @return the pattern string with functions evaluated
      */
 
@@ -291,12 +273,9 @@ public class Pattern implements Iterable<PatternEntry> {
     /**
      * Multiplies the string, which means the string is concatenated count times using the separator in between.
      * 
-     * @param str
-     *            the string
-     * @param count
-     *            the number of concatenations
-     * @param separator
-     *            the separator character
+     * @param str the string
+     * @param count the number of concatenations
+     * @param separator the separator character
      * 
      * @return the multiplied string
      */
@@ -324,8 +303,7 @@ public class Pattern implements Iterable<PatternEntry> {
     /**
      * Returns the number of ticks of the given pattern string. The pattern string is expanded if necessary to count the number of ticks.
      * 
-     * @param patternString
-     *            the pattern string
+     * @param patternString the pattern string
      * 
      * @return the number of ticks
      */
@@ -352,8 +330,7 @@ public class Pattern implements Iterable<PatternEntry> {
     /**
      * Expands the pattern string.
      * 
-     * @param patternString
-     *            the pattern string
+     * @param patternString the pattern string
      * @return the expanded pattern strings
      */
 
@@ -367,8 +344,7 @@ public class Pattern implements Iterable<PatternEntry> {
      * Transposes the pattern up by the given pitch (which may be negative) and returns it as a new pattern (or the original pattern if pitch is 0).
      * Only the notes will be affected by this operation (wildcards and pauses are not affected).
      * 
-     * @param pitch
-     *            the number of halftones to transpose up (may be negative)
+     * @param pitch the number of halftones to transpose up (may be negative)
      * 
      * @return a new pattern that is a transposed version of this pattern
      */
@@ -398,8 +374,7 @@ public class Pattern implements Iterable<PatternEntry> {
     /**
      * Returns a new pattern whose entries' ticks are scaled by the given factor.
      * 
-     * @param factor
-     *            the scale factor
+     * @param factor the scale factor
      * 
      * @return a new pattern that is a scaled by the factor
      */
@@ -451,8 +426,7 @@ public class Pattern implements Iterable<PatternEntry> {
     /**
      * Returns the pattern entry with the given index.
      * 
-     * @param index
-     *            the index
+     * @param index the index
      * 
      * @return the sequence entry at that index
      */
@@ -496,12 +470,9 @@ public class Pattern implements Iterable<PatternEntry> {
      * off if no legato was used; the same applies to the pattern offset. Legato is legal for the tick if there is a subsequent note on the pattern
      * that lies in the activity range of the activity vector. I.e., it is illegal to use legato on a note which ends outside of an activity interval.
      * 
-     * @param activityVector
-     *            the activity vector
-     * @param tick
-     *            the tick
-     * @param patternOffset
-     *            the pattern offset
+     * @param activityVector the activity vector
+     * @param tick the tick
+     * @param patternOffset the pattern offset
      * 
      * @return true if legato is legal, false otherwise
      */
@@ -584,8 +555,7 @@ public class Pattern implements Iterable<PatternEntry> {
         /**
          * Constructor.
          * 
-         * @param ticks
-         *            the number of ticks
+         * @param ticks the number of ticks
          */
 
         public PatternEntry(int ticks) {
@@ -596,14 +566,10 @@ public class Pattern implements Iterable<PatternEntry> {
         /**
          * Constructor.
          * 
-         * @param pitch
-         *            the pitch
-         * @param velocity
-         *            the velocity
-         * @param ticks
-         *            the number of ticks
-         * @param legato
-         *            the legato flag
+         * @param pitch the pitch
+         * @param velocity the velocity
+         * @param ticks the number of ticks
+         * @param legato the legato flag
          */
 
         public PatternEntry(int pitch, int velocity, int ticks, boolean legato) {
@@ -616,14 +582,10 @@ public class Pattern implements Iterable<PatternEntry> {
         /**
          * Constructor.
          * 
-         * @param wildcardCharacter
-         *            the wildcard character
-         * @param velocity
-         *            the velocity
-         * @param ticks
-         *            the number of ticks
-         * @param legato
-         *            the legato flag
+         * @param wildcardCharacter the wildcard character
+         * @param velocity the velocity
+         * @param ticks the number of ticks
+         * @param legato the legato flag
          */
 
         public PatternEntry(char wildcardCharacter, int velocity, int ticks, boolean legato) {

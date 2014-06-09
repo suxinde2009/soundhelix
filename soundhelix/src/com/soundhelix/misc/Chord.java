@@ -347,7 +347,7 @@ public class Chord {
             return octaveOffset + highPitch;
         }
     }
-    
+
     /**
      * Normalizes the chord. Any major, minor or diminished chord with first or second inversion will be converted to its counterpart without
      * inversion. For all other chords the original chord will be returned. Augmented chords cannot be normalized, because they don't have a unique

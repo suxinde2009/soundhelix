@@ -46,7 +46,7 @@ public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
     /**
      * Constructor.
      */
-    
+
     public ArpeggioSequenceEngine() {
         super();
     }
@@ -63,7 +63,7 @@ public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
     public Track render(SongContext songContext, ActivityVector[] activityVectors) {
         Structure structure = songContext.getStructure();
         Harmony harmony = songContext.getHarmony();
-        
+
         ActivityVector activityVector = activityVectors[0];
 
         int tick = 0;
@@ -73,7 +73,7 @@ public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
 
         while (tick < ticks) {
             Chord chord = harmony.getChord(tick);
- 
+
             if (isNormalizeChords) {
                 chord = chord.normalize();
             }
@@ -193,18 +193,15 @@ public class ArpeggioSequenceEngine extends AbstractSequenceEngine {
         try {
             setNormalizeChords(!XMLUtils.parseBoolean(random, "obeyChordSubtype", node));
             logger.warn("The tag \"obeyChordSubtype\" has been deprecated. Use \"normalizeChords\" with inverted value instead.");
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
 
         try {
             setNormalizeChords(XMLUtils.parseBoolean(random, "normalizeChords", node));
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
 
         try {
             setObeyChordSections(XMLUtils.parseBoolean(random, "obeyChordSections", node));
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
 
         int patternEngineCount = nodeList.getLength();
 

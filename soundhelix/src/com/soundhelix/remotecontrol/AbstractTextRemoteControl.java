@@ -53,16 +53,16 @@ public abstract class AbstractTextRemoteControl implements TextRemoteControl {
      * @param line the line
      * @param hasExitPermission flag indicating whether the user may call System.exit()
      */
-    
+
     private void handleCommand(String line, boolean hasExitPermission) {
         if (songContext == null) {
             writeLine("Song context not initialized yet");
             return;
         }
-        
+
         Harmony harmony = songContext.getHarmony();
         Player player = songContext.getPlayer();
-        
+
         if (line.startsWith("bpm ")) {
             if (player != null) {
                 writeLine("Setting BPM");
@@ -110,8 +110,7 @@ public abstract class AbstractTextRemoteControl implements TextRemoteControl {
 
                         if (chordSection >= 0) {
                             int chordSectionTick = tick - HarmonyUtils.getChordSectionTick(songContext, chordSection);
-                            writeLine("Skipping to tick " + tick + " (tick " + chordSectionTick
-                                    + " of chord section " + chordSection + ")");
+                            writeLine("Skipping to tick " + tick + " (tick " + chordSectionTick + " of chord section " + chordSection + ")");
                         } else {
                             writeLine("Skipping to tick " + tick);
                         }
@@ -154,7 +153,7 @@ public abstract class AbstractTextRemoteControl implements TextRemoteControl {
      * 
      * @param hasExitPermission flag indicating whether the user may call System.exit()
      */
-    
+
     private void showHelp(boolean hasExitPermission) {
         writeLine("Available commands");
         writeLine("------------------\n");
@@ -163,8 +162,7 @@ public abstract class AbstractTextRemoteControl implements TextRemoteControl {
         writeLine("skip <value>%           Skips to the specified tick percentage. Example: \"skip 50.8%\"");
         writeLine("skip #<value>           Skips to the specified chord section. "
                 + "Example: \"skip #3.5\" (skips to the middle of chord section 3)");
-        writeLine("skip +                  Skips to the first tick of the next chord section. "
-                + "Example: \"skip +\". Short form: \"+\"");
+        writeLine("skip +                  Skips to the first tick of the next chord section. " + "Example: \"skip +\". Short form: \"+\"");
         writeLine("transposition <value>   Sets the transposition. Example: \"transposition 70\"");
         writeLine("groove <value>          Sets the groove pattern. Example: \"groove 130,70\" or \"groove 120,80\"");
         writeLine("next                    Aborts playing and starts the next song. Example: \"next\"");

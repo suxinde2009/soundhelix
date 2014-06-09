@@ -8,11 +8,11 @@ import java.util.List;
  * Represents a bit vector specifying for each tick whether a voice should be active or not. The bit vector grows dynamically as needed. This vector
  * should be considered a strong hint for a SequenceEngine whether to add notes or to add pauses. However, it is not strictly forbidden to play notes
  * while inactive. For example, after an activity interval, a final note could be played at the start of the following inactivity interval.
- *
+ * 
  * An ActivityVector must always span the whole length of a song.
- *
+ * 
  * @see com.soundhelix.component.sequenceengine.SequenceEngine
- *
+ * 
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
@@ -28,7 +28,7 @@ public class ActivityVector {
 
     /**
      * Constructor. Initializes the internal BitSet's initial size to the default number of bits.
-     *
+     * 
      * @param name the name
      */
 
@@ -39,7 +39,7 @@ public class ActivityVector {
 
     /**
      * Constructor. Initializes the internal BitSet's initial size to the given number of bits.
-     *
+     * 
      * @param name the name
      * @param bits the initial number of bits
      */
@@ -51,7 +51,7 @@ public class ActivityVector {
 
     /**
      * Appends an activity interval with the specified number of ticks.
-     *
+     * 
      * @param ticks the number of ticks
      */
 
@@ -62,7 +62,7 @@ public class ActivityVector {
 
     /**
      * Appends an inactivity interval with the specified number of ticks.
-     *
+     * 
      * @param ticks the number of ticks
      */
 
@@ -73,9 +73,9 @@ public class ActivityVector {
 
     /**
      * Returns the activity state of the specified tick. If the tick number is beyond the end of the vector, false is returned.
-     *
+     * 
      * @param tick the tick
-     *
+     * 
      * @return true if the tick is active, false otherwise
      */
 
@@ -90,9 +90,9 @@ public class ActivityVector {
     /**
      * Returns the length of the interval beginning with the given tick, i.e., the number of ticks until the activity state changes or the end of the
      * vector is reached.
-     *
+     * 
      * @param tick the tick
-     *
+     * 
      * @return the number of ticks until the next change or the vector ends
      */
 
@@ -119,7 +119,7 @@ public class ActivityVector {
 
     /**
      * Returns the name of this ActivityVector.
-     *
+     * 
      * @return the name
      */
 
@@ -129,7 +129,7 @@ public class ActivityVector {
 
     /**
      * Returns the total number of ticks this ActivityVector spans.
-     *
+     * 
      * @return the total number of ticks
      */
 
@@ -139,7 +139,7 @@ public class ActivityVector {
 
     /**
      * Returns the number of ticks this ActivityVector is active.
-     *
+     * 
      * @return the number of active ticks
      */
 
@@ -149,7 +149,7 @@ public class ActivityVector {
 
     /**
      * Returns the tick where the ActivityVector becomes active for the first time. If the ActvityVector never becomes active, -1 is returned.
-     *
+     * 
      * @return the first activity tick (or -1)
      */
 
@@ -159,7 +159,7 @@ public class ActivityVector {
 
     /**
      * Returns the tick where the ActivityVector is active for the last time. If the ActvityVector never becomes active, -1 is returned.
-     *
+     * 
      * @return the last activity tick (or -1)
      */
 
@@ -169,7 +169,7 @@ public class ActivityVector {
 
     /**
      * Returns the tick where the ActivityVector becomes inactive for the first time. If the ActvityVector never becomes in inactive, -1 is returned.
-     *
+     * 
      * @return the first inactivity tick
      */
 
@@ -186,7 +186,7 @@ public class ActivityVector {
     /**
      * Modifies the ActivityVector so that it has the given state in the interval from from (inclusive) to till (exclusive). The vector will be
      * extended, if necessary.
-     *
+     * 
      * @param from the starting tick (inclusive)
      * @param till the ending tick (exclusive)
      * @param state the state of the interval
@@ -204,7 +204,7 @@ public class ActivityVector {
      * Modifies the ActivityVector so that all interval changes from inactive to active are postponed by startTicks and all changes from active to
      * inactive are postponed by stopTicks ticks. startTicks and stopTicks may also be negative to prepone instead of postpone. The start of the first
      * interval is never modified, whereas the end of the last interval is never postponed.
-     *
+     * 
      * @param startTicks the number of ticks to prepone or postpone starting
      * @param stopTicks the number of ticks to prepone or postpone stopping
      */
@@ -237,7 +237,7 @@ public class ActivityVector {
 
     /**
      * Counts the number of activity segments, which is the number of consecutive blocks of activity in the vector.
-     *
+     * 
      * @return the number of activity segments
      */
 
@@ -264,7 +264,7 @@ public class ActivityVector {
 
     /**
      * Returns a string representation of the ActivityVector.
-     *
+     * 
      * @return a string representation
      */
 
@@ -289,17 +289,17 @@ public class ActivityVector {
 
         return sb.toString();
     }
-    
+
     /**
-     * Returns an array that contains all activity and pause segment lengths in ticks, sorted by starting tick number.
-     * Every activity segment will have a positive length, every pause segment will have a negative length.
+     * Returns an array that contains all activity and pause segment lengths in ticks, sorted by starting tick number. Every activity segment will
+     * have a positive length, every pause segment will have a negative length.
      * 
      * @return the array containing the segment lengths
      */
-    
+
     public int[] getSegmentLengths() {
         List<Integer> list = new ArrayList<Integer>();
-        
+
         int tick = 0;
 
         while (tick < totalTicks) {
@@ -313,14 +313,14 @@ public class ActivityVector {
                 if (nextTick == -1) {
                     nextTick = totalTicks;
                 }
-                
+
                 list.add(tick - nextTick);
                 tick = nextTick;
             }
         }
-        
+
         // convert list to int array
-        
+
         int size = list.size();
         int[] result = new int[size];
 

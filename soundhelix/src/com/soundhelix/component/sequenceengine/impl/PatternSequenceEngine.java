@@ -26,7 +26,7 @@ public class PatternSequenceEngine extends AbstractMultiPatternSequenceEngine {
     /**
      * Constructor.
      */
-    
+
     public PatternSequenceEngine() {
         super();
     }
@@ -44,13 +44,11 @@ public class PatternSequenceEngine extends AbstractMultiPatternSequenceEngine {
         try {
             setNormalizeChords(!XMLUtils.parseBoolean(random, "obeyChordSubtype", node));
             logger.warn("The tag \"obeyChordSubtype\" has been deprecated. " + "Use \"normalizeChords\" with inverted value instead.");
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
 
         try {
             setNormalizeChords(XMLUtils.parseBoolean(random, "normalizeChords", node));
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
 
         PatternEngine patternEngine;
 
@@ -63,6 +61,6 @@ public class PatternSequenceEngine extends AbstractMultiPatternSequenceEngine {
 
         Pattern pattern = patternEngine.render(songContext, "" + TRANSITION);
 
-        setPatterns(new Pattern[] {pattern});
+        setPatterns(new Pattern[] { pattern });
     }
 }

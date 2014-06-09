@@ -64,12 +64,10 @@ public class MultiPatternSequenceEngine extends AbstractMultiPatternSequenceEngi
         try {
             setNormalizeChords(!XMLUtils.parseBoolean(random, "obeyChordSubtype", node));
             logger.warn("The tag \"obeyChordSubtype\" has been deprecated. Use \"normalizeChords\" with inverted value instead.");
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
 
         try {
             setNormalizeChords(XMLUtils.parseBoolean(random, "normalizeChords", node));
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
     }
 }

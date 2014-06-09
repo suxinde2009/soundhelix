@@ -31,7 +31,7 @@ public class Arrangement implements Iterable<Arrangement.ArrangementEntry> {
     /**
      * Constructor.
      */
-    
+
     public Arrangement() {
     }
 
@@ -46,7 +46,7 @@ public class Arrangement implements Iterable<Arrangement.ArrangementEntry> {
         if (entryMap.containsKey(instrument)) {
             throw new IllegalArgumentException("Instrument \"" + instrument + "\" already in arrangement");
         }
-        
+
         ArrangementEntry entry = new ArrangementEntry(track, instrument);
         entryList.add(entry);
         entryMap.put(instrument, entry);
@@ -62,7 +62,7 @@ public class Arrangement implements Iterable<Arrangement.ArrangementEntry> {
      * 
      * @return the number of entries
      */
-    
+
     public int size() {
         return entryList.size();
     }
@@ -71,10 +71,10 @@ public class Arrangement implements Iterable<Arrangement.ArrangementEntry> {
      * Returns the arrangement entry with the given index.
      * 
      * @param index the index (starting with 0)
-     *
+     * 
      * @return the arrangement entry
      */
-    
+
     public ArrangementEntry get(int index) {
         return entryList.get(index);
     }
@@ -83,10 +83,10 @@ public class Arrangement implements Iterable<Arrangement.ArrangementEntry> {
      * Returns the arrangement entry whose instrument has the given name. If such an entry doesn't exist, null is returned.
      * 
      * @param instrument the name of the instrument
-     *
+     * 
      * @return the arrangement entry or null
      */
-    
+
     public ArrangementEntry get(String instrument) {
         return entryMap.get(instrument);
     }
@@ -150,7 +150,7 @@ public class Arrangement implements Iterable<Arrangement.ArrangementEntry> {
          * @param track the track
          * @param instrument the instrument
          */
-        
+
         private ArrangementEntry(Track track, String instrument) {
             this.track = track;
             this.instrument = instrument;

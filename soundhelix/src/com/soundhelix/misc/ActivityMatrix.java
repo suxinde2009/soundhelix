@@ -17,27 +17,27 @@ import com.soundhelix.util.HarmonyUtils;
 public class ActivityMatrix implements Iterable<ActivityVector> {
     /** The logger. */
     private static final Logger LOGGER = Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
- 
+
     /** The map that maps from names to ActivityVectors. */
     private Map<String, ActivityVector> map = new LinkedHashMap<String, ActivityVector>();
 
     /**
-     * Adds the given ActivityVector. If an ActivityVector with the same name already exists, it will be replaced in its current position.
-     * Otherwise it will be appended to the list of ActivityVectors.
+     * Adds the given ActivityVector. If an ActivityVector with the same name already exists, it will be replaced in its current position. Otherwise
+     * it will be appended to the list of ActivityVectors.
      * 
      * @param activityVector the ActivityVector
-     */    
+     */
     public void add(ActivityVector activityVector) {
         map.put(activityVector.getName(), activityVector);
     }
 
     /**
      * Looks up and returns the ActivityVector with the given name. If the name is not found, null is returned.
-     *
+     * 
      * @param name the name
      * @return the ActivityVector (or null)
      */
-    
+
     public ActivityVector get(String name) {
         return map.get(name);
     }
@@ -46,10 +46,10 @@ public class ActivityMatrix implements Iterable<ActivityVector> {
     public Iterator<ActivityVector> iterator() {
         return map.values().iterator();
     }
-    
+
     /**
      * Dumps the activity vectors as an activity matrix to the log with level DEBUG.
-     *
+     * 
      * @param songContext the song context
      */
 
@@ -59,7 +59,7 @@ public class ActivityMatrix implements Iterable<ActivityVector> {
         }
 
         Structure structure = songContext.getStructure();
-        
+
         StringBuilder sb = new StringBuilder("Song's activity matrix:\n");
 
         int chordSections = HarmonyUtils.getChordSectionCount(songContext);
@@ -142,5 +142,5 @@ public class ActivityMatrix implements Iterable<ActivityVector> {
         }
 
         LOGGER.info(sb.toString());
-    }    
+    }
 }

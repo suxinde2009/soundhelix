@@ -18,19 +18,19 @@ import com.soundhelix.util.XMLUtils;
 public class LinearRandomLFO extends AbstractLFO {
     /** The random generator. */
     private Random random;
-    
+
     /** The number of random values. */
     private int valueCount;
-    
+
     /** The random values. */
     private double[] values;
- 
+
     /** The minimum distance between neighboring values. */
     private double minDistance;
-    
+
     /** The maximum distance between neighboring values. */
     private double maxDistance;
-    
+
     @Override
     public double getValue(double angle) {
         // normalize angle into the range [0,2*Pi[
@@ -39,25 +39,25 @@ public class LinearRandomLFO extends AbstractLFO {
         double index = angle / TWO_PI * (double) valueCount;
         double fraction = index - Math.floor(index);
         int intIndex = (int) index;
-        
+
         return (1.0d - fraction) * values[intIndex] + fraction * values[(intIndex + 1) % valueCount];
     }
 
     @Override
     public final void configure(SongContext songContext, Node node) throws XPathException {
         random = new Random(randomSeed);
-        
+
         int values = XMLUtils.parseInteger(random, "valueCount", node);
-        
+
         if (values <= 0) {
             throw new RuntimeException("valueCount must be positive");
         }
-        
+
         setValueCount(values);
-    
+
         double minDist = XMLUtils.parseDouble(random, XMLUtils.getNode("minDistance", node));
         double maxDist = XMLUtils.parseDouble(random, XMLUtils.getNode("maxDistance", node));
-        
+
         if (minDist < 0.0 || minDist > 0.5) {
             throw new RuntimeException("minDistance must be in the range [0, 0.5]");
         }
@@ -72,14 +72,14 @@ public class LinearRandomLFO extends AbstractLFO {
 
         setMinDistance(minDist);
         setMaxDistance(maxDist);
-        
+
         generateValues();
     }
 
     /**
      * Generates the LFO values.
      */
-    
+
     private void generateValues() {
         values = new double[valueCount];
         double diff;
@@ -89,20 +89,20 @@ public class LinearRandomLFO extends AbstractLFO {
 
             for (int i = 1; i < valueCount; i++) {
                 double value;
-                
+
                 do {
-                    value = random.nextDouble();                
-                    diff = Math.abs(value - values[i - 1]);                
+                    value = random.nextDouble();
+                    diff = Math.abs(value - values[i - 1]);
                 } while (diff < minDistance || diff > maxDistance);
-                
+
                 values[i] = value;
             }
-            
+
             // special handling for the last value
-            diff = Math.abs(values[0] - values[valueCount - 1]);            
+            diff = Math.abs(values[0] - values[valueCount - 1]);
         } while (diff < minDistance || diff > maxDistance);
     }
-    
+
     public void setValueCount(int valueCount) {
         this.valueCount = valueCount;
     }

@@ -43,13 +43,13 @@ import com.soundhelix.util.VersionUtils;
 
 /**
  * Implements a Swing-based applet for SoundHelix.
- *
+ * 
  * The following optional applet parameters are used:
- *
- * - "invisible": if set to "true", the applet will be invisible (no logging, no controls); useful for embedding in websites
- * - "url": if set, the SoundHelix XML file will be loaded from the provided URL (if relative, relative to the applet's URL)
- * - "songName": if set, the first song generated will use the given song name for random intialization
- *
+ * 
+ * - "invisible": if set to "true", the applet will be invisible (no logging, no controls); useful for embedding in websites - "url": if set, the
+ * SoundHelix XML file will be loaded from the provided URL (if relative, relative to the applet's URL) - "songName": if set, the first song generated
+ * will use the given song name for random intialization
+ * 
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
@@ -105,7 +105,7 @@ public class SoundHelixApplet extends JApplet implements Runnable {
 
     /**
      * Starts the applet.
-     *
+     * 
      * @param args the arguments
      */
 
@@ -210,7 +210,7 @@ public class SoundHelixApplet extends JApplet implements Runnable {
 
     /**
      * Creates a button panel and adds it to the given panel.
-     *
+     * 
      * @param songNamePanel the panel to add the new panel to
      */
 
@@ -229,8 +229,7 @@ public class SoundHelixApplet extends JApplet implements Runnable {
             panel.add(shareButton);
             this.twitterShareButton = shareButton;
 
-            shareButton = getIconButton("http://www.soundhelix.com/applet/images/youtube-share.png",
-                    "Visit the SoundHelix channel on YouTube");
+            shareButton = getIconButton("http://www.soundhelix.com/applet/images/youtube-share.png", "Visit the SoundHelix channel on YouTube");
             panel.add(shareButton);
             this.youTubeShareButton = shareButton;
 
@@ -244,13 +243,12 @@ public class SoundHelixApplet extends JApplet implements Runnable {
             addUrlActionListener(twitterShareButton, true);
             addUrlActionListener(youTubeShareButton, false);
             addUrlActionListener(soundHelixShareButton, false);
-        } catch (MalformedURLException e) {
-        }
+        } catch (MalformedURLException e) {}
     }
 
     /**
      * Adds an action listener for the given button that opens an external website.
-     *
+     * 
      * @param button the button
      * @param needsCurrentSongName flag indicating whether the current song name is needed
      */
@@ -285,12 +283,12 @@ public class SoundHelixApplet extends JApplet implements Runnable {
 
     /**
      * Creates a JButton with the given icon and the given tool tip.
-     *
+     * 
      * @param iconUrl the icon URL
      * @param toolTip the tool tip
-     *
+     * 
      * @return the JButton
-     *
+     * 
      * @throws MalformedURLException if the URL is malformed
      */
 
@@ -322,7 +320,7 @@ public class SoundHelixApplet extends JApplet implements Runnable {
 
     /**
      * Sets the title of the applet frame.
-     *
+     * 
      * @param title the frame title
      */
 
@@ -350,15 +348,14 @@ public class SoundHelixApplet extends JApplet implements Runnable {
                     ((MidiPlayer) player).muteAllChannels();
                 }
             }
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
 
         super.stop();
     }
 
     /**
      * Gets the desktop, if available.
-     *
+     * 
      * @return the desktop (or null)
      */
 
@@ -372,10 +369,10 @@ public class SoundHelixApplet extends JApplet implements Runnable {
 
     /**
      * Generates and returns a Facebook URL for sharing the given song.
-     *
+     * 
      * @param songName the song name
      * @param xmlUrl the XML URL
-     *
+     * 
      * @return the URL
      */
 
@@ -386,10 +383,10 @@ public class SoundHelixApplet extends JApplet implements Runnable {
 
     /**
      * Generates and returns a Facebook URL for sharing the given song.
-     *
+     * 
      * @param songName the song name
      * @param xmlUrl the XML URL
-     *
+     * 
      * @return the URL
      */
 
@@ -412,9 +409,9 @@ public class SoundHelixApplet extends JApplet implements Runnable {
 
     /**
      * URL-encodes the given string and returns it.
-     *
+     * 
      * @param string the input string
-     *
+     * 
      * @return the URL-encoded string
      */
 
@@ -469,8 +466,7 @@ public class SoundHelixApplet extends JApplet implements Runnable {
 
                 try {
                     Thread.sleep(3000);
-                } catch (InterruptedException e2) {
-                }
+                } catch (InterruptedException e2) {}
             }
         }
     }
@@ -506,7 +502,7 @@ public class SoundHelixApplet extends JApplet implements Runnable {
 
         /**
          * Constructor.
-         *
+         * 
          * @param layout the layout
          * @param remoteControl the remote control
          */

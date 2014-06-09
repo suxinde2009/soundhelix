@@ -27,52 +27,47 @@ import com.soundhelix.util.XMLUtils;
  * Implements a simple ArrangementEngine. The song starts with a configurable "fade-in" of the number of active ActivityVectors and ends with a
  * configurable "fade-out" of the number of active ActivityVectors. For each chord section in between, the number of active AVs is varied in the
  * configured range.
- *
+ * 
  * ActivityVector activity can be constrained individually to enforce certain properties. All AVs are filled at the same time because there is always
  * the above-mentioned overall song constraint that defines the number of active AVs for each chord section. For each chord section a choice is made
  * whether to activate or deactivate AVs or to leave the number of active AVs unchanged, according to the AVs that should be active. The list of
  * generated AVs are called a song activity matrix.
- *
+ * 
  * The following constraints are supported for ActivityVectors:
- *
- * - minActive(n): the AV must be active for at least n% of the song; granularity is at chord section level; it is
- *                 also possible define that the AV may be inactive for the whole song or be active with at least n%
- *                 of the song
- * - maxActive(n): the AV must be active for at most n% of the song; granularity is at chord section level
- * - startBeforeSection(n): the AV must start before section n
- * - startAfterSection(n): the AV must start after section n
- * - stopBeforeSection(n): the AV must stop before section n, counted from the end (0 is the last chord section)
- * - stopAfterSection(n): the AV must stop after section n, counted from the end (0 is the last chord section)
- * - minSegmentCount(n): the AV must be active for at least n chord section segments
- * - maxSegmentCount(n): the AV must be active for at most n chord section segments
- * - minSegmentLength(n): the minimum AV segment length must be n chord sections
- * - maxSegmentLength(n): the maximum AV segment length must be n chord sections
- * - minPauseLength(n): the minimum AV pause length must be n chord sections
- * - maxPauseLength(n): the maximum AV pause length must be n chord sections
- *
+ * 
+ * - minActive(n): the AV must be active for at least n% of the song; granularity is at chord section level; it is also possible define that the AV
+ * may be inactive for the whole song or be active with at least n% of the song - maxActive(n): the AV must be active for at most n% of the song;
+ * granularity is at chord section level - startBeforeSection(n): the AV must start before section n - startAfterSection(n): the AV must start after
+ * section n - stopBeforeSection(n): the AV must stop before section n, counted from the end (0 is the last chord section) - stopAfterSection(n): the
+ * AV must stop after section n, counted from the end (0 is the last chord section) - minSegmentCount(n): the AV must be active for at least n chord
+ * section segments - maxSegmentCount(n): the AV must be active for at most n chord section segments - minSegmentLength(n): the minimum AV segment
+ * length must be n chord sections - maxSegmentLength(n): the maximum AV segment length must be n chord sections - minPauseLength(n): the minimum AV
+ * pause length must be n chord sections - maxPauseLength(n): the maximum AV pause length must be n chord sections
+ * 
  * A randomized backtracking algorithm is used for finding a song activity matrix that fulfills all constraints of all ActivityVectors at the same
  * time. It works roughly as follows: The song activity matrix is built from left to right (chord section by chord section) by making random
  * selections about which AVs to activate or deactivate. If a constraint violation is detected, a number of different random choices at the same
  * section is tried by reverting the previous choice and choosing another one; if all these fail, the algorithm backtracks to the previous section. To
  * avoid the overhead of recursion, the algorithm is implemented iteratively.
- *
+ * 
  * The algorithm is able to find a valid song activity matrix pretty quickly (if one exists), much faster than the simpler algorithm used in version
  * 0.1 of SoundHelix and before.
- *
+ * 
  * The algorithm scales pretty well with increasing numbers of constraints, but keep in mind that every additional constraint increases the complexity
  * level of finding a valid song activity matrix.
- *
+ * 
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public class SimpleArrangementEngine extends AbstractArrangementEngine {
     /** The constraint mode for ActivityMatrix generation. */
-    public enum ConstraintMode  {
+    public enum ConstraintMode {
         /** Exact mode using backtracking. */
         EXACT,
         /** Greedy mode using an approximation. */
         GREEDY
     }
+
     /** The random generator. */
     private Random random;
 
@@ -87,16 +82,16 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
     /** The constraintMode. */
     private ConstraintMode constraintMode;
-    
+
     /** The array of start activity counts. */
     private int[] startActivityCounts;
-    
+
     /** The array of stop activity counts. */
     private int[] stopActivityCounts;
 
     /** The arrangement entries. */
     private ArrangementEntry[] arrangementEntries;
-    
+
     /** The map that maps from activity vector names to activity vector configurations. */
     private Map<String, ActivityVectorConfiguration> activityVectorConfigurationHashMap;
 
@@ -120,7 +115,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         }
 
         ActivityMatrix activityMatrix;
-        
+
         if (constraintMode == ConstraintMode.EXACT) {
             activityMatrix = createExactConstrainedActivityVectors(songContext, vectors);
         } else if (constraintMode == ConstraintMode.GREEDY) {
@@ -128,18 +123,18 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         } else {
             throw new RuntimeException("Unknown constraint mode \"" + constraintMode + "\"");
         }
-        
+
         songContext.setActivityMatrix(activityMatrix);
         activityMatrix.dump(songContext);
         shiftIntervalBoundaries(neededActivityVectors);
-        
+
         return createArrangement(songContext, neededActivityVectors);
     }
 
     /**
      * Returns the needed activity vectors as a map that maps from the activity vector name to its configuration. Rather than returning all activity
      * vectors, this method only returns the activity vectors that are used within at least one SequenceEngine.
-     *
+     * 
      * @return the map of activity vectors
      */
 
@@ -166,10 +161,10 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
     /**
      * Creates an arrangement based on the given map of needed activity vectors. This is done by rendering a track for each SequenceEngine based on
      * the already generated activity vectors.
-     *
+     * 
      * @param songContext the song context
      * @param neededActivityVector the map of needed activity vectors
-     *
+     * 
      * @return the created arrangement
      */
 
@@ -207,7 +202,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
     /**
      * Shifts the interval boundaries of all activity vectors where a start or stop shift has been configured.
-     *
+     * 
      * @param neededActivityVector the needed activity vectors
      */
 
@@ -217,8 +212,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         }
     }
 
-    private ActivityMatrix createExactConstrainedActivityVectors(SongContext songContext,
-            ActivityVectorConfiguration[] activityVectorConfigurations) {
+    private ActivityMatrix createExactConstrainedActivityVectors(SongContext songContext, ActivityVectorConfiguration[] activityVectorConfigurations) {
 
         int sections = HarmonyUtils.getChordSectionCount(songContext);
         int vectors = activityVectorConfigurations.length;
@@ -282,8 +276,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
         long startTime = System.nanoTime();
 
-    nextSection:
-        while (section < sections) {
+        nextSection: while (section < sections) {
             BitSet previousBitSet;
 
             if (section == 0) {
@@ -498,8 +491,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         return convertBitSetsToActivityVectors(songContext, activityVectorConfigurations, bitSets);
     }
 
-    private ActivityMatrix createGreedyConstrainedActivityVectors(SongContext songContext,
-            ActivityVectorConfiguration[] activityVectorConfigurations) {
+    private ActivityMatrix createGreedyConstrainedActivityVectors(SongContext songContext, ActivityVectorConfiguration[] activityVectorConfigurations) {
 
         int sections = HarmonyUtils.getChordSectionCount(songContext);
         int vectors = activityVectorConfigurations.length;
@@ -556,10 +548,10 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
             int tries = 0;
             int minError = Integer.MAX_VALUE;
-            
+
             List<BitSet> minBitSetList = new ArrayList<BitSet>();
             List<ActivityVectorState[]> minStatesList = new ArrayList<ActivityVectorState[]>();
-            
+
             while (tries++ < maxIterations) {
                 int wantedCount = getWantedActivityVectorCount(section, sections, maxActivityVectors, lastWantedCount, increaseTill, decreaseFrom,
                         startActivityCounts, stopActivityCounts);
@@ -578,7 +570,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
                 if (d > 0) {
                     do {
                         int p = setRandomBit(bitSet, vectors);
-                        
+
                         if (states[p].activeCount > 0 && states[p].segmentLength < activityVectorConfigurations[p].minPauseLength) {
                             error += 250 * (activityVectorConfigurations[p].minPauseLength - states[p].segmentLength);
                         }
@@ -593,7 +585,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
                         if (states[p].segmentLength < activityVectorConfigurations[p].minSegmentLength) {
                             error += 250 * (activityVectorConfigurations[p].minSegmentLength - states[p].segmentLength);
                         }
-                        
+
                         states[p].segmentLength = 0;
                     } while (++d < 0);
                 } else if (random.nextBoolean() && wantedCount < vectors) {
@@ -605,7 +597,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
                     if (states[p].activeCount > 0 && states[p].segmentLength < activityVectorConfigurations[p].minPauseLength) {
                         error += 250 * (activityVectorConfigurations[p].minPauseLength - states[p].segmentLength);
                     }
-                    
+
                     states[p].segments++;
                     states[p].segmentLength = 0;
 
@@ -681,13 +673,13 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
                         error += 100 * (c.stopBeforeSection + 1 - remainingSections);
                     }
                 }
-                
+
                 if (error < minError) {
                     minBitSetList.clear();
                     minStatesList.clear();
                     minError = error;
                 }
-                
+
                 if (error == minError) {
                     if (!minBitSetList.contains(bitSet)) {
                         minStatesList.add(cloneStates(states));
@@ -715,7 +707,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
     /**
      * Converts the BitSets into a set of ActivityVectors which have their activity set based on the BitSets.
-     *
+     * 
      * @param songContext the song context
      * @param activityVectorConfigurations the array of activity vector configurations
      * @param bitSets the array of BitSets
@@ -766,7 +758,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
     /**
      * Copies the state from the previous chord section to the current chord section state.
-     *
+     * 
      * @param section the section number
      * @param state the array of states
      */
@@ -800,7 +792,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
             target.activeInStopInterval = source.activeInStopInterval;
         }
     }
-    
+
     /**
      * Clones the given array of ActivityVectorStates.
      * 
@@ -808,25 +800,25 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
      * 
      * @return the cloned states
      */
-    
+
     private ActivityVectorState[] cloneStates(ActivityVectorState[] states) {
         int len = states.length;
         ActivityVectorState[] newStates = new ActivityVectorState[states.length];
-        
+
         for (int i = 0; i < len; i++) {
             newStates[i] = new ActivityVectorState(states[i]);
         }
-        
-        return newStates;        
+
+        return newStates;
     }
-    
+
     /**
      * Sets one random bit in the BitSet from false to true, if this is possible (i.e., if not all bits are set already). The number of the set bit is
      * returned or -1 if all bits were true.
-     *
+     * 
      * @param bitSet the BitSet to modify
      * @param size the size of the BitSet
-     *
+     * 
      * @return the number of the set bit (or -1 if no false bit existed)
      */
 
@@ -861,9 +853,9 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
     /**
      * Clears one random bit in the BitSet, if this is possible (i.e., if at least one bit is set to true). The number of the cleared bit is returned
      * or -1 if all bits were false.
-     *
+     * 
      * @param bitSet the BitSet to modify
-     *
+     * 
      * @return the number of the cleared bit (or -1 if no true bit existed)
      */
 
@@ -937,13 +929,13 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
         constraintMode = ConstraintMode.EXACT;
         String constraintModeString;
-        
+
         try {
             constraintModeString = XMLUtils.parseString(random, "constraintMode", node);
-            
+
             if (constraintModeString != null) {
                 constraintMode = ConstraintMode.valueOf(constraintModeString.toUpperCase());
-            }        
+            }
         } catch (Exception e) {
             throw new RuntimeException("Error parsing constraint mode", e);
         }
@@ -951,7 +943,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         setConstraintMode(constraintMode);
 
         int maxIterations;
-        
+
         if (constraintMode == ConstraintMode.EXACT) {
             maxIterations = 1000000;
         } else {
@@ -960,15 +952,14 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
         try {
             maxIterations = XMLUtils.parseInteger(random, "maxIterations", node);
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
 
         setMaxIterations(maxIterations);
 
         int[] startActivityCounts = XMLUtils.parseIntegerListString(random, "startActivityCounts", node);
 
         if (startActivityCounts == null) {
-            startActivityCounts = new int[] {1, 2, 3};
+            startActivityCounts = new int[] { 1, 2, 3 };
         }
 
         setStartActivityCounts(startActivityCounts);
@@ -976,9 +967,9 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         int[] stopActivityCounts = XMLUtils.parseIntegerListString(random, "stopActivityCounts", node);
 
         if (stopActivityCounts == null) {
-            stopActivityCounts = new int[] {3, 2, 1};
+            stopActivityCounts = new int[] { 3, 2, 1 };
         }
-        
+
         setStopActivityCounts(stopActivityCounts);
 
         int minActivityCount = XMLUtils.parseInteger(random, "minActivityCount", node);
@@ -1012,94 +1003,79 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
             try {
                 minActive = Double.parseDouble(XMLUtils.parseString(random, "minActive", nodeList.item(i)));
-            } catch (Exception e) {
-            }
+            } catch (Exception e) {}
 
             boolean allowInactive = false;
 
             try {
                 allowInactive = XMLUtils.parseBoolean(random, "minActive/attribute::allowInactive", nodeList.item(i));
-            } catch (Exception e) {
-            }
+            } catch (Exception e) {}
 
             double maxActive = 100.0d;
 
             try {
                 maxActive = Double.parseDouble(XMLUtils.parseString(random, "maxActive", nodeList.item(i)));
-            } catch (Exception e) {
-            }
+            } catch (Exception e) {}
 
             int startShift = 0;
             try {
                 startShift = XMLUtils.parseInteger(random, "startShift", nodeList.item(i));
-            } catch (Exception e) {
-            }
+            } catch (Exception e) {}
 
             int stopShift = 0;
             try {
                 stopShift = XMLUtils.parseInteger(random, "stopShift", nodeList.item(i));
-            } catch (Exception e) {
-            }
+            } catch (Exception e) {}
 
             int startBeforeSection = Integer.MAX_VALUE;
             try {
                 startBeforeSection = XMLUtils.parseInteger(random, "startBeforeSection", nodeList.item(i));
-            } catch (Exception e) {
-            }
+            } catch (Exception e) {}
 
             int startAfterSection = -1;
             try {
                 startAfterSection = XMLUtils.parseInteger(random, "startAfterSection", nodeList.item(i));
-            } catch (Exception e) {
-            }
+            } catch (Exception e) {}
 
             int stopBeforeSection = -1;
             try {
                 stopBeforeSection = XMLUtils.parseInteger(random, "stopBeforeSection", nodeList.item(i));
-            } catch (Exception e) {
-            }
+            } catch (Exception e) {}
 
             int stopAfterSection = Integer.MAX_VALUE;
             try {
                 stopAfterSection = XMLUtils.parseInteger(random, "stopAfterSection", nodeList.item(i));
-            } catch (Exception e) {
-            }
+            } catch (Exception e) {}
 
             int minSegmentCount = 0;
             try {
                 minSegmentCount = XMLUtils.parseInteger(random, "minSegmentCount", nodeList.item(i));
-            } catch (Exception e) {
-            }
+            } catch (Exception e) {}
 
             int maxSegmentCount = Integer.MAX_VALUE;
             try {
                 maxSegmentCount = XMLUtils.parseInteger(random, "maxSegmentCount", nodeList.item(i));
-            } catch (Exception e) {
-            }
+            } catch (Exception e) {}
 
             int minSegmentLength = 0;
             try {
                 minSegmentLength = XMLUtils.parseInteger(random, "minSegmentLength", nodeList.item(i));
-            } catch (Exception e) {
-            }
+            } catch (Exception e) {}
 
             int maxSegmentLength = Integer.MAX_VALUE;
             try {
                 maxSegmentLength = XMLUtils.parseInteger(random, "maxSegmentLength", nodeList.item(i));
-            } catch (Exception e) {
-            }
+            } catch (Exception e) {}
 
             int minPauseLength = 0;
             try {
                 minPauseLength = XMLUtils.parseInteger(random, "minPauseLength", nodeList.item(i));
-            } catch (Exception e) {
-            }
+            } catch (Exception e) {}
 
             int maxPauseLength = Integer.MAX_VALUE;
             try {
                 maxPauseLength = XMLUtils.parseInteger(random, "maxPauseLength", nodeList.item(i));
-            } catch (Exception e) {
-            }
+            } catch (Exception e) {}
 
             activityVectorConfigurationHashMap.put(name, new ActivityVectorConfiguration(name, minActive, allowInactive, maxActive, startShift,
                     stopShift, startBeforeSection, startAfterSection, stopBeforeSection, stopAfterSection, minSegmentCount, maxSegmentCount,
@@ -1133,8 +1109,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
             try {
                 transposition = XMLUtils.parseInteger(random, "transposition", nodeList.item(i));
-            } catch (Exception e) {
-            }
+            } catch (Exception e) {}
 
             NodeList sequenceEngineNodeList = XMLUtils.getNodeList("sequenceEngine", nodeList.item(i));
 
@@ -1147,8 +1122,8 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
             }
 
             try {
-                SequenceEngine sequenceEngine = XMLUtils.getInstance(songContext, SequenceEngine.class, sequenceEngineNodeList.item(
-                        random.nextInt(sequenceEngineNodeList.getLength())), randomSeed, i);
+                SequenceEngine sequenceEngine = XMLUtils.getInstance(songContext, SequenceEngine.class, sequenceEngineNodeList.item(random
+                        .nextInt(sequenceEngineNodeList.getLength())), randomSeed, i);
                 arrangementEntries[i] = new ArrangementEntry(instrument, sequenceEngine, transposition, activityVectorNames);
             } catch (Exception e) {
                 throw new RuntimeException("Error instantiating SequenceEngine for instrument \"" + instrument + "\"", e);
@@ -1164,11 +1139,11 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
      * activityVectors goes to infinity. The lambda value specifies the speed of the exponential drop-off. The goal is to use almost all
      * ActivityVectors when the number of ActivityVectors is small and use (in relation) fewer ActivityVectors when the number of ActivityVectors
      * becomes larger.
-     *
+     * 
      * @param activityVectors the number of ActivtiyVectors (must be positive)
      * @param factor the factor (between 0 and 1)
      * @param lambda the drop-off factor (must be positive)
-     *
+     * 
      * @return the maximum number of ActivityVectors to use
      */
 
@@ -1179,7 +1154,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
     public void setActivityVectorConfiguration(Map<String, ActivityVectorConfiguration> activityVectorConfigurationHashMap) {
         this.activityVectorConfigurationHashMap = activityVectorConfigurationHashMap;
     }
-    
+
     /**
      * Processes the activity counts.
      * 
@@ -1187,7 +1162,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
      * @param maxCount the maximum count
      * @return the processed activity counts
      */
-    
+
     private int[] processActivityCounts(int[] activityCounts, int maxCount) {
         int[] newActivityCounts = new int[activityCounts.length];
 
@@ -1225,7 +1200,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
     public void setConstraintMode(ConstraintMode constraintMode) {
         this.constraintMode = constraintMode;
     }
-    
+
     public void setStartActivityCounts(int[] startActivityCounts) {
         this.startActivityCounts = startActivityCounts;
     }
@@ -1237,13 +1212,13 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
     private static final class ArrangementEntry {
         /** The instrument name. */
         private final String instrument;
-        
+
         /** The sequence engine. */
         private final SequenceEngine sequenceEngine;
-        
+
         /** The transposition. */
         private final int transposition;
-        
+
         /** The names of ActivityVectors. */
         private final String[] activityVectorNames;
 
@@ -1356,7 +1331,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
         public ActivityVectorState() {
         }
-        
+
         public ActivityVectorState(ActivityVectorState state) {
             this.activeCount = state.activeCount;
             this.segments = state.segments;

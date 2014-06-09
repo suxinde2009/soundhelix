@@ -28,6 +28,7 @@ public class MultiPatternSequenceEngine extends AbstractMultiPatternSequenceEngi
         super();
     }
 
+    @Override
     public void configure(SongContext songContext, Node node) throws XPathException {
         random = new Random(randomSeed);
 

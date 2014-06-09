@@ -12,10 +12,12 @@ public abstract class AbstractSongNameEngine implements SongNameEngine {
     /** The random seed. */
     protected long randomSeed;
 
+    @Override
     public long getRandomSeed() {
         return randomSeed;
     }
 
+    @Override
     public void setRandomSeed(long randomSeed) {
         this.randomSeed = randomSeed;
     }

@@ -204,6 +204,7 @@ public class RandomFragmentPatternEngine extends StringPatternEngine {
         this.patternTicks = patternTicks;
     }
 
+    @Override
     public void setPatternString(String patternString) {
         this.patternString = patternString;
     }

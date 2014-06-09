@@ -1,4 +1,3 @@
-
 package com.soundhelix.component.sequenceengine.impl;
 
 import java.util.ArrayList;
@@ -373,7 +372,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
                             // jump back to where the pattern will start
                             tick -= patternTicks;
 
-                            logger.info("Applying conditional LFO \"" + conditionalEntry.lfoName + "\" with length " + patternTicks + " for ticks "
+                            logger.debug("Applying conditional LFO \"" + conditionalEntry.lfoName + "\" with length " + patternTicks + " for ticks "
                                     + tick + "-" + (tick + patternTicks - 1));
 
                             LFOSequence seq = conditionalEntry.lfoSequence;
@@ -393,7 +392,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
                             }
 
                             for (int k = 0; k < patternTicks; k++) {
-                                seq.addValue(lfo.getTickValue(tick++));
+                                seq.addValue(lfo.getRawTickValue(tick++));
                             }
 
                             lastMatchedTick[i] = tick;
@@ -419,13 +418,6 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
             ConditionalLFODrumEntry conditionalEntry = conditionalLFOEntries[i];
             LFOSequence seq = conditionalEntry.lfoSequence;
             seq.addValue(conditionalEntry.defaultValue, ticks - seq.getTicks());
-
-//            StringBuilder sb = new StringBuilder();
-//            for (int k = 0; k < seq.getTicks(); k++) {
-//                sb.append(seq.getValue(k)).append(',');
-//            }
-//            logger.info("LFO: " + sb);
-
         }
     }
 
@@ -596,35 +588,6 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
             String lfoName = XMLUtils.parseString(random, "name", nodeList.item(i));
             int ticks = XMLUtils.parseInteger(random, XMLUtils.getNode("ticks", nodeList.item(i)));
 
-            int minValue = Integer.MIN_VALUE;
-            int maxValue = Integer.MAX_VALUE;
-            int minAmplitude = 0;
-            int maxAmplitude = 0;
-
-            try {
-                minAmplitude = XMLUtils.parseInteger(random, "minAmplitude", nodeList.item(i));
-            } catch (Exception e) {}
-
-            try {
-                maxAmplitude = XMLUtils.parseInteger(random, "maxAmplitude", nodeList.item(i));
-            } catch (Exception e) {}
-
-            if (minAmplitude > maxAmplitude) {
-                throw new RuntimeException("minAmplitude must be <= maxAmplitude");
-            }
-
-            try {
-                minValue = XMLUtils.parseInteger(random, "minValue", nodeList.item(i));
-            } catch (Exception e) {}
-
-            try {
-                maxValue = XMLUtils.parseInteger(random, "maxValue", nodeList.item(i));
-            } catch (Exception e) {}
-
-            if (minValue > maxValue) {
-                throw new RuntimeException("minValue must be <= maxValue");
-            }
-
             double speed = XMLUtils.parseDouble(random, XMLUtils.getNode("speed", nodeList.item(i)));
 
             String rotationUnit = XMLUtils.parseString(random, "rotationUnit", nodeList.item(i));
@@ -673,10 +636,6 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
             }
 
             lfo.setSongContext(songContext);
-            lfo.setMinAmplitude(minAmplitude);
-            lfo.setMaxAmplitude(maxAmplitude);
-            lfo.setMinValue(minValue);
-            lfo.setMaxValue(maxValue);
 
             conditionalLFOEntries[i] = new ConditionalLFODrumEntry(lfo, lfoName, ticks, speed, rotationUnit, phase, defaultValue, preConditionString,
                     postConditionString, probability, skipWhenApplied, skipWhenNotApplied);

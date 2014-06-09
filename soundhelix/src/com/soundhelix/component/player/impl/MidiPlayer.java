@@ -27,6 +27,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.soundhelix.component.lfo.LFO;
+import com.soundhelix.component.lfo.impl.LFOSequenceLFO;
 import com.soundhelix.misc.ActivityVector;
 import com.soundhelix.misc.Arrangement;
 import com.soundhelix.misc.Arrangement.ArrangementEntry;
@@ -53,16 +54,16 @@ import com.soundhelix.util.XMLUtils;
  * Clock synchronization should be used for devices using synchronized effects (for example, synchronized echo) in order to communicate the BPM speed
  * to use. As clock synchronization requires some additional overhead, e.g., sending out MIDI messages 24 times per beat instead of the number of
  * ticks per beat, it should only be used if really required.
- *
+ * 
  * Timing the ticks (or clock synchronization ticks) is done by using a feedback algorithm based on Thread.sleep() calls with nanosecond resolution.
  * As mentioned, sending out timing ticks is not groove-dependent, whereas sending out note MIDI messages is groove-dependent.
- *
+ * 
  * This player supports LFOs, whose frequency can be based on a second, a beat, the whole song or on the activity (first activity until last activity)
  * of an instrument. The granularity of an LFO is always a tick. With every tick, each LFO will send out a MIDI message with the new value for the
  * target controller, but only if the LFO value is the first one sent or if it has changed since the last value sent.
- *
+ * 
  * Instances of this class are not thread-safe. They must not be used in multiple threads without external synchronization.
- *
+ * 
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
@@ -137,10 +138,10 @@ public class MidiPlayer extends AbstractPlayer {
 
     /** The minimum window size for MIDI sync BPM calculation. */
     private int minWindowSize;
-    
+
     /** The maximum window size for MIDI sync BPM calculation. */
     private int maxWindowSize;
-    
+
     /** The current tick number. */
     private int currentTick;
 
@@ -158,19 +159,19 @@ public class MidiPlayer extends AbstractPlayer {
 
     /** The template for MIDI filenames. */
     private String midiFilename;
-    
+
     /** The song context (only valid while playing). */
     private SongContext songContext;
 
     /** If true, then the player will wait before playing until the first BPM calculation has been done. */
     private boolean waitForStart;
-    
+
     /** If true, then the player is running, otherwise it is stopped. */
     private boolean running;
-    
+
     /**
-     * Contains the pitch used when the last note was played by a voice of an arrangement entry. This is used to be able to change the
-     * transposition while playing and still being able to send the correct NOTE_OFF pitches.
+     * Contains the pitch used when the last note was played by a voice of an arrangement entry. This is used to be able to change the transposition
+     * while playing and still being able to send the correct NOTE_OFF pitches.
      */
     private List<int[]> pitchList;
 
@@ -183,6 +184,7 @@ public class MidiPlayer extends AbstractPlayer {
         midiControllerMap.put("footPedal", new MidiController(ShortMessage.CONTROL_CHANGE, 4, 1));
         midiControllerMap.put("volume", new MidiController(ShortMessage.CONTROL_CHANGE, 7, 1));
         midiControllerMap.put("balance", new MidiController(ShortMessage.CONTROL_CHANGE, 8, 1));
+        midiControllerMap.put("undefined9", new MidiController(ShortMessage.CONTROL_CHANGE, 9, 1));
         midiControllerMap.put("pan", new MidiController(ShortMessage.CONTROL_CHANGE, 10, 1));
         midiControllerMap.put("expression", new MidiController(ShortMessage.CONTROL_CHANGE, 11, 1));
         midiControllerMap.put("effect1", new MidiController(ShortMessage.CONTROL_CHANGE, 12, 1));
@@ -208,7 +210,7 @@ public class MidiPlayer extends AbstractPlayer {
         if (syncDevice != null) {
             syncDevice.open();
         }
-        
+
         try {
             for (Device device : devices) {
                 device.open();
@@ -230,8 +232,7 @@ public class MidiPlayer extends AbstractPlayer {
         if (devices != null && opened) {
             try {
                 muteAllChannels();
-            } catch (Exception e) {
-            }
+            } catch (Exception e) {}
 
             try {
                 for (Device device : devices) {
@@ -253,7 +254,7 @@ public class MidiPlayer extends AbstractPlayer {
 
     /**
      * Sets the MIDI devices.
-     *
+     * 
      * @param devices the MIDI devices
      */
 
@@ -277,7 +278,7 @@ public class MidiPlayer extends AbstractPlayer {
 
     /**
      * Gets the number of beats per minute for playback.
-     *
+     * 
      * @return the number of millibeats per minute
      */
 
@@ -288,7 +289,7 @@ public class MidiPlayer extends AbstractPlayer {
 
     /**
      * Sets the number of beats per minute for playback.
-     *
+     * 
      * @param milliBPM the number of millibeats per minute
      */
 
@@ -298,14 +299,12 @@ public class MidiPlayer extends AbstractPlayer {
             throw new IllegalArgumentException("BPM must be > 0");
         }
 
-        //logger.debug("Setting BPM to " + (milliBPM / 1000f));
-
         this.milliBPM = milliBPM;
     }
 
     /**
      * Sets the transposition.
-     *
+     * 
      * @param transposition the transposition pitch
      */
 
@@ -324,7 +323,7 @@ public class MidiPlayer extends AbstractPlayer {
      * each, then they would be 125 ms and 75 ms, respectively. The default groove (i.e., no groove) is "1", resulting in equally timed ticks. Note
      * that even though the groove is handled correctly by the player, it might not be handled as expected on the MIDI device used for playback. For
      * example, if some time-synchronized echo is used on the MIDI device, it might sound strange if grooved input is used for a non-grooved echo.
-     *
+     * 
      * @param grooveString the groove string
      */
 
@@ -362,7 +361,7 @@ public class MidiPlayer extends AbstractPlayer {
 
     /**
      * Sets the channel map, which maps instruments to MIDI devices and channels. All used instruments must be mapped.
-     *
+     * 
      * @param channelMap the channel map
      */
 
@@ -372,10 +371,10 @@ public class MidiPlayer extends AbstractPlayer {
 
     /**
      * Tries to find the first available MIDI devices with a MIDI IN or MIDI OUT port among the given MIDI device names.
-     *
+     * 
      * @param deviceNames the array of MIDI device names
      * @param findMidiIn if true, a MIDI IN device is searched, otherwise a MIDI OUT device is searched
-     *
+     * 
      * @return a first instantiated MIDI device with MIDI IN or MIDI OUT, or null if none of the devices are available
      */
 
@@ -384,13 +383,13 @@ public class MidiPlayer extends AbstractPlayer {
         Map<String, List<MidiDevice.Info>> map = new HashMap<String, List<MidiDevice.Info>>(infos.length);
 
         for (MidiDevice.Info info : infos) {
-            List<MidiDevice.Info> list = map.get(info.getName()); 
-            
+            List<MidiDevice.Info> list = map.get(info.getName());
+
             if (list == null) {
                 list = new ArrayList<MidiDevice.Info>();
                 map.put(info.getName(), list);
             }
-            
+
             list.add(info);
         }
 
@@ -430,9 +429,9 @@ public class MidiPlayer extends AbstractPlayer {
 
         try {
             this.songContext = songContext;
-            
+
             Arrangement arrangement = songContext.getArrangement();
-            
+
             if (midiFilename != null) {
                 saveMidiFiles();
             }
@@ -445,8 +444,8 @@ public class MidiPlayer extends AbstractPlayer {
             // the ticks per beat divide CLOCK_SYNCHRONIZATION_TICKS_PER_BEAT
 
             if (useClockSynchronization && (CLOCK_SYNCHRONIZATION_TICKS_PER_BEAT % ticksPerBeat) != 0) {
-                throw new RuntimeException("Ticks per beat (" + ticksPerBeat + ") must be a divider of "
-                        + CLOCK_SYNCHRONIZATION_TICKS_PER_BEAT + " for MIDI clock synchronization");
+                throw new RuntimeException("Ticks per beat (" + ticksPerBeat + ") must be a divider of " + CLOCK_SYNCHRONIZATION_TICKS_PER_BEAT
+                        + " for MIDI clock synchronization");
             }
 
             setupMidiDevices();
@@ -462,18 +461,18 @@ public class MidiPlayer extends AbstractPlayer {
 
             long referenceTime = System.nanoTime();
             running = true;
-            
+
             if (syncDevice != null) {
                 if (waitForStart) {
                     logger.info("Waiting for START MIDI message");
                     running = false;
-                    
+
                     while (!running) {
                         referenceTime = waitTicks(referenceTime, 1, clockTimingsPerTick, structure.getTicksPerBeat());
                     }
                 }
             }
-            
+
             sendMidiMessageToClockSynchronized(ShortMessage.START);
             resetPlayerState(arrangement);
 
@@ -569,7 +568,7 @@ public class MidiPlayer extends AbstractPlayer {
      * 
      * @throws InvalidMidiDataException in case of invalid MIDI data
      */
-    
+
     private void setupMidiDevices() throws InvalidMidiDataException {
         initializeControllerLFOs();
         muteAllChannels();
@@ -579,7 +578,7 @@ public class MidiPlayer extends AbstractPlayer {
 
     /**
      * Resets the player state. The state is set up for the first tick.
-     *
+     * 
      * @param arrangement the arrangement
      */
 
@@ -608,7 +607,7 @@ public class MidiPlayer extends AbstractPlayer {
 
     /**
      * Runs the configured before play commands (if any).
-     *
+     * 
      * @throws IOException in case of an I/O problem
      * @throws InterruptedException in case of an interruption
      */
@@ -631,7 +630,7 @@ public class MidiPlayer extends AbstractPlayer {
 
     /**
      * Runs the configured after play commands (if any).
-     *
+     * 
      * @throws IOException in case of an I/O problem
      * @throws InterruptedException in case of an interruption
      */
@@ -654,9 +653,9 @@ public class MidiPlayer extends AbstractPlayer {
 
     /**
      * Mutes all active channels.
-     *
+     * 
      * @param arrangement the arrangement
-     *
+     * 
      * @throws InvalidMidiDataException in case of invalid MIDI data
      */
 
@@ -694,10 +693,10 @@ public class MidiPlayer extends AbstractPlayer {
      * @throws InvalidMidiDataException in case of a MIDI data problem
      * @throws IOException in case of an I/O problem
      */
-    
+
     private void saveMidiFiles() throws InvalidMidiDataException, IOException {
         Arrangement arrangement = songContext.getArrangement();
-        
+
         initializeControllerLFOs();
 
         Structure structure = songContext.getStructure();
@@ -708,7 +707,7 @@ public class MidiPlayer extends AbstractPlayer {
         Map<Device, javax.sound.midi.Track> trackMap = new HashMap<Device, javax.sound.midi.Track>();
 
         for (Device device : devices) {
-            javax.sound.midi.Sequence s =  new javax.sound.midi.Sequence(javax.sound.midi.Sequence.PPQ, ticksPerBeat);
+            javax.sound.midi.Sequence s = new javax.sound.midi.Sequence(javax.sound.midi.Sequence.PPQ, ticksPerBeat);
             sequenceMap.put(device, s);
             javax.sound.midi.Track metaTrack = s.createTrack();
             trackMap.put(device, s.createTrack());
@@ -716,7 +715,7 @@ public class MidiPlayer extends AbstractPlayer {
             long mpqn = 60000000000L / milliBPM;
 
             MetaMessage mt = new MetaMessage();
-            byte[] bt = {(byte) ((mpqn / 65536) & 0xFF), (byte) ((mpqn / 256) & 0xFF), (byte) (mpqn & 0xFF)};
+            byte[] bt = { (byte) ((mpqn / 65536) & 0xFF), (byte) ((mpqn / 256) & 0xFF), (byte) (mpqn & 0xFF) };
             mt.setMessage(0x51, bt, 3);
             metaTrack.add(new MidiEvent(mt, 0L));
 
@@ -829,8 +828,8 @@ public class MidiPlayer extends AbstractPlayer {
 
                             if (se.isNote()) {
                                 int pitch = (track.getType() == TrackType.MELODIC ? transposition : 0) + se.getPitch();
-                                sendMidiMessage(trackMap.get(channel.device), tick, channel.channel, ShortMessage.NOTE_ON, pitch,
-                                        getMidiVelocity(songContext, se.getVelocity()));
+                                sendMidiMessage(trackMap.get(channel.device), tick, channel.channel, ShortMessage.NOTE_ON, pitch, getMidiVelocity(
+                                        songContext, se.getVelocity()));
                                 pitches[j] = pitch;
                             }
 
@@ -862,14 +861,14 @@ public class MidiPlayer extends AbstractPlayer {
             auxMap.put("deviceNumber", String.valueOf(number));
             String midiFilename = replacePlaceholders(this.midiFilename, auxMap);
 
-            File file = new File(midiFilename);            
+            File file = new File(midiFilename);
             File directory = file.getParentFile();
-            
+
             if (directory != null && !directory.exists()) {
                 logger.info("Creating MIDI file directory \"" + directory.getAbsolutePath() + "\"");
                 directory.mkdirs();
             }
-                        
+
             MidiSystem.write(sequenceMap.get(device), 1, file);
             logger.debug("Wrote MIDI data for device \"" + device.name + "\" to MIDI file \"" + midiFilename + "\" (" + file.length() + " bytes)");
             number++;
@@ -878,9 +877,9 @@ public class MidiPlayer extends AbstractPlayer {
 
     /**
      * Plays a tick, sending NOTE_OFF messages for notes that should be muted and NOTE_ON messages for notes that should be started.
-     *
+     * 
      * @param tick the tick
-     *
+     * 
      * @throws InvalidMidiDataException in case of invalid MIDI data
      */
 
@@ -889,10 +888,8 @@ public class MidiPlayer extends AbstractPlayer {
         Structure structure = songContext.getStructure();
 
         if (tick == 0 || songContext.getHarmony().getChordSectionTicks(tick - 1) == 1) {
-            logger.info(String.format("Tick: %5d   Chord section: %3d   Seconds: %4d   Progress: %5.1f %%", tick,
-                    HarmonyUtils.getChordSectionNumber(songContext, tick), tick * 60 * 1000
-                            / (structure.getTicksPerBeat() * milliBPM),
-                    (double) tick * 100 / structure.getTicks()));
+            logger.info(String.format("Tick: %5d   Chord section: %3d   Seconds: %4d   Progress: %5.1f %%", tick, HarmonyUtils.getChordSectionNumber(
+                    songContext, tick), tick * 60 * 1000 / (structure.getTicksPerBeat() * milliBPM), (double) tick * 100 / structure.getTicks()));
         }
 
         sendControllerLFOMessages(tick);
@@ -1031,13 +1028,13 @@ public class MidiPlayer extends AbstractPlayer {
                 // use the whole song as the length (this LFO is then a no-op)
 
                 int[] ticks;
-                
-                if (clfo.instrument != null) {                
+
+                if (clfo.instrument != null) {
                     ticks = getInstrumentActivity(arrangement, clfo.instrument);
                 } else {
                     ticks = getActivityVectorActivity(clfo.activityVector);
                 }
-                
+
                 int startTick = 0;
                 int endTick = structure.getTicks();
 
@@ -1057,11 +1054,11 @@ public class MidiPlayer extends AbstractPlayer {
             } else if (clfo.rotationUnit.equals("segmentPair")) {
                 clfo.lfo.setPhase(clfo.phase);
                 ActivityVector av = songContext.getActivityMatrix().get(clfo.activityVector);
-                
+
                 if (av == null) {
                     throw new RuntimeException("ActivityVector \"" + clfo.activityVector + "\" for LFO not found");
                 }
-                
+
                 clfo.lfo.setSegmentPairSpeed(clfo.speed, av);
             } else if (clfo.rotationUnit.equals("beat")) {
                 clfo.lfo.setPhase(clfo.phase);
@@ -1073,11 +1070,34 @@ public class MidiPlayer extends AbstractPlayer {
                 throw new RuntimeException("Invalid rotation unit \"" + clfo.rotationUnit + "\"");
             }
         }
+
+        for (InstrumentControllerLFO clfo : instrumentControllerLFOs) {
+            String instrument = clfo.instrument;
+            Track track = songContext.getArrangement().get(instrument).getTrack();
+
+            if (track == null) {
+                throw new RuntimeException("Unvalid instrument \"" + instrument + "\" for instrument controller LFO");
+            }
+
+            String lfoName = clfo.lfoName;
+            LFOSequence lfoSequence = track.getLFOSequence(lfoName);
+
+            if (lfoSequence == null) {
+                throw new RuntimeException("Unvalid LFO \"" + lfoName + "\" for instrument \"" + instrument + "\" for instrument controller LFO");
+            }
+
+            LFO lfo = new LFOSequenceLFO(lfoSequence);
+            lfo.setMinAmplitude(clfo.minAmplitude);
+            lfo.setMaxAmplitude(clfo.maxAmplitude);
+            lfo.setMinValue(clfo.minValue);
+            lfo.setMaxValue(clfo.maxValue);
+            clfo.lfo = lfo;
+        }
     }
 
     private int[] getActivityVectorActivity(String activityVectorName) {
         ActivityVector av = songContext.getActivityMatrix().get(activityVectorName);
-        
+
         if (av == null) {
             throw new RuntimeException("ActivityVector \"" + activityVectorName + "\" for LFO not found");
         }
@@ -1086,9 +1106,9 @@ public class MidiPlayer extends AbstractPlayer {
 
         int start = av.getFirstActiveTick();
         int end = av.getLastActiveTick() + 1;
-        
+
         if (start >= 0) {
-            ticks = new int[] {start, end};
+            ticks = new int[] { start, end };
         } else {
             ticks = null;
         }
@@ -1099,15 +1119,15 @@ public class MidiPlayer extends AbstractPlayer {
     /**
      * Sends messages to all configured controllers based on the LFOs. A message is only send to a controller if its LFO value has changed or if tick
      * is 0.
-     *
+     * 
      * @param tick the tick
-     *
+     * 
      * @throws InvalidMidiDataException in case of invalid MIDI data
      */
 
     private void sendControllerLFOMessages(int tick) throws InvalidMidiDataException {
         // handle controller LFOs
-        
+
         for (ControllerLFO clfo : controllerLFOs) {
             int value = clfo.lfo.getTickValue(tick);
 
@@ -1140,23 +1160,9 @@ public class MidiPlayer extends AbstractPlayer {
         }
 
         // handle instrument controller LFOs
-        
+
         for (InstrumentControllerLFO clfo : instrumentControllerLFOs) {
-            String instrument = clfo.instrument;
-            Track track = songContext.getArrangement().get(instrument).getTrack();
-            
-            if (track == null) {
-                throw new RuntimeException("Unvalid instrument \"" + instrument + "\" for instrument controller LFO");
-            }
-            
-            String lfoName = clfo.lfoName;
-            LFOSequence lfoSequence = track.getLFOSequence(lfoName);
-            
-            if (lfoSequence == null) {
-                throw new RuntimeException("Unvalid LFO \"" + lfoName + "\" for instrument \"" + instrument + "\" for instrument controller LFO");
-            }
-            
-            int value = lfoSequence.getValue(tick);
+            int value = clfo.lfo.getTickValue(tick);
 
             if (tick == 0 || value != clfo.lastSentValue) {
                 // value has changed or is the first value, send message
@@ -1190,10 +1196,10 @@ public class MidiPlayer extends AbstractPlayer {
     /**
      * Sends messages to all configured controllers based on the LFOs. A message is only send to a controller if its LFO value has changed or if tick
      * is 0.
-     *
+     * 
      * @param trackMap the map that maps devices to MIDI tracks
      * @param tick the tick
-     *
+     * 
      * @throws InvalidMidiDataException in case of invalid MIDI data
      */
 
@@ -1211,7 +1217,7 @@ public class MidiPlayer extends AbstractPlayer {
                 if (controller.equals("milliBPM")) {
                     long mpqn = 60000000000L / value;
                     MetaMessage mt = new MetaMessage();
-                    byte[] bt = {(byte) ((mpqn / 65536) & 0xFF), (byte) ((mpqn / 256) & 0xFF), (byte) (mpqn & 0xFF)};
+                    byte[] bt = { (byte) ((mpqn / 65536) & 0xFF), (byte) ((mpqn / 256) & 0xFF), (byte) (mpqn & 0xFF) };
                     mt.setMessage(0x51, bt, 3);
 
                     for (Device d : devices) {
@@ -1238,7 +1244,7 @@ public class MidiPlayer extends AbstractPlayer {
         }
 
         for (InstrumentControllerLFO clfo : instrumentControllerLFOs) {
-            int value = songContext.getArrangement().get(clfo.instrument).getTrack().getLFOSequence(clfo.lfoName).getValue(tick);
+            int value = clfo.lfo.getTickValue(tick);
 
             if (tick == 0 || value != clfo.lastSentValue) {
                 // value has changed or is the first value, send message
@@ -1250,7 +1256,7 @@ public class MidiPlayer extends AbstractPlayer {
                 if (controller.equals("milliBPM")) {
                     long mpqn = 60000000000L / value;
                     MetaMessage mt = new MetaMessage();
-                    byte[] bt = {(byte) ((mpqn / 65536) & 0xFF), (byte) ((mpqn / 256) & 0xFF), (byte) (mpqn & 0xFF)};
+                    byte[] bt = { (byte) ((mpqn / 65536) & 0xFF), (byte) ((mpqn / 256) & 0xFF), (byte) (mpqn & 0xFF) };
                     mt.setMessage(0x51, bt, 3);
 
                     for (Device d : devices) {
@@ -1281,14 +1287,14 @@ public class MidiPlayer extends AbstractPlayer {
     /**
      * Waits the given number of ticks, sending out TIMING_CLOCK events to the MIDI devices, if necessary. Waiting is done by using a simple feedback
      * algorithm that tries hard to keep the player exactly in sync with the system clock.
-     *
+     * 
      * @param referenceTime the reference time (from System.nanoTime())
      * @param ticks the number of ticks to wait
      * @param clockTimingsPerTick the number of clock timings per tick
      * @param ticksPerBeat the number of ticks per beat
-     *
+     * 
      * @return the new reference time
-     *
+     * 
      * @throws InvalidMidiDataException in case of invalid MIDI data
      * @throws InterruptedException in case of sleep interruption
      */
@@ -1324,12 +1330,12 @@ public class MidiPlayer extends AbstractPlayer {
      * Waits until either time1 or time2 (both are given in nano seconds) is reached, whichever comes first. Both times are based on
      * System.nanoTime(). If time1 or time2 is in the past, this method returns immediately. In all cases, the time waited on is returned (either
      * time1 or time2).
-     *
+     * 
      * @param time1 the first point in time
      * @param time2 the second point in time
-     *
+     * 
      * @return the point in time waited on (minimum of time1 and time2)
-     *
+     * 
      * @throws InterruptedException in case of sleep interruption
      */
 
@@ -1346,10 +1352,10 @@ public class MidiPlayer extends AbstractPlayer {
 
     /**
      * Returns the number of nanos of the given tick, taking the current groove into account.
-     *
+     * 
      * @param tick the tick
      * @param ticksPerBeat the number of ticks per beat
-     *
+     * 
      * @return the number of nanos
      */
 
@@ -1359,10 +1365,10 @@ public class MidiPlayer extends AbstractPlayer {
 
     /**
      * Returns the number of nanos for a timing tick.
-     *
+     * 
      * @param ticksPerBeat the ticks per beat
      * @param clockTimingsPerTick the clock timings per tick
-     *
+     * 
      * @return the number of nanos for a timing tick
      */
 
@@ -1373,7 +1379,7 @@ public class MidiPlayer extends AbstractPlayer {
     /**
      * Sets the channel programs of all DeviceChannels used. This method does not set the program of a DeviceChannel more than once. Channels whose
      * program is set to -1 are ignored, so that the currently selected program remains active.
-     *
+     * 
      * @throws InvalidMidiDataException in case of invalid MIDI data
      */
 
@@ -1395,7 +1401,7 @@ public class MidiPlayer extends AbstractPlayer {
 
     /**
      * Sends the initial MIDI controller values.
-     *
+     * 
      * @throws InvalidMidiDataException in case of invalid MIDI data
      */
 
@@ -1423,9 +1429,9 @@ public class MidiPlayer extends AbstractPlayer {
 
     /**
      * Sends the given single-byte message to all devices that are using clock synchronization.
-     *
+     * 
      * @param status the message
-     *
+     * 
      * @throws InvalidMidiDataException in case of invalid MIDI data
      */
 
@@ -1446,7 +1452,7 @@ public class MidiPlayer extends AbstractPlayer {
     /**
      * Mutes all channels of all devices. This is done by sending an ALL SOUND OFF message to all channels. In addition to that (because this does not
      * include sending NOTE OFF) a NOTE_OFF is sent for each of the 128 possible pitches to each channel.
-     *
+     * 
      * @throws InvalidMidiDataException in case of invalid MIDI data
      */
 
@@ -1475,10 +1481,10 @@ public class MidiPlayer extends AbstractPlayer {
 
     /**
      * Converts our internal velocity (between 0 and maxVelocity) to a MIDI velocity (between 0 and 127).
-     *
+     * 
      * @param songContext the song context
      * @param velocity the velocity to convert
-     *
+     * 
      * @return the MIDI velocity
      */
 
@@ -1486,7 +1492,7 @@ public class MidiPlayer extends AbstractPlayer {
         if (velocity == 0) {
             return 0;
         }
-        
+
         return 1 + (int) ((velocity - 1) * 126L / (songContext.getStructure().getMaxVelocity() - 1));
     }
 
@@ -1502,10 +1508,10 @@ public class MidiPlayer extends AbstractPlayer {
      * Checks if the given instrument is part of the arrangement and if so, determines the tick of the first note and the tick of the end of the last
      * note plus 1. All sequences of the instrument are checked, and the minimum and maximum accross all sequences are determined. The start and end
      * ticks are returned as a two-element int array. If the instrument is not found or the instrument's track contains no note, null is returned.
-     *
+     * 
      * @param arrangement the arrangement
      * @param instrument the number of the instrument
-     *
+     * 
      * @return a two-element int array containing start and end tick (or null)
      */
 
@@ -1547,7 +1553,7 @@ public class MidiPlayer extends AbstractPlayer {
                     return null;
                 } else {
                     // both startTick and endTick contain a proper value
-                    return new int[] {startTick, endTick};
+                    return new int[] { startTick, endTick };
                 }
             }
         }
@@ -1558,9 +1564,9 @@ public class MidiPlayer extends AbstractPlayer {
 
     /**
      * Takes the given string and replaces all valid placeholders with their values.
-     *
+     * 
      * @param string the string
-     *
+     * 
      * @return the string with replaced placeholders
      */
 
@@ -1569,12 +1575,11 @@ public class MidiPlayer extends AbstractPlayer {
     }
 
     /**
-     * Takes the given string and replaces all valid placeholders with their values. Additional placeholders can be provided in the auxiliary
-     * map.
-     *
+     * Takes the given string and replaces all valid placeholders with their values. Additional placeholders can be provided in the auxiliary map.
+     * 
      * @param string the string
      * @param auxMap the auxiliary map
-     *
+     * 
      * @return the string with replaced placeholders
      */
 
@@ -1616,21 +1621,21 @@ public class MidiPlayer extends AbstractPlayer {
         }
 
         SyncDevice syncDevice = null;
-        
+
         try {
             String syncDeviceName = XMLUtils.parseString(random, "synchronizationDevice", node);
             syncDevice = new SyncDevice(syncDeviceName);
             this.syncDevice = syncDevice;
         } catch (Exception e) {}
-        
+
         boolean waitForStart = true;
-        
+
         try {
             waitForStart = XMLUtils.parseBoolean(random, "synchronizationDevice/@waitForStart", node);
         } catch (Exception e) {}
 
         int minWindowSize = 24;
-        
+
         try {
             minWindowSize = XMLUtils.parseInteger(random, "synchronizationDevice/@minWindowSize", node);
         } catch (Exception e) {}
@@ -1639,12 +1644,12 @@ public class MidiPlayer extends AbstractPlayer {
 
         try {
             maxWindowSize = XMLUtils.parseInteger(random, "synchronizationDevice/@maxWindowSize", node);
-        } catch(Exception e) {}
+        } catch (Exception e) {}
 
         setWaitForStart(waitForStart);
         setMinWindowSize(minWindowSize);
         setMaxWindowSize(maxWindowSize);
-        
+
         beforePlayCommands = XMLUtils.parseString(random, "beforePlayCommands", node);
         afterPlayCommands = XMLUtils.parseString(random, "afterPlayCommands", node);
 
@@ -1677,8 +1682,7 @@ public class MidiPlayer extends AbstractPlayer {
 
             try {
                 program = Integer.parseInt(XMLUtils.parseString(random, "attribute::program", nodeList.item(i))) - 1;
-            } catch (Exception e) {
-            }
+            } catch (Exception e) {}
 
             DeviceChannel ch = new DeviceChannel(deviceMap.get(device), channel, program);
             channelMap.put(instrument, ch);
@@ -1716,14 +1720,12 @@ public class MidiPlayer extends AbstractPlayer {
             try {
                 minAmplitude = XMLUtils.parseInteger(random, "minimum", nodeList.item(i));
                 usesLegacyTags = true;
-            } catch (Exception e) {
-            }
+            } catch (Exception e) {}
 
             try {
                 maxAmplitude = XMLUtils.parseInteger(random, "maximum", nodeList.item(i));
                 usesLegacyTags = true;
-            } catch (Exception e) {
-            }
+            } catch (Exception e) {}
 
             if (usesLegacyTags) {
                 logger.warn("The tags \"minimum\" and \"maximum\" for LFOs have been deprecated. "
@@ -1732,13 +1734,11 @@ public class MidiPlayer extends AbstractPlayer {
 
             try {
                 minAmplitude = XMLUtils.parseInteger(random, "minAmplitude", nodeList.item(i));
-            } catch (Exception e) {
-            }
+            } catch (Exception e) {}
 
             try {
                 maxAmplitude = XMLUtils.parseInteger(random, "maxAmplitude", nodeList.item(i));
-            } catch (Exception e) {
-            }
+            } catch (Exception e) {}
 
             if (minAmplitude > maxAmplitude) {
                 throw new RuntimeException("minAmplitude must be <= maxAmplitude");
@@ -1746,13 +1746,11 @@ public class MidiPlayer extends AbstractPlayer {
 
             try {
                 minValue = XMLUtils.parseInteger(random, "minValue", nodeList.item(i));
-            } catch (Exception e) {
-            }
+            } catch (Exception e) {}
 
             try {
                 maxValue = XMLUtils.parseInteger(random, "maxValue", nodeList.item(i));
-            } catch (Exception e) {
-            }
+            } catch (Exception e) {}
 
             if (minValue > maxValue) {
                 throw new RuntimeException("minValue must be <= maxValue");
@@ -1776,32 +1774,29 @@ public class MidiPlayer extends AbstractPlayer {
 
             try {
                 phase = XMLUtils.parseDouble(random, XMLUtils.getNode("phase", nodeList.item(i)));
-            } catch (Exception e) {
-            }
+            } catch (Exception e) {}
 
             String instrument = null;
 
             try {
                 instrument = XMLUtils.parseString(random, "instrument", nodeList.item(i));
-            } catch (Exception e) {
-            }
+            } catch (Exception e) {}
 
             String activityVector = null;
 
             try {
                 activityVector = XMLUtils.parseString(random, "activityVector", nodeList.item(i));
-            } catch (Exception e) {
-            }
+            } catch (Exception e) {}
 
-            if (rotationUnit.equals("activity") && ((instrument == null || instrument.equals(""))
-                    && (activityVector == null || activityVector.equals("")))) {
+            if (rotationUnit.equals("activity")
+                    && ((instrument == null || instrument.equals("")) && (activityVector == null || activityVector.equals("")))) {
                 throw new RuntimeException("Rotation unit \"activity\" requires an instrument or an ActivityVector");
             }
 
             if (rotationUnit.equals("segmentPair") && (activityVector == null || activityVector.equals(""))) {
                 throw new RuntimeException("Rotation unit \"segmentPair\" requires an ActivityVector");
             }
-            
+
             if (instrument != null && activityVector != null) {
                 throw new RuntimeException("Either ActivityVector or instrument must be set, but not both");
             }
@@ -1826,7 +1821,7 @@ public class MidiPlayer extends AbstractPlayer {
         }
 
         setControllerLFOs(controllerLFOs);
-        
+
         nodeList = XMLUtils.getNodeList("instrumentControllerLFO", node);
         entries = nodeList.getLength();
         InstrumentControllerLFO[] instrumentControllerLFOs = new InstrumentControllerLFO[entries];
@@ -1843,9 +1838,39 @@ public class MidiPlayer extends AbstractPlayer {
             }
 
             String instrument = XMLUtils.parseString(random, "instrument", nodeList.item(i));
-            String lfoName = XMLUtils.parseString(random, "lfoName", nodeList.item(i));
+            String lfoName = XMLUtils.parseString(random, "lfo", nodeList.item(i));
 
-            instrumentControllerLFOs[i] = new InstrumentControllerLFO(device, channel, controller, instrument, lfoName);
+            int minValue = Integer.MIN_VALUE;
+            int maxValue = Integer.MAX_VALUE;
+            int minAmplitude = 0;
+            int maxAmplitude = 0;
+
+            try {
+                minAmplitude = XMLUtils.parseInteger(random, "minAmplitude", nodeList.item(i));
+            } catch (Exception e) {}
+
+            try {
+                maxAmplitude = XMLUtils.parseInteger(random, "maxAmplitude", nodeList.item(i));
+            } catch (Exception e) {}
+
+            if (minAmplitude > maxAmplitude) {
+                throw new RuntimeException("minAmplitude must be <= maxAmplitude");
+            }
+
+            try {
+                minValue = XMLUtils.parseInteger(random, "minValue", nodeList.item(i));
+            } catch (Exception e) {}
+
+            try {
+                maxValue = XMLUtils.parseInteger(random, "maxValue", nodeList.item(i));
+            } catch (Exception e) {}
+
+            if (minValue > maxValue) {
+                throw new RuntimeException("minValue must be <= maxValue");
+            }
+
+            instrumentControllerLFOs[i] = new InstrumentControllerLFO(device, channel, controller, instrument, lfoName, minAmplitude, maxAmplitude,
+                    minValue, maxValue);
         }
 
         setInstrumentControllerLFOs(instrumentControllerLFOs);
@@ -1853,12 +1878,12 @@ public class MidiPlayer extends AbstractPlayer {
 
     /**
      * Sends a MIDI message with the given status, data1 and data2 to the given device channel.
-     *
+     * 
      * @param deviceChannel the device channel
      * @param status the MIDI status
      * @param data1 the first MIDI data
      * @param data2 the second MIDI data
-     *
+     * 
      * @throws InvalidMidiDataException in case of invalid MIDI data
      */
 
@@ -1870,13 +1895,13 @@ public class MidiPlayer extends AbstractPlayer {
 
     /**
      * Sends a MIDI message with the given status, data1 and data2 to the given channel on the given device.
-     *
+     * 
      * @param device the device
      * @param channel the channel number (0-15)
      * @param status the MIDI status
      * @param data1 the first MIDI data
      * @param data2 the second MIDI data
-     *
+     * 
      * @throws InvalidMidiDataException in case of invalid MIDI data
      */
 
@@ -1887,7 +1912,7 @@ public class MidiPlayer extends AbstractPlayer {
     }
 
     private void sendMidiMessage(javax.sound.midi.Track track, int tick, int channel, int status, int data1, int data2)
-        throws InvalidMidiDataException {
+            throws InvalidMidiDataException {
         ShortMessage sm = new ShortMessage();
         sm.setMessage(status, channel, data1, data2);
         track.add(new MidiEvent(sm, (long) tick + 1));
@@ -1895,10 +1920,10 @@ public class MidiPlayer extends AbstractPlayer {
 
     /**
      * Sends a MIDI message with the given status to the given device.
-     *
+     * 
      * @param device the device
      * @param status the MIDI status
-     *
+     * 
      * @throws InvalidMidiDataException in case of invalid MIDI data
      */
 
@@ -1915,11 +1940,11 @@ public class MidiPlayer extends AbstractPlayer {
     }
 
     /**
-     * Skips to the specified tick. This is done by muting all channels, resetting the player state and then silently
-     * fast-forwarding to the specified tick.
-     *
+     * Skips to the specified tick. This is done by muting all channels, resetting the player state and then silently fast-forwarding to the specified
+     * tick.
+     * 
      * @param tick the tick
-     *
+     * 
      * @return true if skipping was successful, false otherwise
      */
 
@@ -2151,7 +2176,7 @@ public class MidiPlayer extends AbstractPlayer {
 
         /** The name of the MIDI controller. */
         private String controller;
-        
+
         /** The value of the MIDI controller. */
         private int value;
 
@@ -2162,7 +2187,7 @@ public class MidiPlayer extends AbstractPlayer {
             this.value = value;
         }
     }
-    
+
     /**
      * Container for LFO configuration.
      */
@@ -2180,18 +2205,31 @@ public class MidiPlayer extends AbstractPlayer {
         /** The instrument. */
         private String instrument;
 
-        /** The LFO name if that instrument. */
+        /** The LFO name of that instrument. */
         private String lfoName;
-        
+
+        /** The LFO. */
+        private LFO lfo;
+
+        private int minAmplitude;
+        private int maxAmplitude;
+        private int minValue;
+        private int maxValue;
+
         /** The value last sent to the MIDI controller. */
         private int lastSentValue;
 
-        public InstrumentControllerLFO(String deviceName, int channel, String controller, String instrument, String lfoName) {
+        public InstrumentControllerLFO(String deviceName, int channel, String controller, String instrument, String lfoName, int minAmplitude,
+                int maxAmplitude, int minValue, int maxValue) {
             this.deviceName = deviceName;
             this.channel = channel;
             this.controller = controller;
             this.instrument = instrument;
             this.lfoName = lfoName;
+            this.minAmplitude = minAmplitude;
+            this.maxAmplitude = maxAmplitude;
+            this.minValue = minValue;
+            this.maxValue = maxValue;
         }
     }
 
@@ -2247,10 +2285,10 @@ public class MidiPlayer extends AbstractPlayer {
     private static class MidiController {
         /** The MIDI status byte. */
         private int status;
-        
+
         /** The parameter. */
         private int parameter;
-        
+
         /** The number of bytes. */
         private int byteCount;
 
@@ -2266,22 +2304,22 @@ public class MidiPlayer extends AbstractPlayer {
             this.byteCount = byteCount;
         }
     }
-    
+
     /**
-     * Implements a receiver for MIDI clock messages. The obtained timing is averaged across a number of timing ticks using
-     * a moving average, and the resulting BPM are set for the player.
+     * Implements a receiver for MIDI clock messages. The obtained timing is averaged across a number of timing ticks using a moving average, and the
+     * resulting BPM are set for the player.
      */
-    
+
     private class MidiClockReceiver implements Receiver {
         /** True if this is the first tick. */
         private boolean firstTick = true;
-        
+
         /** The last time a tick was received. */
         private long lastTime;
-        
+
         /** The sum of the time differences of the queue. */
         private long sum;
-        
+
         /** The queue of time differences. */
         private final Queue<Long> timeQueue;
 
@@ -2293,7 +2331,7 @@ public class MidiPlayer extends AbstractPlayer {
 
         /** The maximum window size for BPM calculation. */
         private int maxWindowSize = 24;
-        
+
         public MidiClockReceiver(int minWindowSize, int maxWindowSize) {
             if (minWindowSize < 1) {
                 throw new IllegalArgumentException("minWindowSize must be >= 1");
@@ -2306,19 +2344,18 @@ public class MidiPlayer extends AbstractPlayer {
             if (maxWindowSize < minWindowSize) {
                 throw new IllegalArgumentException("maxWindowSize must be >= minWindowSize");
             }
-            
+
             this.minWindowSize = minWindowSize;
             this.maxWindowSize = maxWindowSize;
             timeQueue = new ArrayBlockingQueue<Long>(maxWindowSize);
         }
-        
-        
+
         @Override
         public void send(MidiMessage message, long timeStamp) {
             int status = message.getStatus();
             if (status == ShortMessage.TIMING_CLOCK) {
                 long time = System.nanoTime();
-                
+
                 if (!firstTick) {
                     long diff = time - lastTime;
 
@@ -2329,18 +2366,18 @@ public class MidiPlayer extends AbstractPlayer {
 
                     timeQueue.add(diff);
                     sum += diff;
-                    
-                    if (timeQueue.size() >= minWindowSize) {                    
+
+                    if (timeQueue.size() >= minWindowSize) {
                         long milliBPM = 60000000000000L / 24L * timeQueue.size() / sum;
                         setMilliBPM((int) milliBPM);
                     }
                 } else {
                     firstTick = false;
                 }
-                
+
                 lastTime = time;
                 count++;
-                
+
                 if ((count % maxWindowSize) == 0) {
                     logger.trace("Milli BPM from MIDI sync: " + milliBPM);
                 }
@@ -2355,7 +2392,7 @@ public class MidiPlayer extends AbstractPlayer {
                 running = false;
             }
         }
-        
+
         @Override
         public void close() {
             // do nothing

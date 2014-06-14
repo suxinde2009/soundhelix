@@ -115,7 +115,16 @@
     <activityVector name="timbales">
       <minSegmentLength>2</minSegmentLength>
     </activityVector>
-
+    <activityVector name="maracas">
+      <minSegmentLength>2</minSegmentLength>
+    </activityVector>
+    <activityVector name="tambourine">
+      <minSegmentLength>2</minSegmentLength>
+    </activityVector>
+    <activityVector name="cabasa">
+      <minSegmentLength>2</minSegmentLength>
+    </activityVector>
+    
     <track>
       <instrument>percussion</instrument>
       <sequenceEngine class="DrumSequenceEngine">
@@ -209,8 +218,8 @@
             <patternString><random list="A1,A2,A1,A3|A1,A2,A1,A3,A1,A2,A1,A4"/></patternString>
             <noteProbability>70</noteProbability>
             <legatoProbability>0</legatoProbability>
-            <minVelocity>400</minVelocity>
-            <maxVelocity>750</maxVelocity>
+            <minVelocity>500</minVelocity>
+            <maxVelocity>850</maxVelocity>
             <minActiveTicks>5</minActiveTicks>
             <maxActiveTicks>11</maxActiveTicks>
             <offsets>0</offsets>
@@ -356,6 +365,55 @@
             <velocityExponent>1</velocityExponent>
           </patternEngine>
         </pattern>
+        <pattern>
+          <!-- maracas -->
+          <pitch>70</pitch>
+          <patternEngine class="RandomPatternEngine">
+            <patternTicks>16</patternTicks>
+            <patternString><random list="A1,A2,A1,A3|A1,A2,A1,A3,A1,A2,A1,B1"/></patternString>
+            <noteProbability>60</noteProbability>
+            <legatoProbability>0</legatoProbability>
+            <minVelocity>750</minVelocity>
+            <maxVelocity>1000</maxVelocity>
+            <minActiveTicks>12</minActiveTicks>
+            <maxActiveTicks>15</maxActiveTicks>
+            <offsets>0</offsets>
+            <noteLengths>1,2</noteLengths>
+            <pauseLengths>1,2,2</pauseLengths>
+            <pitchVelocityCorrelation>0</pitchVelocityCorrelation>
+            <velocityExponent>1</velocityExponent>
+          </patternEngine>
+        </pattern>
+        <pattern>
+          <!-- tambourine -->
+          <pitch>54</pitch>
+          <patternEngine class="RandomFragmentPatternEngine">
+            <patternTicks>16</patternTicks>
+            <patternString><random list="A1,B1,A1,B2,A1,B1,A1,B3|A1,A1,A1,B1,A1,A1,A1,B2|A1,A1,A1,B1,A1,A1,A1,B2,A1,A1,A1,B1,A1,A1,A1,B3"/></patternString>
+            <pattern group="A">E(6,16,0:700,-)|E(7,16,0:700,-)|E(9,16,0:700,-)</pattern>
+            <pattern group="B">E(10,16,0:700,-)|E(11,16,0:700,-)|E(13,16,0:700,-)</pattern>
+          </patternEngine>
+        </pattern>
+	    <pattern>
+          <!-- cabasa -->
+          <pitch>69</pitch>
+          <patternEngine class="RandomPatternEngine">
+            <patternTicks>16</patternTicks>
+            <patternString><random list="A1,A2,A1,A3|A1,A2,A1,A3,A1,A2,A1,B1"/></patternString>
+            <noteProbability>60</noteProbability>
+            <legatoProbability>0</legatoProbability>
+            <minVelocity>550</minVelocity>
+            <maxVelocity>800</maxVelocity>
+            <minActiveTicks>12</minActiveTicks>
+            <maxActiveTicks>15</maxActiveTicks>
+            <offsets>0</offsets>
+            <noteLengths>1,2</noteLengths>
+            <pauseLengths>1,2,2</pauseLengths>
+            <pitchVelocityCorrelation>0</pitchVelocityCorrelation>
+            <velocityExponent>1</velocityExponent>
+          </patternEngine>
+        </pattern>
+
       </sequenceEngine>
       <activityVector>base</activityVector>
       <activityVector>snare</activityVector>
@@ -373,7 +431,10 @@
       <activityVector>cymbal</activityVector>
       <activityVector>congas</activityVector>
       <activityVector>timbales</activityVector>
-    </track>
+      <activityVector>maracas</activityVector>
+      <activityVector>tambourine</activityVector>
+      <activityVector>cabasa</activityVector>
+      </track>
   </arrangementEngine>
 
   <player class="MidiPlayer">

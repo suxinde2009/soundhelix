@@ -125,45 +125,49 @@ public class RandomPatternEngine extends StringPatternEngine {
         String[] patterns = patternPattern.split(",");
 
         for (String patternString : patterns) {
-            if (patternString.length() != 2) {
+            String p;
+
+            if (patternString.equals("-")) {
+                p = "-/" + patternTicks;
+            } else if (patternString.length() == 2) {
+                p = patternMap.get(patternString);
+
+                if (p == null) {
+                    // the pattern string is unknown, check if there already is a base pattern
+
+                    char basePatternCharacter = patternString.charAt(0);
+                    String basePattern = basePatternMap.get(basePatternCharacter);
+
+                    if (basePattern == null) {
+                        // no base pattern is found, create one and use it
+                        p = generateBasePattern(songContext);
+                        basePatternMap.put(basePatternCharacter, p);
+                    } else {
+                        // we have a base pattern
+                        // generate a modified pattern until we find one that we haven't used so far
+
+                        int tries = 0;
+
+                        do {
+                            tries++;
+
+                            if (tries > 10000) {
+                                throw new RuntimeException("Could not create non-used variation of pattern");
+                            }
+
+                            p = modifyPattern(basePattern, 2);
+                        } while (isUniquePatternParts && patternSet.contains(p));
+                    }
+
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Pattern " + patternString + ": " + p);
+                    }
+
+                    patternMap.put(patternString, p);
+                    patternSet.add(p);
+                }
+            } else {
                 throw new RuntimeException("Pattern part \"" + patternString + "\" is invalid (2 characters required)");
-            }
-
-            String p = patternMap.get(patternString);
-
-            if (p == null) {
-                // the pattern string is unknown, check if there already is a base pattern
-
-                char basePatternCharacter = patternString.charAt(0);
-                String basePattern = basePatternMap.get(basePatternCharacter);
-
-                if (basePattern == null) {
-                    // no base pattern is found, create one and use it
-                    p = generateBasePattern(songContext);
-                    basePatternMap.put(basePatternCharacter, p);
-                } else {
-                    // we have a base pattern
-                    // generate a modified pattern until we find one that we haven't used so far
-
-                    int tries = 0;
-
-                    do {
-                        tries++;
-
-                        if (tries > 10000) {
-                            throw new RuntimeException("Could not create non-used variation of pattern");
-                        }
-
-                        p = modifyPattern(basePattern, 2);
-                    } while (isUniquePatternParts && patternSet.contains(p));
-                }
-
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Pattern " + patternString + ": " + p);
-                }
-
-                patternMap.put(patternString, p);
-                patternSet.add(p);
             }
 
             if (totalPattern.length() > 0) {
@@ -225,7 +229,7 @@ public class RandomPatternEngine extends StringPatternEngine {
 
                     int velocity = (int) RandomUtils.getPowerDouble(v, minVelocity, maxVelocity, velocityExponent);
 
-                    boolean isLegato = nextIsNote && (i + length < patternTicks) && random.nextDouble() < legatoProbability;
+                    boolean isLegato = nextIsNote && i + length < patternTicks && random.nextDouble() < legatoProbability;
 
                     if (isLegato) {
                         if (isWildcard) {

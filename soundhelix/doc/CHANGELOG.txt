@@ -14,6 +14,9 @@ Change log
       MIDI controllers. In the DrumSequenceEngine, a conditional LFO can be configured via the "conditionalLFO" tag, which can be
       mapped to a MIDI controller in the MidiPlayer via the "instrumentControllerLFO" tag.
 
+    - Added support for using "-" in the RandomPatternEngine and the RandomFragmentPatternEngine in order to create an empty pattern.
+      For example, you can now use "A1,-,A2,-".
+
     - Cleaned up all code.
 
 

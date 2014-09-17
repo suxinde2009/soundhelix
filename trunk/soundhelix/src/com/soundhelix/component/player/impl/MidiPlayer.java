@@ -178,6 +178,8 @@ public class MidiPlayer extends AbstractPlayer {
     static {
         midiControllerMap = new HashMap<String, MidiController>();
 
+        // known controllers
+
         midiControllerMap.put("pitchBend", new MidiController(ShortMessage.PITCH_BEND, 2));
         midiControllerMap.put("modulationWheel", new MidiController(ShortMessage.CONTROL_CHANGE, 1, 1));
         midiControllerMap.put("breath", new MidiController(ShortMessage.CONTROL_CHANGE, 2, 1));
@@ -195,6 +197,12 @@ public class MidiPlayer extends AbstractPlayer {
         midiControllerMap.put("attackTime", new MidiController(ShortMessage.CONTROL_CHANGE, 73, 1));
         midiControllerMap.put("brightness", new MidiController(ShortMessage.CONTROL_CHANGE, 74, 1));
         midiControllerMap.put("controlSoundController10", new MidiController(ShortMessage.CONTROL_CHANGE, 79, 1));
+
+        // generic 7-bit controllers (via controller number)
+
+        for (int i = 0; i < 128; i++) {
+            midiControllerMap.put(String.valueOf(i), new MidiController(ShortMessage.CONTROL_CHANGE, i, 1));
+        }
     }
 
     /**
@@ -443,7 +451,7 @@ public class MidiPlayer extends AbstractPlayer {
             // when clock synchronization is used, we must make sure that
             // the ticks per beat divide CLOCK_SYNCHRONIZATION_TICKS_PER_BEAT
 
-            if (useClockSynchronization && (CLOCK_SYNCHRONIZATION_TICKS_PER_BEAT % ticksPerBeat) != 0) {
+            if (useClockSynchronization && CLOCK_SYNCHRONIZATION_TICKS_PER_BEAT % ticksPerBeat != 0) {
                 throw new RuntimeException("Ticks per beat (" + ticksPerBeat + ") must be a divider of " + CLOCK_SYNCHRONIZATION_TICKS_PER_BEAT
                         + " for MIDI clock synchronization");
             }
@@ -453,8 +461,8 @@ public class MidiPlayer extends AbstractPlayer {
             int clockTimingsPerTick = useClockSynchronization ? CLOCK_SYNCHRONIZATION_TICKS_PER_BEAT / structure.getTicksPerBeat() : 1;
 
             if (logger.isInfoEnabled()) {
-                logger.info("Song length: " + ticks + " ticks (" + (ticks * 60000L / (structure.getTicksPerBeat() * milliBPM)) + " seconds @ "
-                        + (milliBPM / 1000d) + " BPM)");
+                logger.info("Song length: " + ticks + " ticks (" + ticks * 60000L / (structure.getTicksPerBeat() * milliBPM) + " seconds @ "
+                        + milliBPM / 1000d + " BPM)");
             }
 
             runBeforePlayCommands();
@@ -715,7 +723,7 @@ public class MidiPlayer extends AbstractPlayer {
             long mpqn = 60000000000L / milliBPM;
 
             MetaMessage mt = new MetaMessage();
-            byte[] bt = { (byte) ((mpqn / 65536) & 0xFF), (byte) ((mpqn / 256) & 0xFF), (byte) (mpqn & 0xFF) };
+            byte[] bt = { (byte) (mpqn / 65536 & 0xFF), (byte) (mpqn / 256 & 0xFF), (byte) (mpqn & 0xFF) };
             mt.setMessage(0x51, bt, 3);
             metaTrack.add(new MidiEvent(mt, 0L));
 
@@ -1217,7 +1225,7 @@ public class MidiPlayer extends AbstractPlayer {
                 if (controller.equals("milliBPM")) {
                     long mpqn = 60000000000L / value;
                     MetaMessage mt = new MetaMessage();
-                    byte[] bt = { (byte) ((mpqn / 65536) & 0xFF), (byte) ((mpqn / 256) & 0xFF), (byte) (mpqn & 0xFF) };
+                    byte[] bt = { (byte) (mpqn / 65536 & 0xFF), (byte) (mpqn / 256 & 0xFF), (byte) (mpqn & 0xFF) };
                     mt.setMessage(0x51, bt, 3);
 
                     for (Device d : devices) {
@@ -1256,7 +1264,7 @@ public class MidiPlayer extends AbstractPlayer {
                 if (controller.equals("milliBPM")) {
                     long mpqn = 60000000000L / value;
                     MetaMessage mt = new MetaMessage();
-                    byte[] bt = { (byte) ((mpqn / 65536) & 0xFF), (byte) ((mpqn / 256) & 0xFF), (byte) (mpqn & 0xFF) };
+                    byte[] bt = { (byte) (mpqn / 65536 & 0xFF), (byte) (mpqn / 256 & 0xFF), (byte) (mpqn & 0xFF) };
                     mt.setMessage(0x51, bt, 3);
 
                     for (Device d : devices) {
@@ -1594,7 +1602,7 @@ public class MidiPlayer extends AbstractPlayer {
         if (auxMap != null) {
             for (Map.Entry<String, String> entry : auxMap.entrySet()) {
                 string = string.replace("${" + entry.getKey() + "}", entry.getValue());
-                string = string.replace("${safe" + (Character.toUpperCase(entry.getKey().charAt(0))) + entry.getKey().substring(1) + "}",
+                string = string.replace("${safe" + Character.toUpperCase(entry.getKey().charAt(0)) + entry.getKey().substring(1) + "}",
                         UNSAFE_CHARACTER_PATTERN.matcher(entry.getValue()).replaceAll("_"));
             }
         }
@@ -1788,8 +1796,8 @@ public class MidiPlayer extends AbstractPlayer {
                 activityVector = XMLUtils.parseString(random, "activityVector", nodeList.item(i));
             } catch (Exception e) {}
 
-            if (rotationUnit.equals("activity")
-                    && ((instrument == null || instrument.equals("")) && (activityVector == null || activityVector.equals("")))) {
+            if (rotationUnit.equals("activity") && (instrument == null || instrument.equals(""))
+                    && (activityVector == null || activityVector.equals(""))) {
                 throw new RuntimeException("Rotation unit \"activity\" requires an instrument or an ActivityVector");
             }
 
@@ -2378,7 +2386,7 @@ public class MidiPlayer extends AbstractPlayer {
                 lastTime = time;
                 count++;
 
-                if ((count % maxWindowSize) == 0) {
+                if (count % maxWindowSize == 0) {
                     logger.trace("Milli BPM from MIDI sync: " + milliBPM);
                 }
             } else if (status == ShortMessage.START || status == ShortMessage.CONTINUE) {

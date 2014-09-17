@@ -17,6 +17,9 @@ Change log
     - Added support for using "-" in the RandomPatternEngine and the RandomFragmentPatternEngine in order to create an empty pattern.
       For example, you can now use "A1,-,A2,-".
 
+    - Controllers for LFOs can now be accessed by their MIDI controller number in addition to predefined names. This allows using
+      controllers where no predefined name exists.
+
     - Cleaned up all code.
 
 

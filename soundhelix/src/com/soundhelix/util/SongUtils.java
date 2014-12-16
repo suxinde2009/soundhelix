@@ -141,9 +141,7 @@ public final class SongUtils {
 
         String songName = songNameEngine.createSongName();
         LOGGER.info("Song name: \"" + songName + "\"");
-        SongContext songContext = generateSongInternal(doc, getSongRandomSeed(songName));
-        songContext.setRandomSeed(randomSeed);
-        songContext.setSongName(songName);
+        SongContext songContext = generateSongInternal(doc, songName);
 
         return songContext;
     }
@@ -167,19 +165,17 @@ public final class SongUtils {
         checkVersion(doc);
 
         LOGGER.info("Song name: \"" + songName + "\"");
-        SongContext songContext = generateSongInternal(doc, getSongRandomSeed(songName));
-        // no random seed is set here
-        songContext.setSongName(songName);
+        SongContext songContext = generateSongInternal(doc, songName);
 
         return songContext;
     }
 
     /**
      * 
-     * Generates a new song based on the given document and random seed and returns the pre-configured player that can be used to play the song.
+     * Generates a new song based on the given document and song name and returns the song context, including a pre-configured arrangement and player.
      * 
      * @param doc the document
-     * @param randomSeed the random seed
+     * @param songName the song name
      * 
      * @return the player
      * 
@@ -189,8 +185,10 @@ public final class SongUtils {
      * @throws ClassNotFoundException if a class cannot be found
      */
 
-    private static SongContext generateSongInternal(Document doc, long randomSeed) throws InstantiationException, IllegalAccessException,
+    private static SongContext generateSongInternal(Document doc, String songName) throws InstantiationException, IllegalAccessException,
             ClassNotFoundException, XPathException {
+
+        long randomSeed = getSongRandomSeed(songName);
 
         LOGGER.debug("Rendering new song with random seed " + randomSeed);
 
@@ -205,6 +203,8 @@ public final class SongUtils {
         Random random = new Random(randomSeed);
 
         SongContext songContext = new SongContext();
+        songContext.setRandomSeed(Long.valueOf(randomSeed));
+        songContext.setSongName(songName);
 
         Structure structure = parseStructure(random.nextLong(), structureNode, null);
         songContext.setStructure(structure);
@@ -221,7 +221,7 @@ public final class SongUtils {
         long time = System.nanoTime() - startTime;
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Rendering took " + (time / 1000000) + " ms");
+            LOGGER.debug("Rendering took " + time / 1000000 + " ms");
         }
 
         Player player = XMLUtils.getInstance(songContext, Player.class, playerNode, randomSeed, 2);

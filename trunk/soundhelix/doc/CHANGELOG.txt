@@ -17,6 +17,10 @@ Change log
     - Added support for using "-" in the RandomPatternEngine and the RandomFragmentPatternEngine in order to create an empty pattern.
       For example, you can now use "A1,-,A2,-".
 
+    - Added support for using a global seed for a component via the "globalSeed" attribute. Unlike the "salt" attribute (which derives
+      the seed from the parent component's seed and the given salt), the "globalSeed" attribute derives the seed from the global seed
+      and the given global salt.
+
     - Controllers for LFOs can now be accessed by their MIDI controller number in addition to predefined names. This allows using
       controllers where no predefined name exists.
 

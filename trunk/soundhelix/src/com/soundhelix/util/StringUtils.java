@@ -116,4 +116,26 @@ public final class StringUtils {
 
         return hash;
     }
+
+    /**
+     * Checks if the given string is null or empty.
+     * 
+     * @param string the string
+     * @return true or false
+     */
+
+    public static boolean isEmpty(String string) {
+        return string == null || string.equals("");
+    }
+
+    /**
+     * Checks if the given string is non-null and not empty.
+     * 
+     * @param string the string
+     * @return true or false
+     */
+
+    public static boolean isNotEmpty(String string) {
+        return string != null && !string.equals("");
+    }
 }

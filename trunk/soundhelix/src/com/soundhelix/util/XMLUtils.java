@@ -143,7 +143,7 @@ public final class XMLUtils {
             try {
                 String s = xpath.evaluate("attribute::list", n);
 
-                if (s != null && !s.equals("")) {
+                if (StringUtils.isNotEmpty(s)) {
                     String[] str = s.split("\\|");
 
                     return Integer.parseInt(str[random.nextInt(str.length)]);
@@ -165,7 +165,7 @@ public final class XMLUtils {
                         double mean;
                         String meanstr = xpath.evaluate("attribute::mean", n);
 
-                        if (meanstr != null && !meanstr.equals("")) {
+                        if (StringUtils.isNotEmpty(meanstr)) {
                             mean = Double.parseDouble(meanstr);
                         } else {
                             // use arithmetic mean
@@ -262,7 +262,7 @@ public final class XMLUtils {
     public static boolean parseBoolean(Random random, Node node) {
         String content = node.getTextContent();
 
-        if (content != null && !content.equals("")) {
+        if (StringUtils.isNotEmpty(content)) {
             if (content.equals("true")) {
                 return true;
             } else if (content.equals("false")) {
@@ -486,16 +486,22 @@ public final class XMLUtils {
         }
 
         boolean isSeedProvided = false;
+        boolean isGlobalSaltProvided = false;
         long providedSeed = 0;
+        int globalSalt = 0;
 
         String seedString = xpath.evaluate("attribute::seed", node);
         String saltString = xpath.evaluate("attribute::salt", node);
+        String globalSaltString = xpath.evaluate("attribute::globalSalt", node);
 
-        if (seedString != null && !seedString.equals("") && saltString != null && !saltString.equals("")) {
-            throw new RuntimeException("Only one of the attributes \"seed\" and \"salt\" may be provided");
+        int check = (StringUtils.isNotEmpty(seedString) ? 1 : 0) + (StringUtils.isNotEmpty(saltString) ? 1 : 0)
+                + (StringUtils.isNotEmpty(globalSaltString) ? 1 : 0);
+
+        if (check > 1) {
+            throw new RuntimeException("Only one of the attributes \"seed\", \"salt\" and \"globalSalt\" may be provided");
         }
 
-        if (seedString != null && !seedString.equals("")) {
+        if (StringUtils.isNotEmpty(seedString)) {
             try {
                 // take the given number directly as the random seed
                 providedSeed = Long.parseLong(seedString);
@@ -503,11 +509,18 @@ public final class XMLUtils {
             } catch (NumberFormatException e) {
                 throw new RuntimeException("Seed \"" + seedString + "\" is invalid", e);
             }
-        } else if (saltString != null && !saltString.equals("")) {
+        } else if (StringUtils.isNotEmpty(saltString)) {
             try {
                 salt = Integer.parseInt(saltString);
             } catch (NumberFormatException e) {
                 throw new RuntimeException("Salt \"" + saltString + "\" is invalid", e);
+            }
+        } else if (StringUtils.isNotEmpty(globalSaltString)) {
+            try {
+                globalSalt = Integer.parseInt(globalSaltString);
+                isGlobalSaltProvided = true;
+            } catch (NumberFormatException e) {
+                throw new RuntimeException("Global salt \"" + globalSaltString + "\" is invalid", e);
             }
         }
 
@@ -525,8 +538,13 @@ public final class XMLUtils {
             long randomSeed;
 
             if (isSeedProvided) {
+                // use seed provided as-is
                 randomSeed = providedSeed;
+            } else if (isGlobalSaltProvided) {
+                // get seed based on global seed and global salt
+                randomSeed = getDerivedRandomSeed(songContext.getRandomSeed(), className, globalSalt);
             } else {
+                // get seed based on parent seed and salt
                 randomSeed = getDerivedRandomSeed(parentRandomSeed, className, salt);
             }
 

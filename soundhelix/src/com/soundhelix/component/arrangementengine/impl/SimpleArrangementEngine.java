@@ -194,6 +194,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
             Track track = sequenceEngine.render(songContext, list);
             track.transpose(entry.transposition);
+            track.scaleVelocity(entry.velocity);
             arrangement.add(track, entry.instrument);
         }
 
@@ -483,9 +484,8 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         long end = System.nanoTime();
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Fulfilled exact constraints in " + ((end - startTime) / 1000000L) + " ms. Iterations: " + iterations + " ("
-                    + (iterations * 1000000000L / (end - startTime)) + " iterations/s), violations: " + violations + ", backtrack steps: "
-                    + backtracks);
+            logger.debug("Fulfilled exact constraints in " + (end - startTime) / 1000000L + " ms. Iterations: " + iterations + " (" + iterations
+                    * 1000000000L / (end - startTime) + " iterations/s), violations: " + violations + ", backtrack steps: " + backtracks);
         }
 
         return convertBitSetsToActivityVectors(songContext, activityVectorConfigurations, bitSets);
@@ -699,7 +699,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         long end = System.nanoTime();
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Fulfilled greedy constraints in " + ((end - startTime) / 1000000L) + " ms.");
+            logger.debug("Fulfilled greedy constraints in " + (end - startTime) / 1000000L + " ms.");
         }
 
         return convertBitSetsToActivityVectors(songContext, activityVectorConfigurations, bitSets);
@@ -911,7 +911,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
             do {
                 num = min + random.nextInt(maxActivityVectors - min + 1);
-            } while (Math.abs(num - lastCount) > maxActivityChangeCount || (num == lastCount && random.nextFloat() >= 0.1f));
+            } while (Math.abs(num - lastCount) > maxActivityChangeCount || num == lastCount && random.nextFloat() >= 0.1f);
 
             count = num;
         }
@@ -1111,6 +1111,12 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
                 transposition = XMLUtils.parseInteger(random, "transposition", nodeList.item(i));
             } catch (Exception e) {}
 
+            int velocity = songContext.getStructure().getMaxVelocity();
+
+            try {
+                velocity = XMLUtils.parseInteger(random, "velocity", nodeList.item(i));
+            } catch (Exception e) {}
+
             NodeList sequenceEngineNodeList = XMLUtils.getNodeList("sequenceEngine", nodeList.item(i));
 
             NodeList nameNodeList = XMLUtils.getNodeList("activityVector", nodeList.item(i));
@@ -1124,7 +1130,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
             try {
                 SequenceEngine sequenceEngine = XMLUtils.getInstance(songContext, SequenceEngine.class, sequenceEngineNodeList.item(random
                         .nextInt(sequenceEngineNodeList.getLength())), randomSeed, i);
-                arrangementEntries[i] = new ArrangementEntry(instrument, sequenceEngine, transposition, activityVectorNames);
+                arrangementEntries[i] = new ArrangementEntry(instrument, sequenceEngine, transposition, velocity, activityVectorNames);
             } catch (Exception e) {
                 throw new RuntimeException("Error instantiating SequenceEngine for instrument \"" + instrument + "\"", e);
             }
@@ -1219,13 +1225,17 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         /** The transposition. */
         private final int transposition;
 
+        /** The transposition. */
+        private final int velocity;
+
         /** The names of ActivityVectors. */
         private final String[] activityVectorNames;
 
-        private ArrangementEntry(String instrument, SequenceEngine sequenceEngine, int transposition, String[] activityVectorNames) {
+        private ArrangementEntry(String instrument, SequenceEngine sequenceEngine, int transposition, int velocity, String[] activityVectorNames) {
             this.instrument = instrument;
             this.sequenceEngine = sequenceEngine;
             this.transposition = transposition;
+            this.velocity = velocity;
             this.activityVectorNames = activityVectorNames;
         }
     }

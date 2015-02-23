@@ -1,6 +1,5 @@
 package com.soundhelix.component.patternengine.impl;
 
-import java.util.Iterator;
 import java.util.Random;
 
 import javax.xml.xpath.XPathException;
@@ -144,9 +143,7 @@ public class CrescendoPatternEngine extends StringPatternEngine {
             return tick;
         }
 
-        for (Iterator<PatternEntry> it = pattern.iterator(); it.hasNext();) {
-            PatternEntry entry = it.next();
-
+        for (PatternEntry entry : pattern) {
             if (sb.length() > 0) {
                 sb.append(',');
             }

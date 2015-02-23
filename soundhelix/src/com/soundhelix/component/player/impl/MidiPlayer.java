@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -1395,11 +1394,8 @@ public class MidiPlayer extends AbstractPlayer {
         // we use a Map to track whether a program has been set already
 
         Map<DeviceChannel, Boolean> map = new HashMap<DeviceChannel, Boolean>();
-        Iterator<DeviceChannel> i = channelMap.values().iterator();
 
-        while (i.hasNext()) {
-            DeviceChannel dc = i.next();
-
+        for (DeviceChannel dc : channelMap.values()) {
             if (dc.program != -1 && !map.containsKey(dc)) {
                 sendMidiMessage(dc, ShortMessage.PROGRAM_CHANGE, dc.program, 0);
                 map.put(dc, true);
@@ -1445,11 +1441,7 @@ public class MidiPlayer extends AbstractPlayer {
 
     private void sendMidiMessageToClockSynchronized(int status) throws InvalidMidiDataException {
         if (useClockSynchronization) {
-            Iterator<Device> iter = deviceMap.values().iterator();
-
-            while (iter.hasNext()) {
-                Device device = iter.next();
-
+            for (Device device : deviceMap.values()) {
                 if (device.useClockSynchronization) {
                     sendMidiMessage(device, status);
                 }
@@ -1470,11 +1462,7 @@ public class MidiPlayer extends AbstractPlayer {
             return;
         }
 
-        Iterator<DeviceChannel> iter = channelMap.values().iterator();
-
-        while (iter.hasNext()) {
-            DeviceChannel dc = iter.next();
-
+        for (DeviceChannel dc : channelMap.values()) {
             // send ALL SOUND OFF message
             sendMidiMessage(dc, ShortMessage.CONTROL_CHANGE, 120, 0);
 

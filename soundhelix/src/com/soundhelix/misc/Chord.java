@@ -154,7 +154,7 @@ public class Chord {
         int max = Math.max(pitch1, Math.max(pitch2, pitch3));
 
         lowPitch = min;
-        middlePitch = min == pitch1 ? (max == pitch2 ? pitch3 : pitch2) : (max == pitch1 ? (min == pitch2 ? pitch3 : pitch2) : pitch1);
+        middlePitch = min == pitch1 ? max == pitch2 ? pitch3 : pitch2 : max == pitch1 ? min == pitch2 ? pitch3 : pitch2 : pitch1;
         highPitch = max;
 
         if (lowPitch == middlePitch || middlePitch == highPitch) {
@@ -165,8 +165,8 @@ public class Chord {
             throw new RuntimeException("High and low pitch are more than 11 halftones apart in chord " + this);
         }
 
-        flavor = (middlePitch - lowPitch) * 100 + (highPitch - lowPitch);
-        code = (((lowPitch % 12) + 12) % 12) * 10000 + flavor;
+        flavor = (middlePitch - lowPitch) * 100 + highPitch - lowPitch;
+        code = (lowPitch % 12 + 12) % 12 * 10000 + flavor;
     }
 
     /**
@@ -336,7 +336,7 @@ public class Chord {
      */
 
     public int getPitch(int offset) {
-        int p = ((offset % 3) + 3) % 3;
+        int p = (offset % 3 + 3) % 3;
         int octaveOffset = 12 * ((offset < 0 ? offset - 2 : offset) / 3);
 
         if (p == 0) {
@@ -415,8 +415,8 @@ public class Chord {
      */
 
     public boolean containsPitch(int pitch) {
-        return ((((pitch - getLowPitch()) % 12) + 12) % 12) == 0 || ((((pitch - getMiddlePitch()) % 12) + 12) % 12) == 0
-                || ((((pitch - getHighPitch()) % 12) + 12) % 12) == 0;
+        return ((pitch - getLowPitch()) % 12 + 12) % 12 == 0 || ((pitch - getMiddlePitch()) % 12 + 12) % 12 == 0
+                || ((pitch - getHighPitch()) % 12 + 12) % 12 == 0;
     }
 
     /**
@@ -532,7 +532,7 @@ public class Chord {
         if (codeInteger != null) {
             int code = codeInteger;
 
-            int diff1 = (code / 100) % 100;
+            int diff1 = code / 100 % 100;
             int diff2 = code % 100;
             int pitch = code / 10000;
 

@@ -1,7 +1,6 @@
 package com.soundhelix.misc;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -189,11 +188,7 @@ public class Sequence {
         sb.append(totalTicks);
         sb.append('{');
 
-        Iterator<SequenceEntry> i = sequence.iterator();
-
-        while (i.hasNext()) {
-            SequenceEntry entry = i.next();
-
+        for (SequenceEntry entry : sequence) {
             if (entry.isNote()) {
                 sb.append(entry.getPitch());
             } else {
@@ -221,13 +216,38 @@ public class Sequence {
             return;
         }
 
-        Iterator<SequenceEntry> iter = sequence.iterator();
-
-        while (iter.hasNext()) {
-            SequenceEntry entry = iter.next();
-
+        for (SequenceEntry entry : sequence) {
             if (entry.isNote()) {
                 entry.pitch += halftones;
+            }
+        }
+    }
+
+    /**
+     * Scales the velocity of all notes by velocity/maxVelocity.
+     * 
+     * @param velocity the velocity
+     */
+
+    public void scaleVelocity(int velocity) {
+        int maxVelocity = songContext.getStructure().getMaxVelocity();
+
+        if (velocity == maxVelocity) {
+            // nothing to do
+            return;
+        }
+
+        for (Sequence.SequenceEntry entry : sequence) {
+            if (entry.isNote()) {
+                int v = (int) ((long) entry.getVelocity() * velocity / maxVelocity);
+
+                if (v < 1) {
+                    v = 1;
+                } else if (v > maxVelocity) {
+                    v = maxVelocity;
+                }
+
+                entry.velocity = v;
             }
         }
     }
@@ -317,13 +337,13 @@ public class Sequence {
         private int pitch;
 
         /** The velocity. */
-        private final int velocity;
+        private int velocity;
 
         /** The number of ticks. */
         private int ticks;
 
         /** The legato flag. */
-        private final boolean legato;
+        private boolean legato;
 
         /**
          * Constructor.

@@ -14,6 +14,9 @@ Change log
       MIDI controllers. In the DrumSequenceEngine, a conditional LFO can be configured via the "conditionalLFO" tag, which can be
       mapped to a MIDI controller in the MidiPlayer via the "instrumentControllerLFO" tag.
 
+    - Added support for velocity scaling in each track in the SimpleArrangementEngine via the new tag "velocity". Each track's note
+      velocity is scaled by a factor of the given velocity divided by the song's maximum velocity.
+
     - Added support for using "-" in the RandomPatternEngine and the RandomFragmentPatternEngine in order to create an empty pattern.
       For example, you can now use "A1,-,A2,-".
 
@@ -24,7 +27,9 @@ Change log
     - Controllers for LFOs can now be accessed by their MIDI controller number in addition to predefined names. This allows using
       controllers where no predefined name exists.
 
-    - Cleaned up all code.
+    - Added new example SoundHelix-Popcorn.xml.
+
+    - Cleaned up code.
 
 
 0.7.1: 2014-05-31

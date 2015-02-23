@@ -145,4 +145,16 @@ public class Track {
             seq.transpose(halftones);
         }
     }
+
+    /**
+     * Scales the volume of the track by a factor of velocity/maxVelocity.
+     * 
+     * @param velocity the velocity
+     */
+
+    public void scaleVelocity(int velocity) {
+        for (Sequence seq : sequences) {
+            seq.scaleVelocity(velocity);
+        }
+    }
 }

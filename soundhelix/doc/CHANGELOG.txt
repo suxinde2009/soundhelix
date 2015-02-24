@@ -17,6 +17,9 @@ Change log
     - Added support for velocity scaling in each track in the SimpleArrangementEngine via the new tag "velocity". Each track's note
       velocity is scaled by a factor of the given velocity divided by the song's maximum velocity.
 
+    - Added support for nested pattern expansion in the chord patterns of the PatternHarmonyEngine, using the syntax "(string)*count".
+      For example, instead of using "Am/4,F/4,Am/4,F/4,Am/4,F/4,G/4,C/4" in a pattern string you can now use (Am/4,F/4)*3,G/4,C/4" instead.
+
     - Added support for using "-" in the RandomPatternEngine and the RandomFragmentPatternEngine in order to create an empty pattern.
       For example, you can now use "A1,-,A2,-".
 

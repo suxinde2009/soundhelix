@@ -141,11 +141,11 @@ public class Pattern implements Iterable<PatternEntry> {
             String[] b = a[0].split("/");
             int t = b.length > 1 ? Integer.parseInt(b[1]) : 1;
 
-            if (((t * currentTPB) % targetTPB) != 0) {
+            if (t * currentTPB % targetTPB != 0) {
                 throw new RuntimeException("Tick value " + t + " in pattern \"" + patternString + "\" can't be scaled by a ratio of " + currentTPB
                         + ":" + targetTPB);
             } else {
-                t = (t * currentTPB) / targetTPB;
+                t = t * currentTPB / targetTPB;
             }
 
             boolean legato = b[0].endsWith("~");
@@ -178,7 +178,7 @@ public class Pattern implements Iterable<PatternEntry> {
      * @return the expanded pattern string
      */
 
-    private static String expandPatternString(String patternString, char separator) {
+    public static String expandPatternString(String patternString, char separator) {
         if (patternString == null || patternString.equals("")) {
             return null;
         }
@@ -393,7 +393,7 @@ public class Pattern implements Iterable<PatternEntry> {
 
         for (int i = 0; i < pattern.length; i++) {
             PatternEntry entry = pattern[i];
-            int ticks = (int) ((entry.ticks) * factor + 0.5d);
+            int ticks = (int) (entry.ticks * factor + 0.5d);
 
             if (ticks == 0) {
                 throw new IllegalArgumentException("Scaling leads to 0 ticks");

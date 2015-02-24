@@ -13,6 +13,7 @@ import org.w3c.dom.NodeList;
 
 import com.soundhelix.misc.Chord;
 import com.soundhelix.misc.Harmony;
+import com.soundhelix.misc.Pattern;
 import com.soundhelix.misc.SongContext;
 import com.soundhelix.misc.Structure;
 import com.soundhelix.util.NoteUtils;
@@ -261,7 +262,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 
         // choose a chord pattern at random
         ChordPattern chordPattern = chordPatterns[random.nextInt(chordPatterns.length)];
-        String[] chords = chordPattern.chordPattern.split(",");
+        String[] chords = Pattern.expandPatternString(chordPattern.chordPattern, ',').split(",");
 
         int count = chords.length;
 

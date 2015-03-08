@@ -60,11 +60,11 @@ public class CFGSongNameEngine extends AbstractSongNameEngine {
         Map<String, RandomStrings> variableMap = new HashMap<String, RandomStrings>(variableCount);
 
         for (int i = 0; i < variableCount; i++) {
-            String name = XMLUtils.parseString(random, "attribute::name", nodeList.item(i));
+            String name = XMLUtils.parseString(random, "@name", nodeList.item(i));
             boolean once;
 
             try {
-                once = XMLUtils.parseBoolean(random, "attribute::once", nodeList.item(i));
+                once = XMLUtils.parseBoolean(random, "@once", nodeList.item(i));
             } catch (Exception e) {
                 once = true;
             }

@@ -1610,9 +1610,9 @@ public class MidiPlayer extends AbstractPlayer {
         Device[] devices = new Device[entries];
 
         for (int i = 0; i < entries; i++) {
-            String name = XMLUtils.parseString(random, "attribute::name", nodeList.item(i));
+            String name = XMLUtils.parseString(random, "@name", nodeList.item(i));
             String midiName = XMLUtils.parseString(random, nodeList.item(i));
-            boolean useClockSynchronization = XMLUtils.parseBoolean(random, "attribute::clockSynchronization", nodeList.item(i));
+            boolean useClockSynchronization = XMLUtils.parseBoolean(random, "@clockSynchronization", nodeList.item(i));
             devices[i] = new Device(name, midiName, useClockSynchronization);
         }
 
@@ -1662,9 +1662,9 @@ public class MidiPlayer extends AbstractPlayer {
         Map<String, DeviceChannel> channelMap = new HashMap<String, DeviceChannel>();
 
         for (int i = 0; i < entries; i++) {
-            String instrument = XMLUtils.parseString(random, "attribute::instrument", nodeList.item(i));
-            String device = XMLUtils.parseString(random, "attribute::device", nodeList.item(i));
-            int channel = Integer.parseInt(XMLUtils.parseString(random, "attribute::channel", nodeList.item(i))) - 1;
+            String instrument = XMLUtils.parseString(random, "@instrument", nodeList.item(i));
+            String device = XMLUtils.parseString(random, "@device", nodeList.item(i));
+            int channel = Integer.parseInt(XMLUtils.parseString(random, "@channel", nodeList.item(i))) - 1;
 
             if (channelMap.containsKey(instrument)) {
                 throw new RuntimeException("Instrument " + instrument + " must not be re-mapped");
@@ -1677,7 +1677,7 @@ public class MidiPlayer extends AbstractPlayer {
             int program = -1;
 
             try {
-                program = Integer.parseInt(XMLUtils.parseString(random, "attribute::program", nodeList.item(i))) - 1;
+                program = Integer.parseInt(XMLUtils.parseString(random, "@program", nodeList.item(i))) - 1;
             } catch (Exception e) {}
 
             DeviceChannel ch = new DeviceChannel(deviceMap.get(device), channel, program);
@@ -1691,9 +1691,9 @@ public class MidiPlayer extends AbstractPlayer {
         ControllerValue[] controllerValues = new ControllerValue[entries];
 
         for (int i = 0; i < entries; i++) {
-            String device = XMLUtils.parseString(random, "attribute::device", nodeList.item(i));
-            int channel = Integer.parseInt(XMLUtils.parseString(random, "attribute::channel", nodeList.item(i))) - 1;
-            String controller = XMLUtils.parseString(random, "attribute::controller", nodeList.item(i));
+            String device = XMLUtils.parseString(random, "@device", nodeList.item(i));
+            int channel = Integer.parseInt(XMLUtils.parseString(random, "@channel", nodeList.item(i))) - 1;
+            String controller = XMLUtils.parseString(random, "@controller", nodeList.item(i));
             int value = Integer.parseInt(XMLUtils.parseString(random, ".", nodeList.item(i)));
 
             controllerValues[i] = new ControllerValue(device, channel, controller, value);

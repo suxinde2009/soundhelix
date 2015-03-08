@@ -370,7 +370,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
             int minimizeChordDistance = -1;
 
             try {
-                boolean b = XMLUtils.parseBoolean(random, "attribute::minimizeChordDistance", nodeList.item(i));
+                boolean b = XMLUtils.parseBoolean(random, "@minimizeChordDistance", nodeList.item(i));
                 minimizeChordDistance = b ? 1 : 0;
             } catch (Exception e) {}
 

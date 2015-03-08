@@ -63,7 +63,7 @@ public class RandomFragmentPatternEngine extends StringPatternEngine {
         patternStringMap = new HashMap<Character, String[]>(patterns);
 
         for (int i = 0; i < patterns; i++) {
-            String group = XMLUtils.parseString(random, "attribute::group", nodeList.item(i));
+            String group = XMLUtils.parseString(random, "@group", nodeList.item(i));
 
             if (group == null || group.length() != 1) {
                 throw new RuntimeException("Need exactly one character, got \"" + group + "\"");
@@ -83,6 +83,10 @@ public class RandomFragmentPatternEngine extends StringPatternEngine {
 
             patternStringMap.put(character, patternArray);
         }
+
+        try {
+            setPatternTicksPerBeat(XMLUtils.parseInteger(random, "ticksPerBeat", node));
+        } catch (Exception e) {}
 
         super.setPatternString(generatePattern(patternString));
     }
@@ -181,26 +185,28 @@ public class RandomFragmentPatternEngine extends StringPatternEngine {
 
         int patternCount = patterns.length;
 
-        StringBuilder sb = new StringBuilder();
-        int activeTicks = 0;
+        for (int i = 0; i < 100; i++) {
+            StringBuilder sb = new StringBuilder();
+            int activeTicks = 0;
 
-        while (activeTicks < patternTicks) {
-            if (sb.length() > 0) {
-                sb.append(',');
-            }
+            while (activeTicks < patternTicks) {
+                if (sb.length() > 0) {
+                    sb.append(',');
+                }
 
-            String patternString = patterns[random.nextInt(patternCount)];
-            int stringTicks = Pattern.getStringTicks(patternString);
+                String patternString = patterns[random.nextInt(patternCount)];
+                int stringTicks = Pattern.getStringTicks(patternString);
 
-            sb.append(patternString);
-            activeTicks += stringTicks;
+                sb.append(patternString);
+                activeTicks += stringTicks;
 
-            if (activeTicks > patternTicks) {
-                throw new RuntimeException("Generated pattern is longer than " + patternTicks + " ticks");
+                if (activeTicks == patternTicks) {
+                    return sb.toString();
+                }
             }
         }
 
-        return sb.toString();
+        throw new RuntimeException("Generated pattern is longer than " + patternTicks + " ticks");
     }
 
     public void setPatternTicks(int patternTicks) {

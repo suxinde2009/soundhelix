@@ -38,11 +38,20 @@ public class CrescendoPatternEngine extends StringPatternEngine {
     /** The prefix pattern string. */
     private String prefixPatternString;
 
-    /** The pattern string. */
+    /** The ticks per beat for the prefix pattern. */
+    private int prefixPatternTicksPerBeat = -1;
+
+    /** The main pattern string. */
     private String patternString;
+
+    /** The ticks per beat for the main pattern. */
+    private int patternTicksPerBeat = -1;
 
     /** The suffix pattern string. */
     private String suffixPatternString;
+
+    /** The ticks per beat for the suffix pattern. */
+    private int suffixPatternTicksPerBeat = -1;
 
     @Override
     public void configure(SongContext songContext, Node node) throws XPathException {
@@ -65,11 +74,23 @@ public class CrescendoPatternEngine extends StringPatternEngine {
         } catch (Exception e) {}
 
         try {
+            setPrefixPatternTicksPerBeat(XMLUtils.parseInteger(random, "prefixPattern/@ticksPerBeat", node));
+        } catch (Exception e) {}
+
+        try {
             setPrefixPatternString(XMLUtils.parseString(random, "prefixPattern", node));
         } catch (Exception e) {}
 
         try {
+            setPatternTicksPerBeat(XMLUtils.parseInteger(random, "pattern/@ticksPerBeat", node));
+        } catch (Exception e) {}
+
+        try {
             setPatternString(XMLUtils.parseString(random, "pattern", node));
+        } catch (Exception e) {}
+
+        try {
+            setSuffixPatternTicksPerBeat(XMLUtils.parseInteger(random, "suffixPattern/@ticksPerBeat", node));
         } catch (Exception e) {}
 
         try {
@@ -91,9 +112,9 @@ public class CrescendoPatternEngine extends StringPatternEngine {
     private String generatePattern(SongContext songContext, String patternPattern) {
         StringBuilder sb = new StringBuilder();
 
-        Pattern prefixPattern = Pattern.parseString(songContext, prefixPatternString);
-        Pattern pattern = Pattern.parseString(songContext, patternString);
-        Pattern suffixPattern = Pattern.parseString(songContext, suffixPatternString);
+        Pattern prefixPattern = Pattern.parseString(songContext, prefixPatternString, prefixPatternTicksPerBeat);
+        Pattern pattern = Pattern.parseString(songContext, patternString, patternTicksPerBeat);
+        Pattern suffixPattern = Pattern.parseString(songContext, suffixPatternString, suffixPatternTicksPerBeat);
 
         int prefixPatternTicks = prefixPattern != null ? prefixPattern.getTicks() : 0;
         int patternTicks = pattern != null ? pattern.getTicks() : 0;
@@ -187,6 +208,10 @@ public class CrescendoPatternEngine extends StringPatternEngine {
         return tick;
     }
 
+    public void setPatternTicksPerBeat(int patternTicksPerBeat) {
+        this.patternTicksPerBeat = patternTicksPerBeat;
+    }
+
     @Override
     public void setPatternString(String patternString) {
         this.patternString = patternString;
@@ -204,8 +229,16 @@ public class CrescendoPatternEngine extends StringPatternEngine {
         this.maxVelocity = maxVelocity;
     }
 
+    public void setPrefixPatternTicksPerBeat(int prefixPatternTicksPerBeat) {
+        this.prefixPatternTicksPerBeat = prefixPatternTicksPerBeat;
+    }
+
     public void setPrefixPatternString(String prefixPatternString) {
         this.prefixPatternString = prefixPatternString;
+    }
+
+    public void setSuffixPatternTicksPerBeat(int suffixPatternTicksPerBeat) {
+        this.suffixPatternTicksPerBeat = suffixPatternTicksPerBeat;
     }
 
     public void setSuffixPatternString(String suffixPatternString) {

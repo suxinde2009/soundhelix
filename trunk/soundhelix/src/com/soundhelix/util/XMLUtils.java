@@ -141,29 +141,29 @@ public final class XMLUtils {
 
         if (n.getNodeName().equals("random")) {
             try {
-                String s = xpath.evaluate("attribute::list", n);
+                String s = xpath.evaluate("@list", n);
 
                 if (StringUtils.isNotEmpty(s)) {
                     String[] str = s.split("\\|");
 
                     return Integer.parseInt(str[random.nextInt(str.length)]);
                 } else {
-                    int min = Integer.parseInt(xpath.evaluate("attribute::min", n));
-                    int max = Integer.parseInt(xpath.evaluate("attribute::max", n));
+                    int min = Integer.parseInt(xpath.evaluate("@min", n));
+                    int max = Integer.parseInt(xpath.evaluate("@max", n));
 
-                    String type = xpath.evaluate("attribute::type", n);
+                    String type = xpath.evaluate("@type", n);
 
                     if (type == null || type.equals("") || type.equals("uniform")) {
                         int step = 1;
 
                         try {
-                            step = Integer.parseInt(xpath.evaluate("attribute::step", n));
+                            step = Integer.parseInt(xpath.evaluate("@step", n));
                         } catch (NumberFormatException e) {}
 
                         return RandomUtils.getUniformInteger(random, min, max, step);
                     } else if (type.equals("normal")) {
                         double mean;
-                        String meanstr = xpath.evaluate("attribute::mean", n);
+                        String meanstr = xpath.evaluate("@mean", n);
 
                         if (StringUtils.isNotEmpty(meanstr)) {
                             mean = Double.parseDouble(meanstr);
@@ -172,7 +172,7 @@ public final class XMLUtils {
                             mean = (min + max) / 2.0f;
                         }
 
-                        double variance = Double.parseDouble(xpath.evaluate("attribute::variance", n));
+                        double variance = Double.parseDouble(xpath.evaluate("@variance", n));
 
                         return RandomUtils.getNormalInteger(random, min, max, mean, variance);
                     } else {
@@ -274,7 +274,7 @@ public final class XMLUtils {
 
         if (n.getNodeName().equals("random")) {
             try {
-                double prob = Double.parseDouble(XPATH.get().evaluate("attribute::probability", n));
+                double prob = Double.parseDouble(XPATH.get().evaluate("@probability", n));
                 return RandomUtils.getBoolean(random, prob / 100.0d);
             } catch (Exception e) {
                 throw new RuntimeException("Error parsing random attributes", e);
@@ -350,7 +350,7 @@ public final class XMLUtils {
 
         if (n.getNodeName().equals("random")) {
             try {
-                String s = XPATH.get().evaluate("attribute::list", n);
+                String s = XPATH.get().evaluate("@list", n);
 
                 if (s == null) {
                     throw new RuntimeException("Attribute \"list\" is undefined");
@@ -390,7 +390,7 @@ public final class XMLUtils {
 
         if (n.getNodeName().equals("random")) {
             try {
-                String s = XPATH.get().evaluate("attribute::list", n);
+                String s = XPATH.get().evaluate("@list", n);
 
                 if (s == null || s.equals("")) {
                     throw new RuntimeException("Attribute \"list\" is empty");
@@ -468,7 +468,7 @@ public final class XMLUtils {
 
         XPath xpath = XPATH.get();
 
-        String className = xpath.evaluate("attribute::class", node);
+        String className = xpath.evaluate("@class", node);
 
         if (className == null) {
             throw new RuntimeException("Attribute \"class\" not defined");
@@ -490,9 +490,9 @@ public final class XMLUtils {
         long providedSeed = 0;
         int globalSalt = 0;
 
-        String seedString = xpath.evaluate("attribute::seed", node);
-        String saltString = xpath.evaluate("attribute::salt", node);
-        String globalSaltString = xpath.evaluate("attribute::globalSalt", node);
+        String seedString = xpath.evaluate("@seed", node);
+        String saltString = xpath.evaluate("@salt", node);
+        String globalSaltString = xpath.evaluate("@globalSalt", node);
 
         int check = (StringUtils.isNotEmpty(seedString) ? 1 : 0) + (StringUtils.isNotEmpty(saltString) ? 1 : 0)
                 + (StringUtils.isNotEmpty(globalSaltString) ? 1 : 0);

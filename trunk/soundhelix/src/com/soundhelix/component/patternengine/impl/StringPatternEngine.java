@@ -18,12 +18,15 @@ import com.soundhelix.util.XMLUtils;
  */
 
 public class StringPatternEngine extends AbstractPatternEngine {
+    /** The ticks per beat of the pattern. */
+    private int patternTicksPerBeat = -1;
+
     /** The pattern string. */
     private String patternString;
 
     @Override
     public Pattern render(SongContext songContext, String wildcardString) {
-        return Pattern.parseString(songContext, patternString, wildcardString);
+        return Pattern.parseString(songContext, patternString, wildcardString, patternTicksPerBeat);
     }
 
     @Override
@@ -36,7 +39,13 @@ public class StringPatternEngine extends AbstractPatternEngine {
             throw new RuntimeException("Need at least 1 pattern string");
         }
 
-        setPatternString(XMLUtils.parseString(random, nodeList.item(random.nextInt(nodeList.getLength()))));
+        Node patternNode = nodeList.item(random.nextInt(nodeList.getLength()));
+
+        try {
+            setPatternTicksPerBeat(XMLUtils.parseInteger(random, "@ticksPerBeat", patternNode));
+        } catch (Exception e) {}
+
+        setPatternString(XMLUtils.parseString(random, patternNode));
     }
 
     public String getPatternString() {
@@ -45,5 +54,9 @@ public class StringPatternEngine extends AbstractPatternEngine {
 
     public void setPatternString(String patternString) {
         this.patternString = patternString;
+    }
+
+    public void setPatternTicksPerBeat(int patternTicksPerBeat) {
+        this.patternTicksPerBeat = patternTicksPerBeat;
     }
 }

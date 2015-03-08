@@ -70,8 +70,8 @@ public class Pattern implements Iterable<PatternEntry> {
      * @return the pattern
      */
 
-    public static Pattern parseString(SongContext songContext, String patternString) {
-        return parseString(songContext, patternString, null, 1, 1);
+    private static Pattern parseString(SongContext songContext, String patternString) {
+        return parseString(songContext, patternString, null, songContext.getStructure().getTicksPerBeat());
     }
 
     /**
@@ -85,8 +85,8 @@ public class Pattern implements Iterable<PatternEntry> {
      * @return the pattern
      */
 
-    public static Pattern parseString(SongContext songContext, String patternString, int currentTPB, int targetTPB) {
-        return parseString(songContext, patternString, null, currentTPB, targetTPB);
+    public static Pattern parseString(SongContext songContext, String patternString, int targetTPB) {
+        return parseString(songContext, patternString, null, targetTPB);
     }
 
     /**
@@ -99,8 +99,8 @@ public class Pattern implements Iterable<PatternEntry> {
      * @return the pattern
      */
 
-    public static Pattern parseString(SongContext songContext, String patternString, String wildcardString) {
-        return parseString(songContext, patternString, wildcardString, 1, 1);
+    private static Pattern parseString(SongContext songContext, String patternString, String wildcardString) {
+        return parseString(songContext, patternString, wildcardString, 4);
     }
 
     /**
@@ -115,7 +115,7 @@ public class Pattern implements Iterable<PatternEntry> {
      * @return the pattern
      */
 
-    public static Pattern parseString(SongContext songContext, String patternString, String wildcardString, int currentTPB, int targetTPB) {
+    public static Pattern parseString(SongContext songContext, String patternString, String wildcardString, int targetTPB) {
         patternString = expand(patternString);
 
         if (patternString == null || patternString.equals("")) {
@@ -124,6 +124,13 @@ public class Pattern implements Iterable<PatternEntry> {
 
         if (wildcardString == null) {
             wildcardString = "";
+        }
+
+        int currentTPB = songContext.getStructure().getTicksPerBeat();
+
+        if (targetTPB == -1) {
+            // -1 means no tick scaling
+            targetTPB = currentTPB;
         }
 
         PatternEntry[] pattern;

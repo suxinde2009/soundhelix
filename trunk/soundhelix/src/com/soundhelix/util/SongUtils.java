@@ -353,7 +353,7 @@ public final class SongUtils {
             return;
         }
 
-        String version = XMLUtils.parseString(null, "attribute::version", rootNode);
+        String version = XMLUtils.parseString(null, "@version", rootNode);
 
         if (version != null && !version.equals("")) {
             if (!VersionUtils.checkVersion(BuildConstants.VERSION, version)) {

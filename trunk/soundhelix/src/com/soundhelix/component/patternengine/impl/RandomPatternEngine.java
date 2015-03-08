@@ -98,6 +98,10 @@ public class RandomPatternEngine extends StringPatternEngine {
             setUniquePatternParts(XMLUtils.parseBoolean(random, "uniquePatternParts", node));
         } catch (Exception e) {}
 
+        try {
+            setPatternTicksPerBeat(XMLUtils.parseInteger(random, "ticksPerBeat", node));
+        } catch (Exception e) {}
+
         super.setPatternString(generatePattern(songContext, patternString));
     }
 

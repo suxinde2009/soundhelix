@@ -125,6 +125,9 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         }
 
         songContext.setActivityMatrix(activityMatrix);
+        // activityMatrix.get("melody").setActivityState(HarmonyUtils.getChordSectionTick(songContext, 1), songContext.getStructure().getTicks(),
+        // true);
+
         activityMatrix.dump(songContext);
         shiftIntervalBoundaries(neededActivityVectors);
 
@@ -993,7 +996,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
                 activityVectorCount);
 
         for (int i = 0; i < activityVectorCount; i++) {
-            String name = XMLUtils.parseString(random, "attribute::name", nodeList.item(i));
+            String name = XMLUtils.parseString(random, "@name", nodeList.item(i));
 
             if (activityVectorConfigurationHashMap.containsKey(name)) {
                 throw new RuntimeException("ActivityVector \"" + name + "\" already defined");
@@ -1008,7 +1011,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
             boolean allowInactive = false;
 
             try {
-                allowInactive = XMLUtils.parseBoolean(random, "minActive/attribute::allowInactive", nodeList.item(i));
+                allowInactive = XMLUtils.parseBoolean(random, "minActive/@allowInactive", nodeList.item(i));
             } catch (Exception e) {}
 
             double maxActive = 100.0d;

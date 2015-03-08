@@ -17,6 +17,15 @@ Change log
     - Added support for velocity scaling in each track in the SimpleArrangementEngine via the new tag "velocity". Each track's note
       velocity is scaled by a factor of the given velocity divided by the song's maximum velocity.
 
+    - Added support for providing a ticks-per-beat value per pattern. If the actual ticks per beat of the song is different (but
+      compatible) all note/pause lengths of the pattern are scaled accordingly. For example, you can have a song with a ticks-per-beat
+      value of 12 and provide some patterns with a ticks-per-beat value of 4, which will then be scaled length-wise by a factor of 3.
+      The ticks per beat can be specified per pattern in the StringPatternEngine and in the CrescendoPatternEngine (using the attribute
+      "ticksPerBeat") and per pattern engine in the RandomPatternEngine and RandomFragmentPatternEngine using the tag "ticksPerBeat".
+
+    - Modified the RandomFragmentPatternEngine to regenerate a pattern from the given fragments if the target pattern length is too long
+      for a number of times before giving up. This makes it possible to use fragments of different lengths at the same time.
+
     - Added support for nested pattern expansion in the chord patterns of the PatternHarmonyEngine, using the syntax "(string)*count".
       For example, instead of using "Am/4,F/4,Am/4,F/4,Am/4,F/4,G/4,C/4" in a pattern string you can now use (Am/4,F/4)*3,G/4,C/4" instead.
 
@@ -30,7 +39,7 @@ Change log
     - Controllers for LFOs can now be accessed by their MIDI controller number in addition to predefined names. This allows using
       controllers where no predefined name exists.
 
-    - Added new example SoundHelix-Popcorn.xml.
+    - Added new example SoundHelix-Popcorn.xml. This song uses a ticks-per-beat value of 12 to support triplets.
 
     - Cleaned up code.
 

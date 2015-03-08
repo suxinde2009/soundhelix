@@ -27,7 +27,7 @@
 		<stopActivityCounts>
 			<random list="4,3|5,3,2|5,4,2|5,4,3" />
 		</stopActivityCounts>
-		<activityVector name="base+snare">
+		<activityVector name="base_snare">
 			<startAfterSection>1</startAfterSection>
 			<startBeforeSection>4</startBeforeSection>
 			<stopBeforeSection>0</stopBeforeSection>
@@ -48,7 +48,7 @@
 		<activityVector name="hihat">
 			<startAfterSection>0</startAfterSection>
 			<minActive>30</minActive>
-			<minSegmentLength>2</minSegmentLength>
+			<minSegmentLength>3</minSegmentLength>
 			<minSegmentCount>2</minSegmentCount>
 		</activityVector>
 		<activityVector name="melody">
@@ -65,7 +65,7 @@
 			<minSegmentLength>2</minSegmentLength>
 		</activityVector>
 		<activityVector name="accomp">
-			<startBeforeSection>1</startBeforeSection>
+			<startBeforeSection>2</startBeforeSection>
 			<minActive>20</minActive>
 			<minSegmentLength>2</minSegmentLength>
 		</activityVector>
@@ -152,9 +152,59 @@
 						<pattern group="B">-,-,0:600,-,-,-,0:600,-|-,-,0:600,-,-,-,0:600,-|-,-,0:600,-,-,-,0:600,-|-,-,0:600,-,-,-,-,0:600|-,-,0:600,-,-,0:600,-,0:600</pattern>
 					</patternEngine>
 				</pattern>
+
+				<conditionalPattern>
+					<target>0</target>
+					<precondition>-base_snare</precondition>
+					<postcondition>+base_snare</postcondition>
+					<mode>replace</mode>
+					<probability>60</probability>
+					<patternEngine class="CrescendoPatternEngine">
+						<patternTicks>
+							<random list="16|32" />
+						</patternTicks>
+						<minVelocity>1</minVelocity>
+						<maxVelocity>1000</maxVelocity>
+						<velocityExponent>1</velocityExponent>
+						<pattern>
+							<random list="0,-,-,-|0" />
+						</pattern>
+					</patternEngine>
+				</conditionalPattern>
+				<conditionalPattern>
+					<target>1</target>
+					<precondition>-base_snare</precondition>
+					<postcondition>+base_snare</postcondition>
+					<mode>replace</mode>
+					<probability>60</probability>
+					<patternEngine class="CrescendoPatternEngine">
+						<patternTicks>
+							<random list="32|64" />
+						</patternTicks>
+						<minVelocity>1</minVelocity>
+						<maxVelocity>1000</maxVelocity>
+						<velocityExponent>1</velocityExponent>
+						<pattern>
+							<random list="0/1|0/1:1000,0/1:700" />
+						</pattern>
+					</patternEngine>
+				</conditionalPattern>
+				<conditionalPattern>
+					<target>0,1</target>
+					<precondition>+base_snare,-hihat</precondition>
+					<postcondition>+base_snare,+hihat</postcondition>
+					<mode>replace</mode>
+					<probability>60</probability>
+					<patternEngine class="StringPatternEngine">
+						<string>
+							<random list="-/16|-/8" />
+						</string>
+					</patternEngine>
+				</conditionalPattern>
+
 			</sequenceEngine>
-			<activityVector>base+snare</activityVector>
-			<activityVector>base+snare</activityVector>
+			<activityVector>base_snare</activityVector>
+			<activityVector>base_snare</activityVector>
 			<activityVector>clap</activityVector>
 			<activityVector>hihat</activityVector>
 			<activityVector>hihat</activityVector>
@@ -211,7 +261,7 @@
 					<minActiveTicks>10</minActiveTicks>
 					<maxActiveTicks>14</maxActiveTicks>
 					<offsets>0,0,0,3</offsets>
-					<noteLengths>1,1,1,1,1,2</noteLengths>
+					<noteLengths>1,1,1,1,1,2,1</noteLengths>
 					<pauseLengths>1</pauseLengths>
 					<pitchVelocityCorrelation>0</pitchVelocityCorrelation>
 					<velocityExponent>1</velocityExponent>
@@ -222,7 +272,7 @@
 
 		<track>
 			<instrument>string</instrument>
-			<velocity>500</velocity>
+			<velocity>600</velocity>
 			<transposition>-12</transposition>
 			<sequenceEngine class="FreePatternSequenceEngine">
 				<patternEngine class="StringPatternEngine">
@@ -238,7 +288,7 @@
 			<instrument>pad</instrument>
 			<sequenceEngine class="PadSequenceEngine">
 				<offsets>
-					<random list="0,1,2,3|-1,0,1,2"/>
+					<random list="-3,0,1,2,3|-1,0,1,2"/>
 				</offsets>
 			</sequenceEngine>
 			<activityVector>pad</activityVector>

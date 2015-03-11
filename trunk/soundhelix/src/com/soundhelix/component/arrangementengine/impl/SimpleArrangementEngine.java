@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Random;
 
 import javax.xml.xpath.XPathException;
+import javax.xml.xpath.XPathExpressionException;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -1087,16 +1088,11 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
         setActivityVectorConfiguration(activityVectorConfigurationHashMap);
 
-        nodeList = XMLUtils.getNodeList("track[@solo=\"true\"]", node);
+        nodeList = getActiveTrackNodes(node);
         int tracks = nodeList.getLength();
 
         if (tracks == 0) {
-            nodeList = XMLUtils.getNodeList("track", node);
-            tracks = nodeList.getLength();
-
-            if (tracks == 0) {
-                throw new RuntimeException("Need at least 1 track");
-            }
+            throw new RuntimeException("Need at least 1 track");
         }
 
         ArrangementEntry[] arrangementEntries = new ArrangementEntry[tracks];
@@ -1140,6 +1136,28 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         }
 
         setArrangementEntries(arrangementEntries);
+    }
+
+    /**
+     * Returns a node list of all active tracks. If at least one track is solo'ed, all solo'ed tracks are returned. Otherwise, all tracks which have
+     * not been muted are returned.
+     * 
+     * @param node the node
+     * @return the node list
+     * @throws XPathExpressionException in case of an XPath problem
+     */
+    private NodeList getActiveTrackNodes(Node node) throws XPathExpressionException {
+        // search for all solo'ed tracks
+
+        NodeList nodeList = XMLUtils.getNodeList("track[@solo=\"true\"]", node);
+
+        if (nodeList.getLength() == 0) {
+            // no solo'ed tracks found, search for all tracks which are not muted
+
+            nodeList = XMLUtils.getNodeList("track[@mute!=\"true\" or not(@mute)]", node);
+        }
+
+        return nodeList;
     }
 
     /**

@@ -1139,20 +1139,20 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
     }
 
     /**
-     * Returns a node list of all active tracks. If at least one track is solo'ed, all solo'ed tracks are returned. Otherwise, all tracks which have
-     * not been muted are returned.
+     * Returns a node list of all active tracks. If at least one track is soloed, all soloed tracks are returned. Otherwise, all tracks which have not
+     * been muted are returned.
      * 
      * @param node the node
      * @return the node list
      * @throws XPathExpressionException in case of an XPath problem
      */
     private NodeList getActiveTrackNodes(Node node) throws XPathExpressionException {
-        // search for all solo'ed tracks
+        // search for all soloed tracks
 
         NodeList nodeList = XMLUtils.getNodeList("track[@solo=\"true\"]", node);
 
         if (nodeList.getLength() == 0) {
-            // no solo'ed tracks found, search for all tracks which are not muted
+            // no soloed tracks found, search for all tracks which are not muted
 
             nodeList = XMLUtils.getNodeList("track[@mute!=\"true\" or not(@mute)]", node);
         }

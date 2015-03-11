@@ -15,7 +15,8 @@ Change log
       mapped to a MIDI controller in the MidiPlayer via the "instrumentControllerLFO" tag.
 
     - Added support for velocity scaling in each track in the SimpleArrangementEngine via the new tag "velocity". Each track's note
-      velocity is scaled by a factor of the given velocity divided by the song's maximum velocity.
+      velocity is scaled by a factor of the given velocity divided by the song's maximum velocity. For example, if the song's maximum
+      velocity is 1000 and you specify 500 in this tag, all velocities are halved.
 
     - Added support for providing a ticks-per-beat value per pattern. If the actual ticks per beat of the song is different (but
       compatible) all note/pause lengths of the pattern are scaled accordingly. For example, you can have a song with a ticks-per-beat
@@ -23,6 +24,10 @@ Change log
       The ticks per beat can be specified per pattern in the StringPatternEngine and in the CrescendoPatternEngine (using the attribute
       "ticksPerBeat") and per pattern engine in the RandomPatternEngine and RandomFragmentPatternEngine using the tag "ticksPerBeat".
       These new attributes/tags are optional. If they are not provided, no length scaling is performed.
+
+    - Added support for soloing and muting individual tracks via the track attributes "solo" and "mute". If at least one track uses
+      solo="true", the song is generated only with the soloed tracks. Otherwise, all tracks which do not have mute="true" are used.
+      In any case, all unused ActivityVectors are ignored when the song is generated.
 
     - Modified the RandomFragmentPatternEngine to regenerate a pattern from the given fragments if the target pattern length is too long
       for a number of times before giving up. This makes it possible to use fragments of different lengths at the same time.

@@ -173,7 +173,7 @@
 					<probability>60</probability>
 					<patternEngine class="CrescendoPatternEngine">
 						<patternTicks>
-							<random list="16|32" />
+							<random list="48|96" />
 						</patternTicks>
 						<minVelocity>1</minVelocity>
 						<maxVelocity>1000</maxVelocity>
@@ -191,7 +191,7 @@
 					<probability>60</probability>
 					<patternEngine class="CrescendoPatternEngine">
 						<patternTicks>
-							<random list="32|64" />
+							<random list="96|192" />
 						</patternTicks>
 						<minVelocity>1</minVelocity>
 						<maxVelocity>1000</maxVelocity>
@@ -199,6 +199,9 @@
 						<pattern ticksPerBeat="4">
 							<random list="0/1|0/1:1000,0/1:700" />
 						</pattern>
+						<suffixPattern ticksPerBeat="6">
+							<random list="0,0,0,0,0,0|0,0,0,0,0,0,0,0,0,0,0,0|0/2,0/2,0/2,0/2,-/4"/>
+						</suffixPattern>
 					</patternEngine>
 				</conditionalPattern>
 				<conditionalPattern>
@@ -327,9 +330,9 @@
 					<ticksPerBeat>12</ticksPerBeat>
 					<uniquePatternParts>false</uniquePatternParts>
 					<patternString>
-						<random list="A1,B1,A1,B2,A1,B1,A1,B3|A1,A1,A1,B1,A1,A1,A1,B2|A1,A1,A1,B1,A1,A1,A1,B2,A1,A1,A1,B1,A1,A1,A1,B3"/>
+						<random list="A1,B1,A2,B2,A1,B1,A2,B3|A1,A1,A1,B1,A1,A1,A1,B2|A1,A1,A1,B1,A1,A1,A1,B2,A1,A1,A1,B1,A1,A1,A1,B3"/>
 					</patternString>
-					<pattern group="A">0/3,1/3,2/3,3/3,4/3,5/3,4/3,3/3|0/3,1/3,2/3,3/3,4/3,5/3,4/3,2/3|0/3,1/3,3/3,5/3,4/3,2/3,3/3,1/3</pattern>
+					<pattern group="A">0/3,1/3,2/3,3/3,4/2,6/2,1/2,4/3,3/3|0/3,1/3,2/3,3/3,4/3,5/3,4/3,2/3|0/3,1/3,3/3,5/3,4/3,2/3,3/3,1/3</pattern>
 					<pattern group="B">0/3,1/3,2/3,3/3,-/3,5/3,4/3,-/3|0/3,1/3,-/3,3/3,6/3,-/3,4/3,2/3|0/3,1/3,4/3,-/3,3/2,5/2,4/2,1/2,4/2,3/2|0/3,4/3,-/3,2/3,5/2,3/2,6/2,2/2,4/2,1/2</pattern>
 				</patternEngine>
 			</sequenceEngine>

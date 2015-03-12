@@ -1,4 +1,9 @@
 <project name="SoundHelix" default="jar" basedir=".">
+    <tstamp>
+        <format property="TODAY" pattern="yyyy-MM-dd"/>
+        <format property="NOW" pattern="HH:mm:ss"/>
+    </tstamp>
+
     <property name="src" location="src"/>
     <property name="tmpsrc" location="tmpsrc"/>
     <property name="build" location="bin"/>
@@ -10,7 +15,11 @@
     <property name="svnbaseurl" value="https://svn.code.sf.net/p/soundhelix/code"/>
     <property file="VERSION.txt"/>
     <property name="binzip" location="SoundHelix-${version}-bin.zip"/>
+    <property name="binzip_with_date" location="SoundHelix-${version}-bin-${TODAY}.zip"/>
     <property name="srczip" location="SoundHelix-${version}-src.zip"/>
+    <property name="srczip_with_date" location="SoundHelix-${version}-src-${TODAY}.zip"/>
+    <property name="binfiles" value="SoundHelix.jar,run.bat,run.sh,examples/SoundHelix-Piano.xml,examples/SoundHelix-Piano2.xml,examples/SoundHelix-Percussion.xml,examples/SoundHelix-Popcorn.xml,includes/*.xml,doc/*,lib/*.jar,log4j.*"/>
+    <property name="srcfiles" value="src/**/*,javadoc/**/*,build.xml,VERSION.txt,SoundHelix.jar,run.bat,run.sh,examples/SoundHelix-Piano.xml,examples/SoundHelix-Piano2.xml,examples/SoundHelix-Percussion.xml,examples/SoundHelix-Popcorn.xml,includes/*.xml,doc/*,lib/*.jar,log4j.*"/>
 
     <path id="class.path">
         <fileset dir="${basedir}/lib" >
@@ -20,11 +29,6 @@
     <pathconvert property="manifest-classpath" dirsep="/" pathsep=" " refid="class.path">
         <map from="${basedir}/lib" to="lib" />
     </pathconvert>
-
-    <tstamp>
-        <format property="TODAY" pattern="yyyy-MM-dd"/>
-        <format property="NOW" pattern="HH:mm:ss"/>
-    </tstamp>
 
     <target name="-createBuildConstants">
         <exec executable="svn" outputproperty="revision">
@@ -148,13 +152,25 @@
 
     <target name="packagebin" description="build binary zip" depends="jar">
         <zip destfile="${binzip}">
-            <zipfileset dir="." includes="SoundHelix.jar,run.bat,run.sh,examples/SoundHelix-Piano.xml,examples/SoundHelix-Piano2.xml,examples/SoundHelix-Percussion.xml,examples/SoundHelix-Popcorn.xml,includes/*.xml,doc/*,lib/*.jar,log4j.*" prefix="soundhelix-${version}"/>
+            <zipfileset dir="." includes="${binfiles}" prefix="soundhelix-${version}"/>
+        </zip>
+    </target>
+
+    <target name="packagenightlybin" description="build nightly binary zip" depends="jar">
+        <zip destfile="${binzip_with_date}">
+            <zipfileset dir="." includes="${binfiles}" prefix="soundhelix-${version}"/>
         </zip>
     </target>
 
     <target name="packagesrc" description="build source zip including binary, sources and javadoc" depends="jar,javadoc">
         <zip destfile="${srczip}">
-             <zipfileset dir="." includes="src/**/*,javadoc/**/*,build.xml,VERSION.txt,SoundHelix.jar,run.bat,run.sh,examples/SoundHelix-Piano.xml,examples/SoundHelix-Piano2.xml,examples/SoundHelix-Percussion.xml,examples/SoundHelix-Popcorn.xml,includes/*.xml,doc/*,lib/*.jar,log4j.*" prefix="soundhelix-${version}"/>
+             <zipfileset dir="." includes="${srcfiles}" prefix="soundhelix-${version}"/>
+        </zip>
+    </target>
+
+    <target name="packagenightlysrc" description="build nightly source zip including binary, sources and javadoc" depends="jar,javadoc">
+        <zip destfile="${srczip_with_date}">
+             <zipfileset dir="." includes="${srcfiles}" prefix="soundhelix-${version}"/>
         </zip>
     </target>
 

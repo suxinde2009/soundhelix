@@ -1,5 +1,7 @@
 package com.soundhelix.util;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import javax.xml.xpath.XPath;
@@ -474,6 +476,8 @@ public final class XMLUtils {
             throw new RuntimeException("Attribute \"class\" not defined");
         }
 
+        LOGGER.debug("Parsing component " + getNodePath(node));
+
         if (className.indexOf('.') < 0) {
             // determine the superclass' package (including the trailing dot)
             String packageName = superclazz.getName().substring(0, superclazz.getName().lastIndexOf('.') + 1);
@@ -602,5 +606,52 @@ public final class XMLUtils {
         }
 
         return hash;
+    }
+
+    /**
+     * Builds a string that contains the path to the given node, starting at the document root. For each node on the path, the node's index is
+     * determined (starting from 0). If the index is greater than 0, it is appended as in "[index]".
+     * 
+     * @param node the node
+     * @return the path string
+     */
+
+    private static String getNodePath(Node node) {
+        List<Node> nodes = new ArrayList<Node>();
+
+        while (node != null && node.getNodeType() != Node.DOCUMENT_NODE) {
+            nodes.add(node);
+            node = node.getParentNode();
+        }
+
+        StringBuilder sb = new StringBuilder("/");
+
+        for (int i = nodes.size() - 1; i >= 0; i--) {
+            if (sb.length() > 0) {
+                sb.append('/');
+            }
+
+            Node n = nodes.get(i);
+
+            String name = n.getNodeName();
+            sb.append(name);
+
+            // determine the index of the node
+
+            int count = 0;
+            while (n.getPreviousSibling() != null) {
+                n = n.getPreviousSibling();
+                if (n.getNodeName().equals(name)) {
+                    count++;
+                }
+            }
+
+            if (count > 0) {
+                sb.append('[').append(count).append(']');
+            }
+
+        }
+
+        return sb.toString();
     }
 }

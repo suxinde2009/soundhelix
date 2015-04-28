@@ -7,6 +7,9 @@ Author: Thomas Schürger (thomas@schuerger.com)
 Change log
 ----------
 
+0.9u:
+
+
 0.8: 2015-04-28
 
     - Added support for conditional LFOs in the DrumSequenceEngine and the MidiPlayer. Similar to conditional patterns, a condition

@@ -79,7 +79,6 @@ public class Pattern implements Iterable<PatternEntry> {
      * 
      * @param songContext the song context
      * @param patternString the pattern string
-     * @param currentTPB the ticks per beat of the song
      * @param targetTPB the ticks per beat the pattern is for
      * 
      * @return the pattern
@@ -109,7 +108,6 @@ public class Pattern implements Iterable<PatternEntry> {
      * @param songContext the song context
      * @param patternString the pattern string
      * @param wildcardString the wildcard string
-     * @param currentTPB the ticks per beat of the song
      * @param targetTPB the ticks per beat the pattern is for
      * 
      * @return the pattern

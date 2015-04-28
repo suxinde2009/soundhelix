@@ -142,7 +142,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
             pat = "+" + pat;
         }
 
-        logger.debug("Using harmony pattern " + pat);
+        logger.info("Using harmony pattern " + pat);
 
         String[] c = pat.split(",");
 

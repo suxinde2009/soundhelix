@@ -126,8 +126,6 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         }
 
         songContext.setActivityMatrix(activityMatrix);
-        // activityMatrix.get("melody").setActivityState(HarmonyUtils.getChordSectionTick(songContext, 1), songContext.getStructure().getTicks(),
-        // true);
 
         activityMatrix.dump(songContext);
         shiftIntervalBoundaries(neededActivityVectors);

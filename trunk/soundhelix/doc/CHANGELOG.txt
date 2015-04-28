@@ -7,7 +7,7 @@ Author: Thomas Schürger (thomas@schuerger.com)
 Change log
 ----------
 
-0.8u:
+0.8: 2015-04-28
 
     - Added support for conditional LFOs in the DrumSequenceEngine and the MidiPlayer. Similar to conditional patterns, a condition
       can now trigger the usage of an LFO for creating an LFO sequence, which can be used in the MidiPlayer for remote-controlling
@@ -45,7 +45,8 @@ Change log
     - Controllers for LFOs can now be accessed by their MIDI controller number in addition to predefined names. This allows using
       controllers where no predefined name exists.
 
-    - Added new example SoundHelix-Popcorn.xml. This song uses a ticks-per-beat value of 12 to support triplets.
+    - Added new example SoundHelix-Popcorn.xml. This song uses a ticks-per-beat value of 12 to support triplets. This is now the default
+      song when run.sh/run.bat is run without any parameters.
 
     - Cleaned up code.
 

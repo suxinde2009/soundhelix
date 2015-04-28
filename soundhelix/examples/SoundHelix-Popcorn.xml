@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!-- Example XML file for SoundHelix. Author: Thomas Schuerger. -->
-<SoundHelix version="0.8u+" xmlns:xi="http://www.w3.org/2001/XInclude">
+<SoundHelix version="0.8+" xmlns:xi="http://www.w3.org/2001/XInclude">
 	<xi:include href="../includes/Standard-SongNameEngine.xml" />
 	<structure>
 		<bars>
@@ -204,7 +204,7 @@
 						<maxVelocity>1000</maxVelocity>
 						<velocityExponent>1</velocityExponent>
 						<pattern ticksPerBeat="4">
-							<random list="0/1|0/1:1000,0/1:700" />
+							<random list="0/1|0/1:1000,0/1:700|0,-,-,0,-,-,0,-" />
 						</pattern>
 						<suffixPattern ticksPerBeat="6">
 							<random list="(0)*6|(0)*12|0/2,0/2,0/2,0/2,-/4"/>

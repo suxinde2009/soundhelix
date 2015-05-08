@@ -177,10 +177,12 @@ public abstract class AbstractLFO implements LFO {
 
         if (segmentLength > 0) {
             // first half (0 to pi within the segment pair)
-            return TWO_PI * (0.5d * tickInSegment / segmentLength * rotationsPerSegmentPair + phase + segmentPair);
+            return TWO_PI * (0.5d * tickInSegment / segmentLength * rotationsPerSegmentPair + phase + segmentPair * rotationsPerSegmentPair);
         } else {
             // second half (pi to 2*pi within the segment pair)
-            return TWO_PI * (0.5d + 0.5d * tickInSegment / -segmentLength * rotationsPerSegmentPair + phase + segmentPair);
+            return TWO_PI
+                    * (0.5d * rotationsPerSegmentPair + 0.5d * tickInSegment / -segmentLength * rotationsPerSegmentPair + phase + segmentPair
+                            * rotationsPerSegmentPair);
         }
     }
 

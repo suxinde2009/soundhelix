@@ -647,9 +647,27 @@ public final class XMLUtils {
             }
 
             if (count > 0) {
+                // at least one sibling exists, add index
                 sb.append('[').append(count).append(']');
-            }
+            } else {
+                // no preceding sibling exists, if there is a succeeding sibling,
+                // log index, otherwise don't
 
+                boolean hasSucceedingSibling = false;
+
+                n = nodes.get(i);
+                while (n.getNextSibling() != null) {
+                    n = n.getNextSibling();
+                    if (n.getNodeName().equals(name)) {
+                        hasSucceedingSibling = true;
+                        break;
+                    }
+                }
+
+                if (hasSucceedingSibling) {
+                    sb.append('[').append(count).append(']');
+                }
+            }
         }
 
         return sb.toString();

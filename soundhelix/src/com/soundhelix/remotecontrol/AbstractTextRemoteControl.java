@@ -34,11 +34,13 @@ public abstract class AbstractTextRemoteControl implements TextRemoteControl {
 
         while (true) {
             try {
+                // may or may not block until a line is available
                 String line = readLine();
 
                 if (line != null && !line.equals("")) {
                     handleCommand(line, hasExitPermission);
                 } else {
+                    // null or empty string returned, wait a bit before retrying
                     Thread.sleep(100);
                 }
             } catch (Exception e) {

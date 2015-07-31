@@ -19,7 +19,7 @@
     <property name="srczip" location="SoundHelix-${version}-src.zip"/>
     <property name="srczip_with_date" location="SoundHelix-${version}-src-${TODAY}.zip"/>
     <property name="binfiles" value="SoundHelix.jar,run.bat,run.sh,examples/SoundHelix-Piano.xml,examples/SoundHelix-Piano2.xml,examples/SoundHelix-Percussion.xml,examples/SoundHelix-Popcorn.xml,includes/*.xml,doc/*,lib/*.jar,log4j.*"/>
-    <property name="srcfiles" value="src/**/*,javadoc/**/*,build.xml,VERSION.txt,SoundHelix.jar,run.bat,run.sh,examples/SoundHelix-Piano.xml,examples/SoundHelix-Piano2.xml,examples/SoundHelix-Percussion.xml,examples/SoundHelix-Popcorn.xml,includes/*.xml,doc/*,lib/*.jar,log4j.*"/>
+    <property name="srcfiles" value=".checkstyle,.classpath,.pmd,.project,.settings/**/*,src/**/*,javadoc/**/*,build.xml,VERSION.txt,SoundHelix.jar,run.bat,run.sh,examples/SoundHelix-Piano.xml,examples/SoundHelix-Piano2.xml,examples/SoundHelix-Percussion.xml,examples/SoundHelix-Popcorn.xml,includes/*.xml,doc/*,lib/*.jar,log4j.*"/>
 
     <path id="class.path">
         <fileset dir="${basedir}/lib" >

@@ -5,10 +5,12 @@ import com.soundhelix.misc.ActivityVector;
 import com.soundhelix.misc.SongContext;
 
 /**
- * Represents a low frequency oscillator (LFO). The oscillator can run in one of four modes: synchronized to time (e.g, a full rotation every 5
- * seconds), synchronized to beat (e.g., a full rotation every 16 beats), synchronized to activity (e.g., a full rotation from activity start to
- * activity end of an instrument) or synchronized to the song length (e.g., 2 full rotations over the whole song). An LFO allows random access to its
- * value given a tick. LFOs can be used for slowly changing certain settings, for example, for changing the filter cutoff frequency of a MIDI device.
+ * Represents a low frequency oscillator (LFO). The oscillator can run in one of five synchronization modes: synchronized to time (e.g, a full
+ * rotation every 5 seconds), synchronized to beat (e.g., a full rotation every 16 beats), synchronized to activity (e.g., a full rotation from
+ * activity start to activity end of an instrument), synchronized to the song length (e.g., 2 full rotations over the whole song) or synchronized to a
+ * segment pair (e.g., the first half a rotation in the active segment and the second half in the inactive segment). An LFO allows random access to
+ * its value given a tick. LFOs can be used for slowly changing certain settings, for example, for changing the filter cutoff frequency of a MIDI
+ * device.
  * 
  * LFO implementation must be able to handle small values for their parameters and must return values correctly (i.e., without returning jumpy/glitchy
  * values).

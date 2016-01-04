@@ -42,6 +42,12 @@ public class ActivityMatrix implements Iterable<ActivityVector> {
         return map.get(name);
     }
 
+    /**
+     * Provides an iterator that iterates over all ActivityVectors of this ActivityMatrix in the order they have been added.
+     * 
+     * @return the iterator
+     */
+
     @Override
     public Iterator<ActivityVector> iterator() {
         return map.values().iterator();
@@ -89,7 +95,7 @@ public class ActivityMatrix implements Iterable<ActivityVector> {
 
             int n = 0;
             for (int tick = 0; tick < ticks; tick += songContext.getHarmony().getChordSectionTicks(tick)) {
-                sb.append((n / div) % 10);
+                sb.append(n / div % 10);
                 n++;
             }
             sb.append('\n');

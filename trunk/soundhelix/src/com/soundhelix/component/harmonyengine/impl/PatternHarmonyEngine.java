@@ -52,10 +52,10 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
     /** The array of chord random tables. */
     private String[][] chordRandomTables;
 
-    /** Boolean indicating whether chord distances should be minimized. */
-    private boolean isMinimizeChordDistance = true;
+    /** The Boolean indicating whether chord distances should be minimized by default. Can be overridden per chordPattern tag. */
+    private boolean minimizeChordDistance = true;
 
-    /** The crossover pitch. */
+    /** The default crossover pitch. Can be overridden per chordPattern tag. */
     private int crossoverPitch = 3;
 
     /** The random generator. */
@@ -169,15 +169,13 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
                 sTicks = 0;
             }
 
-            Chord chord = Chord.parseChord(chordString, crossoverPitch);
+            Chord chord = Chord.parseChord(chordString, getCrossoverPitchValue(chordPattern));
 
             if (firstChord == null) {
                 firstChord = chord;
             }
 
-            // use override for minimizeChordDistance, if provided, otherwise use global minimizeChordDistance value
-
-            if (chordPattern.minimizeChordDistance == 1 || chordPattern.minimizeChordDistance == -1 && isMinimizeChordDistance) {
+            if (getMinimizeChordDistanceValue(chordPattern)) {
                 chord = chord.findChordClosestTo(firstChord);
             }
 
@@ -331,9 +329,13 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
                             // try again
                             return createPattern();
                         }
-                    } while (Chord.parseChord(chord, crossoverPitch).equalsNormalized(Chord.parseChord(prevChord, crossoverPitch)) || i == count - 1
-                            && chord.equals(firstChord) || notrefnum >= 0
-                            && Chord.parseChord(chord, crossoverPitch).equalsNormalized(Chord.parseChord(chordList.get(notrefnum), crossoverPitch)));
+                    } while (Chord.parseChord(chord, getCrossoverPitchValue(chordPattern)).equalsNormalized(
+                            Chord.parseChord(prevChord, getCrossoverPitchValue(chordPattern)))
+                            || i == count - 1
+                            && chord.equals(firstChord)
+                            || notrefnum >= 0
+                            && Chord.parseChord(chord, getCrossoverPitchValue(chordPattern)).equalsNormalized(
+                                    Chord.parseChord(chordList.get(notrefnum), getCrossoverPitchValue(chordPattern))));
                 } else {
                     // we have a note, take the note (include 'm' suffix, if present)
                     chord = spec[0];
@@ -351,7 +353,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
         }
 
         // create a new ChordPattern containing the random chord table replacement result
-        return new ChordPattern(sb.toString(), chordPattern.minimizeChordDistance);
+        return new ChordPattern(sb.toString(), chordPattern.minimizeChordDistance, chordPattern.crossoverPitch);
     }
 
     @Override
@@ -367,14 +369,20 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 
         for (int i = 0; i < nodeList.getLength(); i++) {
             String pattern = XMLUtils.parseString(random, nodeList.item(i));
-            int minimizeChordDistance = -1;
+            Boolean minimizeChordDistance = null;
+            Integer crossoverPitch = null;
 
             try {
                 boolean b = XMLUtils.parseBoolean(random, "@minimizeChordDistance", nodeList.item(i));
-                minimizeChordDistance = b ? 1 : 0;
+                minimizeChordDistance = Boolean.valueOf(b);
             } catch (Exception e) {}
 
-            chordPatterns[i] = new ChordPattern(pattern, minimizeChordDistance);
+            try {
+                int p = XMLUtils.parseInteger(random, "@crossoverPitch", nodeList.item(i));
+                crossoverPitch = Integer.valueOf(p);
+            } catch (Exception e) {}
+
+            chordPatterns[i] = new ChordPattern(pattern, minimizeChordDistance, crossoverPitch);
         }
 
         setChordPatterns(chordPatterns);
@@ -394,8 +402,36 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
         setChordRandomTables(chordRandomTables);
     }
 
+    /**
+     * Returns the ChordPattern's minimizeChordDistance value if defined, otherwise the default minimizeChordDistance value is returned.
+     * 
+     * @param pattern the ChordPattern
+     * @return the value
+     */
+    boolean getMinimizeChordDistanceValue(ChordPattern pattern) {
+        if (pattern != null && pattern.minimizeChordDistance != null) {
+            return pattern.minimizeChordDistance.booleanValue();
+        } else {
+            return minimizeChordDistance;
+        }
+    }
+
+    /**
+     * Returns the ChordPattern's crossoverPitch value if defined, otherwise the default crossoverPitch value is returned.
+     * 
+     * @param pattern the ChordPattern
+     * @return the value
+     */
+    int getCrossoverPitchValue(ChordPattern pattern) {
+        if (pattern != null && pattern.crossoverPitch != null) {
+            return pattern.crossoverPitch.intValue();
+        } else {
+            return crossoverPitch;
+        }
+    }
+
     public void setMinimizeChordDistance(boolean isMinimizeChordDistance) {
-        this.isMinimizeChordDistance = isMinimizeChordDistance;
+        this.minimizeChordDistance = isMinimizeChordDistance;
     }
 
     /**
@@ -406,15 +442,13 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
         /** The chord pattern string. */
         private String chordPattern;
 
-        private int minimizeChordDistance;
+        private Boolean minimizeChordDistance;
+        private Integer crossoverPitch;
 
-        public ChordPattern(String chordPattern, int minimizeChordDistance) {
-            if (minimizeChordDistance < -1 || minimizeChordDistance > 1) {
-                throw new RuntimeException("Invalid value " + minimizeChordDistance + " for minimizeChordDistance");
-            }
-
+        public ChordPattern(String chordPattern, Boolean minimizeChordDistance, Integer crossoverPitch) {
             this.chordPattern = chordPattern;
             this.minimizeChordDistance = minimizeChordDistance;
+            this.crossoverPitch = crossoverPitch;
         }
     }
 }

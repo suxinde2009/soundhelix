@@ -507,6 +507,12 @@ public class Pattern implements Iterable<PatternEntry> {
         return false;
     }
 
+    /**
+     * Provides an iterator that iterates over all PatternEntries of this pattern.
+     * 
+     * @return the iterator
+     */
+
     @Override
     public Iterator<PatternEntry> iterator() {
         return new Iterator<PatternEntry>() {

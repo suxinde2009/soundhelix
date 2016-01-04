@@ -112,7 +112,7 @@ public class Track {
     }
 
     /**
-     * Returns an iterator that iterates over this track's sequences.
+     * Provides an iterator that iterates over all Sequences of this Track in the order they have been added.
      * 
      * @return the iterator
      */

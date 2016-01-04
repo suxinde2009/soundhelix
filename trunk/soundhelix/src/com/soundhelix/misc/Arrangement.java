@@ -52,6 +52,13 @@ public class Arrangement implements Iterable<Arrangement.ArrangementEntry> {
         entryMap.put(instrument, entry);
     }
 
+    /**
+     * Provides an iterator that iterates over all ArrangementEntries of this Arrangement in the order the corresponding (Track, Instrument) pairs
+     * have been added.
+     * 
+     * @return the iterator
+     */
+
     @Override
     public Iterator<ArrangementEntry> iterator() {
         return entryList.iterator();

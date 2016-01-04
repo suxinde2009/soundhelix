@@ -443,14 +443,14 @@
     </bpm>
     <!-- transposition is not relevant, because only percussion is used -->
     <transposition>65</transposition>
-    <beforePlayWaitTicks>0</beforePlayWaitTicks>
+    <beforePlayWaitTicks>16</beforePlayWaitTicks>
     <afterPlayWaitTicks>16</afterPlayWaitTicks>
     <groove>
       <random list="100|110,90" />
     </groove>
     <!-- uncomment the following line if you want to write all generated songs as MIDI files in the subdirectory "midifiles" -->
     <!-- <midiFilename>midifiles/SoundHelix-Percussion_-_${safeSongName}.mid</midiFilename> -->
-    <device name="device1" clockSynchronization="true">Microsoft GS Wavetable Synth,Microsoft GS Wavetable SW Synth,Gervill,Java Sound Synthesizer</device>
+    <device name="device1" clockSynchronization="true">Gervill,Microsoft GS Wavetable Synth,Microsoft GS Wavetable SW Synth,Java Sound Synthesizer</device>
     <!-- <synchronizationDevice waitForStart="true">timingport</synchronizationDevice> -->
     <map instrument="percussion" device="device1" channel="10" />
   </player>

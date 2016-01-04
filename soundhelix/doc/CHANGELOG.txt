@@ -9,6 +9,9 @@ Change log
 
 0.9u:
 
+    - Added support for specifying a crossoverPitch attribute per chordPattern tag in the PatternHarmonyEngine.
+      If set, this attribute allows you to override the global crossoverPitch value.
+
     - Fixed a bug regarding the phase computation for LFOs running in "segmentPair" mode. Whenever the speed was set to something
       other than 1, the off-segment's phase was incorrect.
 

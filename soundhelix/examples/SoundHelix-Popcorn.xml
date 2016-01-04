@@ -274,6 +274,7 @@
 
 		<track>
 			<instrument>accomp</instrument>
+			<velocity>600</velocity>
 			<transposition>-24</transposition>
 			<sequenceEngine class="PatternSequenceEngine">
 				<patternEngine class="StringPatternEngine">
@@ -372,14 +373,14 @@
 			<random min="124" max="138" type="normal" variance="7" />
 		</bpm>
 		<transposition><random min="65" max="68"/></transposition>
-		<beforePlayWaitTicks>0</beforePlayWaitTicks>
+		<beforePlayWaitTicks>16</beforePlayWaitTicks>
 		<afterPlayWaitTicks>16</afterPlayWaitTicks>
 		<groove>
 			<random list="100|110,110,110,90,90,90|115,115,115,85,85,85" />
 		</groove>
 		<!-- uncomment the following line if you want to write all generated songs as MIDI files in the subdirectory "midifiles" -->
 		<!-- <midiFilename>midifiles/SoundHelix-Popcorn_-_${safeSongName}.mid</midiFilename> -->
-		<device name="device1" clockSynchronization="true">Microsoft GS Wavetable Synth,Microsoft GS Wavetable SW Synth,Gervill,Java Sound Synthesizer</device>
+		<device name="device1" clockSynchronization="true">Gervill,Microsoft GS Wavetable Synth,Microsoft GS Wavetable SW Synth,Java Sound Synthesizer</device>
 		<!-- <synchronizationDevice waitForStart="true">timingport</synchronizationDevice> -->
 		<map instrument="percussion" device="device1" channel="10" />
 		<map instrument="melody" device="device1" channel="1" program="1" />

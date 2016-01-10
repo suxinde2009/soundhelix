@@ -9,6 +9,10 @@ Change log
 
 0.9u:
 
+    - Changed the DrumSequenceEngine implementation to allow referring to ActivityVectors in conditional patterns'/LFO's conditions even if
+      they are not provided in the ActivityVector list of the DrumSequenceEngine. This removes the need to apply the workaround of using
+      dummy patterns.
+
     - Added support for specifying a crossoverPitch attribute per chordPattern tag in the PatternHarmonyEngine.
       If set, this attribute allows you to override the global crossoverPitch value.
 

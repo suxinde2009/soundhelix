@@ -1,9 +1,6 @@
 package com.soundhelix.component.sequenceengine.impl;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -14,6 +11,7 @@ import org.w3c.dom.NodeList;
 
 import com.soundhelix.component.lfo.LFO;
 import com.soundhelix.component.patternengine.PatternEngine;
+import com.soundhelix.misc.ActivityMatrix;
 import com.soundhelix.misc.ActivityVector;
 import com.soundhelix.misc.Harmony;
 import com.soundhelix.misc.LFOSequence;
@@ -165,23 +163,12 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
         int chordSections = HarmonyUtils.getChordSectionCount(songContext);
         int conditionalPatternEntryCount = conditionalPatternEntries.length;
 
-        Map<String, List<Integer>> map = new HashMap<String, List<Integer>>();
-
-        for (int i = 0; i < activityVectors.length; i++) {
-            ActivityVector av = activityVectors[i];
-            List<Integer> list = map.get(av.getName());
-            if (list == null) {
-                list = new ArrayList<Integer>();
-                map.put(av.getName(), list);
-            }
-
-            list.add(i);
-        }
+        Map<String, Integer> indexMap = songContext.getActivityMatrix().getIndexMap();
 
         for (ConditionalPatternDrumEntry entry : conditionalPatternEntries) {
             if (entry.preCondition == null) {
-                entry.preCondition = getConditionPattern(map, drumEntries.length, entry.preConditionString);
-                entry.postCondition = getConditionPattern(map, drumEntries.length, entry.postConditionString);
+                entry.preCondition = getConditionPattern(indexMap, entry.preConditionString);
+                entry.postCondition = getConditionPattern(indexMap, entry.postConditionString);
             }
         }
 
@@ -196,7 +183,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
         int x = 0;
 
         while (tick < ticks) {
-            chordSectionActivity[x++] = getActivityString(tick, activityVectors);
+            chordSectionActivity[x++] = getActivityString(tick, songContext.getActivityMatrix());
             tick += harmony.getChordSectionTicks(tick);
         }
 
@@ -296,22 +283,11 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
         int chordSections = HarmonyUtils.getChordSectionCount(songContext);
         int conditionalLFOEntryCount = conditionalLFOEntries.length;
 
-        Map<String, List<Integer>> map = new HashMap<String, List<Integer>>();
-
-        for (int i = 0; i < activityVectors.length; i++) {
-            ActivityVector av = activityVectors[i];
-            List<Integer> list = map.get(av.getName());
-            if (list == null) {
-                list = new ArrayList<Integer>();
-                map.put(av.getName(), list);
-            }
-
-            list.add(i);
-        }
+        Map<String, Integer> indexMap = songContext.getActivityMatrix().getIndexMap();
 
         for (ConditionalLFODrumEntry entry : conditionalLFOEntries) {
-            entry.preCondition = getConditionPattern(map, drumEntries.length, entry.preConditionString);
-            entry.postCondition = getConditionPattern(map, drumEntries.length, entry.postConditionString);
+            entry.preCondition = getConditionPattern(indexMap, entry.preConditionString);
+            entry.postCondition = getConditionPattern(indexMap, entry.postConditionString);
 
             // generate LFO sequence and attach to track (will be filled during processing)
             LFOSequence seq = new LFOSequence(songContext);
@@ -330,7 +306,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
         int x = 0;
 
         while (tick < ticks) {
-            chordSectionActivity[x++] = getActivityString(tick, activityVectors);
+            chordSectionActivity[x++] = getActivityString(tick, songContext.getActivityMatrix());
             tick += harmony.getChordSectionTicks(tick);
         }
 
@@ -431,10 +407,10 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
      * @return the activity string
      */
 
-    private String getActivityString(int tick, ActivityVector[] activityVectors) {
-        StringBuilder sb = new StringBuilder(activityVectors.length);
+    private String getActivityString(int tick, ActivityMatrix activityMatrix) {
+        StringBuilder sb = new StringBuilder(activityMatrix.size());
 
-        for (ActivityVector av : activityVectors) {
+        for (ActivityVector av : activityMatrix) {
             if (tick >= 0 && av.isActive(tick)) {
                 sb.append('1');
             } else {
@@ -648,15 +624,14 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
      * Parses the given condition string and returns a pattern representing the condition. The condition string is given as a comma-separated list of
      * ActivityVector names, which are each prefixed by either "+" or "-".
      * 
-     * @param map the map that maps ActivityVector names to lists of offsets
-     * @param vectors the total number of ActivityVectors
+     * @param map the map that maps ActivityVector names to iterator index
      * @param string the condition string
      * 
      * @return the condition pattern
      */
 
-    private static java.util.regex.Pattern getConditionPattern(Map<String, List<Integer>> map, int vectors, String string) {
-        // start with a regexp string consisting of only dots
+    private static java.util.regex.Pattern getConditionPattern(Map<String, Integer> indexMap, String string) {
+        int vectors = indexMap.size();
 
         StringBuilder sb = new StringBuilder(vectors);
 
@@ -681,15 +656,13 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
 
                 // set all characters at the offsets given by ActivityVector name to either "1" or "0"
 
-                List<Integer> indexes = map.get(name);
+                Integer index = indexMap.get(name);
 
-                if (indexes == null) {
+                if (index == null) {
                     throw new IllegalArgumentException("Unknown ActitvityVector \"" + name + "\" referenced in condition pattern");
                 }
 
-                for (int index : indexes) {
-                    sb.setCharAt(index, c);
-                }
+                sb.setCharAt(index, c);
             }
         }
 

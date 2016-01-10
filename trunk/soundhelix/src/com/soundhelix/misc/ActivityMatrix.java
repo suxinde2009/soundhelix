@@ -1,5 +1,6 @@
 package com.soundhelix.misc;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -51,6 +52,33 @@ public class ActivityMatrix implements Iterable<ActivityVector> {
     @Override
     public Iterator<ActivityVector> iterator() {
         return map.values().iterator();
+    }
+
+    /**
+     * Returns the number of ActivityVectors.
+     * 
+     * @return the number of ActivityVectors
+     */
+
+    public int size() {
+        return map.size();
+    }
+
+    /**
+     * Returns a map that maps from ActivityVector name to its iterator index.
+     *
+     * @return the map
+     */
+
+    public Map<String, Integer> getIndexMap() {
+        Map<String, Integer> map = new HashMap<String, Integer>(size());
+
+        int i = 0;
+        for (ActivityVector vector : this) {
+            map.put(vector.getName(), Integer.valueOf(i++));
+        }
+
+        return map;
     }
 
     /**

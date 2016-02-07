@@ -210,12 +210,30 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         }
     }
 
+    /**
+     * Returns the chord section number for the given string, which is either an integer (zero, positive or negative) or a positive double with a "%"
+     * behind it.
+     * 
+     * @param songContext the song context
+     * @param str the string
+     * @return the chord section number
+     */
     private int getChordSectionNumber(SongContext songContext, String str) {
         if (str.endsWith("%")) {
             double percentage = Double.parseDouble(str.substring(0, str.length() - 1));
+
+            if (percentage < 0d || percentage > 100d) {
+                throw new IllegalArgumentException("The percentage \"" + str + "\" must be between 0 and 100");
+            }
+
             int tick = (int) (songContext.getStructure().getTicks() * percentage / 100d);
 
-            return HarmonyUtils.getChordSectionNumber(songContext, tick);
+            int number = HarmonyUtils.getChordSectionNumber(songContext, tick);
+            if (number == -1) {
+                return HarmonyUtils.getChordSectionCount(songContext) - 1;
+            } else {
+                return number;
+            }
         } else {
             int number = Integer.parseInt(str);
 
@@ -1229,7 +1247,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
         setArrangementEntries(arrangementEntries);
 
-        nodeList = XMLUtils.getNodeList("modifyActivityVector", node);
+        nodeList = XMLUtils.getNodeList("ActivityVectorModification", node);
         int modificationCount = nodeList.getLength();
         ActivityVectorModification[] activityVectorModifications = new ActivityVectorModification[modificationCount];
 

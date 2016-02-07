@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.apache.log4j.Priority;
 
 import com.soundhelix.util.HarmonyUtils;
 
@@ -40,6 +41,9 @@ public class ActivityMatrix implements Iterable<ActivityVector> {
      */
 
     public ActivityVector get(String name) {
+        if (name == null) {
+            return null;
+        }
         return map.get(name);
     }
 
@@ -82,13 +86,14 @@ public class ActivityMatrix implements Iterable<ActivityVector> {
     }
 
     /**
-     * Dumps the activity vectors as an activity matrix to the log with level DEBUG.
+     * Dumps the activity vectors as an activity matrix using the given log level.
      * 
      * @param songContext the song context
+     * @param priority the log level to use
      */
 
-    public void dump(SongContext songContext) {
-        if (!LOGGER.isInfoEnabled()) {
+    public void dump(SongContext songContext, Priority priority) {
+        if (!LOGGER.isEnabledFor(priority)) {
             return;
         }
 

@@ -10,6 +10,7 @@ import java.util.Random;
 import javax.xml.xpath.XPathException;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.apache.log4j.Priority;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -69,6 +70,31 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         GREEDY
     }
 
+    private enum ActivityVectorModificationOperator {
+        /** Set bits (0 operands, 1 target). */
+        SET(0),
+        /** Clear bits (0 operands, 1 target). */
+        CLEAR(0),
+        /** Flip bits (0 operands, 1 target). */
+        FLIP(0),
+        /** Logical NOT (1 operand, 1 target). */
+        NOT(1),
+        /** Logical XOR (2 operands, 1 target). */
+        AND(2),
+        /** Logical AND NOT (2 operands, 1 target). */
+        AND_NOT(2),
+        /** Logical OR (2 operands, 1 target). */
+        OR(2),
+        /** Logical AND (2 operands, 1 target). */
+        XOR(2);
+
+        private int operands;
+
+        private ActivityVectorModificationOperator(int operands) {
+            this.operands = operands;
+        }
+    }
+
     /** The random generator. */
     private Random random;
 
@@ -99,6 +125,9 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
     /** The maximum number of iterations before failing. */
     private int maxIterations;
 
+    /** The activity vevtor modifications. */
+    private ActivityVectorModification[] activityVectorModifications;
+
     public SimpleArrangementEngine() {
         super();
     }
@@ -126,11 +155,76 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         }
 
         songContext.setActivityMatrix(activityMatrix);
+        processActivityVectorModifications(songContext);
 
-        activityMatrix.dump(songContext);
+        activityMatrix.dump(songContext, Priority.INFO);
         shiftIntervalBoundaries(neededActivityVectors);
 
         return createArrangement(songContext, neededActivityVectors);
+    }
+
+    /**
+     * Processes the activity vector modifications.
+     * 
+     * @param songContext the song context
+     */
+
+    private void processActivityVectorModifications(SongContext songContext) {
+        ActivityMatrix activityMatrix = songContext.getActivityMatrix();
+
+        for (ActivityVectorModification modification : activityVectorModifications) {
+            ActivityVectorModificationOperator operator = modification.operator;
+            String fromString = modification.from;
+            String toString = modification.to;
+            ActivityVector target = activityMatrix.get(modification.target);
+            ActivityVector operand1 = activityMatrix.get(modification.operand1);
+            ActivityVector operand2 = activityMatrix.get(modification.operand2);
+
+            int from = getChordSectionNumber(songContext, fromString);
+            int to = getChordSectionNumber(songContext, toString);
+
+            if (from > to) {
+                // swap from and to
+                from = from ^ to ^ (to = from);
+            }
+
+            switch (operator) {
+                case SET:
+                    target.setActivityState(HarmonyUtils.getChordSectionTick(songContext, from), HarmonyUtils
+                            .getChordSectionTick(songContext, to + 1), true);
+                    break;
+
+                case CLEAR:
+                    target.setActivityState(HarmonyUtils.getChordSectionTick(songContext, from), HarmonyUtils
+                            .getChordSectionTick(songContext, to + 1), false);
+                    break;
+
+                case FLIP:
+                    target.flipActivityState(HarmonyUtils.getChordSectionTick(songContext, from), HarmonyUtils.getChordSectionTick(songContext,
+                            to + 1));
+                    break;
+
+                default:
+                    throw new RuntimeException("Unsupported operator \"" + operator + "\"");
+            }
+        }
+    }
+
+    private int getChordSectionNumber(SongContext songContext, String str) {
+        if (str.endsWith("%")) {
+            double percentage = Double.parseDouble(str.substring(0, str.length() - 1));
+            int tick = (int) (songContext.getStructure().getTicks() * percentage / 100d);
+
+            return HarmonyUtils.getChordSectionNumber(songContext, tick);
+        } else {
+            int number = Integer.parseInt(str);
+
+            if (number < 0) {
+                return HarmonyUtils.getChordSectionCount(songContext) + number;
+            } else {
+                return number;
+            }
+        }
     }
 
     /**
@@ -1134,6 +1228,36 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         }
 
         setArrangementEntries(arrangementEntries);
+
+        nodeList = XMLUtils.getNodeList("modifyActivityVector", node);
+        int modificationCount = nodeList.getLength();
+        ActivityVectorModification[] activityVectorModifications = new ActivityVectorModification[modificationCount];
+
+        for (int i = 0; i < modificationCount; i++) {
+            String modeString = XMLUtils.parseString(random, "@operator", nodeList.item(i));
+
+            if (modeString == null) {
+                modeString = "";
+            }
+
+            ActivityVectorModificationOperator operator;
+
+            try {
+                operator = Enum.valueOf(ActivityVectorModificationOperator.class, modeString.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new RuntimeException("Invalid activity vector modification mode \"" + modeString + "\"");
+            }
+
+            String from = XMLUtils.parseString(random, "@from", nodeList.item(i));
+            String to = XMLUtils.parseString(random, "@to", nodeList.item(i));
+            String operand1 = XMLUtils.parseString(random, "@operand1", nodeList.item(i));
+            String operand2 = XMLUtils.parseString(random, "@operand2", nodeList.item(i));
+            String target = XMLUtils.parseString(random, "@target", nodeList.item(i));
+
+            activityVectorModifications[i] = new ActivityVectorModification(operator, from, to, operand1, operand2, target);
+        }
+
+        this.activityVectorModifications = activityVectorModifications;
     }
 
     /**
@@ -1366,6 +1490,32 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
             this.segments = state.segments;
             this.segmentLength = state.segmentLength;
             this.activeInStopInterval = state.activeInStopInterval;
+        }
+    }
+
+    private static final class ActivityVectorModification {
+        ActivityVectorModificationOperator operator;
+        String from;
+        String to;
+        String operand1;
+        String operand2;
+        String target;
+
+        private ActivityVectorModification(ActivityVectorModificationOperator operator, String from, String to, String operand1, String operand2,
+                String target) {
+            int operands = operator.operands;
+
+            if (operands == 0 && (operand1 != null || operand2 != null) || operands == 1 && (operand1 == null || operand2 != null) || operands == 2
+                    && (operand1 == null || operand2 == null)) {
+                throw new IllegalArgumentException("Mode \"" + operator + "\" needs exactly " + operands + " operand(s)");
+            }
+
+            this.operator = operator;
+            this.from = from;
+            this.to = to;
+            this.operand1 = operand1;
+            this.operand2 = operand2;
+            this.target = target;
         }
     }
 }

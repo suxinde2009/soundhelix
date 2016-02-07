@@ -200,6 +200,14 @@ public class ActivityVector {
         bitSet.set(from, till, state);
     }
 
+    public void flipActivityState(int from, int till) {
+        if (till > totalTicks) {
+            totalTicks = till;
+        }
+
+        bitSet.flip(from, till);
+    }
+
     /**
      * Modifies the ActivityVector so that all interval changes from inactive to active are postponed by startTicks and all changes from active to
      * inactive are postponed by stopTicks ticks. startTicks and stopTicks may also be negative to prepone instead of postpone. The start of the first

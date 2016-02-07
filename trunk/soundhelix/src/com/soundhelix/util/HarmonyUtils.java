@@ -130,8 +130,8 @@ public final class HarmonyUtils {
     }
 
     /**
-     * Returns the first tick of the given chord section number (starting from 0) or -1 if the chord section number is negative or at or beyond the
-     * end of the song.
+     * Returns the first tick of the given chord section number (starting from 0) or -1 if the chord section number is negative or beyond the end of
+     * the song. If
      * 
      * @param songContext the song context
      * @param chordSection the number of the chord section
@@ -161,8 +161,8 @@ public final class HarmonyUtils {
             count++;
         } while (count < chordSection && tick < ticks);
 
-        if (tick >= ticks) {
-            // at or beyond the end of the song
+        if (tick > ticks) {
+            // beyond the end of the song
             return -1;
         } else {
             return tick;

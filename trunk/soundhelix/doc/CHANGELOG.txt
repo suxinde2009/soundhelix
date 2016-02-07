@@ -10,7 +10,7 @@ Change log
 0.9u:
 
     - Added support to the SimpleArrangementEngine for modifying the ActivityVectors of the generated ActivityMatrix using the
-      "modifyActivityVector" tag. Currently, the operators "set", "clear" and "flip" are supported on any chord section range of an
+      "activityVectorModification" tag. Currently, the operators "set", "clear" and "flip" are supported on any chord section range of an
       ActivityVector.
 
     - Changed the DrumSequenceEngine implementation to allow referring to ActivityVectors in conditional patterns'/LFO's conditions even if

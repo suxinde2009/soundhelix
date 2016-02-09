@@ -92,14 +92,15 @@ public class ActivityMatrix implements Iterable<ActivityVector> {
      * @param priority the log level to use
      */
 
-    public void dump(SongContext songContext, Priority priority) {
+    public void dump(SongContext songContext, String title, Priority priority) {
         if (!LOGGER.isEnabledFor(priority)) {
             return;
         }
 
         Structure structure = songContext.getStructure();
 
-        StringBuilder sb = new StringBuilder("Song's activity matrix:\n");
+        StringBuilder sb = new StringBuilder(title);
+        sb.append(":\n");
 
         int chordSections = HarmonyUtils.getChordSectionCount(songContext);
 

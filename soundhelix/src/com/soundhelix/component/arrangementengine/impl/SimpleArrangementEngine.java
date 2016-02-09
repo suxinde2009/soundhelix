@@ -82,7 +82,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         /** Logical XOR (2 operands, 1 target). */
         AND(2),
         /** Logical AND NOT (2 operands, 1 target). */
-        AND_NOT(2),
+        ANDNOT(2),
         /** Logical OR (2 operands, 1 target). */
         OR(2),
         /** Logical AND (2 operands, 1 target). */
@@ -155,9 +155,13 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         }
 
         songContext.setActivityMatrix(activityMatrix);
-        processActivityVectorModifications(songContext);
 
-        activityMatrix.dump(songContext, Priority.INFO);
+        if (activityVectorModifications.length > 0) {
+            activityMatrix.dump(songContext, "Song's activity matrix before applying ActivityVector modifications", Priority.DEBUG);
+            processActivityVectorModifications(songContext);
+        }
+
+        activityMatrix.dump(songContext, "Song's activity matrix", Priority.INFO);
         shiftIntervalBoundaries(neededActivityVectors);
 
         return createArrangement(songContext, neededActivityVectors);
@@ -170,6 +174,10 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
      */
 
     private void processActivityVectorModifications(SongContext songContext) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Applying ActivityVector modifications");
+        }
+
         ActivityMatrix activityMatrix = songContext.getActivityMatrix();
 
         for (ActivityVectorModification modification : activityVectorModifications) {
@@ -188,20 +196,39 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
                 from = from ^ to ^ (to = from);
             }
 
+            int fromTick = HarmonyUtils.getChordSectionTick(songContext, from);
+            int tillTick = HarmonyUtils.getChordSectionTick(songContext, to + 1);
             switch (operator) {
                 case SET:
-                    target.setActivityState(HarmonyUtils.getChordSectionTick(songContext, from), HarmonyUtils
-                            .getChordSectionTick(songContext, to + 1), true);
+                    target.setActivityState(fromTick, tillTick, true);
                     break;
 
                 case CLEAR:
-                    target.setActivityState(HarmonyUtils.getChordSectionTick(songContext, from), HarmonyUtils
-                            .getChordSectionTick(songContext, to + 1), false);
+                    target.setActivityState(fromTick, tillTick, false);
                     break;
 
                 case FLIP:
-                    target.flipActivityState(HarmonyUtils.getChordSectionTick(songContext, from), HarmonyUtils.getChordSectionTick(songContext,
-                            to + 1));
+                    target.flipActivityState(fromTick, tillTick);
+                    break;
+
+                case NOT:
+                    target.applyLogicalNot(operand1, fromTick, tillTick);
+                    break;
+
+                case AND:
+                    target.applyLogicalAnd(operand1, operand2, fromTick, tillTick);
+                    break;
+
+                case ANDNOT:
+                    target.applyLogicalAndNot(operand1, operand2, fromTick, tillTick);
+                    break;
+
+                case OR:
+                    target.applyLogicalOr(operand1, operand2, fromTick, tillTick);
+                    break;
+
+                case XOR:
+                    target.applyLogicalXor(operand1, operand2, fromTick, tillTick);
                     break;
 
                 default:
@@ -1247,7 +1274,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
         setArrangementEntries(arrangementEntries);
 
-        nodeList = XMLUtils.getNodeList("ActivityVectorModification", node);
+        nodeList = XMLUtils.getNodeList("activityVectorModification", node);
         int modificationCount = nodeList.getLength();
         ActivityVectorModification[] activityVectorModifications = new ActivityVectorModification[modificationCount];
 

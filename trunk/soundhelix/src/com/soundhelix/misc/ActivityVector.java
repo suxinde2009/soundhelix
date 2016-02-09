@@ -278,16 +278,20 @@ public class ActivityVector {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(name);
+        sb.append('=');
 
         int tick = 0;
+        boolean first = true;
 
         while (tick < totalTicks) {
 
             int len = getIntervalLength(tick);
 
-            if (sb.length() > 0) {
+            if (!first) {
                 sb.append(',');
+            } else {
+                first = false;
             }
 
             sb.append(isActive(tick) ? "1/" + len : "0/" + len);
@@ -337,5 +341,147 @@ public class ActivityVector {
         }
 
         return result;
+    }
+
+    /**
+     * Applies a logical AND between the two BitSet operands and replaces the given range of this ActivityVector's BitSet with the result.
+     * 
+     * @param operand1 the first operand
+     * @param operand2 the second operand
+     * @param fromTick the from tick (inclusive)
+     * @param tillTick the till tick (exclusive)
+     */
+
+    public void applyLogicalNot(ActivityVector operand, int fromTick, int tillTick) {
+        if (operand.getTicks() != totalTicks) {
+            throw new IllegalArgumentException("Operands must have the same number of ticks as the target");
+        }
+
+        try {
+            // bitSet is modified by the operation, so we must clone it first
+            BitSet bitSet = (BitSet) operand.bitSet.clone();
+            bitSet.flip(fromTick, tillTick);
+            replaceBitSetRange(bitSet, fromTick, tillTick);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Applies a logical AND between the two BitSet operands and replaces the given range of this ActivityVector's BitSet with the result.
+     * 
+     * @param operand1 the first operand
+     * @param operand2 the second operand
+     * @param fromTick the from tick (inclusive)
+     * @param tillTick the till tick (exclusive)
+     */
+
+    public void applyLogicalAnd(ActivityVector operand1, ActivityVector operand2, int fromTick, int tillTick) {
+        if (operand1.getTicks() != totalTicks || operand2.getTicks() != totalTicks) {
+            throw new IllegalArgumentException("Operands must have the same number of ticks as the target");
+        }
+
+        try {
+            // bitSet1 is modified by the operation, so we must clone it first
+            BitSet bitSet1 = (BitSet) operand1.bitSet.clone();
+            BitSet bitSet2 = operand2.bitSet;
+            bitSet1.and(bitSet2);
+            replaceBitSetRange(bitSet1, fromTick, tillTick);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Applies a logical AND between the two BitSet operands and replaces the given range of this ActivityVector's BitSet with the result.
+     * 
+     * @param operand1 the first operand
+     * @param operand2 the second operand
+     * @param fromTick the from tick (inclusive)
+     * @param tillTick the till tick (exclusive)
+     */
+
+    public void applyLogicalAndNot(ActivityVector operand1, ActivityVector operand2, int fromTick, int tillTick) {
+        if (operand1.getTicks() != totalTicks || operand2.getTicks() != totalTicks) {
+            throw new IllegalArgumentException("Operands must have the same number of ticks as the target");
+        }
+
+        try {
+            // bitSet1 is modified by the operation, so we must clone it first
+            BitSet bitSet1 = (BitSet) operand1.bitSet.clone();
+            BitSet bitSet2 = operand2.bitSet;
+            bitSet1.andNot(bitSet2);
+            replaceBitSetRange(bitSet1, fromTick, tillTick);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Applies a logical OR between the two BitSet operands and replaces the given range of this ActivityVector's BitSet with the result.
+     * 
+     * @param operand1 the first operand
+     * @param operand2 the second operand
+     * @param fromTick the from tick (inclusive)
+     * @param tillTick the till tick (exclusive)
+     */
+
+    public void applyLogicalOr(ActivityVector operand1, ActivityVector operand2, int fromTick, int tillTick) {
+        if (operand1.getTicks() != totalTicks || operand2.getTicks() != totalTicks) {
+            throw new IllegalArgumentException("Operands must have the same number of ticks as the target");
+        }
+
+        try {
+            // bitSet1 is modified by the operation, so we must clone it first
+            BitSet bitSet1 = (BitSet) operand1.bitSet.clone();
+            BitSet bitSet2 = operand2.bitSet;
+            bitSet1.or(bitSet2);
+            replaceBitSetRange(bitSet1, fromTick, tillTick);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Applies a logical OR between the two BitSet operands and replaces the given range of this ActivityVector's BitSet with the result.
+     * 
+     * @param operand1 the first operand
+     * @param operand2 the second operand
+     * @param fromTick the from tick (inclusive)
+     * @param tillTick the till tick (exclusive)
+     */
+
+    public void applyLogicalXor(ActivityVector operand1, ActivityVector operand2, int fromTick, int tillTick) {
+        if (operand1.getTicks() != totalTicks || operand2.getTicks() != totalTicks) {
+            throw new IllegalArgumentException("Operands must have the same number of ticks as the target");
+        }
+
+        try {
+            // bitSet1 is modified by the operation, so we must clone it first
+            BitSet bitSet1 = (BitSet) operand1.bitSet.clone();
+            BitSet bitSet2 = operand2.bitSet;
+            bitSet1.xor(bitSet2);
+            replaceBitSetRange(bitSet1, fromTick, tillTick);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Replaces this ActivityVector's BitSet range from fromTick (inclusive) to tillTick (exclusive) with the content of the given source BitSet in
+     * that range.
+     * 
+     * @param sourceBitSet the source BitSet to copy the range from
+     * @param fromTick the start tick of the range (inclusive)
+     * @param tillTick the end tick of the range (exclusive)
+     */
+
+    private void replaceBitSetRange(BitSet sourceBitSet, int fromTick, int tillTick) {
+        // clear the range of the target BitSet
+        bitSet.clear(fromTick, tillTick);
+
+        for (int i = sourceBitSet.nextSetBit(fromTick); i >= 0 && i < tillTick; i = sourceBitSet.nextSetBit(i + 1)) {
+            bitSet.set(i);
+        }
     }
 }

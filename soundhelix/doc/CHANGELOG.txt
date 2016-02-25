@@ -20,6 +20,8 @@ Change log
     - Added support for specifying a crossoverPitch attribute per chordPattern tag in the PatternHarmonyEngine.
       If set, this attribute allows you to override the global crossoverPitch value.
 
+    - Added the chord types "sus2" and "sus4". Example chord names: "Csus2", "Csus24", "Csus26", "Csus4", "Csus44", "Csus46".
+
     - Fixed a bug regarding the phase computation for LFOs running in "segmentPair" mode. Whenever the speed was set to something
       other than 1, the off-segment's phase was incorrect.
 

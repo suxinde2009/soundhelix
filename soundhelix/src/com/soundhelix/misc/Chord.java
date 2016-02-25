@@ -75,9 +75,11 @@ public class Chord {
                 NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i).toUpperCase() + chordTemplate.name + "4", (i + chordTemplate.diff1) % 12 * 10000
                         + flavor4);
 
-                INVERSION_TYPE_MAP.put(flavor, InversionType.NONE);
+                // order is important here; for "aug" chords, all flavors are equal, and the inversion type should be NONE
+
                 INVERSION_TYPE_MAP.put(flavor6, InversionType.SECOND);
                 INVERSION_TYPE_MAP.put(flavor4, InversionType.FIRST);
+                INVERSION_TYPE_MAP.put(flavor, InversionType.NONE);
             }
         }
 
@@ -413,8 +415,6 @@ public class Chord {
             if (pitch >= crossoverPitch) {
                 pitch -= 12;
             }
-
-            System.out.println(name + " -> " + pitch + ":" + (pitch + diff1) + ":" + (pitch + diff2));
 
             return new Chord(pitch, pitch + diff1, pitch + diff2);
         } else {

@@ -64,16 +64,16 @@ public class Chord {
     static {
         for (int i = 0; i < 12; i++) {
             for (ChordTemplate chordTemplate : chordTemplates) {
-                int flavor = chordTemplate.diff1 * 100 + chordTemplate.diff2;
-                int flavor6 = (12 - chordTemplate.diff2) * 101 + chordTemplate.diff1;
-                int flavor4 = (chordTemplate.diff2 - chordTemplate.diff1) * 100 + 12 - chordTemplate.diff1;
+                final int diff1 = chordTemplate.diff1;
+                final int diff2 = chordTemplate.diff2;
+
+                int flavor = diff1 * 100 + diff2;
+                int flavor6 = (12 - diff2) * 101 + diff1;
+                int flavor4 = (diff2 - diff1) * 100 + 12 - diff1;
 
                 NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i).toUpperCase() + chordTemplate.name, i * 10000 + flavor);
-
-                NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i).toUpperCase() + chordTemplate.name + "6", (i + chordTemplate.diff2) % 12 * 10000
-                        + flavor6);
-                NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i).toUpperCase() + chordTemplate.name + "4", (i + chordTemplate.diff1) % 12 * 10000
-                        + flavor4);
+                NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i).toUpperCase() + chordTemplate.name + "6", (i + diff2) % 12 * 10000 + flavor6);
+                NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i).toUpperCase() + chordTemplate.name + "4", (i + diff1) % 12 * 10000 + flavor4);
 
                 // order is important here; for "aug" chords, all flavors are equal, and the inversion type should be NONE
 

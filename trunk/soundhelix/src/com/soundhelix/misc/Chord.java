@@ -21,71 +21,21 @@ import com.soundhelix.util.NoteUtils;
  */
 
 public class Chord {
-    /** The number of chord flavors. */
-    private static final int CHORD_FLAVORS = 12;
-
-    /** Code for the major chord. */
-    private static final int MAJOR = 407;
-
-    /** Code for the faked major7 chord. */
-    private static final int MAJOR7 = 410;
-
-    /** Code for the major6 chord. */
-    private static final int MAJOR6 = 509;
-
-    /** Code for the faked major76 chord. */
-    private static final int MAJOR76 = 206;
-
-    /** Code for the major4 chord. */
-    private static final int MAJOR4 = 308;
-
-    /** Code for the faked major74 chord. */
-    private static final int MAJOR74 = 608;
-
-    /** Code for the minor chord. */
-    private static final int MINOR = 307;
-
-    /** Code for the faked minor7 chord. */
-    private static final int MINOR7 = 310;
-
-    /** Code for the minor6 chord. */
-    private static final int MINOR6 = 508;
-
-    /** Code for the faked minor76 chord. */
-    private static final int MINOR76 = 205;
-
-    /** Code for the minor4 chord. */
-    private static final int MINOR4 = 409;
-
-    /** Code for the faked minor74 chord. */
-    private static final int MINOR74 = 709;
-
-    /** Code for the diminished chord. */
-    private static final int DIM = 306;
-
-    /** Code for the diminished6 chord. */
-    private static final int DIM6 = 609;
-
-    /** Code for the diminished4 chord. */
-    private static final int DIM4 = 309;
-
-    /** Code for the augmented chord. */
-    private static final int AUG = 408;
-
-    /** Code for the augmented 6 chord (same as augmented). */
-    private static final int AUG6 = 408;
-
-    /** Code for the augmented 4 chord (same as augmented). */
-    private static final int AUG4 = 408;
+    public enum InversionType {
+        NONE, FIRST, SECOND
+    };
 
     /** Pattern for arbitrary chords ("pitch1:pitch2:pitch3"). */
     private static final Pattern GENERIC_CHORD_PATTERN = Pattern.compile("^(-?\\d+):(-?\\d+):(-?\\d+)$");
 
     /** Maps from chord names to chord codes. */
-    private static final Map<String, Integer> NAME_TO_CODE_MAP = new LinkedHashMap<String, Integer>(12 * CHORD_FLAVORS);
+    private static final Map<String, Integer> NAME_TO_CODE_MAP = new LinkedHashMap<String, Integer>();
 
     /** Maps from chord codes to chord names. */
-    private static final Map<Integer, String> CODE_TO_NAME_MAP = new HashMap<Integer, String>(12 * CHORD_FLAVORS);
+    private static final Map<Integer, String> CODE_TO_NAME_MAP = new HashMap<Integer, String>();
+
+    /** Maps from flavor to inversion type. */
+    private static Map<Integer, InversionType> INVERSION_TYPE_MAP = new HashMap<Integer, InversionType>();
 
     /** The low pitch of the chord. */
     private final int lowPitch;
@@ -107,29 +57,28 @@ public class Chord {
      */
     private final int code;
 
+    private static ChordTemplate chordTemplates[] = { new ChordTemplate("", 4, 7), new ChordTemplate("m", 3, 7), new ChordTemplate("7", 4, 10),
+            new ChordTemplate("m7", 3, 10), new ChordTemplate("aug", 4, 8), new ChordTemplate("dim", 3, 6), new ChordTemplate("sus4", 5, 7),
+            new ChordTemplate("sus2", 2, 7) };
+
     static {
         for (int i = 0; i < 12; i++) {
-            NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i).toUpperCase(), i * 10000 + MAJOR);
-            NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i).toUpperCase() + "7", i * 10000 + MAJOR7);
-            NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i + 5).toUpperCase() + "6", i * 10000 + MAJOR6);
-            NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i + 2).toUpperCase() + "76", i * 10000 + MAJOR76);
-            NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i - 4).toUpperCase() + "4", i * 10000 + MAJOR4);
-            NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i - 4).toUpperCase() + "74", i * 10000 + MAJOR74);
-            NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i).toUpperCase() + "m", i * 10000 + MINOR);
-            NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i).toUpperCase() + "m7", i * 10000 + MINOR7);
-            NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i + 5).toUpperCase() + "m6", i * 10000 + MINOR6);
-            NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i + 2).toUpperCase() + "m76", i * 10000 + MINOR76);
-            NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i - 3).toUpperCase() + "m4", i * 10000 + MINOR4);
-            NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i - 3).toUpperCase() + "m74", i * 10000 + MINOR74);
-            NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i).toUpperCase() + "dim", i * 10000 + DIM);
-            NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i + 6).toUpperCase() + "dim6", i * 10000 + DIM6);
-            NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i - 4).toUpperCase() + "dim4", i * 10000 + DIM4);
+            for (ChordTemplate chordTemplate : chordTemplates) {
+                int flavor = chordTemplate.diff1 * 100 + chordTemplate.diff2;
+                int flavor6 = (12 - chordTemplate.diff2) * 101 + chordTemplate.diff1;
+                int flavor4 = (chordTemplate.diff2 - chordTemplate.diff1) * 100 + 12 - chordTemplate.diff1;
 
-            // use "aug" last for the reverse mapping; we want 10000 + AUG to point to ...aug, rather than
-            // to ...aug4 or ...aug6; we are using a LinkedHashMap, so order matters
-            NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i + 4).toUpperCase() + "aug6", i * 10000 + AUG6);
-            NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i - 4).toUpperCase() + "aug4", i * 10000 + AUG4);
-            NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i).toUpperCase() + "aug", i * 10000 + AUG);
+                NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i).toUpperCase() + chordTemplate.name, i * 10000 + flavor);
+
+                NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i).toUpperCase() + chordTemplate.name + "6", (i + chordTemplate.diff2) % 12 * 10000
+                        + flavor6);
+                NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i).toUpperCase() + chordTemplate.name + "4", (i + chordTemplate.diff1) % 12 * 10000
+                        + flavor4);
+
+                INVERSION_TYPE_MAP.put(flavor, InversionType.NONE);
+                INVERSION_TYPE_MAP.put(flavor6, InversionType.SECOND);
+                INVERSION_TYPE_MAP.put(flavor4, InversionType.FIRST);
+            }
         }
 
         // create the reverse version of the upper map
@@ -140,7 +89,7 @@ public class Chord {
     }
 
     /**
-     * Instantiates a chord. Pitches are sorted by their value and are used as the low, middle and high pitch, respectively.
+     * Instantiates a chord. Pitches are sorted automatically by their value and are used as the low, middle and high pitch, respectively.
      * 
      * @param pitch1 the first pitch
      * @param pitch2 the second pitch
@@ -167,67 +116,6 @@ public class Chord {
 
         flavor = (middlePitch - lowPitch) * 100 + highPitch - lowPitch;
         code = (lowPitch % 12 + 12) % 12 * 10000 + flavor;
-    }
-
-    /**
-     * Returns true iff this chord is a major chord.
-     * 
-     * @return true iff the chord is a major chord
-     */
-
-    public boolean isMajor() {
-        return flavor == MAJOR || flavor == MAJOR6 || flavor == MAJOR4;
-    }
-
-    /**
-     * Returns true iff this chord is a major7 chord.
-     * 
-     * @return true iff the chord is a major7 chord
-     */
-
-    public boolean isMajor7() {
-        return flavor == MAJOR7 || flavor == MAJOR76 || flavor == MAJOR74;
-    }
-
-    /**
-     * Returns true iff this chord is a minor chord.
-     * 
-     * @return true iff the chord is a minor chord
-     */
-
-    public boolean isMinor() {
-        return flavor == MINOR || flavor == MINOR6 || flavor == MINOR4;
-    }
-
-    /**
-     * Returns true iff this chord is a minor7 chord.
-     * 
-     * @return true iff the chord is a minor7 chord
-     */
-
-    public boolean isMinor7() {
-        return flavor == MINOR7 || flavor == MINOR76 || flavor == MINOR74;
-    }
-
-    /**
-     * Returns true iff this chord is a diminished chord.
-     * 
-     * @return true iff this chord is a diminished chord.
-     */
-
-    public boolean isDiminished() {
-        return flavor == DIM || flavor == DIM6 || flavor == DIM4;
-    }
-
-    /**
-     * Returns true iff this chord is an augmented chord.
-     * 
-     * @return true iff this chord is an augmented chord.
-     */
-
-    public boolean isAugmented() {
-        // all types (no inversion, first inversion and second inversion) are equal
-        return flavor == AUG;
     }
 
     /**
@@ -282,7 +170,7 @@ public class Chord {
      * Returns a string representation of this chord. If the chord has a canonical name, its canonical name is returned, otherwise a generic string
      * representation is returned.
      * 
-     * @return the string represenation
+     * @return the string representation
      */
 
     @Override
@@ -357,30 +245,17 @@ public class Chord {
      */
 
     public Chord normalize() {
-        switch (flavor) {
-            case MAJOR6:
-                return new Chord(middlePitch, middlePitch + 4, middlePitch + 7);
-            case MAJOR76:
-                return new Chord(middlePitch, middlePitch + 4, middlePitch + 10);
-            case MAJOR4:
-                return new Chord(highPitch - 12, highPitch - 8, highPitch - 5);
-            case MAJOR74:
-                return new Chord(highPitch - 12, highPitch - 8, highPitch - 2);
-            case MINOR6:
-                return new Chord(middlePitch, middlePitch + 3, middlePitch + 7);
-            case MINOR76:
-                return new Chord(middlePitch, middlePitch + 3, middlePitch + 10);
-            case MINOR4:
-                return new Chord(highPitch - 12, highPitch - 9, highPitch - 5);
-            case MINOR74:
-                return new Chord(highPitch - 12, highPitch - 9, highPitch - 2);
-            case DIM6:
-                return new Chord(middlePitch, middlePitch + 3, middlePitch + 6);
-            case DIM4:
-                return new Chord(highPitch - 12, highPitch - 9, highPitch - 6);
-            default:
-                // already normalized or not normalizable
-                return this;
+        InversionType type = INVERSION_TYPE_MAP.get(flavor);
+
+        if (type == null || type == InversionType.NONE) {
+            // not normalizable or already normalized
+            return this;
+        }
+
+        if (type == InversionType.SECOND) {
+            return rotateUp();
+        } else {
+            return rotateDown();
         }
     }
 
@@ -391,7 +266,7 @@ public class Chord {
      */
 
     public Chord rotateUp() {
-        return new Chord(getLowPitch() + 12, getMiddlePitch(), getHighPitch());
+        return new Chord(lowPitch + 12, middlePitch, highPitch);
     }
 
     /**
@@ -402,7 +277,7 @@ public class Chord {
      */
 
     public Chord rotateDown() {
-        return new Chord(getLowPitch(), getMiddlePitch(), getHighPitch() - 12);
+        return new Chord(lowPitch, middlePitch, highPitch - 12);
     }
 
     /**
@@ -415,8 +290,7 @@ public class Chord {
      */
 
     public boolean containsPitch(int pitch) {
-        return ((pitch - getLowPitch()) % 12 + 12) % 12 == 0 || ((pitch - getMiddlePitch()) % 12 + 12) % 12 == 0
-                || ((pitch - getHighPitch()) % 12 + 12) % 12 == 0;
+        return ((pitch - lowPitch) % 12 + 12) % 12 == 0 || ((pitch - middlePitch) % 12 + 12) % 12 == 0 || ((pitch - highPitch) % 12 + 12) % 12 == 0;
     }
 
     /**
@@ -540,9 +414,27 @@ public class Chord {
                 pitch -= 12;
             }
 
+            System.out.println(name + " -> " + pitch + ":" + (pitch + diff1) + ":" + (pitch + diff2));
+
             return new Chord(pitch, pitch + diff1, pitch + diff2);
         } else {
             return null;
+        }
+    }
+
+    /**
+     * Chord template. Consists of 2 pitch differences from the root pitch.
+     */
+
+    private static class ChordTemplate {
+        private String name;
+        private int diff1;
+        private int diff2;
+
+        private ChordTemplate(String name, int diff1, int diff2) {
+            this.name = name;
+            this.diff1 = diff1;
+            this.diff2 = diff2;
         }
     }
 }

@@ -624,7 +624,7 @@ public final class XMLUtils {
             node = node.getParentNode();
         }
 
-        StringBuilder sb = new StringBuilder("/");
+        StringBuilder sb = new StringBuilder();
 
         for (int i = nodes.size() - 1; i >= 0; i--) {
             if (sb.length() > 0) {
@@ -638,20 +638,20 @@ public final class XMLUtils {
 
             // determine the index of the node
 
-            int count = 0;
+            int index = 0;
             while (n.getPreviousSibling() != null) {
                 n = n.getPreviousSibling();
                 if (n.getNodeName().equals(name)) {
-                    count++;
+                    index++;
                 }
             }
 
-            if (count > 0) {
+            if (index > 0) {
                 // at least one sibling exists, add index
-                sb.append('[').append(count).append(']');
+                sb.append('[').append(index).append(']');
             } else {
                 // no preceding sibling exists, if there is a succeeding sibling,
-                // log index, otherwise don't
+                // add 0 as index, otherwise don't
 
                 boolean hasSucceedingSibling = false;
 
@@ -665,7 +665,7 @@ public final class XMLUtils {
                 }
 
                 if (hasSucceedingSibling) {
-                    sb.append('[').append(count).append(']');
+                    sb.append("[0]");
                 }
             }
         }

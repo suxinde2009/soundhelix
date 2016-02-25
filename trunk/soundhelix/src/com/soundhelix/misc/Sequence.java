@@ -1,6 +1,7 @@
 package com.soundhelix.misc;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -12,7 +13,7 @@ import java.util.List;
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
-public class Sequence {
+public class Sequence implements Iterable<Sequence.SequenceEntry> {
     /** The list of sequence entries. */
     private List<Sequence.SequenceEntry> sequence = new ArrayList<Sequence.SequenceEntry>();
 
@@ -44,6 +45,11 @@ public class Sequence {
         }
 
         this.songContext = songContext;
+    }
+
+    @Override
+    public Iterator<SequenceEntry> iterator() {
+        return sequence.iterator();
     }
 
     /**

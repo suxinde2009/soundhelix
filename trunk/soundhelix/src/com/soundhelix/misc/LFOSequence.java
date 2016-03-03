@@ -20,6 +20,7 @@ public class LFOSequence {
      * Constructor.
      */
 
+    @SuppressWarnings("unused")
     private LFOSequence() {
     }
 

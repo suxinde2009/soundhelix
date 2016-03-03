@@ -42,7 +42,12 @@ public class Chord {
     private static final Map<Integer, String> CODE_TO_NAME_MAP = new HashMap<Integer, String>();
 
     /** Maps from flavor to inversion type. */
-    private static Map<Integer, InversionType> INVERSION_TYPE_MAP = new HashMap<Integer, InversionType>();
+    private static final Map<Integer, InversionType> INVERSION_TYPE_MAP = new HashMap<Integer, InversionType>();
+
+    /** The chord templates. */
+    private static ChordTemplate[] chordTemplates = { new ChordTemplate("", 4, 7), new ChordTemplate("m", 3, 7), new ChordTemplate("7", 4, 10),
+            new ChordTemplate("m7", 3, 10), new ChordTemplate("aug", 4, 8), new ChordTemplate("dim", 3, 6), new ChordTemplate("sus4", 5, 7),
+            new ChordTemplate("sus2", 2, 7) };
 
     /** The low pitch of the chord. */
     private final int lowPitch;
@@ -63,10 +68,6 @@ public class Chord {
      * The integer that uniquely identifies the chords, including the chord's low pitch, but the octave is normalized.
      */
     private final int code;
-
-    private static ChordTemplate chordTemplates[] = { new ChordTemplate("", 4, 7), new ChordTemplate("m", 3, 7), new ChordTemplate("7", 4, 10),
-            new ChordTemplate("m7", 3, 10), new ChordTemplate("aug", 4, 8), new ChordTemplate("dim", 3, 6), new ChordTemplate("sus4", 5, 7),
-            new ChordTemplate("sus2", 2, 7) };
 
     static {
         for (int i = 0; i < 12; i++) {
@@ -386,7 +387,7 @@ public class Chord {
      * 
      * @param basePitch the base pitch
      * @param flavor the flavor
-     * @return
+     * @return the code
      */
 
     private static int getCode(int basePitch, int flavor) {
@@ -461,10 +462,23 @@ public class Chord {
      * Chord template. Consists of a name and 2 pitch differences from the root pitch.
      */
 
-    private static class ChordTemplate {
+    private static final class ChordTemplate {
+        /** The name. */
         private String name;
+
+        /** The first pitch difference. */
         private int diff1;
+
+        /** The second pitch difference. */
         private int diff2;
+
+        /**
+         * Constructor.
+         * 
+         * @param name the name
+         * @param diff1 the first pitch difference
+         * @param diff2 the second pitch difference
+         */
 
         private ChordTemplate(String name, int diff1, int diff2) {
             this.name = name;

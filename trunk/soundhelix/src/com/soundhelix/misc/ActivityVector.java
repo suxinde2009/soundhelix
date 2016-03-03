@@ -346,8 +346,7 @@ public class ActivityVector {
     /**
      * Applies a logical AND between the two BitSet operands and replaces the given range of this ActivityVector's BitSet with the result.
      * 
-     * @param operand1 the first operand
-     * @param operand2 the second operand
+     * @param operand the operand
      * @param fromTick the from tick (inclusive)
      * @param tillTick the till tick (exclusive)
      */

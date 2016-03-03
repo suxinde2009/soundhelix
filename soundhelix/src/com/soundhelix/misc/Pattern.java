@@ -70,6 +70,7 @@ public class Pattern implements Iterable<PatternEntry> {
      * @return the pattern
      */
 
+    @SuppressWarnings("unused")
     private static Pattern parseString(SongContext songContext, String patternString) {
         return parseString(songContext, patternString, null, songContext.getStructure().getTicksPerBeat());
     }
@@ -98,6 +99,7 @@ public class Pattern implements Iterable<PatternEntry> {
      * @return the pattern
      */
 
+    @SuppressWarnings("unused")
     private static Pattern parseString(SongContext songContext, String patternString, String wildcardString) {
         return parseString(songContext, patternString, wildcardString, 4);
     }
@@ -691,8 +693,8 @@ public class Pattern implements Iterable<PatternEntry> {
             if (isPause()) {
                 return "-" + (ticks > 1 ? "/" + ticks : "");
             } else {
-                return (isWildcard ? "" + wildcardCharacter : "" + pitch) + (ticks > 1 ? "/" + ticks : "")
-                        + (velocity == songContext.getStructure().getMaxVelocity() ? "" : ":" + velocity);
+                return (isWildcard ? "" + wildcardCharacter : "" + pitch) + (ticks > 1 ? "/" + ticks : "") + (velocity == songContext.getStructure()
+                        .getMaxVelocity() ? "" : ":" + velocity);
             }
         }
     }

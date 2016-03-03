@@ -30,6 +30,7 @@ public class Sequence implements Iterable<Sequence.SequenceEntry> {
      * Constructor.
      */
 
+    @SuppressWarnings("unused")
     private Sequence() {
     }
 

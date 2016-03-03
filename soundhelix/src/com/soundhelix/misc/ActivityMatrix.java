@@ -37,6 +37,7 @@ public class ActivityMatrix implements Iterable<ActivityVector> {
      * Looks up and returns the ActivityVector with the given name. If the name is not found, null is returned.
      * 
      * @param name the name
+     *
      * @return the ActivityVector (or null)
      */
 

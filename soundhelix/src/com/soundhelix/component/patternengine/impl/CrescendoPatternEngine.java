@@ -208,6 +208,7 @@ public class CrescendoPatternEngine extends StringPatternEngine {
         return tick;
     }
 
+    @Override
     public void setPatternTicksPerBeat(int patternTicksPerBeat) {
         this.patternTicksPerBeat = patternTicksPerBeat;
     }

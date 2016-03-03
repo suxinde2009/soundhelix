@@ -22,6 +22,7 @@ public class ConsistentRandom {
      * Private constructor.
      */
 
+    @SuppressWarnings("unused")
     private ConsistentRandom() {
     }
 

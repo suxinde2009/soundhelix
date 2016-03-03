@@ -104,9 +104,9 @@ public class Chord {
         int min = Math.min(pitch1, Math.min(pitch2, pitch3));
         int max = Math.max(pitch1, Math.max(pitch2, pitch3));
 
-        lowPitch = min;
-        middlePitch = min == pitch1 ? max == pitch2 ? pitch3 : pitch2 : max == pitch1 ? min == pitch2 ? pitch3 : pitch2 : pitch1;
-        highPitch = max;
+        int lowPitch = min;
+        int middlePitch = min == pitch1 ? max == pitch2 ? pitch3 : pitch2 : max == pitch1 ? min == pitch2 ? pitch3 : pitch2 : pitch1;
+        int highPitch = max;
 
         if (lowPitch == middlePitch || middlePitch == highPitch) {
             throw new RuntimeException("Duplicate pitches in chord " + this);
@@ -115,6 +115,10 @@ public class Chord {
         if (highPitch - lowPitch >= 12) {
             throw new RuntimeException("High and low pitch are more than 11 halftones apart in chord " + this);
         }
+
+        this.lowPitch = lowPitch;
+        this.middlePitch = middlePitch;
+        this.highPitch = highPitch;
 
         flavor = getFlavor(middlePitch - lowPitch, highPitch - lowPitch);
         code = getCode((lowPitch % 12 + 12) % 12, flavor);
@@ -448,7 +452,7 @@ public class Chord {
     }
 
     /**
-     * Chord template. Consists of 2 pitch differences from the root pitch.
+     * Chord template. Consists of a name and 2 pitch differences from the root pitch.
      */
 
     private static class ChordTemplate {

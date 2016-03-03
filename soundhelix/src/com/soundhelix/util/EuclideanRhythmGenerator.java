@@ -10,7 +10,14 @@ import java.util.Arrays;
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
-public class EuclideanRhythmGenerator {
+public final class EuclideanRhythmGenerator {
+
+    /**
+     * Private constructor.
+     */
+
+    private EuclideanRhythmGenerator() {
+    }
 
     /**
      * Generates the Euclidean rhythm with the given number of pulses spread across the given number of steps.

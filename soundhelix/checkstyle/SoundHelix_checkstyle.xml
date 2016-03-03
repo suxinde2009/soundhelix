@@ -79,7 +79,7 @@ SoundHelix checkstyle configuration
       <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
     </module>
     <module name="MissingSwitchDefault"/>
-    <module name="RedundantThrows"/>
+    <!-- <module name="RedundantThrows"/> -->
     <module name="SimplifyBooleanExpression"/>
     <module name="SimplifyBooleanReturn"/>
     <module name="DesignForExtension">
@@ -105,7 +105,7 @@ SoundHelix checkstyle configuration
       <property name="severity" value="ignore"/>
       <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
     </module>
-    <module name="JUnitTestCase"/>
+    <!--  <module name="JUnitTestCase"/> -->
     <module name="UnnecessaryParentheses"/>
     <module name="AnonInnerLength">
       <property name="max" value="60"/>
@@ -267,9 +267,9 @@ SoundHelix checkstyle configuration
     <property name="message" value="Line has trailing spaces."/>
     <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="info"/>
   </module>
-  <module name="StrictDuplicateCode">
+  <!-- <module name="StrictDuplicateCode">
     <property name="min" value="20"/>
-  </module>
+  </module> -->
   <module name="RegexpMultiline">
     <property name="severity" value="warning"/>
     <property name="format" value="^ \* @author .* \(.+\)$"/>

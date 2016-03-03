@@ -354,8 +354,8 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         }
     }
 
-    private ActivityMatrix createExactConstrainedActivityVectors(SongContext songContext, ActivityVectorConfiguration[] activityVectorConfigurations) {
-
+    private ActivityMatrix createExactConstrainedActivityVectors(SongContext songContext,
+            ActivityVectorConfiguration[] activityVectorConfigurations) {
         int sections = HarmonyUtils.getChordSectionCount(songContext);
         int vectors = activityVectorConfigurations.length;
 
@@ -632,7 +632,8 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         return convertBitSetsToActivityVectors(songContext, activityVectorConfigurations, bitSets);
     }
 
-    private ActivityMatrix createGreedyConstrainedActivityVectors(SongContext songContext, ActivityVectorConfiguration[] activityVectorConfigurations) {
+    private ActivityMatrix createGreedyConstrainedActivityVectors(SongContext songContext,
+            ActivityVectorConfiguration[] activityVectorConfigurations) {
 
         int sections = HarmonyUtils.getChordSectionCount(songContext);
         int vectors = activityVectorConfigurations.length;
@@ -1264,8 +1265,8 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
             }
 
             try {
-                SequenceEngine sequenceEngine = XMLUtils.getInstance(songContext, SequenceEngine.class, sequenceEngineNodeList.item(random
-                        .nextInt(sequenceEngineNodeList.getLength())), randomSeed, i);
+                SequenceEngine sequenceEngine = XMLUtils.getInstance(songContext, SequenceEngine.class, sequenceEngineNodeList.item(random.nextInt(
+                        sequenceEngineNodeList.getLength())), randomSeed, i);
                 arrangementEntries[i] = new ArrangementEntry(instrument, sequenceEngine, transposition, velocity, activityVectorNames);
             } catch (Exception e) {
                 throw new RuntimeException("Error instantiating SequenceEngine for instrument \"" + instrument + "\"", e);

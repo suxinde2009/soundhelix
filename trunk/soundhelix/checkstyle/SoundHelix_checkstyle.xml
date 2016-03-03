@@ -79,7 +79,6 @@ SoundHelix checkstyle configuration
       <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
     </module>
     <module name="MissingSwitchDefault"/>
-    <!-- <module name="RedundantThrows"/> -->
     <module name="SimplifyBooleanExpression"/>
     <module name="SimplifyBooleanReturn"/>
     <module name="DesignForExtension">
@@ -105,7 +104,6 @@ SoundHelix checkstyle configuration
       <property name="severity" value="ignore"/>
       <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
     </module>
-    <!--  <module name="JUnitTestCase"/> -->
     <module name="UnnecessaryParentheses"/>
     <module name="AnonInnerLength">
       <property name="max" value="60"/>
@@ -194,10 +192,11 @@ SoundHelix checkstyle configuration
       <property name="tokens" value="LITERAL_DO,LITERAL_ELSE,LITERAL_FINALLY,LITERAL_IF,LITERAL_FOR,LITERAL_TRY,LITERAL_WHILE,STATIC_INIT"/>
     </module>
     <module name="HiddenField">
-      <property name="severity" value="info"/>
+      <property name="severity" value="ignore"/>
       <property name="ignoreConstructorParameter" value="true"/>
       <property name="ignoreSetter" value="true"/>
       <property name="ignoreAbstractMethods" value="true"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="info"/>
     </module>
     <module name="AbstractClassName">
       <property name="format" value="^Abstract.*$"/>
@@ -232,11 +231,6 @@ SoundHelix checkstyle configuration
     <module name="Indentation">
       <property name="severity" value="info"/>
     </module>
-    <module name="HiddenField">
-      <property name="ignoreConstructorParameter" value="true"/>
-      <property name="ignoreSetter" value="true"/>
-      <property name="ignoreAbstractMethods" value="true"/>
-    </module>
     <module name="MissingOverride">
       <property name="severity" value="warning"/>
       <property name="javaFiveCompatibility" value="true"/>
@@ -267,9 +261,6 @@ SoundHelix checkstyle configuration
     <property name="message" value="Line has trailing spaces."/>
     <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="info"/>
   </module>
-  <!-- <module name="StrictDuplicateCode">
-    <property name="min" value="20"/>
-  </module> -->
   <module name="RegexpMultiline">
     <property name="severity" value="warning"/>
     <property name="format" value="^ \* @author .* \(.+\)$"/>

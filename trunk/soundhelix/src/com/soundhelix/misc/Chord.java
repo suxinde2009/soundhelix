@@ -67,13 +67,13 @@ public class Chord {
                 final int diff1 = chordTemplate.diff1;
                 final int diff2 = chordTemplate.diff2;
 
-                int flavor = diff1 * 100 + diff2;
-                int flavor6 = (12 - diff2) * 101 + diff1;
-                int flavor4 = (diff2 - diff1) * 100 + 12 - diff1;
+                int flavor = getFlavor(diff1, diff2);
+                int flavor6 = getFlavor(12 - diff2, diff1 + 12 - diff2);
+                int flavor4 = getFlavor(diff2 - diff1, 12 - diff1);
 
-                NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i).toUpperCase() + chordTemplate.name, i * 10000 + flavor);
-                NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i).toUpperCase() + chordTemplate.name + "6", (i + diff2) % 12 * 10000 + flavor6);
-                NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i).toUpperCase() + chordTemplate.name + "4", (i + diff1) % 12 * 10000 + flavor4);
+                NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i).toUpperCase() + chordTemplate.name, getCode(i, flavor));
+                NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i).toUpperCase() + chordTemplate.name + "6", getCode((i + diff2) % 12, flavor6));
+                NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i).toUpperCase() + chordTemplate.name + "4", getCode((i + diff1) % 12, flavor4));
 
                 // order is important here; for "aug" chords, all flavors are equal, and the inversion type should be NONE
 
@@ -116,8 +116,8 @@ public class Chord {
             throw new RuntimeException("High and low pitch are more than 11 halftones apart in chord " + this);
         }
 
-        flavor = (middlePitch - lowPitch) * 100 + highPitch - lowPitch;
-        code = (lowPitch % 12 + 12) % 12 * 10000 + flavor;
+        flavor = getFlavor(middlePitch - lowPitch, highPitch - lowPitch);
+        code = getCode((lowPitch % 12 + 12) % 12, flavor);
     }
 
     /**
@@ -356,6 +356,31 @@ public class Chord {
     @Override
     public int hashCode() {
         return toString().hashCode();
+    }
+
+    /**
+     * Returns the chord flavor for the given two pitch differences.
+     * 
+     * @param diff1 the first pitch difference (must be smaller than diff2)
+     * @param diff2 the second pitch difference (must be larger than diff1)
+     *
+     * @return the flavor
+     */
+
+    private static int getFlavor(int diff1, int diff2) {
+        return diff1 * 100 + diff2;
+    }
+
+    /**
+     * Returns the chord code for the given base pitch and flavor.
+     * 
+     * @param basePitch the base pitch
+     * @param flavor the flavor
+     * @return
+     */
+
+    private static int getCode(int basePitch, int flavor) {
+        return basePitch * 10000 + flavor;
     }
 
     /**

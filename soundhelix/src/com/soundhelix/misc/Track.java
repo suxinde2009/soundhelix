@@ -62,6 +62,7 @@ public class Track {
      * Adds the given sequence to this track.
      * 
      * @param sequence the sequence to add
+     * @param name the LFO name
      */
 
     public void add(LFOSequence sequence, String name) {

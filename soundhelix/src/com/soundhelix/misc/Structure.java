@@ -44,6 +44,7 @@ public class Structure {
      * @param bars the number of bars
      * @param beatsPerBar the number of beats per bar
      * @param ticksPerBeat the number of ticks per beat
+     * @param maxVelocity the maximum velocity
      */
 
     public Structure(int bars, int beatsPerBar, int ticksPerBeat, int maxVelocity) {

@@ -90,6 +90,7 @@ public class ActivityMatrix implements Iterable<ActivityVector> {
      * Dumps the activity vectors as an activity matrix using the given log level.
      * 
      * @param songContext the song context
+     * @param title the title
      * @param priority the log level to use
      */
 

@@ -9,20 +9,27 @@ import java.util.regex.Pattern;
 import com.soundhelix.util.NoteUtils;
 
 /**
- * Defines a chord. A chord is immutable and consists of 3 different pitches, which cannot span more than 11 halftones. A chord may be one of the
- * common type major, minor, diminished or augmented (all of them in all three inversion flavors) or can have any other pitch combination. All chords
- * can be rotated up or down. Rotating a chord up means replacing the chord's low pitch with the same pitch transposed one octave up. Rotating a chord
- * down means replacing the chord's high pitch with the same pitch transposed one octave down. All common type chords (except for augmented chords)
- * can be normalized, which means that the chords are rotated up or down so that their low pitch equals the root pitch of the chord (e.g., "C4" and
- * "C6" are normalized to "C"), if that is not already the case. Augmented chords cannot be normalized, because they don't have a unique root pitch
- * (e.g., the chords "Caug", "Eaug6" and "G#aug4" are not distinguishable if you look at their pitches).
+ * Defines a chord. A chord is immutable and consists of 3 different pitches, which cannot span more than 11 halftones. Each chord is available in 3
+ * inversions (no inversion, first or second inversion). All chords can be rotated up or down. Rotating a chord up means replacing the chord's low
+ * pitch with the same pitch transposed one octave up. Rotating a chord down means replacing the chord's high pitch with the same pitch transposed one
+ * octave down. All common type chords (except for augmented chords) can be normalized, which means that the chords are rotated up or down so that
+ * their low pitch equals the root pitch of the chord (e.g., "C4" and "C6" are normalized to "C"), if that is not already the case. Augmented chords
+ * cannot be normalized, because they don't have a unique root pitch (e.g., the chords "Caug", "Eaug6" and "G#aug4" are not distinguishable if you
+ * look at their pitches).
  * 
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public class Chord {
+
+    /** The chord inversion type. */
     public enum InversionType {
-        NONE, FIRST, SECOND
+        /** No inversion. */
+        NONE,
+        /** First inversion. */
+        FIRST,
+        /** Second inversion. */
+        SECOND
     };
 
     /** Pattern for arbitrary chords ("pitch1:pitch2:pitch3"). */
@@ -144,7 +151,7 @@ public class Chord {
     }
 
     /**
-     * Implements an equality check. Two chords are equivalent if they are equivalent when both are normalized.
+     * Implements an equality check. Two chords are considered equivalent if they are equivalent when both are normalized.
      * 
      * @param other the other chord to compare this chord to
      * 
@@ -266,7 +273,7 @@ public class Chord {
     }
 
     /**
-     * Rotates the chord up by one chord offset. Effectively, this method creates a copy of this chord where the low note is transposed one octave up.
+     * Rotates the chord up by one chord offset. This method returns a chord where the low note is transposed one octave up.
      * 
      * @return the chord rotated up by one chord offset
      */
@@ -276,8 +283,7 @@ public class Chord {
     }
 
     /**
-     * Rotates the chord down by one chord offset. Effectively, this method creates a copy of this chord where the high note is transposed one octave
-     * down.
+     * Rotates the chord down by one chord offset. This method returns a chord where the high note is transposed one octave down.
      * 
      * @return the chord rotated down by one chord offset
      */
@@ -439,13 +445,13 @@ public class Chord {
 
             int diff1 = code / 100 % 100;
             int diff2 = code % 100;
-            int pitch = code / 10000;
+            int basePitch = code / 10000;
 
-            if (pitch >= crossoverPitch) {
-                pitch -= 12;
+            if (basePitch >= crossoverPitch) {
+                basePitch -= 12;
             }
 
-            return new Chord(pitch, pitch + diff1, pitch + diff2);
+            return new Chord(basePitch, basePitch + diff1, basePitch + diff2);
         } else {
             return null;
         }

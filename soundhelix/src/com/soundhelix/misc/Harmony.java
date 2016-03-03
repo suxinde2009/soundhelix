@@ -13,22 +13,23 @@ import java.util.Set;
 
 public interface Harmony {
     /**
-     * Returns the chord to use at the specified point in time. Within the valid tick interval this must be non-null (each tick must define a chord).
+     * Returns the chord to use at the specified point in time. Within the valid tick interval this must be non-null (i.e., each tick must define a
+     * chord).
      * 
      * @param tick the tick
      * 
-     * @return the Chord
+     * @return the Chord (or null if the tick is out of range)
      */
 
     Chord getChord(int tick);
 
     /**
-     * Returns the set of tag for the given tick. Within the valid tick interval this must be non-null. If a tick doesn't define any tags, an empty
-     * must be returned.
+     * Returns the set of tags for the given tick. Within the valid tick interval this must be non-null. If a tick doesn't define any tags, an empty
+     * set must be returned rather than null.
      * 
      * @param tick the tick
      * 
-     * @return the set of tags
+     * @return the set of tags (or null if the tick is out of range)
      */
 
     Set<String> getTags(int tick);
@@ -62,7 +63,7 @@ public interface Harmony {
      * the song will end. This method can be used to check when special processing (like adding rhythm fill-ins) can be done. For standard chord
      * sections, the total length of the chord section should be used. For a valid tick parameter, the return value must always be positive.
      * 
-     * @param tick the tick number
+     * @param tick the tick
      * 
      * @return the number of ticks before the next chord section begins or the song will end
      */

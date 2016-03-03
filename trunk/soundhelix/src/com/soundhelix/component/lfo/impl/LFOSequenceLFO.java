@@ -19,6 +19,7 @@ public class LFOSequenceLFO extends AbstractLFO {
     /** The LFO sequence. */
     private LFOSequence lfoSequence;
 
+    @SuppressWarnings("unused")
     private LFOSequenceLFO() {
     }
 

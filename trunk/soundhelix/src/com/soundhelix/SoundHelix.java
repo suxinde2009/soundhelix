@@ -1,8 +1,5 @@
 package com.soundhelix;
 
-import gnu.getopt.Getopt;
-import gnu.getopt.LongOpt;
-
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
@@ -25,6 +22,9 @@ import com.soundhelix.remotecontrol.ConsoleRemoteControl;
 import com.soundhelix.remotecontrol.RemoteControl;
 import com.soundhelix.util.SongUtils;
 import com.soundhelix.util.VersionUtils;
+
+import gnu.getopt.Getopt;
+import gnu.getopt.LongOpt;
 
 /**
  * Implements the main class. The main() method determines the configuration file and then waits for the next generated song and plays it. The
@@ -300,9 +300,9 @@ public class SoundHelix implements Runnable {
      */
 
     private static Getopt parseParameters(String[] args) {
-        LongOpt[] longopts = new LongOpt[] { new LongOpt("help", LongOpt.NO_ARGUMENT, null, 'h'),
-                new LongOpt("version", LongOpt.NO_ARGUMENT, null, 'v'), new LongOpt("song-name", LongOpt.REQUIRED_ARGUMENT, null, 's'),
-                new LongOpt("show-midi-devices", LongOpt.NO_ARGUMENT, null, 'm'), };
+        LongOpt[] longopts = new LongOpt[] { new LongOpt("help", LongOpt.NO_ARGUMENT, null, 'h'), new LongOpt("version", LongOpt.NO_ARGUMENT, null,
+                'v'), new LongOpt("song-name", LongOpt.REQUIRED_ARGUMENT, null, 's'), new LongOpt("show-midi-devices", LongOpt.NO_ARGUMENT, null,
+                        'm'), };
 
         return new Getopt("SoundHelix", args, "-hvs:m", longopts);
     }

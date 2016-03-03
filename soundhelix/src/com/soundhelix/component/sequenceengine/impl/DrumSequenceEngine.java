@@ -229,8 +229,8 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
                             int[] targets = conditionalEntry.targets;
                             Mode mode = conditionalEntry.mode;
 
-                            logger.debug("Applying conditional pattern " + i + " with length " + patternTicks + " for targets "
-                                    + Arrays.toString(targets) + " at ticks " + tick + "-" + (tick + patternTicks - 1));
+                            logger.debug("Applying conditional pattern " + i + " with length " + patternTicks + " for targets " + Arrays.toString(
+                                    targets) + " at ticks " + tick + "-" + (tick + patternTicks - 1));
 
                             int len = pattern.size();
 
@@ -274,6 +274,8 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
      * Process all conditional LFOs.
      * 
      * @param songContext the song context
+     * @param activityVectors the activity vectors
+     * @param track the track
      */
 
     private void processConditionalLFOs(SongContext songContext, ActivityVector[] activityVectors, Track track) {
@@ -402,7 +404,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
      * ActivityVectors from the list are active or not. If the tick is negative, the returned string consists of only '0' characters.
      * 
      * @param tick the tick to check
-     * @param activityVectors the array of ActivityVectors
+     * @param activityMatrix the activity matrix
      * 
      * @return the activity string
      */
@@ -624,7 +626,7 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
      * Parses the given condition string and returns a pattern representing the condition. The condition string is given as a comma-separated list of
      * ActivityVector names, which are each prefixed by either "+" or "-".
      * 
-     * @param map the map that maps ActivityVector names to iterator index
+     * @param indexMap the map that maps ActivityVector names to iterator index
      * @param string the condition string
      * 
      * @return the condition pattern
@@ -834,10 +836,13 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
         /**
          * Constructor.
          * 
-         * @param lfo the lfo
+         * @param lfo the LFO
+         * @param lfoName the LFO name
+         * @param ticks the number of ticks
          * @param speed the speed
          * @param rotationUnit the rotation unit
          * @param phase the phase
+         * @param defaultValue the default value
          * @param preConditionString the precondition
          * @param postConditionString the postcondition
          * @param probability the probability

@@ -109,6 +109,7 @@ public class RandomPatternEngine extends StringPatternEngine {
      * Generates a pattern that is based on the given pattern of patterns. Each element of the pattern pattern represents a variation of the base
      * pattern specified by the first character each.
      * 
+     * @param songContext the song context
      * @param patternPattern the string of pattern characters (comma-separated)
      * 
      * @return the generated pattern
@@ -187,6 +188,8 @@ public class RandomPatternEngine extends StringPatternEngine {
     /**
      * Creates and returns a random pattern.
      * 
+     * @param songContext the song context
+     *
      * @return the random pattern
      */
 
@@ -228,8 +231,8 @@ public class RandomPatternEngine extends StringPatternEngine {
                     PatternEntry entry = offsets[random.nextInt(offsets.length)];
                     boolean isWildcard = entry.isWildcard;
 
-                    double v = (1.0d - pitchVelocityCorrelation) * random.nextDouble()
-                            + (pitchDiff == 0 ? 0 : pitchVelocityCorrelation * ((isWildcard ? previousPitch : entry.offset) - minPitch) / pitchDiff);
+                    double v = (1.0d - pitchVelocityCorrelation) * random.nextDouble() + (pitchDiff == 0 ? 0
+                            : pitchVelocityCorrelation * ((isWildcard ? previousPitch : entry.offset) - minPitch) / pitchDiff);
 
                     int velocity = (int) RandomUtils.getPowerDouble(v, minVelocity, maxVelocity, velocityExponent);
 

@@ -104,6 +104,7 @@ public class CrescendoPatternEngine extends StringPatternEngine {
      * Generates a pattern that is based on the given pattern of patterns. Each element of the pattern pattern represents a variation of the base
      * pattern specified by the first character each.
      * 
+     * @param songContext the song context
      * @param patternPattern the string of pattern characters (comma-separated)
      * 
      * @return the generated pattern
@@ -150,6 +151,7 @@ public class CrescendoPatternEngine extends StringPatternEngine {
     /**
      * Appends the given pattern to the given StringBuilder.
      * 
+     * @param songContext the song context
      * @param sb the StringBuilder
      * @param pattern the pattern
      * @param tick the current tick

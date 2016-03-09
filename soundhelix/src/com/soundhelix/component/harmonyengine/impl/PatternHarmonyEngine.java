@@ -27,9 +27,9 @@ import com.soundhelix.util.XMLUtils;
  * backreference to an already generated chord at an earlier position ("$0" for first chord, "$1" for second chord, etc.). If a random table number is
  * given, a chord is randomly chosen from that table. Chord random tables a comma-separated lists of chord names (e.g., "Am,G,F,Em,Dm"), they are
  * numbered starting from 0. For example, the chord pattern "Am/4,0/4,0!1/4,$1/4" means "A minor for 4 beats, a random chord from random table 0 for 4
- * beats, a random chord from random table 0 but not the same as the one from position 1 for 4 beats and the second chord again for 4
- * beats" and could result in the chord sequence "Am/4,F/4,G/4,F/4" (given suitable random tables). Normally, each chord pattern is an individual
- * chord section. A pattern can be split into two or more chord sections by using "+" signs directly before a chord/length combination (e.g.,
+ * beats, a random chord from random table 0 but not the same as the one from position 1 for 4 beats and the second chord again for 4 beats
+ * " and could result in the chord sequence "Am/4,F/4,G/4,F/4" (given suitable random tables). Normally, each chord pattern is an individual chord
+ * section. A pattern can be split into two or more chord sections by using "+" signs directly before a chord/length combination (e.g.,
  * "Am/4,F/4,G/4,C/4,+Am/4,F/4,G/4,Em/4").
  * 
  * @author Thomas Schuerger (thomas@schuerger.com)
@@ -329,13 +329,10 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
                             // try again
                             return createPattern();
                         }
-                    } while (Chord.parseChord(chord, getCrossoverPitchValue(chordPattern)).equalsNormalized(
-                            Chord.parseChord(prevChord, getCrossoverPitchValue(chordPattern)))
-                            || i == count - 1
-                            && chord.equals(firstChord)
-                            || notrefnum >= 0
-                            && Chord.parseChord(chord, getCrossoverPitchValue(chordPattern)).equalsNormalized(
-                                    Chord.parseChord(chordList.get(notrefnum), getCrossoverPitchValue(chordPattern))));
+                    } while (Chord.parseChord(chord, getCrossoverPitchValue(chordPattern)).equalsNormalized(Chord.parseChord(prevChord,
+                            getCrossoverPitchValue(chordPattern))) || i == count - 1 && chord.equals(firstChord) || notrefnum >= 0 && Chord
+                                    .parseChord(chord, getCrossoverPitchValue(chordPattern)).equalsNormalized(Chord.parseChord(chordList.get(
+                                            notrefnum), getCrossoverPitchValue(chordPattern))));
                 } else {
                     // we have a note, take the note (include 'm' suffix, if present)
                     chord = spec[0];
@@ -445,7 +442,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
         private Boolean minimizeChordDistance;
         private Integer crossoverPitch;
 
-        public ChordPattern(String chordPattern, Boolean minimizeChordDistance, Integer crossoverPitch) {
+        ChordPattern(String chordPattern, Boolean minimizeChordDistance, Integer crossoverPitch) {
             this.chordPattern = chordPattern;
             this.minimizeChordDistance = minimizeChordDistance;
             this.crossoverPitch = crossoverPitch;

@@ -54,9 +54,9 @@ public class RandomPatternEngine extends StringPatternEngine {
     /** The list of offsets to choose from. The list may contain values more than once for extra weight. */
     private PatternEntry[] offsets = {};
     /** The list of note lengths to choose from. The list may contain values more than once for extra weight. */
-    private int[] noteLengths = { 1, 2, 3, 2, 1, 1 };
+    private int[] noteLengths = {1, 2, 3, 2, 1, 1};
     /** The list of pause lengths to choose from. The list may contain values more than once for extra weight. */
-    private int[] pauseLengths = { 1, 2, 3, 2, 1, 1 };
+    private int[] pauseLengths = {1, 2, 3, 2, 1, 1};
     /** The minimum number of active ticks. */
     private int minActiveTicks = 1;
     /** The maximum number of active ticks. */

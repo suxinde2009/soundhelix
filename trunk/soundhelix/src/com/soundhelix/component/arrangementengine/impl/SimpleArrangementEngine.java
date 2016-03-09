@@ -90,7 +90,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
         private int operands;
 
-        private ActivityVectorModificationOperator(int operands) {
+        ActivityVectorModificationOperator(int operands) {
             this.operands = operands;
         }
     }
@@ -1101,7 +1101,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         int[] startActivityCounts = XMLUtils.parseIntegerListString(random, "startActivityCounts", node);
 
         if (startActivityCounts == null) {
-            startActivityCounts = new int[] { 1, 2, 3 };
+            startActivityCounts = new int[] {1, 2, 3};
         }
 
         setStartActivityCounts(startActivityCounts);
@@ -1109,7 +1109,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         int[] stopActivityCounts = XMLUtils.parseIntegerListString(random, "stopActivityCounts", node);
 
         if (stopActivityCounts == null) {
-            stopActivityCounts = new int[] { 3, 2, 1 };
+            stopActivityCounts = new int[] {3, 2, 1};
         }
 
         setStopActivityCounts(stopActivityCounts);
@@ -1528,10 +1528,10 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         /** Boolean indicating whether the activity vector is active within the stop interval. */
         private boolean activeInStopInterval;
 
-        public ActivityVectorState() {
+        ActivityVectorState() {
         }
 
-        public ActivityVectorState(ActivityVectorState state) {
+        ActivityVectorState(ActivityVectorState state) {
             this.activeCount = state.activeCount;
             this.segments = state.segments;
             this.segmentLength = state.segmentLength;

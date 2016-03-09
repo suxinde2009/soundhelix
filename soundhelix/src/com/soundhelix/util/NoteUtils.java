@@ -7,7 +7,7 @@ import com.soundhelix.misc.Chord;
 
 /**
  * Implements some static methods for converting notes to pitches and vice versa. Note names can be provided either using sharp or flat notation (e.g.
- * "g#" and "ab" are equal). When pitches are converted to note names, always the sharp notation is used.
+ * "G#" and "Ab" are equal).
  * 
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
@@ -45,7 +45,7 @@ public final class NoteUtils {
     }
 
     /**
-     * Returns the sharp note name of the given pitch in lower-case. The pitch is normalized first (between 0 and 11).
+     * Returns the sharp note name of the given pitch. The pitch is normalized first (between 0 and 11).
      * 
      * @param pitch the pitch
      * 
@@ -57,7 +57,7 @@ public final class NoteUtils {
     }
 
     /**
-     * Returns the flat note name of the given pitch in lower-case. The pitch is normalized first (between 0 and 11).
+     * Returns the flat note name of the given pitch. The pitch is normalized first (between 0 and 11).
      * 
      * @param pitch the pitch
      * 
@@ -69,7 +69,7 @@ public final class NoteUtils {
     }
 
     /**
-     * Returns the note pitch of the given note (between 0 and 11), ignoring case. If the note is invalid, Integer.MIN_VALUE is returned.
+     * Returns the note pitch of the given note (between 0 and 11). If the note is invalid, Integer.MIN_VALUE is returned.
      * 
      * @param name the note name
      * 

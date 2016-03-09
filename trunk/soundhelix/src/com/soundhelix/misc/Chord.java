@@ -45,9 +45,9 @@ public class Chord {
     private static final Map<Integer, InversionType> INVERSION_TYPE_MAP = new HashMap<Integer, InversionType>();
 
     /** The chord templates. */
-    private static ChordTemplate[] chordTemplates = { new ChordTemplate("", 4, 7), new ChordTemplate("m", 3, 7), new ChordTemplate("7", 4, 10),
+    private static ChordTemplate[] chordTemplates = {new ChordTemplate("", 4, 7), new ChordTemplate("m", 3, 7), new ChordTemplate("7", 4, 10),
             new ChordTemplate("m7", 3, 10), new ChordTemplate("aug", 4, 8), new ChordTemplate("dim", 3, 6), new ChordTemplate("sus4", 5, 7),
-            new ChordTemplate("sus2", 2, 7) };
+            new ChordTemplate("sus2", 2, 7)};
 
     /** The low pitch of the chord. */
     private final int lowPitch;
@@ -79,9 +79,12 @@ public class Chord {
                 int flavor6 = getFlavor(12 - diff2, diff1 + 12 - diff2);
                 int flavor4 = getFlavor(diff2 - diff1, 12 - diff1);
 
-                NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i).toUpperCase() + chordTemplate.name, getCode(i, flavor));
-                NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i).toUpperCase() + chordTemplate.name + "6", getCode((i + diff2) % 12, flavor6));
-                NAME_TO_CODE_MAP.put(NoteUtils.getNoteName(i).toUpperCase() + chordTemplate.name + "4", getCode((i + diff1) % 12, flavor4));
+                NAME_TO_CODE_MAP.put(NoteUtils.getSharpNoteName(i) + chordTemplate.name, getCode(i, flavor));
+                NAME_TO_CODE_MAP.put(NoteUtils.getFlatNoteName(i) + chordTemplate.name, getCode(i, flavor));
+                NAME_TO_CODE_MAP.put(NoteUtils.getSharpNoteName(i) + chordTemplate.name + "6", getCode((i + diff2) % 12, flavor6));
+                NAME_TO_CODE_MAP.put(NoteUtils.getFlatNoteName(i) + chordTemplate.name + "6", getCode((i + diff2) % 12, flavor6));
+                NAME_TO_CODE_MAP.put(NoteUtils.getSharpNoteName(i) + chordTemplate.name + "4", getCode((i + diff1) % 12, flavor4));
+                NAME_TO_CODE_MAP.put(NoteUtils.getFlatNoteName(i) + chordTemplate.name + "4", getCode((i + diff1) % 12, flavor4));
 
                 // order is important here; for "aug" chords, all flavors are equal, and the inversion type should be NONE
 

@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Random;
 
-import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -46,7 +45,7 @@ public final class SongUtils {
     private static final boolean ENABLE_SCHEMA_VALIDATION = false;
 
     /** The XSD schema to use for schema validation. */
-    private static final String VALIDATION_SCHEMA_FILENAME = "SoundHelix.xsd";
+    private static final String VALIDATION_SCHEMA_FILENAME = "resources/SoundHelix.xsd";
 
     /**
      * Private constructor.
@@ -275,12 +274,14 @@ public final class SongUtils {
 
         if (ENABLE_SCHEMA_VALIDATION) {
             // create a SchemaFactory capable of understanding WXS schemas
-            SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            SchemaFactory factory = SchemaFactory.newInstance("http://www.w3.org/XML/XMLSchema/v1.1");
             Schema schema = factory.newSchema(new StreamSource(new File(VALIDATION_SCHEMA_FILENAME)));
 
             // validate the DOM tree against the schema
 
+            long time = System.currentTimeMillis();
             schema.newValidator().validate(new DOMSource(doc));
+            LOGGER.debug("XML validation took " + (System.currentTimeMillis() - time) + " ms");
         }
 
         return doc;
@@ -357,7 +358,8 @@ public final class SongUtils {
 
         if (version != null && !version.equals("")) {
             if (!VersionUtils.checkVersion(BuildConstants.VERSION, version)) {
-                throw new RuntimeException("Application version " + BuildConstants.VERSION + " does not match allowed version(s) \"" + version + "\"");
+                throw new RuntimeException("Application version " + BuildConstants.VERSION + " does not match allowed version(s) \"" + version
+                        + "\"");
             }
         }
     }

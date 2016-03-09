@@ -291,7 +291,7 @@ public final class HarmonyUtils {
         if (maxSegmentLength == 0) {
             return null;
         } else {
-            return new int[] { minSegmentLength, maxSegmentLength, minPauseLength < Integer.MAX_VALUE ? minPauseLength : 0, maxPauseLength };
+            return new int[] {minSegmentLength, maxSegmentLength, minPauseLength < Integer.MAX_VALUE ? minPauseLength : 0, maxPauseLength};
         }
     }
 

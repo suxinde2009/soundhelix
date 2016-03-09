@@ -300,9 +300,9 @@ public class SoundHelix implements Runnable {
      */
 
     private static Getopt parseParameters(String[] args) {
-        LongOpt[] longopts = new LongOpt[] { new LongOpt("help", LongOpt.NO_ARGUMENT, null, 'h'), new LongOpt("version", LongOpt.NO_ARGUMENT, null,
+        LongOpt[] longopts = new LongOpt[] {new LongOpt("help", LongOpt.NO_ARGUMENT, null, 'h'), new LongOpt("version", LongOpt.NO_ARGUMENT, null,
                 'v'), new LongOpt("song-name", LongOpt.REQUIRED_ARGUMENT, null, 's'), new LongOpt("show-midi-devices", LongOpt.NO_ARGUMENT, null,
-                        'm'), };
+                        'm')};
 
         return new Getopt("SoundHelix", args, "-hvs:m", longopts);
     }
@@ -381,7 +381,7 @@ public class SoundHelix implements Runnable {
         /** The player. */
         private Player player;
 
-        public ShutdownRunnable(Player player) {
+        ShutdownRunnable(Player player) {
             this.player = player;
         }
 

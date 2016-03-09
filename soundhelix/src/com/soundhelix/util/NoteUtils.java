@@ -1,30 +1,39 @@
 package com.soundhelix.util;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 import com.soundhelix.misc.Chord;
 
 /**
- * Implements some static methods for converting notes to pitches and vice versa.
+ * Implements some static methods for converting notes to pitches and vice versa. Note names can be provided either using sharp or flat notation (e.g.
+ * "g#" and "ab" are equal). When pitches are converted to note names, always the sharp notation is used.
  * 
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public final class NoteUtils {
     /** Array of notes that are on the C/Am scale, starting with C. */
-    private static final boolean[] SCALE_TABLE = new boolean[] { true, false, true, false, true, true, false, true, false, true, false, true };
+    private static final boolean[] SCALE_TABLE = new boolean[] {true, false, true, false, true, true, false, true, false, true, false, true};
 
-    /** The list of all note names, starting with C. */
-    private static String[] noteNames = { "c", "c#", "d", "d#", "e", "f", "f#", "g", "g#", "a", "a#", "b" };
+    /** The list of all note names (using sharp), starting with C. */
+    private static String[] sharpNoteNames = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
+
+    /** The list of all note names (using flat), starting with C. */
+    private static String[] flatNoteNames = {"C", "Db", "D", "Eb", "E", "F", "Ab", "G", "Gb", "A", "Bb", "B"};
 
     /** Maps note names to normalized pitches. */
-    private static Map<String, Integer> h = new HashMap<String, Integer>();
+    private static Map<String, Integer> noteMap = new HashMap<String, Integer>();
 
     static {
-        // build a reverse lookup table for noteNames
+        // build a reverse lookup table for sharpNoteNames and flatNoteNames
+
         for (int i = 0; i < 12; i++) {
-            h.put(noteNames[i], i);
+            noteMap.put(sharpNoteNames[i], i);
+        }
+
+        for (int i = 0; i < 12; i++) {
+            noteMap.put(flatNoteNames[i], i);
         }
     }
 
@@ -36,15 +45,27 @@ public final class NoteUtils {
     }
 
     /**
-     * Returns the note name of the given pitch in lower-case. The pitch is normalized first (between 0 and 11).
+     * Returns the sharp note name of the given pitch in lower-case. The pitch is normalized first (between 0 and 11).
      * 
      * @param pitch the pitch
      * 
      * @return the pitch name
      */
 
-    public static String getNoteName(int pitch) {
-        return noteNames[((pitch % 12) + 12) % 12];
+    public static String getSharpNoteName(int pitch) {
+        return sharpNoteNames[(pitch % 12 + 12) % 12];
+    }
+
+    /**
+     * Returns the flat note name of the given pitch in lower-case. The pitch is normalized first (between 0 and 11).
+     * 
+     * @param pitch the pitch
+     * 
+     * @return the pitch name
+     */
+
+    public static String getFlatNoteName(int pitch) {
+        return flatNoteNames[(pitch % 12 + 12) % 12];
     }
 
     /**
@@ -60,7 +81,7 @@ public final class NoteUtils {
             return Integer.MIN_VALUE;
         }
 
-        Integer pitch = h.get(name.toLowerCase());
+        Integer pitch = noteMap.get(name);
 
         if (pitch == null) {
             return Integer.MIN_VALUE;
@@ -78,7 +99,7 @@ public final class NoteUtils {
      */
 
     public static boolean isOnScale(int pitch) {
-        return SCALE_TABLE[((pitch % 12) + 12) % 12];
+        return SCALE_TABLE[(pitch % 12 + 12) % 12];
     }
 
     /**

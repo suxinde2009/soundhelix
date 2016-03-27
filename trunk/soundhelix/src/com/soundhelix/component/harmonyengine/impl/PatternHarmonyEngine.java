@@ -439,8 +439,19 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
         /** The chord pattern string. */
         private String chordPattern;
 
+        /** The flag indicating whether chord distances should be minimized (may be null). */
         private Boolean minimizeChordDistance;
+
+        /** The cross-over pitch (may be null). */
         private Integer crossoverPitch;
+
+        /**
+         * Constructor.
+         * 
+         * @param chordPattern the chord pattern
+         * @param minimizeChordDistance flag indicating whether chord distances should be minimized
+         * @param crossoverPitch the cross-over pitch
+         */
 
         ChordPattern(String chordPattern, Boolean minimizeChordDistance, Integer crossoverPitch) {
             this.chordPattern = chordPattern;

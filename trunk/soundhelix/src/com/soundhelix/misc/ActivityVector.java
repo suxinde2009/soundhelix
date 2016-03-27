@@ -200,6 +200,13 @@ public class ActivityVector {
         bitSet.set(from, till, state);
     }
 
+    /**
+     * Flips all bits of the ActivityVector in the given tick range.
+     * 
+     * @param from the from tick (inclusive)
+     * @param till the till tick (exclusive)
+     */
+
     public void flipActivityState(int from, int till) {
         if (till > totalTicks) {
             totalTicks = till;

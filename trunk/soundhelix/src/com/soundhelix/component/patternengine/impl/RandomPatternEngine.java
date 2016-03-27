@@ -414,6 +414,15 @@ public class RandomPatternEngine extends StringPatternEngine {
         this.maxActiveTicks = maxActiveTicks;
     }
 
+    /**
+     * Parses an XML node consisting of pattern entries.
+     * 
+     * @param random the random generator
+     * @param path the XML path
+     * @param parentNode the parent node
+     * @return the array of pattern entries
+     */
+
     private static PatternEntry[] parsePatternEntryListString(Random random, String path, Node parentNode) {
         String string = XMLUtils.parseString(random, path, parentNode);
 
@@ -456,9 +465,21 @@ public class RandomPatternEngine extends StringPatternEngine {
         /** The wildcard flag. */
         private boolean isWildcard;
 
+        /**
+         * Constructor.
+         * 
+         * @param offset the offset
+         */
+
         private PatternEntry(int offset) {
             this.offset = offset;
         }
+
+        /**
+         * Constructor.
+         * 
+         * @param wildcard the wildcard character
+         */
 
         private PatternEntry(char wildcard) {
             this.wildcard = wildcard;

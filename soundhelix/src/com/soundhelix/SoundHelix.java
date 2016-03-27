@@ -54,17 +54,39 @@ public class SoundHelix implements Runnable {
     /** The song name. */
     private String songName;
 
+    /**
+     * Constructor.
+     * 
+     * @param url the SoundHelix XML URL
+     * @param randomSeed the random seed
+     */
+
     public SoundHelix(URL url, long randomSeed) {
         this.url = url;
         this.randomSeed = randomSeed;
         this.songName = null;
     }
 
+    /**
+     * Constructor.
+     * 
+     * @param url the SoundHelix XML URL
+     * @param songName the song name
+     */
+
     public SoundHelix(URL url, String songName) {
         this.url = url;
         this.randomSeed = 0;
         this.songName = songName;
     }
+
+    /**
+     * The main method.
+     * 
+     * @param args the arguments
+     * 
+     * @throws Exception in case of any problem
+     */
 
     public static void main(String[] args) throws Exception {
         Getopt g = parseParameters(args);
@@ -380,6 +402,12 @@ public class SoundHelix implements Runnable {
     private static class ShutdownRunnable implements Runnable {
         /** The player. */
         private Player player;
+
+        /**
+         * Constructor.
+         * 
+         * @param player the player
+         */
 
         ShutdownRunnable(Player player) {
             this.player = player;

@@ -722,7 +722,7 @@ public class MidiPlayer extends AbstractPlayer {
             long mpqn = 60000000000L / milliBPM;
 
             MetaMessage mt = new MetaMessage();
-            byte[] bt = { (byte) (mpqn / 65536 & 0xFF), (byte) (mpqn / 256 & 0xFF), (byte) (mpqn & 0xFF) };
+            byte[] bt = {(byte) (mpqn / 65536 & 0xFF), (byte) (mpqn / 256 & 0xFF), (byte) (mpqn & 0xFF)};
             mt.setMessage(0x51, bt, 3);
             metaTrack.add(new MidiEvent(mt, 0L));
 
@@ -1102,6 +1102,14 @@ public class MidiPlayer extends AbstractPlayer {
         }
     }
 
+    /**
+     * Returns an array consisting of the first activity tick (inclusive) and the last activity tick (exclusive). If the ActivityVector is never
+     * active, null is returned.
+     * 
+     * @param activityVectorName the name of the ActivityVector
+     * @return the array (or null)
+     */
+
     private int[] getActivityVectorActivity(String activityVectorName) {
         ActivityVector av = songContext.getActivityMatrix().get(activityVectorName);
 
@@ -1115,7 +1123,7 @@ public class MidiPlayer extends AbstractPlayer {
         int end = av.getLastActiveTick() + 1;
 
         if (start >= 0) {
-            ticks = new int[] { start, end };
+            ticks = new int[] {start, end};
         } else {
             ticks = null;
         }
@@ -1224,7 +1232,7 @@ public class MidiPlayer extends AbstractPlayer {
                 if (controller.equals("milliBPM")) {
                     long mpqn = 60000000000L / value;
                     MetaMessage mt = new MetaMessage();
-                    byte[] bt = { (byte) (mpqn / 65536 & 0xFF), (byte) (mpqn / 256 & 0xFF), (byte) (mpqn & 0xFF) };
+                    byte[] bt = {(byte) (mpqn / 65536 & 0xFF), (byte) (mpqn / 256 & 0xFF), (byte) (mpqn & 0xFF)};
                     mt.setMessage(0x51, bt, 3);
 
                     for (Device d : devices) {
@@ -1263,7 +1271,7 @@ public class MidiPlayer extends AbstractPlayer {
                 if (controller.equals("milliBPM")) {
                     long mpqn = 60000000000L / value;
                     MetaMessage mt = new MetaMessage();
-                    byte[] bt = { (byte) (mpqn / 65536 & 0xFF), (byte) (mpqn / 256 & 0xFF), (byte) (mpqn & 0xFF) };
+                    byte[] bt = {(byte) (mpqn / 65536 & 0xFF), (byte) (mpqn / 256 & 0xFF), (byte) (mpqn & 0xFF)};
                     mt.setMessage(0x51, bt, 3);
 
                     for (Device d : devices) {
@@ -1549,7 +1557,7 @@ public class MidiPlayer extends AbstractPlayer {
                     return null;
                 } else {
                     // both startTick and endTick contain a proper value
-                    return new int[] { startTick, endTick };
+                    return new int[] {startTick, endTick};
                 }
             }
         }
@@ -1784,8 +1792,8 @@ public class MidiPlayer extends AbstractPlayer {
                 activityVector = XMLUtils.parseString(random, "activityVector", nodeList.item(i));
             } catch (Exception e) {}
 
-            if (rotationUnit.equals("activity") && (instrument == null || instrument.equals(""))
-                    && (activityVector == null || activityVector.equals(""))) {
+            if (rotationUnit.equals("activity") && (instrument == null || instrument.equals("")) && (activityVector == null || activityVector.equals(
+                    ""))) {
                 throw new RuntimeException("Rotation unit \"activity\" requires an instrument or an ActivityVector");
             }
 
@@ -1907,6 +1915,19 @@ public class MidiPlayer extends AbstractPlayer {
         device.receiver.send(sm, -1);
     }
 
+    /**
+     * Adds a MIDI message to the given MIDI track.
+     * 
+     * @param track the MIDI track
+     * @param tick the tick
+     * @param channel the MIDI channel number
+     * @param status the MIDI status
+     * @param data1 the first data byte
+     * @param data2 the second data byte
+     * 
+     * @throws InvalidMidiDataException in case of a MIDI error
+     */
+
     private void sendMidiMessage(javax.sound.midi.Track track, int tick, int channel, int status, int data1, int data2)
             throws InvalidMidiDataException {
         ShortMessage sm = new ShortMessage();
@@ -1928,6 +1949,16 @@ public class MidiPlayer extends AbstractPlayer {
         sm.setMessage(status);
         device.receiver.send(sm, -1);
     }
+
+    /**
+     * Adds a MIDI message to the given MIDI track.
+     * 
+     * @param track the MIDI track
+     * @param tick the MIDI tick
+     * @param status the MIDI status
+     * 
+     * @throws InvalidMidiDataException in case of a MIDI error
+     */
 
     private void sendMidiMessage(javax.sound.midi.Track track, int tick, int status) throws InvalidMidiDataException {
         ShortMessage sm = new ShortMessage();

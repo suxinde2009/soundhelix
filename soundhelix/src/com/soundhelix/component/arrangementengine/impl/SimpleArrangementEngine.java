@@ -70,6 +70,10 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         GREEDY
     }
 
+    /**
+     * The ActivityVector modification operators.
+     */
+
     private enum ActivityVectorModificationOperator {
         /** Set bits (0 operands, 1 target). */
         SET(0),
@@ -88,7 +92,14 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         /** Logical AND (2 operands, 1 target). */
         XOR(2);
 
+        /** The number of operands. */
         private int operands;
+
+        /**
+         * Constructor.
+         * 
+         * @param operands the number of operands
+         */
 
         ActivityVectorModificationOperator(int operands) {
             this.operands = operands;
@@ -127,6 +138,10 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
     /** The activity vevtor modifications. */
     private ActivityVectorModification[] activityVectorModifications;
+
+    /**
+     * Constructor.
+     */
 
     public SimpleArrangementEngine() {
         super();
@@ -353,6 +368,16 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
             avc.activityVector.shiftIntervalBoundaries(avc.startShift, avc.stopShift);
         }
     }
+
+    /**
+     * Creates an ActivityMatrix that fulfills all constraints.
+     * 
+     * @param songContext the song context
+     * @param activityVectorConfigurations the ActivityVector configurations
+     * @return the ActivityMatrix
+     * 
+     * @throws RuntimeException in case the constraints could not be fulfilled
+     */
 
     private ActivityMatrix createExactConstrainedActivityVectors(SongContext songContext,
             ActivityVectorConfiguration[] activityVectorConfigurations) {
@@ -1404,6 +1429,10 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         this.stopActivityCounts = stopActivityCounts;
     }
 
+    /**
+     * Represents an arrangement entry.
+     */
+
     private static final class ArrangementEntry {
         /** The instrument name. */
         private final String instrument;
@@ -1420,6 +1449,16 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         /** The names of ActivityVectors. */
         private final String[] activityVectorNames;
 
+        /**
+         * Constructor.
+         * 
+         * @param instrument the instrument name
+         * @param sequenceEngine the SequenceEngine
+         * @param transposition the transposition
+         * @param velocity the velocity
+         * @param activityVectorNames the ActivityVector names
+         */
+
         private ArrangementEntry(String instrument, SequenceEngine sequenceEngine, int transposition, int velocity, String[] activityVectorNames) {
             this.instrument = instrument;
             this.sequenceEngine = sequenceEngine;
@@ -1428,6 +1467,10 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
             this.activityVectorNames = activityVectorNames;
         }
     }
+
+    /**
+     * Container for ActivityVector configurations.
+     */
 
     private static final class ActivityVectorConfiguration {
         /** The name. */
@@ -1540,12 +1583,34 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
     }
 
     private static final class ActivityVectorModification {
-        ActivityVectorModificationOperator operator;
-        String from;
-        String to;
-        String operand1;
-        String operand2;
-        String target;
+        /** The operator. */
+        private ActivityVectorModificationOperator operator;
+
+        /** The from tick. */
+        private String from;
+
+        /** The till tick. */
+        private String to;
+
+        /** The first ActivityVector operand. */
+        private String operand1;
+
+        /** The second ActivityVector operand. */
+        private String operand2;
+
+        /** The target ActivityVector operand. */
+        private String target;
+
+        /**
+         * Constructor.
+         * 
+         * @param operator the operator
+         * @param from the from tick
+         * @param to the to tick
+         * @param operand1 the first operand
+         * @param operand2 the second operand
+         * @param target the target operand
+         */
 
         private ActivityVectorModification(ActivityVectorModificationOperator operator, String from, String to, String operand1, String operand2,
                 String target) {

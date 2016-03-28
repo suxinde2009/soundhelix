@@ -45,6 +45,7 @@ public class ActivityMatrix implements Iterable<ActivityVector> {
         if (name == null) {
             return null;
         }
+
         return map.get(name);
     }
 
@@ -79,6 +80,7 @@ public class ActivityMatrix implements Iterable<ActivityVector> {
         Map<String, Integer> map = new HashMap<String, Integer>(size());
 
         int i = 0;
+
         for (ActivityVector vector : this) {
             map.put(vector.getName(), Integer.valueOf(i++));
         }

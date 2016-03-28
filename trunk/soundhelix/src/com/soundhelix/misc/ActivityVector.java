@@ -38,7 +38,8 @@ public class ActivityVector {
     }
 
     /**
-     * Constructor. Initializes the internal BitSet's initial size to the given number of bits.
+     * Constructor. Initializes the internal BitSet's initial size to the given number of bits. This method should be used when the final number of
+     * bits is (roughly) known in advance.
      * 
      * @param name the name
      * @param bits the initial number of bits
@@ -110,7 +111,11 @@ public class ActivityVector {
             int num = bitSet.nextSetBit(tick);
 
             if (num == -1) {
-                return totalTicks - tick;
+                if (tick >= totalTicks) {
+                    return 0;
+                } else {
+                    return totalTicks - tick;
+                }
             } else {
                 return num - tick;
             }
@@ -351,7 +356,7 @@ public class ActivityVector {
     }
 
     /**
-     * Applies a logical AND between the two BitSet operands and replaces the given range of this ActivityVector's BitSet with the result.
+     * Applies a logical NOT to the BitSet operand and replaces the given range of this ActivityVector's BitSet with the result.
      * 
      * @param operand the operand
      * @param fromTick the from tick (inclusive)
@@ -360,7 +365,7 @@ public class ActivityVector {
 
     public void applyLogicalNot(ActivityVector operand, int fromTick, int tillTick) {
         if (operand.getTicks() != totalTicks) {
-            throw new IllegalArgumentException("Operands must have the same number of ticks as the target");
+            throw new IllegalArgumentException("Operand must have the same number of ticks as the target");
         }
 
         try {
@@ -399,7 +404,7 @@ public class ActivityVector {
     }
 
     /**
-     * Applies a logical AND between the two BitSet operands and replaces the given range of this ActivityVector's BitSet with the result.
+     * Applies a logical AND NOT between the two BitSet operands and replaces the given range of this ActivityVector's BitSet with the result.
      * 
      * @param operand1 the first operand
      * @param operand2 the second operand
@@ -449,7 +454,7 @@ public class ActivityVector {
     }
 
     /**
-     * Applies a logical OR between the two BitSet operands and replaces the given range of this ActivityVector's BitSet with the result.
+     * Applies a logical XOR between the two BitSet operands and replaces the given range of this ActivityVector's BitSet with the result.
      * 
      * @param operand1 the first operand
      * @param operand2 the second operand

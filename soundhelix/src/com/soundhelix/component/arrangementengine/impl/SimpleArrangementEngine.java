@@ -370,10 +370,11 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
     }
 
     /**
-     * Creates an ActivityMatrix that fulfills all constraints.
+     * Creates an ActivityMatrix that fulfills all constraints. The algorithm uses randomized backtracking for finding such an ActivityMatrix.
      * 
      * @param songContext the song context
      * @param activityVectorConfigurations the ActivityVector configurations
+     *
      * @return the ActivityMatrix
      * 
      * @throws RuntimeException in case the constraints could not be fulfilled
@@ -400,9 +401,6 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
         int[] startActivityCounts = processActivityCounts(this.startActivityCounts, vectors);
         int[] stopActivityCounts = processActivityCounts(this.stopActivityCounts, vectors);
-
-        int increaseTill = Math.min(sections / 2, startActivityCounts.length) - 1;
-        int decreaseFrom = sections - Math.min(sections / 2, stopActivityCounts.length + 1);
 
         BitSet[] bitSets = new BitSet[sections];
         int[] tries = new int[sections];
@@ -457,8 +455,8 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
             // note that the wanted AV acount can be different when backtracking and returning to a section where
             // have been before; this is a wanted behavior of the algorithm in order to increase the exploration
             // space
-            int wantedCount = getWantedActivityVectorCount(section, sections, maxActivityVectors, lastWantedCount, increaseTill, decreaseFrom,
-                    startActivityCounts, stopActivityCounts);
+            int wantedCount = getWantedActivityVectorCount(section, sections, maxActivityVectors, lastWantedCount, startActivityCounts,
+                    stopActivityCounts);
 
             int diff = wantedCount - lastWantedCount;
 
@@ -657,6 +655,15 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         return convertBitSetsToActivityVectors(songContext, activityVectorConfigurations, bitSets);
     }
 
+    /**
+     * Creates an ActivityMatrix that fulfills all or most of the constraints, based on a greedy algorithm.
+     * 
+     * @param songContext the song context
+     * @param activityVectorConfigurations the ActivityVector configurations
+     *
+     * @return the ActivityMatrix
+     */
+
     private ActivityMatrix createGreedyConstrainedActivityVectors(SongContext songContext,
             ActivityVectorConfiguration[] activityVectorConfigurations) {
 
@@ -679,9 +686,6 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
         int[] startActivityCounts = processActivityCounts(this.startActivityCounts, vectors);
         int[] stopActivityCounts = processActivityCounts(this.stopActivityCounts, vectors);
-
-        int increaseTill = Math.min(sections / 2, startActivityCounts.length) - 1;
-        int decreaseFrom = sections - Math.min(sections / 2, stopActivityCounts.length + 1);
 
         BitSet[] bitSets = new BitSet[sections];
 
@@ -720,8 +724,8 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
             List<ActivityVectorState[]> minStatesList = new ArrayList<ActivityVectorState[]>();
 
             while (tries++ < maxIterations) {
-                int wantedCount = getWantedActivityVectorCount(section, sections, maxActivityVectors, lastWantedCount, increaseTill, decreaseFrom,
-                        startActivityCounts, stopActivityCounts);
+                int wantedCount = getWantedActivityVectorCount(section, sections, maxActivityVectors, lastWantedCount, startActivityCounts,
+                        stopActivityCounts);
 
                 int diff = wantedCount - lastWantedCount;
 
@@ -1050,9 +1054,24 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         return pos;
     }
 
-    private int getWantedActivityVectorCount(int section, int sections, int maxActivityVectors, int lastCount, int increaseTill, int decreaseFrom,
-            int[] startActivityCounts, int[] stopActivityCounts) {
+    /**
+     * Returns the number of wanted ActivityVectors for the given section.
+     *
+     * @param section the chord section number
+     * @param sections the total number of chord sections
+     * @param maxActivityVectors the maximum number of ActivityVectors
+     * @param lastCount the number of ActivityVectors of the previous chord section
+     * @param startActivityCounts the start activity counts of the song
+     * @param stopActivityCounts the stop activity counts of the song
+     * @return the wanted number of active ActivityVectors
+     */
+
+    private int getWantedActivityVectorCount(int section, int sections, int maxActivityVectors, int lastCount, int[] startActivityCounts,
+            int[] stopActivityCounts) {
         int count;
+
+        int increaseTill = Math.min(sections / 2, startActivityCounts.length) - 1;
+        int decreaseFrom = sections - Math.min(sections / 2, stopActivityCounts.length + 1);
 
         if (section <= increaseTill) {
             // in fade-in phase

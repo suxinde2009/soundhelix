@@ -237,6 +237,7 @@ SoundHelix checkstyle configuration
     </module>
     <module name="Indentation">
       <property name="severity" value="info"/>
+      <property name="lineWrappingIndentation" value="8"/>
     </module>
     <module name="MissingOverride">
       <property name="severity" value="warning"/>

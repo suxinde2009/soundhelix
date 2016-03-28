@@ -2044,7 +2044,15 @@ public class MidiPlayer extends AbstractPlayer {
         /** Flag for using MIDI clock synchronization. */
         private boolean useClockSynchronization;
 
-        public Device(String name, String midiName, boolean useClockSynchronization) {
+        /**
+         * Constructor.
+         * 
+         * @param name the device name
+         * @param midiName the MIDI device name
+         * @param useClockSynchronization flag indicating whether clock synchronization should be used
+         */
+
+        private Device(String name, String midiName, boolean useClockSynchronization) {
             if (name == null || name.equals("")) {
                 throw new IllegalArgumentException("Name must not be null or empty");
             }
@@ -2095,6 +2103,10 @@ public class MidiPlayer extends AbstractPlayer {
         }
     }
 
+    /**
+     * Represents a synchronization device.
+     */
+
     private final class SyncDevice {
         /** The system's MIDI device name. */
         private final String midiName;
@@ -2105,7 +2117,13 @@ public class MidiPlayer extends AbstractPlayer {
         /** The MIDI transmitter. */
         private Transmitter transmitter;
 
-        public SyncDevice(String midiName) {
+        /**
+         * Constructor.
+         * 
+         * @param midiName the MIDI device name
+         */
+
+        private SyncDevice(String midiName) {
             if (midiName == null || midiName.equals("")) {
                 throw new IllegalArgumentException("MIDI device name must not be null or empty");
             }
@@ -2207,7 +2225,16 @@ public class MidiPlayer extends AbstractPlayer {
         /** The value of the MIDI controller. */
         private int value;
 
-        public ControllerValue(String deviceName, int channel, String controller, int value) {
+        /**
+         * Constructor.
+         * 
+         * @param deviceName the device name
+         * @param channel the MIDI channel number
+         * @param controller the controller number
+         * @param value the controller value
+         */
+
+        private ControllerValue(String deviceName, int channel, String controller, int value) {
             this.deviceName = deviceName;
             this.channel = channel;
             this.controller = controller;
@@ -2246,7 +2273,21 @@ public class MidiPlayer extends AbstractPlayer {
         /** The value last sent to the MIDI controller. */
         private int lastSentValue;
 
-        public InstrumentControllerLFO(String deviceName, int channel, String controller, String instrument, String lfoName, int minAmplitude,
+        /**
+         * Constructor.
+         * 
+         * @param deviceName the device name
+         * @param channel the MIDI channel number
+         * @param controller the MIDI controller number
+         * @param instrument the instrument name
+         * @param lfoName the LFO name
+         * @param minAmplitude the minimum amplitude
+         * @param maxAmplitude the maximum amplitude
+         * @param minValue the minimum value
+         * @param maxValue the maximum value
+         */
+
+        private InstrumentControllerLFO(String deviceName, int channel, String controller, String instrument, String lfoName, int minAmplitude,
                 int maxAmplitude, int minValue, int maxValue) {
             this.deviceName = deviceName;
             this.channel = channel;
@@ -2295,7 +2336,21 @@ public class MidiPlayer extends AbstractPlayer {
         /** The value last sent to the MIDI controller. */
         private int lastSentValue;
 
-        public ControllerLFO(LFO lfo, String deviceName, int channel, String controller, String activityVector, String instrument, double speed,
+        /**
+         * Constructor.
+         * 
+         * @param lfo the LFO
+         * @param deviceName the device name
+         * @param channel the MIDI channel number
+         * @param controller the MIDI controller number
+         * @param activityVector the ActivityVector name
+         * @param instrument the instrument name
+         * @param speed the speed
+         * @param rotationUnit the rotation unit
+         * @param phase the phase
+         */
+
+        private ControllerLFO(LFO lfo, String deviceName, int channel, String controller, String activityVector, String instrument, double speed,
                 String rotationUnit, double phase) {
             this.lfo = lfo;
             this.deviceName = deviceName;
@@ -2319,13 +2374,28 @@ public class MidiPlayer extends AbstractPlayer {
         /** The number of bytes. */
         private int byteCount;
 
-        public MidiController(int status, int byteCount) {
+        /**
+         * Constructor.
+         * 
+         * @param status the MIDI status
+         * @param byteCount the number of bytes
+         */
+
+        private MidiController(int status, int byteCount) {
             this.status = status;
             this.parameter = -1;
             this.byteCount = byteCount;
         }
 
-        public MidiController(int status, int parameter, int byteCount) {
+        /**
+         * Constructor.
+         * 
+         * @param status the MIDI status
+         * @param parameter the parameter
+         * @param byteCount the number of bytes
+         */
+
+        private MidiController(int status, int parameter, int byteCount) {
             this.status = status;
             this.parameter = parameter;
             this.byteCount = byteCount;
@@ -2359,7 +2429,14 @@ public class MidiPlayer extends AbstractPlayer {
         /** The maximum window size for BPM calculation. */
         private int maxWindowSize = 24;
 
-        public MidiClockReceiver(int minWindowSize, int maxWindowSize) {
+        /**
+         * Constructor.
+         * 
+         * @param minWindowSize the minimum window size
+         * @param maxWindowSize the maximum window size
+         */
+
+        private MidiClockReceiver(int minWindowSize, int maxWindowSize) {
             if (minWindowSize < 1) {
                 throw new IllegalArgumentException("minWindowSize must be >= 1");
             }

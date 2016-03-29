@@ -16,7 +16,7 @@ import java.util.zip.GZIPOutputStream;
 /**
  * Represents an arrangement. An arrangement consists of pairs of Tracks and instruments.
  * 
- * @see Track
+ * @see com.soundhelix.misc.Track
  * 
  * @author Thomas Schuerger (thomas@schuerger.com)
  */

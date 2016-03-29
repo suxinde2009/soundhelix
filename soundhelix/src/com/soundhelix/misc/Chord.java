@@ -120,11 +120,11 @@ public class Chord {
         int highPitch = max;
 
         if (lowPitch == middlePitch || middlePitch == highPitch) {
-            throw new RuntimeException("Duplicate pitches in chord " + this);
+            throw new IllegalArgumentException("Duplicate pitches in chord " + this);
         }
 
         if (highPitch - lowPitch >= 12) {
-            throw new RuntimeException("High and low pitch are more than 11 halftones apart in chord " + this);
+            throw new IllegalArgumentException("High and low pitch are more than 11 halftones apart in chord " + this);
         }
 
         this.lowPitch = lowPitch;
@@ -254,11 +254,10 @@ public class Chord {
     }
 
     /**
-     * Normalizes the chord. Any major, minor or diminished chord with first or second inversion will be converted to its counterpart without
-     * inversion. For all other chords the original chord will be returned. Augmented chords cannot be normalized, because they don't have a unique
-     * root pitch.
+     * Returns a normalized version of the chord. Any chord with first or second inversion will be converted to its counterpart without inversion. For
+     * all other chords the original chord will be returned. Augmented chords cannot be normalized, because they don't have a unique root pitch.
      * 
-     * @return the chord
+     * @return the normalized chord
      */
 
     public Chord normalize() {
@@ -462,7 +461,7 @@ public class Chord {
     }
 
     /**
-     * Chord template. Consists of a name and 2 pitch differences from the root pitch.
+     * Chord template. Consists of a name fragment (e.g. "m" for minor, "" for major) and 2 pitch differences from the root pitch.
      */
 
     private static final class ChordTemplate {

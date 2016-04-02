@@ -52,10 +52,10 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
     private int maxPitch = 12;
 
     /** The number of melodies to generate per distinct chord section. */
-    private int[] melodies = { 1 };
+    private int[] melodies = {1};
 
     /** The pitch distances. */
-    private int[] pitchDistances = new int[] { -2, -1, 0, 1, 2 };
+    private int[] pitchDistances = new int[] {-2, -1, 0, 1, 2};
 
     /** The input pattern for melodies. */
     private Pattern pattern;
@@ -133,7 +133,40 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
 
         Track track = new Track(TrackType.MELODIC);
         track.add(seq);
+        // track.add(generateAdditionalMelody(songContext, seq, secondMelodyPitchDeltas));
         return track;
+    }
+
+    /**
+     * Generates a sequence for a second melody for the given melody. This is done by transposing each pitch up by a major or minor third.
+     * 
+     * @param songContext the song context
+     * @param melody the melody
+     * @param pitchDeltas the pitch deltas
+     * 
+     * @return the second melody
+     */
+
+    @SuppressWarnings("unused")
+    private Sequence generateAdditionalMelody(SongContext songContext, Sequence melody, int[] pitchDeltas) {
+        Sequence seq = new Sequence(songContext);
+
+        for (Sequence.SequenceEntry entry : melody) {
+            if (entry.isNote()) {
+                int pitchDelta = pitchDeltas[(entry.getPitch() % 12 + 12) % 12];
+
+                if (pitchDelta >= 0) {
+                    seq.addNote(entry.getPitch() + pitchDelta, entry.getTicks(), entry.getVelocity(), entry.isLegato());
+                } else {
+                    // no valid pitch delta available, use pause instead
+                    seq.addPause(entry.getTicks());
+                }
+            } else {
+                seq.addPause(entry.getTicks());
+            }
+        }
+
+        return seq;
     }
 
     /**
@@ -296,8 +329,8 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
                     } else if (entry.isWildcard() && entry.getWildcardCharacter() == FREE) {
                         pitch = getRandomPitch(pitch);
                         list.add(new PatternEntry(pitch, entry.getVelocity(), t, entry.isLegato()));
-                    } else if (entry.isWildcard() && entry.getWildcardCharacter() == REPEAT && previousPitch != Integer.MIN_VALUE
-                            && chord.containsPitch(pitch)) {
+                    } else if (entry.isWildcard() && entry.getWildcardCharacter() == REPEAT && previousPitch != Integer.MIN_VALUE && chord
+                            .containsPitch(pitch)) {
                         // reuse the previous pitch
                         list.add(new PatternEntry(pitch, entry.getVelocity(), t, entry.isLegato()));
                     } else if (!entry.isWildcard() || entry.getWildcardCharacter() == ON_CHORD) {

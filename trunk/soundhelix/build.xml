@@ -131,7 +131,7 @@
        </exec>
        <echo>Extracting compressed javadoc</echo>
        <exec executable="ssh">
-            <arg line="soundhelix.com 'cd soundhelix.com/public_html/javadoc/current &amp;&amp; \\rm -rf * &amp;&amp; tar -zxvf ~/javadoc.tar.gz --warning=no-timestamp &amp;&amp; find . -type f -exec chmod a+r {} \\; &amp;&amp; find . -type d -exec chmod a+rx {} \\;'"/>
+            <arg line="soundhelix.com 'cd soundhelix.com/public_html/javadoc/current &amp;&amp; \\rm -rf *;tar -zxvf ~/javadoc.tar.gz --warning=no-timestamp &amp;&amp; find . -type f -exec chmod a+r {} \\; &amp;&amp; find . -type d -exec chmod a+rx {} \\;'"/>
        </exec>
     </target>
 
@@ -146,7 +146,7 @@
        </exec>
        <echo>Extracting compressed javadoc</echo>
        <exec executable="ssh">
-            <arg line="soundhelix.com 'cd soundhelix.com/public_html/javadoc/release &amp;&amp; \\rm -rf * &amp;&amp; tar -zxvf ~/javadoc.tar.gz --warning=no-timestamp &amp;&amp; find . -type f -exec chmod a+r {} \\; &amp;&amp; find . -type d -exec chmod a+rx {} \\;'"/>
+            <arg line="soundhelix.com 'cd soundhelix.com/public_html/javadoc/release &amp;&amp; \\rm -rf *;tar -zxvf ~/javadoc.tar.gz --warning=no-timestamp &amp;&amp; find . -type f -exec chmod a+r {} \\; &amp;&amp; find . -type d -exec chmod a+rx {} \\;'"/>
        </exec>
     </target>
 

@@ -45,6 +45,9 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
     /** The wildcard for repeated pitch. */
     private static final char REPEAT = '*';
 
+    /** The pitch delta for invalid pitches. */
+    private static final int INVALID = Integer.MIN_VALUE;
+
     /** The minimum pitch to use. */
     private int minPitch = -3;
 
@@ -62,6 +65,10 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
 
     /** The random generator. */
     private Random random;
+
+    /**
+     * Constructor.
+     */
 
     public MelodySequenceEngine() {
         super();
@@ -133,12 +140,12 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
 
         Track track = new Track(TrackType.MELODIC);
         track.add(seq);
-        // track.add(generateAdditionalMelody(songContext, seq, secondMelodyPitchDeltas));
         return track;
     }
 
     /**
-     * Generates a sequence for a second melody for the given melody. This is done by transposing each pitch up by a major or minor third.
+     * Generates a sequence for an additional melody for the given melody. This is done by transposing each pitch up or down based on the given pitch
+     * deltas.
      * 
      * @param songContext the song context
      * @param melody the melody
@@ -155,7 +162,7 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
             if (entry.isNote()) {
                 int pitchDelta = pitchDeltas[(entry.getPitch() % 12 + 12) % 12];
 
-                if (pitchDelta >= 0) {
+                if (pitchDelta != INVALID) {
                     seq.addNote(entry.getPitch() + pitchDelta, entry.getTicks(), entry.getVelocity(), entry.isLegato());
                 } else {
                     // no valid pitch delta available, use pause instead
@@ -218,7 +225,7 @@ public class MelodySequenceEngine extends AbstractSequenceEngine {
     }
 
     /**
-     * Returns a random pitch which is near the given pitch and is one of the given chords notes.
+     * Returns a random pitch which is near the given pitch and is one of the given chords' notes.
      * 
      * @param chord the chord
      * @param pitch the starting pitch

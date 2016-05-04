@@ -17,6 +17,9 @@ Change log
       restarted from the beginning on each chord section change, each chord change or never, respectively. For backwards compatibility, the default
       is to never restart the pattern.
 
+    - Added two more pattern expansion operators, "+" for transposing pattern up, "-" for transposing pattern down, using the syntax "(pattern)+delta"
+      or "(pattern)-delta", respectively. For example, "2/2,(1/2,2/2,-1/2,4/2)+2" is expanded to "2/2,3/2,4/2,1/2,6/2".
+
     - Changed the DrumSequenceEngine implementation to allow referring to ActivityVectors in conditional patterns'/LFO's conditions even if
       they are not provided in the ActivityVector list of the DrumSequenceEngine. This removes the need to apply the workaround of using dummy
       patterns.
@@ -64,7 +67,7 @@ Change log
       for a number of times before giving up. This makes it possible to use fragments of different lengths at the same time.
 
     - Added support for nested pattern expansion in the chord patterns of the PatternHarmonyEngine, using the syntax "(string)*count".
-      For example, instead of using "Am/4,F/4,Am/4,F/4,Am/4,F/4,G/4,C/4" in a pattern string you can now use (Am/4,F/4)*3,G/4,C/4" instead.
+      For example, instead of using "Am/4,F/4,Am/4,F/4,Am/4,F/4,G/4,C/4" in a pattern string you can now use "(Am/4,F/4)*3,G/4,C/4" instead.
 
     - Added support for using "-" in the RandomPatternEngine and the RandomFragmentPatternEngine in order to create an empty pattern.
       For example, you can now use "A1,-,A2,-".

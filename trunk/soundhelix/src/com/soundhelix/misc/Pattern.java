@@ -21,13 +21,16 @@ public class Pattern implements Iterable<PatternEntry> {
     private static final Logger LOGGER = Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
 
     /** The pattern for matching groups. */
-    private static final java.util.regex.Pattern GROUP_PATTERN = java.util.regex.Pattern.compile("\\(([^()]+)\\)\\*(\\d+)");
+    private static final java.util.regex.Pattern GROUP_PATTERN = java.util.regex.Pattern.compile("\\(([^()]+)\\)([*+\\-])(\\d+)");
 
     /** The pattern for matching groups. */
     private static final java.util.regex.Pattern GROUP_CHAR_PATTERN = java.util.regex.Pattern.compile("[()]");
 
     /** The pattern for matching functions. */
     private static final java.util.regex.Pattern FUNCTION_PATTERN = java.util.regex.Pattern.compile("([0-9A-Za-z]+)\\((([^,)]*,)*[^,)]*)\\)");
+
+    /** The pattern for matching integers with optional sign. */
+    private static final java.util.regex.Pattern TRANSPOSITION_PATTERN = java.util.regex.Pattern.compile("(?<=^|,)(-?\\d+)");
 
     /** The PatternEntry array. */
     private PatternEntry[] pattern;
@@ -185,7 +188,7 @@ public class Pattern implements Iterable<PatternEntry> {
      * @return the expanded pattern string
      */
 
-    public static String expandPatternString(String patternString, char separator) {
+    public static String expandPatternString(String patternString) {
         if (patternString == null || patternString.equals("")) {
             return null;
         }
@@ -199,8 +202,29 @@ public class Pattern implements Iterable<PatternEntry> {
 
             while (matcher.find()) {
                 String str = matcher.group(1);
-                int multiplier = Integer.parseInt(matcher.group(2));
-                matcher.appendReplacement(sb, Matcher.quoteReplacement(multiply(str, multiplier, separator)));
+                char operator = matcher.group(2).charAt(0);
+                int number = Integer.parseInt(matcher.group(3));
+
+                String replacement;
+
+                switch (operator) {
+                    case '*':
+                        replacement = multiply(str, number);
+                        break;
+
+                    case '+':
+                        replacement = transpose(str, number);
+                        break;
+
+                    case '-':
+                        replacement = transpose(str, -number);
+                        break;
+
+                    default:
+                        throw new RuntimeException("Invalid operator \"" + operator + "\"");
+                }
+
+                matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
                 found = true;
             }
 
@@ -287,7 +311,7 @@ public class Pattern implements Iterable<PatternEntry> {
      * @return the multiplied string
      */
 
-    private static String multiply(String str, int count, char separator) {
+    private static String multiply(String str, int count) {
         int len = str.length();
 
         if (len == 0 || count == 0) {
@@ -298,11 +322,40 @@ public class Pattern implements Iterable<PatternEntry> {
 
         for (int i = 0; i < count; i++) {
             if (i > 0) {
-                sb.append(separator);
+                sb.append(',');
             }
 
             sb.append(str);
         }
+
+        return sb.toString();
+    }
+
+    /**
+     * Transposes the pattern string by the given delta.
+     * 
+     * @param str the string
+     * @param delta the transposition delta
+     *
+     * @return the multiplied string
+     */
+
+    private static String transpose(String str, int delta) {
+        if (delta == 0) {
+            // nothing to do
+            return str;
+        }
+
+        StringBuffer sb = new StringBuffer(str.length());
+
+        Matcher matcher = TRANSPOSITION_PATTERN.matcher(str);
+
+        while (matcher.find()) {
+            int number = Integer.valueOf(matcher.group(1));
+            matcher.appendReplacement(sb, String.valueOf(number + delta));
+        }
+
+        matcher.appendTail(sb);
 
         return sb.toString();
     }
@@ -343,7 +396,7 @@ public class Pattern implements Iterable<PatternEntry> {
 
     private static String expand(String patternString) {
         patternString = evaluateFunctions(patternString);
-        patternString = expandPatternString(patternString, ',');
+        patternString = expandPatternString(patternString);
         return patternString;
     }
 

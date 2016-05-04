@@ -260,7 +260,7 @@ public class PatternHarmonyEngine extends AbstractHarmonyEngine {
 
         // choose a chord pattern at random
         ChordPattern chordPattern = chordPatterns[random.nextInt(chordPatterns.length)];
-        String[] chords = Pattern.expandPatternString(chordPattern.chordPattern, ',').split(",");
+        String[] chords = Pattern.expandPatternString(chordPattern.chordPattern).split(",");
 
         int count = chords.length;
 

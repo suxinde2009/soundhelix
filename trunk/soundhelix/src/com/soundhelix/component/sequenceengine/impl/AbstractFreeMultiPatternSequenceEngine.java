@@ -59,10 +59,16 @@ public abstract class AbstractFreeMultiPatternSequenceEngine extends AbstractSeq
             int patternLength = pattern.size();
             int pos = 0;
             int tick = 0;
+            int restartTick = 0;
 
             while (tick < ticks) {
+                if (tick >= restartTick) {
+                    pos = 0;
+                    restartTick = getNextPatternRestartTick(songContext, tick);
+                }
+
                 Pattern.PatternEntry entry = pattern.get(pos % patternLength);
-                int len = entry.getTicks();
+                int len = Math.min(entry.getTicks(), restartTick - tick);
 
                 if (activityVector.isActive(tick)) {
                     int vel = entry.getVelocity();

@@ -57,5 +57,7 @@ public class FreeMultiPatternSequenceEngine extends AbstractFreeMultiPatternSequ
         }
 
         setPatterns(patterns);
+
+        configurePatternRestartMode(random, node);
     }
 }

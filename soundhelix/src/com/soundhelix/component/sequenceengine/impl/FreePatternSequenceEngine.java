@@ -48,5 +48,7 @@ public class FreePatternSequenceEngine extends AbstractFreeMultiPatternSequenceE
 
         Pattern pattern = patternEngine.render(songContext, "");
         setPatterns(new Pattern[] {pattern});
+
+        configurePatternRestartMode(random, node);
     }
 }

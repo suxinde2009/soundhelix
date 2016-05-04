@@ -121,11 +121,17 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
             int patternLength = pattern.size();
             int pos = 0;
             int tick = 0;
+            int restartTick = 0;
 
             while (tick < ticks) {
+                if (tick >= restartTick) {
+                    pos = 0;
+                    restartTick = getNextPatternRestartTick(songContext, tick);
+                }
+
                 Pattern.PatternEntry entry = pattern.get(pos % patternLength);
                 int pitch = entry.getPitch();
-                int len = entry.getTicks();
+                int len = Math.min(entry.getTicks(), restartTick - tick);
 
                 if (activityVector.isActive(tick)) {
                     int vel = entry.getVelocity();
@@ -620,6 +626,8 @@ public class DrumSequenceEngine extends AbstractSequenceEngine {
         }
 
         setConditionalLFOEntries(conditionalLFOEntries);
+
+        configurePatternRestartMode(random, node);
     }
 
     /**

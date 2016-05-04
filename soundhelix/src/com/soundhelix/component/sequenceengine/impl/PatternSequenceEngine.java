@@ -60,7 +60,8 @@ public class PatternSequenceEngine extends AbstractMultiPatternSequenceEngine {
         }
 
         Pattern pattern = patternEngine.render(songContext, "" + TRANSITION);
-
         setPatterns(new Pattern[] {pattern});
+
+        configurePatternRestartMode(random, node);
     }
 }

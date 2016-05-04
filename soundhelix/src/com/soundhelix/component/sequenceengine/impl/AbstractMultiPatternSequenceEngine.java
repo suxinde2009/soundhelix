@@ -73,8 +73,14 @@ public abstract class AbstractMultiPatternSequenceEngine extends AbstractSequenc
             int patternLength = pattern.size();
             int pos = 0;
             int tick = 0;
+            int restartTick = 0;
 
             while (tick < ticks) {
+                if (tick >= restartTick) {
+                    pos = 0;
+                    restartTick = getNextPatternRestartTick(songContext, tick);
+                }
+
                 Chord chord = harmony.getChord(tick);
 
                 if (isNormalizeChords) {
@@ -82,7 +88,7 @@ public abstract class AbstractMultiPatternSequenceEngine extends AbstractSequenc
                 }
 
                 Pattern.PatternEntry entry = pattern.get(pos % patternLength);
-                int len = entry.getTicks();
+                int len = Math.min(entry.getTicks(), restartTick - tick);
 
                 if (activityVector.isActive(tick)) {
                     int vel = entry.getVelocity();
@@ -97,7 +103,7 @@ public abstract class AbstractMultiPatternSequenceEngine extends AbstractSequenc
                         int p = pos + 1;
                         int t = tick + len;
 
-                        while (t < ticks && (!pattern.get(p % patternLength).isNote())) {
+                        while (t < ticks && !pattern.get(p % patternLength).isNote()) {
                             t += pattern.get(p % patternLength).getTicks();
                             p++;
                         }

@@ -70,5 +70,7 @@ public class MultiPatternSequenceEngine extends AbstractMultiPatternSequenceEngi
         try {
             setNormalizeChords(XMLUtils.parseBoolean(random, "normalizeChords", node));
         } catch (Exception e) {}
+
+        configurePatternRestartMode(random, node);
     }
 }

@@ -10,23 +10,32 @@ Change log
 0.9u:
 
     - Added support to the SimpleArrangementEngine for modifying the ActivityVectors of the generated ActivityMatrix using the
-      "activityVectorModification" tag. Currently, the operators "set", "clear", "flip", "and", "andNot", "or" and "xor" are supported
-      on any chord section range of an ActivityVector. See the SimpleArrangementEngine documentation for more details.
+      "activityVectorModification" tag. Currently, the operators "set", "clear", "flip", "and", "andNot", "or" and "xor" are supported on any chord
+      section range of an ActivityVector. See the SimpleArrangementEngine documentation for more details.
+
+    - Added "patternRestartMode" tag to many of the SequenceEngine implementations, which allows to define whether the generated pattern should be
+      restarted from the beginning on each chord section change, each chord change or never, respectively. For backwards compatibility, the default
+      is to never restart the pattern.
 
     - Changed the DrumSequenceEngine implementation to allow referring to ActivityVectors in conditional patterns'/LFO's conditions even if
-      they are not provided in the ActivityVector list of the DrumSequenceEngine. This removes the need to apply the workaround of using
-      dummy patterns.
+      they are not provided in the ActivityVector list of the DrumSequenceEngine. This removes the need to apply the workaround of using dummy
+      patterns.
 
-    - Added support for specifying a crossoverPitch attribute per chordPattern tag in the PatternHarmonyEngine.
-      If set, this attribute allows you to override the global crossoverPitch value.
+    - Added support for specifying a crossoverPitch attribute per chordPattern tag in the PatternHarmonyEngine. If set, this attribute allows you to
+      override the global crossoverPitch value.
 
     - Added the chord types "sus2" and "sus4". Example chord names: "Csus2", "Csus24", "Csus26", "Csus4", "Csus44", "Csus46".
 
-    - Fixed a bug regarding the phase computation for LFOs running in "segmentPair" mode. Whenever the speed was set to something
-      other than 1, the off-segment's phase was incorrect.
+    - Chord names can now be provided also in flat notation (using "b" instead of "#"), e.g. "Ab7" and "G#7" are the same.
 
-    - Moved the MIDI device "gervill" to the beginning of the list of MIDI devices in all examples. Set the beforePlayWaitTicks value
-      to 16 in all examples. This will fix problems with Windows 10 (and possibly also Windows 8).
+    - Fixed a bug regarding the phase computation for LFOs running in "segmentPair" mode. Whenever the speed was set to something other than 1, the
+      off-segment's phase was incorrect.
+
+    - Moved the MIDI device "gervill" to the beginning of the list of MIDI devices in all examples. Set the beforePlayWaitTicks value to 16 in all
+      examples. This will fix problems with Windows 10 (and possibly also Windows 8).
+
+    - SoundHelix now requires Java 7 or later.
+
 
 
 0.8: 2015-04-28

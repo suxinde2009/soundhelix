@@ -180,10 +180,9 @@ public class Pattern implements Iterable<PatternEntry> {
     /**
      * Expands the given pattern string until no more expansion is possible. This method search for occurences of the pattern "(string)*count" and
      * replaces this with the string concatenated count times using the separator character in between. These constructs can be nested. The
-     * replacement starts with the innermost occurence.
+     * replacement starts with the innermost occurrence.
      * 
      * @param patternString the pattern string
-     * @param separator the separator character for pattern entries
      * 
      * @return the expanded pattern string
      */

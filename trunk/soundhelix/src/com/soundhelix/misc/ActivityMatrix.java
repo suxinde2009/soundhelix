@@ -2,8 +2,8 @@ package com.soundhelix.misc;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.Priority;
@@ -21,7 +21,7 @@ public class ActivityMatrix implements Iterable<ActivityVector> {
     private static final Logger LOGGER = Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
 
     /** The map that maps from names to ActivityVectors. */
-    private Map<String, ActivityVector> map = new LinkedHashMap<String, ActivityVector>();
+    private Map<String, ActivityVector> map = new TreeMap<String, ActivityVector>();
 
     /**
      * Adds the given ActivityVector. If an ActivityVector with the same name already exists, it will be replaced in its current position. Otherwise

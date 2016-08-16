@@ -88,7 +88,7 @@ public final class HarmonyUtils {
 
             // the chord section might end before a chord change occurs
             // therefore we need to use Math.min()
-            sb.append(Math.min(tickEnd - tick, len));
+            sb.append(NumberUtils.toString((double) Math.min(tickEnd - tick, len) / structure.getTicksPerBeat()));
 
             tick += len;
         }

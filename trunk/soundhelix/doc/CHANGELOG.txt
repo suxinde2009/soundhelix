@@ -1,4 +1,4 @@
-﻿SoundHelix
+SoundHelix
 ----------
 
 Author: Thomas Schürger (thomas@schuerger.com)
@@ -14,15 +14,14 @@ Change log
       section range of an ActivityVector. See the SimpleArrangementEngine documentation for more details.
 
     - Added "patternRestartMode" tag to many of the SequenceEngine implementations, which allows to define whether the generated pattern should be
-      restarted from the beginning on each chord section change, each chord change or never, respectively. For backwards compatibility, the default
-      is to never restart the pattern.
+      restarted from the beginning on each chord section change, each chord change or never, respectively. For backwards compatibility, the default is
+      to never restart the pattern.
 
     - Added two more pattern expansion operators, "+" for transposing pattern up, "-" for transposing pattern down, using the syntax "(pattern)+delta"
       or "(pattern)-delta", respectively. For example, "2/2,(1/2,2/2,-1/2,4/2)+2" is expanded to "2/2,3/2,4/2,1/2,6/2".
 
-    - Changed the DrumSequenceEngine implementation to allow referring to ActivityVectors in conditional patterns'/LFO's conditions even if
-      they are not provided in the ActivityVector list of the DrumSequenceEngine. This removes the need to apply the workaround of using dummy
-      patterns.
+    - Changed the DrumSequenceEngine implementation to allow referring to ActivityVectors in conditional patterns'/LFO's conditions even if they are
+      not provided in the ActivityVector list of the DrumSequenceEngine. This removes the need to apply the workaround of using dummy patterns.
 
     - Added support for specifying a crossoverPitch attribute per chordPattern tag in the PatternHarmonyEngine. If set, this attribute allows you to
       override the global crossoverPitch value.
@@ -43,44 +42,43 @@ Change log
 
 0.8: 2015-04-28
 
-    - Added support for conditional LFOs in the DrumSequenceEngine and the MidiPlayer. Similar to conditional patterns, a condition
-      can now trigger the usage of an LFO for creating an LFO sequence, which can be used in the MidiPlayer for remote-controlling
-      MIDI controllers. In the DrumSequenceEngine, a conditional LFO can be configured via the "conditionalLFO" tag, which can be
-      mapped to a MIDI controller in the MidiPlayer via the "instrumentControllerLFO" tag.
+    - Added support for conditional LFOs in the DrumSequenceEngine and the MidiPlayer. Similar to conditional patterns, a condition can now trigger
+      the usage of an LFO for creating an LFO sequence, which can be used in the MidiPlayer for remote-controlling MIDI controllers. In the
+      DrumSequenceEngine, a conditional LFO can be configured via the "conditionalLFO" tag, which can be mapped to a MIDI controller in the MidiPlayer
+      via the "instrumentControllerLFO" tag.
 
-    - Added support for velocity scaling in each track in the SimpleArrangementEngine via the new tag "velocity". Each track's note
-      velocity is scaled by a factor of the given velocity divided by the song's maximum velocity. For example, if the song's maximum
-      velocity is 1000 and you specify 500 in this tag, all velocities of all the track's sequences are halved.
+    - Added support for velocity scaling in each track in the SimpleArrangementEngine via the new tag "velocity". Each track's note velocity is scaled
+      by a factor of the given velocity divided by the song's maximum velocity. For example, if the song's maximum velocity is 1000 and you specify 500
+      in this tag, all velocities of all the track's sequences are halved.
 
-    - Added support for providing a ticks-per-beat value per pattern. If the actual ticks per beat of the song is different (but
-      compatible) all note/pause lengths of the pattern are scaled accordingly. For example, you can have a song with a ticks-per-beat
-      value of 12 and provide some patterns with a ticks-per-beat value of 4, which will then be scaled length-wise by a factor of 3.
-      The ticks per beat can be specified per pattern in the StringPatternEngine and in the CrescendoPatternEngine (using the attribute
-      "ticksPerBeat") and per pattern engine in the RandomPatternEngine and RandomFragmentPatternEngine using the tag "ticksPerBeat".
-      These new attributes/tags are optional. If they are not provided, no length scaling is performed.
+    - Added support for providing a ticks-per-beat value per pattern. If the actual ticks per beat of the song is different (but compatible) all
+      note/pause lengths of the pattern are scaled accordingly. For example, you can have a song with a ticks-per-beat value of 12 and provide some
+      patterns with a ticks-per-beat value of 4, which will then be scaled length-wise by a factor of 3.  The ticks per beat can be specified per
+      pattern in the StringPatternEngine and in the CrescendoPatternEngine (using the attribute "ticksPerBeat") and per pattern engine in the
+      RandomPatternEngine and RandomFragmentPatternEngine using the tag "ticksPerBeat".  These new attributes/tags are optional. If they are not
+      provided, no length scaling is performed.
 
-    - Added support for soloing and muting individual tracks via the track tag's attributes "solo" and "mute". If at least one track uses
-      solo="true", the song is generated only with the soloed tracks. Otherwise, all tracks which do not have mute="true" are used.
-      In any case, all unused ActivityVectors are ignored when the song's activity matrix is generated.
+    - Added support for soloing and muting individual tracks via the track tag's attributes "solo" and "mute". If at least one track uses solo="true",
+      the song is generated only with the soloed tracks. Otherwise, all tracks which do not have mute="true" are used.  In any case, all unused
+      ActivityVectors are ignored when the song's activity matrix is generated.
 
-    - Modified the RandomFragmentPatternEngine to regenerate a pattern from the given fragments if the target pattern length is too long
-      for a number of times before giving up. This makes it possible to use fragments of different lengths at the same time.
+    - Modified the RandomFragmentPatternEngine to regenerate a pattern from the given fragments if the target pattern length is too long for a number
+      of times before giving up. This makes it possible to use fragments of different lengths at the same time.
 
-    - Added support for nested pattern expansion in the chord patterns of the PatternHarmonyEngine, using the syntax "(string)*count".
-      For example, instead of using "Am/4,F/4,Am/4,F/4,Am/4,F/4,G/4,C/4" in a pattern string you can now use "(Am/4,F/4)*3,G/4,C/4" instead.
+    - Added support for nested pattern expansion in the chord patterns of the PatternHarmonyEngine, using the syntax "(string)*count".  For example,
+      instead of using "Am/4,F/4,Am/4,F/4,Am/4,F/4,G/4,C/4" in a pattern string you can now use "(Am/4,F/4)*3,G/4,C/4" instead.
 
-    - Added support for using "-" in the RandomPatternEngine and the RandomFragmentPatternEngine in order to create an empty pattern.
-      For example, you can now use "A1,-,A2,-".
+    - Added support for using "-" in the RandomPatternEngine and the RandomFragmentPatternEngine in order to create an empty pattern.  For example,
+      you can now use "A1,-,A2,-".
 
-    - Added support for using a global seed for a component via the "globalSeed" attribute. Unlike the "salt" attribute (which derives
-      the seed from the parent component's seed and the given salt), the "globalSeed" attribute derives the seed from the global seed
-      and the given global salt.
+    - Added support for using a global seed for a component via the "globalSeed" attribute. Unlike the "salt" attribute (which derives the seed from
+      the parent component's seed and the given salt), the "globalSeed" attribute derives the seed from the global seed and the given global salt.
 
-    - Controllers for LFOs can now be accessed by their MIDI controller number in addition to predefined names. This allows using
-      controllers where no predefined name exists.
+    - Controllers for LFOs can now be accessed by their MIDI controller number in addition to predefined names. This allows using controllers where no
+      predefined name exists.
 
-    - Added new example SoundHelix-Popcorn.xml. This song uses a ticks-per-beat value of 12 to support triplets. This is now the default
-      song when run.sh/run.bat is run without any parameters.
+    - Added new example SoundHelix-Popcorn.xml. This song uses a ticks-per-beat value of 12 to support triplets. This is now the default song when
+      run.sh/run.bat is run without any parameters.
 
     - Cleaned up code.
 
@@ -89,51 +87,50 @@ Change log
 
     - The option "--show-midi-devices" (alias "-m") now also shows devices with MIDI IN in additon to devices with MIDI OUT.
 
-    - Fixed a stupid bug that made the MIDI device detection fail if the first MIDI device in the <device> tag of the MidiPlayer is
-      not available in the system. A workaround is to put just the available MIDI device in the list.
-     
+    - Fixed a stupid bug that made the MIDI device detection fail if the first MIDI device in the <device> tag of the MidiPlayer is not available in
+      the system. A workaround is to put just the available MIDI device in the list.
+
 
 0.7: 2014-05-24
 
-    - Added support for function evaluation in pattern strings. The first function added is E(pulses, steps, on-fragment,
-      off-fragment), which expands to the Euclidean rhythm given by the given number of pulses and steps. See the Basics documentation
-      for details about pattern function evaluation.
+    - Added support for function evaluation in pattern strings. The first function added is E(pulses, steps, on-fragment, off-fragment), which expands
+      to the Euclidean rhythm given by the given number of pulses and steps. See the Basics documentation for details about pattern function evaluation.
 
-    - The MidiPlayer now supports receiving synchronization messages from an external MIDI device using the
-      "synchronizationDevice" tag. The synchronization device can supply MIDI timing ticks for remote-controlling SoundHelix'
-      BPM speed. It can also provide START/CONTINUE and STOP messages for starting/stopping playback remotely. SoundHelix will
-      wait for a START message if the "waitForStart" attribute is set to true, otherwise it will start playing automatically as before.
+    - The MidiPlayer now supports receiving synchronization messages from an external MIDI device using the "synchronizationDevice" tag. The
+      synchronization device can supply MIDI timing ticks for remote-controlling SoundHelix' BPM speed. It can also provide START/CONTINUE and STOP
+      messages for starting/stopping playback remotely. SoundHelix will wait for a START message if the "waitForStart" attribute is set to true,
+      otherwise it will start playing automatically as before.
 
-    - Added support for setting the maximum velocity using the "maxVelocity" tag in the "structure" tag (defaults to 32767 for
-      backwards compatibility). This sets the default note velocity if no velocity is provided as well as the scaling factor when
-      converting SoundHelix velocities to MIDI velocities. For example, instead of the (somewhat cumbersome) maximum of 32767,
-      you could choose to to set it to 1000 instead, providing velocites as per mill values, or to 100 to use percent values.
+    - Added support for setting the maximum velocity using the "maxVelocity" tag in the "structure" tag (defaults to 32767 for backwards
+      compatibility). This sets the default note velocity if no velocity is provided as well as the scaling factor when converting SoundHelix velocities
+      to MIDI velocities. For example, instead of the (somewhat cumbersome) maximum of 32767, you could choose to to set it to 1000 instead, providing
+      velocites as per mill values, or to 100 to use percent values.
 
-    - Added support for using version ranges in the "version" tag. Now a comma-separated list of version specifications can
-      be provided (each either "<version>", "<version>+" or "<version1>-<version2>" for application version checks in XML files.
+    - Added support for using version ranges in the "version" tag. Now a comma-separated list of version specifications can be provided (each either
+      "<version>", "<version>+" or "<version1>-<version2>" for application version checks in XML files.
 
-      Improved percussion example to use Euclidean rhythms.
-    
+    - Improved percussion example to use Euclidean rhythms.
+
     - Improved logging. Now the default log level is INFO, where the most important details (song title, etc.) are logged.
 
     - Removed obsolete classes RandomSequenceEngine and RandomPatternSequenceEngine.
-    
+
 
 0.6: 2013-04-17
 
-    - Added new experimental greedy constraint mode to the SimpleArrangement engine, which only approximates the ActivityVector
-      constraints, but is much faster and can be used for very large numbers of ActivityVectors and very long songs. Added tag
-      "constraintMode", which can be set to "exact" for the existing backtracking-based algorithm and to "greedy" for the new
-      greedy algorithm. Note that both modes use the "maxIterations" setting, but use the setting differently.
+    - Added new experimental greedy constraint mode to the SimpleArrangement engine, which only approximates the ActivityVector constraints, but is
+      much faster and can be used for very large numbers of ActivityVectors and very long songs. Added tag "constraintMode", which can be set to "exact"
+      for the existing backtracking-based algorithm and to "greedy" for the new greedy algorithm. Note that both modes use the "maxIterations" setting,
+      but use the setting differently.
 
-    - Added the new LFO synchronization mode "segmentPair", which synchronizes an LFO to the activity and pause segments of any
-      given ActivityVector. The first half of an LFO rotation will be in the active segment, the second half in the pause segment. 
+    - Added the new LFO synchronization mode "segmentPair", which synchronizes an LFO to the activity and pause segments of any given ActivityVector.
+      The first half of an LFO rotation will be in the active segment, the second half in the pause segment.
 
-    - The MidiPlayer now supports setting arbitrary MIDI controller values at the beginning of the song, using the "controllerValue"
-      tag. This allows, for example, to set relative MIDI volumes, panning, etc., per MIDI channel to fixed values.
+    - The MidiPlayer now supports setting arbitrary MIDI controller values at the beginning of the song, using the "controllerValue" tag. This allows,
+      for example, to set relative MIDI volumes, panning, etc., per MIDI channel to fixed values.
 
-    - The track configuration in the SimpleArrangementEngine now supports more than one "sequenceEngine" tag. One of the provided
-      SequenceEngines will be taken at random for the track.
+    - The track configuration in the SimpleArrangementEngine now supports more than one "sequenceEngine" tag. One of the provided SequenceEngines will
+      be taken at random for the track.
 
     - The MidiPlayer now creates the configured output MIDI file directory if it doesn't exist.
 
@@ -146,262 +143,240 @@ Change log
 
 0.5: 2012-10-07
 
-    - Added first version of the MIDI file export to the MidiPlayer. Use the tag "midiFilename" to define the MIDI filename template
-      for writing MIDI files (one for each MIDI device) between generating and playing a song.
+    - Added first version of the MIDI file export to the MidiPlayer. Use the tag "midiFilename" to define the MIDI filename template for writing MIDI
+      files (one for each MIDI device) between generating and playing a song.
 
-    - Added arbitrary skipping support to the MidiPlayer, including backward skipping. Skipping is now done instantaneously, muting
-      the MIDI channels first. Use "skip 0" to replay the current song from the beginning.
+    - Added arbitrary skipping support to the MidiPlayer, including backward skipping. Skipping is now done instantaneously, muting the MIDI channels
+      first. Use "skip 0" to replay the current song from the beginning.
 
-    - For the PatternHarmonyEngine the chord crossover pitch can now be defined using the "crossoverPitch" tag. Any chord with
-      a root pitch higher than or equal to this pitch will be transposed one octave down, otherwise the root node is taken as-is.
-      This is only done if the chord is specified by its name (e.g. "Am6") rather than by providing the pitches in
-      "pitch1:pitch2:pitch3" syntax. Previously, the crossover pitch always was between "D" and "D#" (i.e., starting with D#, the
-      chords were transposed one octave down, C, C# and D were not transposed). The crossover pitch defaults to this value (3 for
-      "D#") for backwards compatibility.
+    - For the PatternHarmonyEngine the chord crossover pitch can now be defined using the "crossoverPitch" tag. Any chord with a root pitch higher
+      than or equal to this pitch will be transposed one octave down, otherwise the root node is taken as-is.  This is only done if the chord is
+      specified by its name (e.g. "Am6") rather than by providing the pitches in "pitch1:pitch2:pitch3" syntax. Previously, the crossover pitch always
+      was between "D" and "D#" (i.e., starting with D#, the chords were transposed one octave down, C, C# and D were not transposed). The crossover
+      pitch defaults to this value (3 for "D#") for backwards compatibility.
 
-    - Added support for nested pattern expansion where pattern strings are used, using the syntax "(string)*count". For example,
-      instead of using "0/2,0/2,0/2,1/2,0/2,0/2,0/2,1/2" in a pattern string you can now use "((0/2)*3,1/2)*2" instead.
+    - Added support for nested pattern expansion where pattern strings are used, using the syntax "(string)*count". For example, instead of using
+      "0/2,0/2,0/2,1/2,0/2,0/2,0/2,1/2" in a pattern string you can now use "((0/2)*3,1/2)*2" instead.
 
-    - Added support for "fake" seventh chords, which use 3 instead of 4 notes. Seventh chords can be selected using a simple
-      syntax (e.g., "C7" for C major seventh, "Am76" for A minor seventh, second inversion).
+    - Added support for "fake" seventh chords, which use 3 instead of 4 notes. Seventh chords can be selected using a simple syntax (e.g., "C7" for C
+      major seventh, "Am76" for A minor seventh, second inversion).
 
-    - Added the tags "precondition" and "postcondition" to the "conditionalPattern" tag of the DrumSequenceEngine, which
-      replace the "condition" tag and have a much more user-friendly syntax for specifying the condition. For example, instead
-      of the old ugly syntax like "0--10>1--10", you can now use something like "-base,+clap,-snare" as the precondition and
-      "+base,+clap,-snare" as the postcondition. The "condition" tag is deprecated, but can still be used.
+    - Added the tags "precondition" and "postcondition" to the "conditionalPattern" tag of the DrumSequenceEngine, which replace the "condition" tag
+      and have a much more user-friendly syntax for specifying the condition. For example, instead of the old ugly syntax like "0--10>1--10", you can
+      now use something like "-base,+clap,-snare" as the precondition and "+base,+clap,-snare" as the postcondition. The "condition" tag is deprecated,
+      but can still be used.
 
     - Added LinearRandomLFO, which is an LFO that linearly interpolates between a given number of random values.
 
-    - Added usage of GNU Getopt 1.0.14 for cleaner parameter parsing. Run "java -jar SoundHelix.jar -h" to see the details.
-      Note that the syntax of the start script parameters (run.bat and run.sh) have been changed as well. Run "run.sh -h"
-      or "run.bat -h" to see the details. You can still run the two scripts without parameters to run SoundHelix with the default
-      XML file.
+    - Added usage of GNU Getopt 1.0.14 for cleaner parameter parsing. Run "java -jar SoundHelix.jar -h" to see the details.  Note that the syntax of
+      the start script parameters (run.bat and run.sh) have been changed as well. Run "run.sh -h" or "run.bat -h" to see the details. You can still run
+      the two scripts without parameters to run SoundHelix with the default XML file.
 
     - Added the possibility to list all available MIDI devices with MIDI IN by starting SoundHelix with the "-m" option.
 
     - Updated included log4j version from 1.2.16 to 1.2.17.
 
-    - Applied a number of refactoring operations (interfaces and implementations have moved into a different package structure,
-      some interfaces have been changed).
+    - Applied a number of refactoring operations (interfaces and implementations have moved into a different package structure, some interfaces have
+      been changed).
 
 
 0.4: 2012-03-13
 
-    - Made the MelodySequenceEngine much more configurable. You can now specify the minimum pitch ("minPitch" tag), the
-      maximum pitch ("maxPitch" tag) and the list of pitch distances ("pitchDistances" tag).
-    
-    - Added support for generating more than one melody per distinct chord section to the MelodySequenceEngine. You can
-      now provide a list of integers for the number of melodies to generate per distinct chord section. For each distinct
-      chord section a numer is chosen randomly from the list and that number of melodies are generated for the chord section.
-      The generated melodies for the distinct chord sections will be used in a round-robin manner each time the respective chord
-      section appears.
-    
-    - Added support for specifying a minimizeChordDistance attribute per chordPattern tag in the PatternHarmonyEngine.
-      If set, this attribute allows you to override the global minimizeChordDistance value.
+    - Made the MelodySequenceEngine much more configurable. You can now specify the minimum pitch ("minPitch" tag), the maximum pitch ("maxPitch" tag)
+      and the list of pitch distances ("pitchDistances" tag).
 
-    - Added "retriggerPitches" tag to the PadSequenceEngine. If set to true, all chord pitches will be retriggered on
-      every chord change. If set to false, only the chord pitches that have changed are untriggered/triggered, the other ones
-      are kept active. Defaults to true, because this was the behavior of version 0.3 and before.
+    - Added support for generating more than one melody per distinct chord section to the MelodySequenceEngine. You can now provide a list of integers
+      for the number of melodies to generate per distinct chord section. For each distinct chord section a numer is chosen randomly from the list and
+      that number of melodies are generated for the chord section.  The generated melodies for the distinct chord sections will be used in a
+      round-robin manner each time the respective chord section appears.
 
-    - Added tags "minAmplitude", "maxAmplitude", "minValue" and "maxValue" to the MidiPlayer's controller LFO configuration.
-      "minValue" and "maxValue" lets you set a lower and upper bound, respectively, to the value generated by the LFO. This
-      enables the user to shape existing LFO functions by cutting off the LFO function at the specified values. For example, you
-      can use a SawtoothLFO to fade out the volume at the end of the song by using an amplitude between 0 and e.g. 5000 and limiting
-      the maximum value to 127. Throughout the song the LFO will linearly decline from 5000 to 0 and will give 127 (maximum volume value)
-      for every LFO value above 127. This gives you full volume throughout the song, at the end the volume will decrease to 0.
-      An example for this is used in "SoundHelix-Piano2.xml". The tags "minimum" and "maximum" have been deprecated (but still work);
-      use their equivalent "minAmplitude" and "maxAmplitude" instead.
+    - Added support for specifying a minimizeChordDistance attribute per chordPattern tag in the PatternHarmonyEngine.  If set, this attribute allows
+      you to override the global minimizeChordDistance value.
 
-    - Added more supported MIDI controllers for LFO targets to the MidiPlayer: "volume", "variation", "timbre", "releaseTime",
-      "attackTime" and "brightness".
-    
-    - Changed the LFO implementations to use floating-point instead of fixed-point integer arithmetic. This greatly increases the LFO
-      precision.
-    
-    - Added support for providing the section number to skip to as a floating-point number in the remote control. This allows you to
-      skip to any position within a chord section (e.g., you can now use "skip #3.5" to skip into the middle of chord section 3).
-      
-    - Added support for unreleased versions (e.g., "0.4u", which is considered to be smaller than "0.4", but larger than
-      anything starting with "0.3").
+    - Added "retriggerPitches" tag to the PadSequenceEngine. If set to true, all chord pitches will be retriggered on every chord change. If set to
+      false, only the chord pitches that have changed are untriggered/triggered, the other ones are kept active. Defaults to true, because this was the
+      behavior of version 0.3 and before.
+
+    - Added tags "minAmplitude", "maxAmplitude", "minValue" and "maxValue" to the MidiPlayer's controller LFO configuration.  "minValue" and
+      "maxValue" lets you set a lower and upper bound, respectively, to the value generated by the LFO. This enables the user to shape existing LFO
+      functions by cutting off the LFO function at the specified values. For example, you can use a SawtoothLFO to fade out the volume at the end of the
+      song by using an amplitude between 0 and e.g. 5000 and limiting the maximum value to 127. Throughout the song the LFO will linearly decline from
+      5000 to 0 and will give 127 (maximum volume value) for every LFO value above 127. This gives you full volume throughout the song, at the end the
+      volume will decrease to 0.  An example for this is used in "SoundHelix-Piano2.xml". The tags "minimum" and "maximum" have been deprecated (but
+      still work); use their equivalent "minAmplitude" and "maxAmplitude" instead.
+
+    - Added more supported MIDI controllers for LFO targets to the MidiPlayer: "volume", "variation", "timbre", "releaseTime", "attackTime" and
+      "brightness".
+
+    - Changed the LFO implementations to use floating-point instead of fixed-point integer arithmetic. This greatly increases the LFO precision.
+
+    - Added support for providing the section number to skip to as a floating-point number in the remote control. This allows you to skip to any
+      position within a chord section (e.g., you can now use "skip #3.5" to skip into the middle of chord section 3).
+
+    - Added support for unreleased versions (e.g., "0.4u", which is considered to be smaller than "0.4", but larger than anything starting with
+      "0.3").
 
     - Fixed bug that treated negative chord offsets incorrectly.
 
-    - Fixed bug in the PatternHarmonyEngine that treated different inversions of the same chord as different when the
-      chord pattern was built (relevant for the "x!y" syntax). Now different inversions of the same chord are treated as
-      equal.
+    - Fixed bug in the PatternHarmonyEngine that treated different inversions of the same chord as different when the chord pattern was built
+      (relevant for the "x!y" syntax). Now different inversions of the same chord are treated as equal.
 
-    - Corrected the MidiPlayer's legato fix from the previous release, which lead to the note being immediately cut off
-      if the legato flag was used with the same pitch (e.g., "0~/4,0/4"). This situation is now treated as if the legato
-      flag were off.
+    - Corrected the MidiPlayer's legato fix from the previous release, which lead to the note being immediately cut off if the legato flag was used
+      with the same pitch (e.g., "0~/4,0/4"). This situation is now treated as if the legato flag were off.
 
     - The MIDI channels are now muted if the applet is stopped and the MidiPlayer is used.
-    
+
     - Added another simple example file "SoundHelix-Piano2.xml".
 
 
 0.3: 2011-10-01
 
-    - Rewrote the internals of the chord functionality and adapted all code accordingly. Now not only major and minor chords
-      are supported, but any 3-note chords which use 3 distinct pitches that do not span more than 11 halftones. Extended
-      the chord syntax to add inversion support to chords and added diminished and augmented chords ("dim" and "aug",
-      respectively, e.g., "Adim4" is a diminished A chord using first inversion, "Caug6" is an augmented C chord using second
-      inversion). Arbitrary chords can be provided with the syntax "pitch1:pitch2:pitch3". For example, "-7:-3:3" gives you the
-      non-standard chord using the pitches F, A and e.
+    - Rewrote the internals of the chord functionality and adapted all code accordingly. Now not only major and minor chords are supported, but any
+      3-note chords which use 3 distinct pitches that do not span more than 11 halftones. Extended the chord syntax to add inversion support to chords
+      and added diminished and augmented chords ("dim" and "aug", respectively, e.g., "Adim4" is a diminished A chord using first inversion, "Caug6" is
+      an augmented C chord using second inversion). Arbitrary chords can be provided with the syntax "pitch1:pitch2:pitch3". For example, "-7:-3:3"
+      gives you the non-standard chord using the pitches F, A and e.
 
-    - Chord lengths in the PatternHarmonyEngine can now be specified as fractions of beats instead of only whole beats
-      (e.g., you can now use "Am/7.5" for a chord that lasts 7.5 beats). Chord lengths are rounded to the nearest integer number
-      of ticks.  
-      
-    - Renamed the tag "obeyChordSubtype" (false/true) to "normalizeChords" (true/false). Normalizing a chord means converting
-      chords with first or second inversion (e.g., "Am4" or "Am6") to their normalized counterpart ("Am"), which has the root
-      note at its low pitch. Note that only minor, major and diminished chords are normalized if this is on, all other chords
-      are unchanged. Note also that "obeyChordSubtype" can still be used, but is deprecated; "normalizeChords" has higher
-      priority if both tags are present.
-      
-    - Added "minimizeChordDistance" tag to the PatternHarmonyEngine. If set to true, all chords will be rotated so that
-      their middle pitch is as close as possible to the first chord's middle pitch. This involves changing the inversion
-      type of the chords, if needed. Example: if you use "Am/4,C/4", this will effectively be converted to "Am/4,C6/4",
-      which leaves the middle pitch at "c" for both chords. Defaults to true, as this was always done in previous
-      versions. This can be "undone" by setting "normalizeChords" to "true" in the SequenceEngines where you would like
-      to only use the non-inverted versions of the chords.
-    
-    - Added CrescendoPatternEngine. This lets you generate a pattern from repeated pattern parts while changing the
-      velocity so that a crescendo or decrescendo is created. Comes in handy for the DrumSequenceEngine.
+    - Chord lengths in the PatternHarmonyEngine can now be specified as fractions of beats instead of only whole beats (e.g., you can now use "Am/7.5"
+      for a chord that lasts 7.5 beats). Chord lengths are rounded to the nearest integer number of ticks.
 
-    - Improved the DrumSequenceEngine to also check the precondition of conditional patterns for all chord section boundaries
-      crossed by the pattern. 
+    - Renamed the tag "obeyChordSubtype" (false/true) to "normalizeChords" (true/false). Normalizing a chord means converting chords with first or
+      second inversion (e.g., "Am4" or "Am6") to their normalized counterpart ("Am"), which has the root note at its low pitch. Note that only minor,
+      major and diminished chords are normalized if this is on, all other chords are unchanged. Note also that "obeyChordSubtype" can still be used, but
+      is deprecated; "normalizeChords" has higher priority if both tags are present.
 
-    - Added applet parameters "url" (sets the SoundHelix XML document URL) and "invisible" (hides all controls and
-      logging if set to "true", which is nice for embedding the applet into a webpage). Please see the documentation
-      about how to use the applet.
+    - Added "minimizeChordDistance" tag to the PatternHarmonyEngine. If set to true, all chords will be rotated so that their middle pitch is as close
+      as possible to the first chord's middle pitch. This involves changing the inversion type of the chords, if needed. Example: if you use "Am/4,C/4",
+      this will effectively be converted to "Am/4,C6/4", which leaves the middle pitch at "c" for both chords. Defaults to true, as this was always done
+      in previous versions. This can be "undone" by setting "normalizeChords" to "true" in the SequenceEngines where you would like to only use the
+      non-inverted versions of the chords.
 
-    - Added "beforePlayCommands" and "afterPlayCommands" to the MidiPlayer. This allows running external commands before
-      playing a song and after playing a song, respectively. For the former, the commands are run before waiting the
-      number of ticks configured in beforePlayWaitTicks, for the latter, the commands are run after waiting the number
-      of ticks in afterPlayWaitTicks.
+    - Added CrescendoPatternEngine. This lets you generate a pattern from repeated pattern parts while changing the velocity so that a crescendo or
+      decrescendo is created. Comes in handy for the DrumSequenceEngine.
 
-    - Added "skip" command to the remote control (usable in the console and the applet), which lets to you skip playing
-      to the specified tick, to the specified tick percentage, to the start of the given chord section number or to the
-      start of the next chord section during playback (type "help" in the console to see the different syntaxes). Added
-      skipping support to the MidiPlayer.
+    - Improved the DrumSequenceEngine to also check the precondition of conditional patterns for all chord section boundaries crossed by the pattern.
+
+    - Added applet parameters "url" (sets the SoundHelix XML document URL) and "invisible" (hides all controls and logging if set to "true", which is
+      nice for embedding the applet into a webpage). Please see the documentation about how to use the applet.
+
+    - Added "beforePlayCommands" and "afterPlayCommands" to the MidiPlayer. This allows running external commands before playing a song and after
+      playing a song, respectively. For the former, the commands are run before waiting the number of ticks configured in beforePlayWaitTicks, for the
+      latter, the commands are run after waiting the number of ticks in afterPlayWaitTicks.
+
+    - Added "skip" command to the remote control (usable in the console and the applet), which lets to you skip playing to the specified tick, to the
+      specified tick percentage, to the start of the given chord section number or to the start of the next chord section during playback (type "help"
+      in the console to see the different syntaxes). Added skipping support to the MidiPlayer.
 
     - The MelodySequenceEngine did not take velocity and legato flag of the provided pattern into account. Fixed.
-      
+
     - Fixed bug in the velocity generation of the RandomPatternEngine if the minimum and maximum pitch is the same.
 
-    - Fixed bug in the MidiPlayer where a NOTE_OFF for a legato pitch was skipped if the same pitch was used as in the
-      following note (e.g., "0~/4,0/4").
+    - Fixed bug in the MidiPlayer where a NOTE_OFF for a legato pitch was skipped if the same pitch was used as in the following note (e.g.,
+      "0~/4,0/4").
 
 
 0.2: 2011-07-31
 
-    - Completely rewrote the constraint fulfillment code in the SimpleArrangementEngine. Now a randomized backtracking
-      algorithm is used to find a song activity matrix which fulfills all constraints. The time required to find a valid
-      matrix is now a fraction of what it was before, even if more restrictive constraints are used. You might need to
-      increase the maxInterations parameter up to a million or more if you used that parameter before (it now defaults to
-      1000000).
+    - Completely rewrote the constraint fulfillment code in the SimpleArrangementEngine. Now a randomized backtracking algorithm is used to find a
+      song activity matrix which fulfills all constraints. The time required to find a valid matrix is now a fraction of what it was before, even if
+      more restrictive constraints are used. You might need to increase the maxInterations parameter up to a million or more if you used that parameter
+      before (it now defaults to 1000000).
 
-    - Added "seed" attribute which allows random seeding of a component by providing a constant 64-bit value (decimal
-      integer with sign). Added "salt" attribute which allows to set the random salt by providing a 32-bit value (decimal
-      integer with sign). Both attributes can be used for all tags where a "class" attribute is used for instantiating a class,
-      but not both can be used at the same time. The provided seed value will be used instead of deriving a seed from the
-      parent component or as a random seed salt for the seed derivation scheme, respectively. See the "Random seeds" section
-      of the documentation for details (http://www.soundhelix.com/doc/random-seeds).
+    - Added "seed" attribute which allows random seeding of a component by providing a constant 64-bit value (decimal integer with sign). Added "salt"
+      attribute which allows to set the random salt by providing a 32-bit value (decimal integer with sign). Both attributes can be used for all tags
+      where a "class" attribute is used for instantiating a class, but not both can be used at the same time. The provided seed value will be used
+      instead of deriving a seed from the parent component or as a random seed salt for the seed derivation scheme, respectively. See the "Random seeds"
+      section of the documentation for details (http://www.soundhelix.com/doc/random-seeds).
 
-    - Added "obeyChordSections" tag to the ArpeggioSequenceEngine. If set to true, a chord that spans a chord section boundary
-      will lead to a pattern being chosen that ends at the boundary rather than when the chord ends. Defaults to false.
+    - Added "obeyChordSections" tag to the ArpeggioSequenceEngine. If set to true, a chord that spans a chord section boundary will lead to a pattern
+      being chosen that ends at the boundary rather than when the chord ends. Defaults to false.
 
-    - Added "obeyChordSections" tag to the PadSequenceEngine. If set to true, a chord that spans a chord section boundary
-      will lead to retriggering the chord at the boundary. Defaults to false.
+    - Added "obeyChordSections" tag to the PadSequenceEngine. If set to true, a chord that spans a chord section boundary will lead to retriggering
+      the chord at the boundary. Defaults to false.
 
-    - Added the constraints "minSegmentLength" and "maxSegmentLength" to the SimpleArrangementEntry, which constrain the
-      minimum and maximum activity segment lengths, respectively, of an activity vector (counted in chord sections). The two
-      constraints will be ignored for an activity vector if the activity vector never becomes active.
+    - Added the constraints "minSegmentLength" and "maxSegmentLength" to the SimpleArrangementEntry, which constrain the minimum and maximum activity
+      segment lengths, respectively, of an activity vector (counted in chord sections). The two constraints will be ignored for an activity vector if
+      the activity vector never becomes active.
 
-    - Added the counterpart constraints "minPauseLength" and "maxPauseLength" to the SimpleArrangementEngine, which constrain
-      the minimum and maximum pause lengths, respectively, between activity segments (counted in chord sections).  The
-      constraints will be ignored for an activity vector if the activity vector is never active or only has one activity
-      segment.
+    - Added the counterpart constraints "minPauseLength" and "maxPauseLength" to the SimpleArrangementEngine, which constrain the minimum and maximum
+      pause lengths, respectively, between activity segments (counted in chord sections).  The constraints will be ignored for an activity vector if the
+      activity vector is never active or only has one activity segment.
 
-    - Added a "uniquePatternParts" tag to the RandomPatternEngine and the RandomFragmentPatternEngine. If the value is "true",
-      the pattern parts within a pattern group a generated until they are unique. If the value is "false", the uniqueness is
-      not enforced. Defaults to true (which is what was used in the previous versions).
+    - Added a "uniquePatternParts" tag to the RandomPatternEngine and the RandomFragmentPatternEngine. If the value is "true", the pattern parts
+      within a pattern group a generated until they are unique. If the value is "false", the uniqueness is not enforced. Defaults to true (which is what
+      was used in the previous versions).
 
 
-    - Added "skipWhenApplied" and "skipWhenNotApplied" tags to conditional patterns in the DrumSequenceEngine. With these two
-      tags you can define the number of conditional patterns to skip if the current pattern was applied or was not applied
-      (even though it was allowed to be applied), respectively. You can skip backwards by using a negative number (-1 would
-      repeat the current conditional pattern, -2 would jump to the previous one, etc.; make sure that you don't create
-      infinite loops). Both values default to zero, which means that processing continues with the next pattern.
+    - Added "skipWhenApplied" and "skipWhenNotApplied" tags to conditional patterns in the DrumSequenceEngine. With these two tags you can define the
+      number of conditional patterns to skip if the current pattern was applied or was not applied (even though it was allowed to be applied),
+      respectively. You can skip backwards by using a negative number (-1 would repeat the current conditional pattern, -2 would jump to the previous
+      one, etc.; make sure that you don't create infinite loops). Both values default to zero, which means that processing continues with the next
+      pattern.
 
     - Fixed bug that prevented correct random seeding when a song name was used on the command-line.
 
 
 0.1: 2011-05-22
 
-    - Added a better random seed augmentation scheme. Now random seeds from a component are passed on to subcomponents by
-      augmenting the value with a hash value of the implementation class of the subcomponent and the position of the subcomponent
-      within the parent component. This makes sure that each subcomponent receives a different random seed with very high
-      probability.
+    - Added a better random seed augmentation scheme. Now random seeds from a component are passed on to subcomponents by augmenting the value with a
+      hash value of the implementation class of the subcomponent and the position of the subcomponent within the parent component. This makes sure that
+      each subcomponent receives a different random seed with very high probability.
 
-    - The DrumSequenceEngine now supports using pitch offsets relative to the base pitch. For example, if the base pitch is
-      36, using "0" in the pattern uses pitch 36, "1" uses pitch 37, etc. This is suitable for example for loop players, where
-      different pitches for different loop fragments are used.
+    - The DrumSequenceEngine now supports using pitch offsets relative to the base pitch. For example, if the base pitch is 36, using "0" in the
+      pattern uses pitch 36, "1" uses pitch 37, etc. This is suitable for example for loop players, where different pitches for different loop fragments
+      are used.
 
     - Removed the RhythmSequenceEngine, because it was not configurable and not really usable. Use the DrumSequenceEngine instead.
 
-    - Added a new PatternEngine called RandomFragmentPatternEngine. This PatternEngine can be used for example to generate
-      drum patterns. It gives you more control over the results than the RandomPatternEngine by building a pattern by concatenating
-      provided pattern fragments, but does not support random velocity generation.
+    - Added a new PatternEngine called RandomFragmentPatternEngine. This PatternEngine can be used for example to generate drum patterns. It gives you
+      more control over the results than the RandomPatternEngine by building a pattern by concatenating provided pattern fragments, but does not support
+      random velocity generation.
 
-    - Added the constraints startBeforeSection and stopAfterSection to the SimpleArrangementEntry, which are the counterparts of
-      startAfterSection and stopBeforeSection, respectively.
+    - Added the constraints startBeforeSection and stopAfterSection to the SimpleArrangementEntry, which are the counterparts of startAfterSection and
+      stopBeforeSection, respectively.
 
-    - The RandomSequenceEngine and the RandomPatternSequenceEngine are now deprecated (they will be removed in a future
-      version). Consider using the RandomPatternEngine or RandomFragmentPatternEngine with a different SequenceEngine instead.
+    - The RandomSequenceEngine and the RandomPatternSequenceEngine are now deprecated (they will be removed in a future version). Consider using the
+      RandomPatternEngine or RandomFragmentPatternEngine with a different SequenceEngine instead.
 
-    - Added pseudo LFO controller "milliBPM" to the MidiPlayer. This allows changing the BPM during playback using an LFO. Note
-      that this may have some side-effects on other BPM-dependent parts of the MidiPlayer (MIDI timing ticks, LFOs, etc.), just
-      like if you change the BPM manually during playback.
+    - Added pseudo LFO controller "milliBPM" to the MidiPlayer. This allows changing the BPM during playback using an LFO. Note that this may have
+      some side-effects on other BPM-dependent parts of the MidiPlayer (MIDI timing ticks, LFOs, etc.), just like if you change the BPM manually during
+      playback.
 
     - Re-implemented the ArpeggioSequenceEngine to use PatternEngines.
 
     - The SoundHelix applet now sets the applet's window title to the current song name.
 
-    - Improved example. The example now uses the RandomFragmentPatternEngine for the percussion and the ArpeggioSequenceEngine for
-      arpeggios.
+    - Improved example. The example now uses the RandomFragmentPatternEngine for the percussion and the ArpeggioSequenceEngine for arpeggios.
 
 
 0.0.5: 2011-02-27
 
-    - The command-line version of SoundHelix now accepts document URLs as well instead of only files, so XML files
-      can be referenced by using HTTP/HTTPS/FTP URLs directly. Note that HTTPS requires special JVM configuration.
+    - The command-line version of SoundHelix now accepts document URLs as well instead of only files, so XML files can be referenced by using
+      HTTP/HTTPS/FTP URLs directly. Note that HTTPS requires special JVM configuration.
 
-    - The base URL (xml:base) is now set correctly when XML documents are parsed. This means that
-      XInclude can now be used properly. All relative URLs referenced in the XML documents are now
-      relative to the including document URLs. The example has been changed to source out the SongNameEngine and
+    - The base URL (xml:base) is now set correctly when XML documents are parsed. This means that XInclude can now be used properly. All relative URLs
+      referenced in the XML documents are now relative to the including document URLs. The example has been changed to source out the SongNameEngine and
       the HarmonyEngine configuration as separate documents.
- 
-    - The RandomPatternEngine now also supports wildcards as offsets. Useful for all SequenceEngines which allow wildcards
-      (e.g., the MelodySequenceEngine).
 
-    - Introduced "version" attribute for the XML root tag. If present, the application version will be checked against the
-      specified version of the tag. If the version attribute ends with a "+" (e.g., "0.0.5+"), the application version must
-      be at least the given version, otherwise the versions must match exactly.
+    - The RandomPatternEngine now also supports wildcards as offsets. Useful for all SequenceEngines which allow wildcards (e.g., the
+      MelodySequenceEngine).
 
-    - Added escaping support for splitting strings. For example, now commas in MIDI device names can be escaped by preceding
-      them with a backslash.
+    - Introduced "version" attribute for the XML root tag. If present, the application version will be checked against the specified version of the
+      tag. If the version attribute ends with a "+" (e.g., "0.0.5+"), the application version must be at least the given version, otherwise the versions
+      must match exactly.
 
-    - Fixed inconsistent XML structure of the "lfo" tag of the MidiPlayer. The tag is now called "controllerLFO" without
-      a "class" attribute, and it has (among others) a subtag called "lfo" with a "class" attribute. Fix your XML files accordingly.
+    - Added escaping support for splitting strings. For example, now commas in MIDI device names can be escaped by preceding them with a backslash.
 
-    - Fixed inconsistency in the controllerLFO/channel tag of the MidiPlayer (channels were numbered from 0-15 instead of
-      1-16 like in the "map" tag). Fix your XML files accordingly by increasing the LFO channels by 1.
+    - Fixed inconsistent XML structure of the "lfo" tag of the MidiPlayer. The tag is now called "controllerLFO" without a "class" attribute, and it
+      has (among others) a subtag called "lfo" with a "class" attribute. Fix your XML files accordingly.
+
+    - Fixed inconsistency in the controllerLFO/channel tag of the MidiPlayer (channels were numbered from 0-15 instead of 1-16 like in the "map" tag).
+      Fix your XML files accordingly by increasing the LFO channels by 1.
 
     - Added random seedability and XML configurability to the LFO interface.
 
-    - Added song name text field to the applet. A new song with a given name can be created by entering it into the field,
-      with the song name being used as the random seed.
+    - Added song name text field to the applet. A new song with a given name can be created by entering it into the field, with the song name being
+      used as the random seed.
 
     - Added buttons for Facebook and Twitter to applet, which lets you share the current song easily on Facebook/Twitter.
 
@@ -416,8 +391,7 @@ Change log
 
 0.0.4: 2011-01-15
 
-    - Added a first version of a JNLP-based applet. The applet is available at
-      http://www.soundhelix.com/applet/SoundHelix-applet.jnlp
+    - Added a first version of a JNLP-based applet. The applet is available at http://www.soundhelix.com/applet/SoundHelix-applet.jnlp
 
     - Added support for song name generation. Each XML file now requires a songNameEngine tag.
 
@@ -435,9 +409,8 @@ Change log
 
 0.0.2: 2010-11-07
 
-    - Added possibility to specify more than one MIDI device name for the MIDI player; SoundHelix will take the first
-      one available on your system.
-      
+    - Added possibility to specify more than one MIDI device name for the MIDI player; SoundHelix will take the first one available on your system.
+
     - Updated example.
 
 

@@ -62,7 +62,7 @@ public class RandomPatternEngine extends StringPatternEngine {
     /** The maximum number of active ticks. */
     private int maxActiveTicks = 16;
     /** True if all pattern parts must be unique, false otherwise. */
-    private boolean isUniquePatternParts = true;
+    private boolean uniquePatternParts = true;
 
     /**
      * The correlation between pitch and velocity. If 1, the velocity depends only on the pitch and not on the random value; if 0, the velocity only
@@ -161,7 +161,7 @@ public class RandomPatternEngine extends StringPatternEngine {
                             }
 
                             p = modifyPattern(basePattern, 2);
-                        } while (isUniquePatternParts && patternSet.contains(p));
+                        } while (uniquePatternParts && patternSet.contains(p));
                     }
 
                     if (logger.isDebugEnabled()) {
@@ -447,8 +447,8 @@ public class RandomPatternEngine extends StringPatternEngine {
         return array;
     }
 
-    public void setUniquePatternParts(boolean isUniquePatternParts) {
-        this.isUniquePatternParts = isUniquePatternParts;
+    public void setUniquePatternParts(boolean uniquePatternParts) {
+        this.uniquePatternParts = uniquePatternParts;
     }
 
     /**

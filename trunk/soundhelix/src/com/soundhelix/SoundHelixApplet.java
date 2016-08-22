@@ -380,8 +380,8 @@ public class SoundHelixApplet extends JApplet implements Runnable {
      */
 
     private static String getFacebookUrl(String songName, String xmlUrl) {
-        return "http://www.facebook.com/sharer.php?u="
-                + urlEncode("http://www.soundhelix.com/applet/SoundHelix-applet.jnlp?songName=" + urlEncode(songName) + "&url=" + urlEncode(xmlUrl));
+        return "http://www.facebook.com/sharer.php?u=" + urlEncode("http://www.soundhelix.com/applet/SoundHelix-applet.jnlp?songName=" + urlEncode(
+                songName) + "&url=" + urlEncode(xmlUrl));
     }
 
     /**
@@ -395,7 +395,7 @@ public class SoundHelixApplet extends JApplet implements Runnable {
 
     private static String getTwitterUrl(String songName, String xmlUrl) {
         String url = "http://www.soundhelix.com/applet/SoundHelix-applet.jnlp?songName=" + urlEncode(songName) + "&url=" + urlEncode(xmlUrl);
-        String text = "Check out this cool song called \"" + songName + "\"! Needs audio and a browser with " + "Java 6 plugin.";
+        String text = "Check out this cool song called \"" + songName + "\"! Needs audio and a browser with " + "Java 7 plugin.";
 
         // URL shortener creates URL like http://t.co/CmVMQgu
 

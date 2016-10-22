@@ -505,6 +505,12 @@ public class MidiPlayer extends AbstractPlayer {
             while (currentTick <= ticks && !isAborted) {
                 int tick = currentTick;
 
+                while (!running && !isAborted) {
+                    // if a STOP event has been received, wait but send timing ticks if configured
+                    timingTickReferenceTime = waitTicks(timingTickReferenceTime, 1, clockTimingsPerTick, structure.getTicksPerBeat());
+                    tickReferenceTime = timingTickReferenceTime;
+                }
+
                 // wait until the next event
                 referenceTime = waitNanos(tickReferenceTime, timingTickReferenceTime);
 

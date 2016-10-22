@@ -26,6 +26,9 @@ Change log
     - Added support for specifying a crossoverPitch attribute per chordPattern tag in the PatternHarmonyEngine. If set, this attribute allows you to
       override the global crossoverPitch value.
 
+    - Added support for pausing the playback if a STOP message is received from the synchronization device. Playing will continue if either START or
+      CONTINUE is sent.
+
     - Added the chord types "sus2" and "sus4". Example chord names: "Csus2", "Csus24", "Csus26", "Csus4", "Csus44", "Csus46".
 
     - Chord names can now be provided also in flat notation (using "b" instead of "#"), e.g. "Ab7" and "G#7" are the same.

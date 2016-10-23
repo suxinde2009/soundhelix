@@ -11,25 +11,13 @@ import com.soundhelix.misc.SongContext;
 
 public interface Player extends Component {
     /**
-     * Opens all required resources for playing.
-     */
-
-    void open();
-
-    /**
      * Plays the arrangement last set by setArrangement(). The method will return as soon as playing has finished. The method open() must have been
-     * called once prior to calling this method.
+     * called once prior to calling this method. This method will block until the song is finished or playback has been aborted via abortPlay().
      * 
      * @param songContext the song context
      */
 
     void play(SongContext songContext);
-
-    /**
-     * Closes all required resources. The method play() must not be called after resources have been closed, unless open() has been called after that.
-     */
-
-    void close();
 
     /**
      * Gets the playback speed in milli-BPM.
@@ -70,7 +58,8 @@ public interface Player extends Component {
     int getCurrentTick();
 
     /**
-     * Aborts playback. Calling this method should stop the player if it is currently playing an arrangement.
+     * Aborts play(). When this message returns, the playback should already have stopped and all resources should have been released. If the player
+     * isn't playing, nothing is done.
      */
 
     void abortPlay();

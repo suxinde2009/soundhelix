@@ -34,7 +34,6 @@ import org.apache.log4j.PatternLayout;
 import org.apache.log4j.spi.LoggingEvent;
 
 import com.soundhelix.component.player.Player;
-import com.soundhelix.component.player.impl.MidiPlayer;
 import com.soundhelix.misc.SongContext;
 import com.soundhelix.remotecontrol.SwingRemoteControl;
 import com.soundhelix.remotecontrol.TextRemoteControl;
@@ -346,10 +345,6 @@ public class SoundHelixApplet extends JApplet implements Runnable {
 
             if (player != null) {
                 player.abortPlay();
-
-                if (player instanceof MidiPlayer) {
-                    ((MidiPlayer) player).muteAllChannels();
-                }
             }
         } catch (Exception e) {}
 
@@ -451,19 +446,15 @@ public class SoundHelixApplet extends JApplet implements Runnable {
                 Player player = songContext.getPlayer();
 
                 if (isInvisible) {
-                    player.open();
                     player.play(songContext);
-                    player.close();
                 } else {
                     this.currentSongName = songContext.getSongName();
                     songNameTextField.setText(this.currentSongName);
                     setFrameTitle("SoundHelix Song \"" + this.currentSongName + "\"");
 
-                    player.open();
                     remoteControl.setSongContext(songContext);
                     player.play(songContext);
                     remoteControl.setSongContext(null);
-                    player.close();
                 }
             } catch (Exception e) {
                 LOGGER.debug("Exception occurred", e);

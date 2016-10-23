@@ -36,6 +36,9 @@ Change log
     - Fixed a bug regarding the phase computation for LFOs running in "segmentPair" mode. Whenever the speed was set to something other than 1, the
       off-segment's phase was incorrect.
 
+    - Changed the API of the Player to support proper playback abortion. Changed MidiPlayer accordingly. Now a JVM shutdown will properly mute all
+      MIDI channels.
+
     - Moved the MIDI device "gervill" to the beginning of the list of MIDI devices in all examples. Set the beforePlayWaitTicks value to 16 in all
       examples. This will fix problems with Windows 10 (and possibly also Windows 8).
 

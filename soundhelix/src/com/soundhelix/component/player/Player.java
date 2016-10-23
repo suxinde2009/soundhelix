@@ -11,8 +11,8 @@ import com.soundhelix.misc.SongContext;
 
 public interface Player extends Component {
     /**
-     * Plays the arrangement last set by setArrangement(). The method will return as soon as playing has finished. The method open() must have been
-     * called once prior to calling this method. This method will block until the song is finished or playback has been aborted via abortPlay().
+     * Plays the arrangement from the song context. The method will return as soon as playing has finished. This method will block until the song is
+     * finished or playback has been aborted successfully via abortPlay().
      * 
      * @param songContext the song context
      */

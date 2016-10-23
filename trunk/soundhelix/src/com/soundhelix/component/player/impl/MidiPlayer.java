@@ -22,6 +22,7 @@ import javax.sound.midi.ShortMessage;
 import javax.sound.midi.Transmitter;
 import javax.xml.xpath.XPathException;
 
+import org.apache.log4j.Logger;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -70,6 +71,9 @@ import com.soundhelix.util.XMLUtils;
 // TODO: on each tick, send all note-offs before sending note-ons (this is currently done per track, but should be done globally)
 
 public class MidiPlayer extends AbstractPlayer {
+    /** The maximum time in ms to wait in abortPlay(). */
+    private static final int ABORT_PLAY_TIMEOUT = 5000;
+
     /**
      * The number of MIDI clock synchronization ticks per beat. 24 is the standard MIDI synchronization, 480 is the professional MIDI synchronization.
      */
@@ -80,6 +84,9 @@ public class MidiPlayer extends AbstractPlayer {
 
     /** The map which maps MIDI controller names to MidiController instances. */
     private static Map<String, MidiController> midiControllerMap;
+
+    /** The logger. */
+    protected final Logger logger = Logger.getLogger(this.getClass());
 
     /** The random generator. */
     private Random random;
@@ -132,8 +139,14 @@ public class MidiPlayer extends AbstractPlayer {
     /** True if at least one MIDI device requires clock synchronization. */
     private boolean useClockSynchronization;
 
-    /** True if playing has been aborted. */
-    private boolean isAborted;
+    /** True if a request for aborting playback has been received. */
+    private boolean playAbortRequested;
+
+    /** True if playback has finished (either because the song has ended or playback has been aborted. */
+    private boolean playFinished;
+
+    /** The lock for waiting for playback to finish during abortPlay(). */
+    private Object playFinishedLock = new Object();
 
     /** The minimum window size for MIDI sync BPM calculation. */
     private int minWindowSize;
@@ -208,8 +221,7 @@ public class MidiPlayer extends AbstractPlayer {
      * Opens all MIDI devices.
      */
 
-    @Override
-    public void open() {
+    private void open() {
         if (opened) {
             throw new IllegalStateException("open() already called");
         }
@@ -227,15 +239,14 @@ public class MidiPlayer extends AbstractPlayer {
         }
 
         opened = true;
-        isAborted = false;
+        playAbortRequested = false;
     }
 
     /**
      * Closes all MIDI devices.
      */
 
-    @Override
-    public final void close() {
+    private void close() {
         if (devices != null && opened) {
             try {
                 muteAllChannels();
@@ -430,9 +441,7 @@ public class MidiPlayer extends AbstractPlayer {
 
     @Override
     public void play(SongContext songContext) {
-        if (!opened) {
-            throw new IllegalStateException("Must call open() first");
-        }
+        open();
 
         try {
             this.songContext = songContext;
@@ -502,10 +511,10 @@ public class MidiPlayer extends AbstractPlayer {
             // (including timing ticks); otherwise (with <) the loop would end as soon as the last tick has been
             // played, but the remaining timing ticks for the last tick still need to be processed
 
-            while (currentTick <= ticks && !isAborted) {
+            while (currentTick <= ticks && !playAbortRequested) {
                 int tick = currentTick;
 
-                while (!running && !isAborted) {
+                while (!running && !playAbortRequested) {
                     // if a STOP event has been received, wait but send timing ticks if configured
                     timingTickReferenceTime = waitTicks(timingTickReferenceTime, 1, clockTimingsPerTick, structure.getTicksPerBeat());
                     tickReferenceTime = timingTickReferenceTime;
@@ -552,6 +561,8 @@ public class MidiPlayer extends AbstractPlayer {
                 }
             }
 
+            logger.trace("Muting all active channels");
+
             // playing finished, send a NOTE_OFF for all current notes
 
             muteActiveChannels(arrangement);
@@ -572,7 +583,16 @@ public class MidiPlayer extends AbstractPlayer {
         } catch (Exception e) {
             throw new RuntimeException("Playback error", e);
         } finally {
+            close();
+
             this.songContext = null;
+            this.playFinished = true;
+
+            // notify all threads (if any) that are currently waiting in abortPlay()
+
+            synchronized (playFinishedLock) {
+                this.playFinishedLock.notifyAll();
+            }
         }
     }
 
@@ -1324,7 +1344,7 @@ public class MidiPlayer extends AbstractPlayer {
             InterruptedException {
         long lastWantedNanos = referenceTime;
 
-        for (int t = 0; t < ticks && !isAborted && !skipEnabled; t++) {
+        for (int t = 0; t < ticks && !playAbortRequested && !skipEnabled; t++) {
             for (int s = 0; s < clockTimingsPerTick; s++) {
 
                 long length = getTimingTickNanos(clockTimingsPerTick, ticksPerBeat);
@@ -1477,6 +1497,8 @@ public class MidiPlayer extends AbstractPlayer {
         }
 
         for (DeviceChannel dc : channelMap.values()) {
+            logger.trace("Muting channel " + dc);
+
             // send ALL SOUND OFF message
             sendMidiMessage(dc, ShortMessage.CONTROL_CHANGE, 120, 0);
 
@@ -1898,9 +1920,7 @@ public class MidiPlayer extends AbstractPlayer {
      */
 
     private void sendMidiMessage(DeviceChannel deviceChannel, int status, int data1, int data2) throws InvalidMidiDataException {
-        ShortMessage sm = new ShortMessage();
-        sm.setMessage(status, deviceChannel.channel, data1, data2);
-        deviceChannel.device.receiver.send(sm, -1);
+        sendMidiMessage(deviceChannel.device, deviceChannel.channel, status, data1, data2);
     }
 
     /**
@@ -1994,7 +2014,19 @@ public class MidiPlayer extends AbstractPlayer {
 
     @Override
     public void abortPlay() {
-        this.isAborted = true;
+        if (opened && !playFinished) {
+            this.playAbortRequested = true;
+
+            // wait until playing has finished
+
+            synchronized (playFinishedLock) {
+                try {
+                    playFinishedLock.wait(ABORT_PLAY_TIMEOUT);
+                } catch (InterruptedException e) {
+                    // do nothing
+                }
+            }
+        }
     }
 
     public void setBeforePlayWaitTicks(int preWaitTicks) {
@@ -2212,6 +2244,11 @@ public class MidiPlayer extends AbstractPlayer {
         @Override
         public final int hashCode() {
             return device.hashCode() * 16273 + channel * 997 + program;
+        }
+
+        @Override
+        public String toString() {
+            return device.name + "/" + (channel + 1);
         }
     }
 

@@ -16,7 +16,6 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import com.soundhelix.component.player.Player;
-import com.soundhelix.component.player.impl.MidiPlayer;
 import com.soundhelix.misc.SongContext;
 import com.soundhelix.remotecontrol.ConsoleRemoteControl;
 import com.soundhelix.remotecontrol.RemoteControl;
@@ -241,11 +240,9 @@ public class SoundHelix implements Runnable {
                 Runtime.getRuntime().addShutdownHook(shutdownHook);
 
                 try {
-                    player.open();
                     remoteControl.setSongContext(songContext);
                     player.play(songContext);
                     remoteControl.setSongContext(null);
-                    player.close();
                 } catch (Exception e) {
                     logger.warn("Exception during playback", e);
                 }
@@ -253,7 +250,11 @@ public class SoundHelix implements Runnable {
                 generateNew = true;
 
                 // remove shutdown hook
-                Runtime.getRuntime().removeShutdownHook(shutdownHook);
+                try {
+                    Runtime.getRuntime().removeShutdownHook(shutdownHook);
+                } catch (IllegalStateException e) {
+                    // ignore, happens if the shutdown hook is already running
+                }
             }
         } catch (Exception e) {
             logger.warn("Exception detected", e);
@@ -418,15 +419,9 @@ public class SoundHelix implements Runnable {
             logger.trace("Starting shutdown hook");
 
             try {
-                // FIXME: this is a quick and dirty solution
-
-                // the preferred solution would be to call player.close(). However, calling close() can cause the player to throw exceptions because
-                // the player thread doesn't seem to be already terminated when the shutdown hook is called, and so the player may be using already
-                // closed resources.
-
-                if (player instanceof MidiPlayer) {
-                    logger.trace("Muting all MIDI channels");
-                    ((MidiPlayer) player).muteAllChannels();
+                if (player != null) {
+                    logger.debug("Aborting playback");
+                    player.abortPlay();
                 }
             } catch (Exception e) {
                 logger.error("Exception during shutdoown hook", e);

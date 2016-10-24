@@ -305,7 +305,6 @@ public class Pattern implements Iterable<PatternEntry> {
      * 
      * @param str the string
      * @param count the number of concatenations
-     * @param separator the separator character
      * 
      * @return the multiplied string
      */

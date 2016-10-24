@@ -62,8 +62,6 @@ import com.soundhelix.util.XMLUtils;
  * of an instrument. The granularity of an LFO is always a tick. With every tick, each LFO will send out a MIDI message with the new value for the
  * target controller, but only if the LFO value is the first one sent or if it has changed since the last value sent.
  * 
- * Instances of this class are not thread-safe. They must not be used in multiple threads without external synchronization.
- * 
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
@@ -1981,22 +1979,6 @@ public class MidiPlayer extends AbstractPlayer {
     }
 
     /**
-     * Adds a MIDI message to the given MIDI track.
-     * 
-     * @param track the MIDI track
-     * @param tick the MIDI tick
-     * @param status the MIDI status
-     * 
-     * @throws InvalidMidiDataException in case of a MIDI error
-     */
-
-    private void sendMidiMessage(javax.sound.midi.Track track, int tick, int status) throws InvalidMidiDataException {
-        ShortMessage sm = new ShortMessage();
-        sm.setMessage(status);
-        track.add(new MidiEvent(sm, (long) tick + 1));
-    }
-
-    /**
      * Skips to the specified tick. This is done by muting all channels, resetting the player state and then silently fast-forwarding to the specified
      * tick.
      * 
@@ -2312,9 +2294,16 @@ public class MidiPlayer extends AbstractPlayer {
         /** The LFO. */
         private LFO lfo;
 
+        /** The minimum amplitude. */
         private int minAmplitude;
+
+        /** The maximum amplitude. */
         private int maxAmplitude;
+
+        /** The minimum cut-off value. */
         private int minValue;
+
+        /** The maximum cut-off value. */
         private int maxValue;
 
         /** The value last sent to the MIDI controller. */
@@ -2352,7 +2341,7 @@ public class MidiPlayer extends AbstractPlayer {
      * Container for LFO configuration.
      */
 
-    private static class ControllerLFO {
+    private static final class ControllerLFO {
         /** The LFO. */
         private LFO lfo;
 
@@ -2411,7 +2400,7 @@ public class MidiPlayer extends AbstractPlayer {
         }
     }
 
-    private static class MidiController {
+    private static final class MidiController {
         /** The MIDI status byte. */
         private int status;
 
@@ -2454,7 +2443,7 @@ public class MidiPlayer extends AbstractPlayer {
      * resulting BPM are set for the player.
      */
 
-    private class MidiClockReceiver implements Receiver {
+    private final class MidiClockReceiver implements Receiver {
         /** True if this is the first tick. */
         private boolean firstTick = true;
 

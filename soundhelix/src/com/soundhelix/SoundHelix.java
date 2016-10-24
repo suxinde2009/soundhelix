@@ -397,7 +397,7 @@ public class SoundHelix implements Runnable {
     /**
      * Implements a simple shutdown hook that can be run when the JVM exits. The hook currently mutes all channels if the current player is a MIDI
      * player. Note that shutdown hooks are only run when the JVM exits normally, e.g., by pressing CTRL+C, calls to System.exit() or uncaught
-     * exceptions. If the JVM is killed however, (e.g., using SIGTERM), shutdown hooks are not run.
+     * exceptions. If the JVM is killed however, (e.g., using SIGKILL), shutdown hooks are not run.
      */
 
     private static class ShutdownRunnable implements Runnable {
@@ -424,7 +424,7 @@ public class SoundHelix implements Runnable {
                     player.abortPlay();
                 }
             } catch (Exception e) {
-                logger.error("Exception during shutdoown hook", e);
+                logger.error("Exception during shutdown hook", e);
             }
 
             logger.trace("Finished shutdown hook");

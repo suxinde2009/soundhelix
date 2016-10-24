@@ -4,7 +4,8 @@ import com.soundhelix.component.Component;
 import com.soundhelix.misc.SongContext;
 
 /**
- * Represents an interface for playing Arrangements. A player's task usually is to play the arrangement in real-time.
+ * Represents an interface for playing Arrangements. A player's task is to play the arrangement in real-time. All methods except for play() are
+ * callable and should have an immediate or delayed effect while play() is running in another thread.
  * 
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
@@ -12,9 +13,11 @@ import com.soundhelix.misc.SongContext;
 public interface Player extends Component {
     /**
      * Plays the arrangement from the song context. The method will return as soon as playing has finished. This method will block until the song is
-     * finished or playback has been aborted successfully via abortPlay().
+     * finished or playback has been aborted successfully via abortPlay(). Only one thread can run play() at a time.
      * 
      * @param songContext the song context
+     * 
+     * @throws IllegalStateException if play() is called while play() is running in another thread
      */
 
     void play(SongContext songContext);

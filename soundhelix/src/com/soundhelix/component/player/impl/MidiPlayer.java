@@ -441,6 +441,10 @@ public class MidiPlayer extends AbstractPlayer {
 
     @Override
     public void play(SongContext songContext) {
+        if (opened) {
+            throw new IllegalStateException("Already playing");
+        }
+
         open();
 
         try {

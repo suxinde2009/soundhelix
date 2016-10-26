@@ -2241,7 +2241,7 @@ public class MidiPlayer extends AbstractPlayer {
     /**
      * Container for MIDI controller values.
      */
-    private static class ControllerValue {
+    private static final class ControllerValue {
         /** The device name. */
         private final String deviceName;
 
@@ -2275,7 +2275,7 @@ public class MidiPlayer extends AbstractPlayer {
      * Container for LFO configuration.
      */
 
-    private static class InstrumentControllerLFO {
+    private static final class InstrumentControllerLFO {
         /** The device name. */
         private final String deviceName;
 

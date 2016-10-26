@@ -161,7 +161,9 @@ public class SoundHelix implements Runnable {
             System.out.println("   --song-name songname   Set the song name for seeding the random generator");
             System.out.println();
             System.out.println("   -m");
-            System.out.println("   --show-midi-devices    Show available MIDI devices with MIDI IN port");
+            System.out.println("   --show-midi-devices    Show available MIDI devices with MIDI IN/OUT port");
+            System.out.println();
+            System.out.println("See http://www.soundhelix.com/doc/running for more information.");
             System.exit(0);
         }
 

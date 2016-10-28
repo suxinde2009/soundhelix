@@ -42,6 +42,8 @@ Change log
     - Moved the MIDI device "gervill" to the beginning of the list of MIDI devices in all examples. Set the beforePlayWaitTicks value to 16 in all
       examples. This will fix problems with Windows 10 (and possibly also Windows 8).
 
+    - Removed deprecated tag "obeyChordSubtype" from various SequenceEngine implementations.
+
     - SoundHelix now requires Java 7 or later.
 
 

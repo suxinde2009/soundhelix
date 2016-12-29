@@ -46,7 +46,10 @@ SoundHelix checkstyle configuration
     <module name="MethodLength">
       <property name="max" value="200"/>
     </module>
-    <module name="ParameterNumber"/>
+    <module name="ParameterNumber">
+      <property name="max" value="10"/>
+      <property name="ignoreOverriddenMethods" value="true"/>
+    </module>
     <module name="EmptyForIteratorPad"/>
     <module name="GenericWhitespace"/>
     <module name="MethodParamPad"/>
@@ -128,7 +131,8 @@ SoundHelix checkstyle configuration
       <property name="max" value="30"/>
     </module>
     <module name="CyclomaticComplexity">
-      <property name="max" value="20"/>
+      <property name="max" value="30"/>
+      <property name="switchBlockAsSingleDecisionPoint" value="true"/>
     </module>
     <module name="EmptyForIteratorPad"/>
     <module name="ExecutableStatementCount">
@@ -237,7 +241,7 @@ SoundHelix checkstyle configuration
       <property name="severity" value="warning"/>
     </module>
     <module name="ClassDataAbstractionCoupling">
-      <property name="max" value="15"/>
+      <property name="max" value="20"/>
     </module>
     <module name="Indentation">
       <property name="severity" value="info"/>

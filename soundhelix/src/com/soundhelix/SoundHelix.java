@@ -29,7 +29,7 @@ import gnu.getopt.LongOpt;
  * Implements the main class. The main() method determines the configuration file and then waits for the next generated song and plays it. The
  * configuration parsing and generation of songs is done in a separate thread to guarantee seamless playing. The thread priority for the song
  * generator is set to a low value, the priority of the playing thread is set to a high value.
- * 
+ *
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
@@ -55,7 +55,7 @@ public class SoundHelix implements Runnable {
 
     /**
      * Constructor.
-     * 
+     *
      * @param url the SoundHelix XML URL
      * @param randomSeed the random seed
      */
@@ -68,7 +68,7 @@ public class SoundHelix implements Runnable {
 
     /**
      * Constructor.
-     * 
+     *
      * @param url the SoundHelix XML URL
      * @param songName the song name
      */
@@ -81,9 +81,9 @@ public class SoundHelix implements Runnable {
 
     /**
      * The main method.
-     * 
+     *
      * @param args the arguments
-     * 
+     *
      * @throws Exception in case of any problem
      */
 
@@ -146,24 +146,7 @@ public class SoundHelix implements Runnable {
         }
 
         if (showHelp) {
-            System.out.println("Usage: java -jar SoundHelix.jar [options] xml-filename");
-            System.out.println("       java -jar SoundHelix.jar [options] xml-url");
-            System.out.println();
-            System.out.println("Options:");
-            System.out.println();
-            System.out.println("   -h");
-            System.out.println("   --help                 Show this help");
-            System.out.println();
-            System.out.println("   -v");
-            System.out.println("   --version              Show the application version");
-            System.out.println();
-            System.out.println("   -s songname");
-            System.out.println("   --song-name songname   Set the song name for seeding the random generator");
-            System.out.println();
-            System.out.println("   -m");
-            System.out.println("   --show-midi-devices    Show available MIDI devices with MIDI IN/OUT port");
-            System.out.println();
-            System.out.println("See http://www.soundhelix.com/doc/running for more information.");
+            showHelp();
             System.exit(0);
         }
 
@@ -199,6 +182,19 @@ public class SoundHelix implements Runnable {
             randomSeed = new Random().nextLong();
         }
 
+        play(songName, filename, randomSeed);
+    }
+
+    /**
+     * Plays the given file.
+     *
+     * @param songName the song name
+     * @param filename the file name
+     * @param randomSeed the random seed
+     * @throws Exception in case of any problem
+     */
+
+    private static void play(String songName, String filename, long randomSeed) throws Exception {
         try {
             // instantiate this class so we can launch a thread
             SoundHelix soundHelix;
@@ -265,6 +261,31 @@ public class SoundHelix implements Runnable {
     }
 
     /**
+     * Prints the command-line help.
+     */
+
+    private static void showHelp() {
+        System.out.println("Usage: java -jar SoundHelix.jar [options] xml-filename");
+        System.out.println("       java -jar SoundHelix.jar [options] xml-url");
+        System.out.println();
+        System.out.println("Options:");
+        System.out.println();
+        System.out.println("   -h");
+        System.out.println("   --help                 Show this help");
+        System.out.println();
+        System.out.println("   -v");
+        System.out.println("   --version              Show the application version");
+        System.out.println();
+        System.out.println("   -s songname");
+        System.out.println("   --song-name songname   Set the song name for seeding the random generator");
+        System.out.println();
+        System.out.println("   -m");
+        System.out.println("   --show-midi-devices    Show available MIDI devices with MIDI IN/OUT port");
+        System.out.println();
+        System.out.println("See http://www.soundhelix.com/doc/running for more information.");
+    }
+
+    /**
      * Implements the functionality of the thread that generates songs. The method runs forever and generates a new song as soon as it detects the
      * queue to be empty.
      */
@@ -306,9 +327,9 @@ public class SoundHelix implements Runnable {
 
     /**
      * Removes and returns the next SongContext from the queue. This method will block until an entry is available.
-     * 
+     *
      * @return the next SongContext
-     * 
+     *
      * @throws InterruptedException if interrupted
      */
 
@@ -318,9 +339,9 @@ public class SoundHelix implements Runnable {
 
     /**
      * Parse command-line parameters and return a Getopt instance.
-     * 
+     *
      * @param args the command-line parameters
-     * 
+     *
      * @return the Getopt instance
      */
 
@@ -369,9 +390,9 @@ public class SoundHelix implements Runnable {
     /**
      * Gets the available MIDI device names. If midiIn is true, devices with MIDI IN are returned, otherwise devices with MIDI OUT are returned. The
      * device names are returned as a sorted string array.
-     * 
+     *
      * @param midiIn if true, MIDI in is returned, otherwise MIDI OUT is returned
-     * 
+     *
      * @return the list of MIDI devices
      */
 
@@ -408,7 +429,7 @@ public class SoundHelix implements Runnable {
 
         /**
          * Constructor.
-         * 
+         *
          * @param player the player
          */
 

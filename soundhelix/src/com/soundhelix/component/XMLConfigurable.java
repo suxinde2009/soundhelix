@@ -8,7 +8,7 @@ import com.soundhelix.misc.SongContext;
 
 /**
  * Simple interface that adds XML-configurability to a class. XML configuration is based on DOM and XPath.
- * 
+ *
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
@@ -18,11 +18,12 @@ public interface XMLConfigurable {
      * setter methods of the class. All settings of the class that are settable using XML should also be settable by using public methods (for
      * example, if the beats per minute are settable using an XML tag, then the class should also provide a public method setBPM(), which does the
      * same). XML configuration can also be a recursive process, if XML settings contain nodes that require XML configuration themselves, but this is
-     * up to the implementation of this method. The method should (but need not) use XPath to access the node's tags.
-     * 
+     * up to the implementation of this method. The method should (but need not) use XPath to access the node's tags. Only the node and its descendant
+     * nodes may be used for configuration.
+     *
      * @param songContext the song context
      * @param node the parent XML node of the configuration tags
-     * 
+     *
      * @throws XPathException in case of an XPath problem
      */
 

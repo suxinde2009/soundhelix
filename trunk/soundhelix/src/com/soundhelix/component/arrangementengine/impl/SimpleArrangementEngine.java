@@ -10,7 +10,7 @@ import java.util.Random;
 import javax.xml.xpath.XPathException;
 import javax.xml.xpath.XPathExpressionException;
 
-import org.apache.log4j.Priority;
+import org.apache.log4j.Level;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -29,14 +29,14 @@ import com.soundhelix.util.XMLUtils;
  * Implements a simple ArrangementEngine. The song starts with a configurable "fade-in" of the number of active ActivityVectors and ends with a
  * configurable "fade-out" of the number of active ActivityVectors. For each chord section in between, the number of active AVs is varied in the
  * configured range.
- * 
+ *
  * ActivityVector activity can be constrained individually to enforce certain properties. All AVs are filled at the same time because there is always
  * the above-mentioned overall song constraint that defines the number of active AVs for each chord section. For each chord section a choice is made
  * whether to activate or deactivate AVs or to leave the number of active AVs unchanged, according to the AVs that should be active. The list of
  * generated AVs are called a song activity matrix.
- * 
+ *
  * The following constraints are supported for ActivityVectors:
- * 
+ *
  * - minActive(n): the AV must be active for at least n% of the song; granularity is at chord section level; it is also possible define that the AV
  * may be inactive for the whole song or be active with at least n% of the song - maxActive(n): the AV must be active for at most n% of the song;
  * granularity is at chord section level - startBeforeSection(n): the AV must start before section n - startAfterSection(n): the AV must start after
@@ -45,19 +45,19 @@ import com.soundhelix.util.XMLUtils;
  * section segments - maxSegmentCount(n): the AV must be active for at most n chord section segments - minSegmentLength(n): the minimum AV segment
  * length must be n chord sections - maxSegmentLength(n): the maximum AV segment length must be n chord sections - minPauseLength(n): the minimum AV
  * pause length must be n chord sections - maxPauseLength(n): the maximum AV pause length must be n chord sections
- * 
+ *
  * A randomized backtracking algorithm is used for finding a song activity matrix that fulfills all constraints of all ActivityVectors at the same
  * time. It works roughly as follows: The song activity matrix is built from left to right (chord section by chord section) by making random
  * selections about which AVs to activate or deactivate. If a constraint violation is detected, a number of different random choices at the same
  * section is tried by reverting the previous choice and choosing another one; if all these fail, the algorithm backtracks to the previous section. To
  * avoid the overhead of recursion, the algorithm is implemented iteratively.
- * 
+ *
  * The algorithm is able to find a valid song activity matrix pretty quickly (if one exists), much faster than the simpler algorithm used in version
  * 0.1 of SoundHelix and before.
- * 
+ *
  * The algorithm scales pretty well with increasing numbers of constraints, but keep in mind that every additional constraint increases the complexity
  * level of finding a valid song activity matrix.
- * 
+ *
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
@@ -97,7 +97,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
         /**
          * Constructor.
-         * 
+         *
          * @param operands the number of operands
          */
 
@@ -172,11 +172,11 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
         songContext.setActivityMatrix(activityMatrix);
 
         if (activityVectorModifications.length > 0) {
-            activityMatrix.dump(songContext, "Song's activity matrix before applying ActivityVector modifications", Priority.DEBUG);
+            activityMatrix.dump(songContext, "Song's activity matrix before applying ActivityVector modifications", Level.DEBUG);
             processActivityVectorModifications(songContext);
         }
 
-        activityMatrix.dump(songContext, "Song's activity matrix", Priority.INFO);
+        activityMatrix.dump(songContext, "Song's activity matrix", Level.INFO);
         shiftIntervalBoundaries(neededActivityVectors);
 
         return createArrangement(songContext, neededActivityVectors);
@@ -184,7 +184,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
     /**
      * Processes the activity vector modifications.
-     * 
+     *
      * @param songContext the song context
      */
 
@@ -255,7 +255,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
     /**
      * Returns the chord section number for the given string, which is either an integer (zero, positive or negative) or a positive double with a "%"
      * behind it.
-     * 
+     *
      * @param songContext the song context
      * @param str the string
      * @return the chord section number
@@ -290,7 +290,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
     /**
      * Returns the needed activity vectors as a map that maps from the activity vector name to its configuration. Rather than returning all activity
      * vectors, this method only returns the activity vectors that are used within at least one SequenceEngine.
-     * 
+     *
      * @return the map of activity vectors
      */
 
@@ -317,10 +317,10 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
     /**
      * Creates an arrangement based on the given map of needed activity vectors. This is done by rendering a track for each SequenceEngine based on
      * the already generated activity vectors.
-     * 
+     *
      * @param songContext the song context
      * @param neededActivityVector the map of needed activity vectors
-     * 
+     *
      * @return the created arrangement
      */
 
@@ -359,7 +359,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
     /**
      * Shifts the interval boundaries of all activity vectors where a start or stop shift has been configured.
-     * 
+     *
      * @param neededActivityVector the needed activity vectors
      */
 
@@ -371,12 +371,12 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
     /**
      * Creates an ActivityMatrix that fulfills all constraints. The algorithm uses randomized backtracking for finding such an ActivityMatrix.
-     * 
+     *
      * @param songContext the song context
      * @param activityVectorConfigurations the ActivityVector configurations
      *
      * @return the ActivityMatrix
-     * 
+     *
      * @throws RuntimeException in case the constraints could not be fulfilled
      */
 
@@ -657,7 +657,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
     /**
      * Creates an ActivityMatrix that fulfills all or most of the constraints, based on a greedy algorithm.
-     * 
+     *
      * @param songContext the song context
      * @param activityVectorConfigurations the ActivityVector configurations
      *
@@ -878,11 +878,11 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
     /**
      * Converts the BitSets into a set of ActivityVectors which have their activity set based on the BitSets.
-     * 
+     *
      * @param songContext the song context
      * @param activityVectorConfigurations the array of activity vector configurations
      * @param bitSets the array of BitSets
-     * 
+     *
      * @return the activity matrix
      */
 
@@ -929,7 +929,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
     /**
      * Copies the state from the previous chord section to the current chord section state.
-     * 
+     *
      * @param section the section number
      * @param state the array of states
      */
@@ -966,9 +966,9 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
     /**
      * Clones the given array of ActivityVectorStates.
-     * 
+     *
      * @param states the states to clone
-     * 
+     *
      * @return the cloned states
      */
 
@@ -986,10 +986,10 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
     /**
      * Sets one random bit in the BitSet from false to true, if this is possible (i.e., if not all bits are set already). The number of the set bit is
      * returned or -1 if all bits were true.
-     * 
+     *
      * @param bitSet the BitSet to modify
      * @param size the size of the BitSet
-     * 
+     *
      * @return the number of the set bit (or -1 if no false bit existed)
      */
 
@@ -1024,9 +1024,9 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
     /**
      * Clears one random bit in the BitSet, if this is possible (i.e., if at least one bit is set to true). The number of the cleared bit is returned
      * or -1 if all bits were false.
-     * 
+     *
      * @param bitSet the BitSet to modify
-     * 
+     *
      * @return the number of the cleared bit (or -1 if no true bit existed)
      */
 
@@ -1353,7 +1353,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
     /**
      * Returns a node list of all active tracks. If at least one track is soloed, all soloed tracks are returned. Otherwise, all tracks which have not
      * been muted are returned.
-     * 
+     *
      * @param node the node
      * @return the node list
      * @throws XPathExpressionException in case of an XPath problem
@@ -1378,11 +1378,11 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
      * activityVectors goes to infinity. The lambda value specifies the speed of the exponential drop-off. The goal is to use almost all
      * ActivityVectors when the number of ActivityVectors is small and use (in relation) fewer ActivityVectors when the number of ActivityVectors
      * becomes larger.
-     * 
+     *
      * @param activityVectors the number of ActivtiyVectors (must be positive)
      * @param factor the factor (between 0 and 1)
      * @param lambda the drop-off factor (must be positive)
-     * 
+     *
      * @return the maximum number of ActivityVectors to use
      */
 
@@ -1396,7 +1396,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
     /**
      * Processes the activity counts.
-     * 
+     *
      * @param activityCounts the activity counts
      * @param maxCount the maximum count
      * @return the processed activity counts
@@ -1470,7 +1470,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
         /**
          * Constructor.
-         * 
+         *
          * @param instrument the instrument name
          * @param sequenceEngine the SequenceEngine
          * @param transposition the transposition
@@ -1622,7 +1622,7 @@ public class SimpleArrangementEngine extends AbstractArrangementEngine {
 
         /**
          * Constructor.
-         * 
+         *
          * @param operator the operator
          * @param from the from tick
          * @param to the to tick

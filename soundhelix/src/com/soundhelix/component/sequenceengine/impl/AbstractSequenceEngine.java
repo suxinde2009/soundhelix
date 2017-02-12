@@ -11,14 +11,15 @@ import com.soundhelix.util.XMLUtils;
 
 /**
  * Implements an abstract SequenceEngine with some basic functionality.
- * 
+ *
  * @see SequenceEngine
- * 
+ *
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
 public abstract class AbstractSequenceEngine implements SequenceEngine {
 
+    /** The restart mode for patterns. */
     protected enum PatternRestartMode {
         /** Never restart the pattern. */
         SONG,
@@ -50,7 +51,7 @@ public abstract class AbstractSequenceEngine implements SequenceEngine {
     /**
      * Returns the required number of ActivityVectors. For most implementations, this will be 1, but certain implementations, like for
      * multi-instrument sequences, more than 1 might be required. Subclasses should override this.
-     * 
+     *
      * @return the number of ActivityVectors
      */
 
@@ -71,7 +72,7 @@ public abstract class AbstractSequenceEngine implements SequenceEngine {
 
     /**
      * Returns the tick number of the next required pattern restart after the given tick.
-     * 
+     *
      * @param songContext the song context
      * @param tick the tick
      * @return the pattern restart tick

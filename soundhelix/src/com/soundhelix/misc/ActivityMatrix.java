@@ -5,14 +5,14 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.Priority;
 
 import com.soundhelix.util.HarmonyUtils;
 
 /**
  * Container for ActivityVectors.
- * 
+ *
  * @author Thomas Schuerger (thomas@schuerger.com)
  */
 
@@ -26,7 +26,7 @@ public class ActivityMatrix implements Iterable<ActivityVector> {
     /**
      * Adds the given ActivityVector. If an ActivityVector with the same name already exists, it will be replaced in its current position. Otherwise
      * it will be appended to the list of ActivityVectors.
-     * 
+     *
      * @param activityVector the ActivityVector
      */
     public void add(ActivityVector activityVector) {
@@ -35,7 +35,7 @@ public class ActivityMatrix implements Iterable<ActivityVector> {
 
     /**
      * Looks up and returns the ActivityVector with the given name. If the name is not found, null is returned.
-     * 
+     *
      * @param name the name
      *
      * @return the ActivityVector (or null)
@@ -51,7 +51,7 @@ public class ActivityMatrix implements Iterable<ActivityVector> {
 
     /**
      * Provides an iterator that iterates over all ActivityVectors of this ActivityMatrix in the order they have been added.
-     * 
+     *
      * @return the iterator
      */
 
@@ -62,7 +62,7 @@ public class ActivityMatrix implements Iterable<ActivityVector> {
 
     /**
      * Returns the number of ActivityVectors.
-     * 
+     *
      * @return the number of ActivityVectors
      */
 
@@ -90,14 +90,14 @@ public class ActivityMatrix implements Iterable<ActivityVector> {
 
     /**
      * Dumps the activity vectors as an activity matrix using the given log level.
-     * 
+     *
      * @param songContext the song context
      * @param title the title
-     * @param priority the log level to use
+     * @param level the log level to use
      */
 
-    public void dump(SongContext songContext, String title, Priority priority) {
-        if (!LOGGER.isEnabledFor(priority)) {
+    public void dump(SongContext songContext, String title, Level level) {
+        if (!LOGGER.isEnabledFor(level)) {
             return;
         }
 

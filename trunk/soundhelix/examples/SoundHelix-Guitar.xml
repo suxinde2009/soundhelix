@@ -1,0 +1,120 @@
+<?xml version="1.0"?>
+<!-- Example XML file for SoundHelix. Author: Thomas Schuerger. -->
+<SoundHelix version="0.5+" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <xi:include href="../includes/Standard-SongNameEngine.xml" />
+  <structure>
+    <bars>
+      <random min="96" max="160" step="16" />
+    </bars>
+    <beatsPerBar>4</beatsPerBar>
+    <ticksPerBeat>4</ticksPerBeat>
+	<maxVelocity>127</maxVelocity>
+  </structure>
+  <xi:include href="../includes/Standard-HarmonyEngine.xml" />
+  <harmonyEngine class="PatternHarmonyEngine">
+    <crossoverPitch>1</crossoverPitch>
+    <!-- direct chords -->
+    <chordPattern minimizeChordDistance="false">Am/8,F/8,Dm/8,Em/8,Am/8,F/8,G/8,Dm/4,F/4</chordPattern>
+    <chordPattern minimizeChordDistance="false">Am/4,F/4,G/4,Em/4,F/4,Dm/4,E/8</chordPattern>
+  </harmonyEngine>
+  <arrangementEngine class="SimpleArrangementEngine">
+    <maxIterations>5000000</maxIterations>
+    <minActivityCount>3</minActivityCount>
+    <maxActivityCount>3</maxActivityCount>
+    <maxActivityChangeCount>2</maxActivityChangeCount>
+    <startActivityCounts>
+      <random list="3" />
+    </startActivityCounts>
+    <stopActivityCounts>
+      <random list="3" />
+    </stopActivityCounts>
+     <activityVector name="accomp">
+     </activityVector>
+    <activityVector name="melody">
+     </activityVector>
+    <activityVector name="bass">
+     </activityVector>
+ 
+    <track>
+      <instrument>accomp</instrument>
+      <transposition>-12</transposition>
+	  <velocity>100</velocity>
+      <sequenceEngine class="MultiPatternSequenceEngine">
+        <patternEngines>
+		  <patternEngine class="StringPatternEngine">
+            <string>0/3,-/5</string>
+          </patternEngine>
+ 		  <patternEngine class="StringPatternEngine">
+            <string>-/2,2/3,-/3</string>
+          </patternEngine>
+ 		  <patternEngine class="StringPatternEngine">
+            <string>-/4,3/3,-/1</string>
+          </patternEngine>
+        </patternEngines>
+      </sequenceEngine>
+      <activityVector>accomp</activityVector>
+    </track>
+    <track>
+      <instrument>melody</instrument>
+      <transposition>0</transposition>
+	  <velocity>100</velocity>
+      <sequenceEngine class="MelodySequenceEngine">
+        <melodies>2,3,2</melodies>
+        <minPitch>0</minPitch>
+        <maxPitch>9</maxPitch>
+        <pitchDistances>-2,-2,-1,-1,-1,-1,1,1,1,1,2,2</pitchDistances>
+        <patternEngine class="RandomFragmentPatternEngine">
+          <patternTicks>8</patternTicks>
+          <patternString>A1,B1,A1,C1,A1,B1,A1,D2</patternString>
+          <pattern group="A">-/6,#/2</pattern>
+          <pattern group="B">-/6,+/2</pattern>
+          <pattern group="C">-/4,+/2,+/2|-/6,+/2</pattern>
+          <pattern group="D">#/2,+/2,+/2,-/2|-/2,+/2,+/2,+/2</pattern>
+        </patternEngine>
+      </sequenceEngine>
+      <activityVector>melody</activityVector>
+    </track>
+    <track>
+      <instrument>bass</instrument>
+      <transposition>-24</transposition>
+	  <velocity>100</velocity>
+      <sequenceEngine class="PatternSequenceEngine">
+        <patternEngine class="RandomFragmentPatternEngine">
+          <patternTicks>8</patternTicks>
+          <patternString>A1,A1,A1,B1,A1,A1,A1,B2</patternString>
+          <pattern group="A">0,-,-,-,-,-,-,-</pattern>
+	  <pattern group="B">0,-,-,-,-,-,2,-|0,-,-,-,-,-,3,-|0,-,-,-,-,-,-1,-</pattern>
+        </patternEngine>
+      </sequenceEngine>
+      <activityVector>bass</activityVector>
+    </track>
+  
+  </arrangementEngine>
+
+  <player class="MidiPlayer">
+    <bpm>
+      <random min="120" max="134" type="normal" variance="7" />
+    </bpm>
+    <transposition>
+      <random min="65" max="69" />
+    </transposition>
+    <beforePlayWaitTicks>16</beforePlayWaitTicks>
+    <afterPlayWaitTicks>16</afterPlayWaitTicks>
+    <groove>
+      <random list="100|110,90|120,80|115,85" />
+    </groove>
+    <!-- uncomment the following line if you want to write all generated songs as MIDI files -->
+    <!-- <midiFilename>midifiles/${safeSongName}-${safeDeviceName}.mid</midiFilename> -->
+    <device name="device1" clockSynchronization="true">Gervill,Microsoft GS Wavetable Synth,Microsoft GS Wavetable SW Synth,Java Sound Synthesizer</device>
+    <map instrument="accomp" device="device1" channel="2" program="25" />
+    <map instrument="melody" device="device1" channel="3" program="25" />
+    <map instrument="bass" device="device1" channel="4" program="33" />
+  	<controllerValue device="device1" channel="2" controller="72">80</controllerValue>
+  	<controllerValue device="device1" channel="3" controller="72">80</controllerValue>
+  	<controllerValue device="device1" channel="4" controller="72">80</controllerValue>
+  	<!-- <controllerValue device="device1" channel="3" controller="76">50</controllerValue>
+  	<controllerValue device="device1" channel="3" controller="77">66</controllerValue>
+  	<controllerValue device="device1" channel="3" controller="78">0</controllerValue> -->
+	   
+  </player>
+</SoundHelix>

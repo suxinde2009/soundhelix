@@ -862,6 +862,12 @@ public class MidiPlayer extends AbstractPlayer {
 
                             if (se.isNote()) {
                                 int pitch = (track.getType() == TrackType.MELODIC ? transposition : 0) + se.getPitch();
+                                if (channel.legatoController >= 0) {
+                                    sendMidiMessage(deviceMap.get(channel.device), channel.channel, ShortMessage.CONTROL_CHANGE,
+                                            channel.legatoController, se.isLegato() ? channel.legatoControllerValueOn
+                                                    : channel.legatoControllerValueOff);
+                                }
+
                                 sendMidiMessage(trackMap.get(channel.device), tick, channel.channel, ShortMessage.NOTE_ON, pitch, getMidiVelocity(
                                         songContext, se.getVelocity()));
                                 pitches[j] = pitch;
@@ -1717,7 +1723,26 @@ public class MidiPlayer extends AbstractPlayer {
                 program = Integer.parseInt(XMLUtils.parseString(random, "@program", nodeList.item(i))) - 1;
             } catch (Exception e) {}
 
-            DeviceChannel ch = new DeviceChannel(deviceMap.get(device), channel, program);
+            int legatoController = -1;
+
+            try {
+                legatoController = Integer.parseInt(XMLUtils.parseString(random, "@legatoController", nodeList.item(i)));
+            } catch (Exception e) {}
+
+            int legatoControllerValueOn = -1;
+
+            try {
+                legatoControllerValueOn = Integer.parseInt(XMLUtils.parseString(random, "@legatoControllerValueOn", nodeList.item(i)));
+            } catch (Exception e) {}
+
+            int legatoControllerValueOff = -1;
+
+            try {
+                legatoControllerValueOff = Integer.parseInt(XMLUtils.parseString(random, "@legatoControllerValueOff", nodeList.item(i)));
+            } catch (Exception e) {}
+
+            DeviceChannel ch = new DeviceChannel(deviceMap.get(device), channel, program, legatoController, legatoControllerValueOn,
+                    legatoControllerValueOff);
             channelMap.put(instrument, ch);
         }
 
@@ -2208,10 +2233,32 @@ public class MidiPlayer extends AbstractPlayer {
         /** The MIDI program. */
         private final int program;
 
+        /** The controller to use for enabling/disabling legato (optional). */
+        private final int legatoController;
+
+        /** The controller value for legato on. */
+        private final int legatoControllerValueOn;
+
+        /** The controller value for legato off. */
+        private final int legatoControllerValueOff;
+
         public DeviceChannel(Device device, int channel, int program) {
             this.device = device;
             this.channel = channel;
             this.program = program;
+            this.legatoController = -1;
+            this.legatoControllerValueOn = -1;
+            this.legatoControllerValueOff = -1;
+        }
+
+        public DeviceChannel(Device device, int channel, int program, int legatoController, int legatoControllerValueOn,
+                int legatoControllerValueOff) {
+            this.device = device;
+            this.channel = channel;
+            this.program = program;
+            this.legatoController = legatoController;
+            this.legatoControllerValueOn = legatoControllerValueOn;
+            this.legatoControllerValueOff = legatoControllerValueOff;
         }
 
         @Override
@@ -2223,12 +2270,14 @@ public class MidiPlayer extends AbstractPlayer {
             }
 
             DeviceChannel other = (DeviceChannel) object;
-            return device.equals(other.device) && channel == other.channel && program == other.program;
+            return device.equals(other.device) && channel == other.channel && program == other.program && legatoController == other.legatoController
+                    && legatoControllerValueOn == other.legatoControllerValueOn && legatoControllerValueOff == other.legatoControllerValueOff;
         }
 
         @Override
         public final int hashCode() {
-            return device.hashCode() * 16273 + channel * 997 + program;
+            return device.hashCode() * 16273 + channel * 997 + program + 131 * legatoController + 73 * legatoControllerValueOn + 37
+                    * legatoControllerValueOff;
         }
 
         @Override
